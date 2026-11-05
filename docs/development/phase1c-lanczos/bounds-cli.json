@@ -1,0 +1,479 @@
+{
+  "executable_sha256": "647ca1b7a652086fa377f882dc5a2914c21f5f45b04c801a42b7942dc06d1823",
+  "cases": [
+    {
+      "name": "zero-alg1-omp1",
+      "alg": 1,
+      "threads": 1,
+      "expected_failure": false,
+      "input_sha256": "c5172d2a05deecd534790e6b2c3bcbf798728feca9da1f2f10064ddcfcc023ec",
+      "exit_code": 0,
+      "eigenvalues": [
+        0.0
+      ],
+      "residuals": [
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0
+      ],
+      "orthogonality_error": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "zero-alg1-omp2",
+      "alg": 1,
+      "threads": 2,
+      "expected_failure": false,
+      "input_sha256": "c5172d2a05deecd534790e6b2c3bcbf798728feca9da1f2f10064ddcfcc023ec",
+      "exit_code": 0,
+      "eigenvalues": [
+        0.0
+      ],
+      "residuals": [
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0
+      ],
+      "orthogonality_error": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "zero-alg2-omp1",
+      "alg": 2,
+      "threads": 1,
+      "expected_failure": false,
+      "input_sha256": "6b83a3c4ac620c41b7298d7b3570da6f09898cf4853980f5403cf47a16950577",
+      "exit_code": 0,
+      "eigenvalues": [
+        0.0,
+        0.0
+      ],
+      "residuals": [
+        0.0,
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0,
+        0.0
+      ],
+      "orthogonality_error": 2.130333878888249e-17,
+      "status": "passed"
+    },
+    {
+      "name": "zero-alg2-omp2",
+      "alg": 2,
+      "threads": 2,
+      "expected_failure": false,
+      "input_sha256": "6b83a3c4ac620c41b7298d7b3570da6f09898cf4853980f5403cf47a16950577",
+      "exit_code": 0,
+      "eigenvalues": [
+        0.0,
+        0.0
+      ],
+      "residuals": [
+        0.0,
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0,
+        0.0
+      ],
+      "orthogonality_error": 2.905813106306973e-16,
+      "status": "passed"
+    },
+    {
+      "name": "scalar-sector-alg1-omp1",
+      "alg": 1,
+      "threads": 1,
+      "expected_failure": false,
+      "input_sha256": "c0c13db4630c1e8a9e62d2accdd66ba0ff2c196499f324581b377e12fa58829e",
+      "exit_code": 0,
+      "eigenvalues": [
+        1.0
+      ],
+      "residuals": [
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0
+      ],
+      "orthogonality_error": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "scalar-sector-alg1-omp2",
+      "alg": 1,
+      "threads": 2,
+      "expected_failure": false,
+      "input_sha256": "c0c13db4630c1e8a9e62d2accdd66ba0ff2c196499f324581b377e12fa58829e",
+      "exit_code": 0,
+      "eigenvalues": [
+        1.0
+      ],
+      "residuals": [
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0
+      ],
+      "orthogonality_error": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "scalar-sector-alg2-omp1",
+      "alg": 2,
+      "threads": 1,
+      "expected_failure": false,
+      "input_sha256": "41348931b5dd918218e3d06e984eac4704d356ba5860fba160b48e1a7e14b04f",
+      "exit_code": 0,
+      "eigenvalues": [
+        0.9999999999999993,
+        0.9999999999999998
+      ],
+      "residuals": [
+        7.121795204760207e-16,
+        2.559172818926429e-16
+      ],
+      "normalized_residuals": [
+        7.121795204760207e-16,
+        2.559172818926429e-16
+      ],
+      "orthogonality_error": 1.3328808578546401e-16,
+      "status": "passed"
+    },
+    {
+      "name": "scalar-sector-alg2-omp2",
+      "alg": 2,
+      "threads": 2,
+      "expected_failure": false,
+      "input_sha256": "41348931b5dd918218e3d06e984eac4704d356ba5860fba160b48e1a7e14b04f",
+      "exit_code": 0,
+      "eigenvalues": [
+        0.9999999999999998,
+        0.9999999999999999
+      ],
+      "residuals": [
+        2.4885876471244096e-16,
+        1.3882123939089715e-16
+      ],
+      "normalized_residuals": [
+        2.4885876471244096e-16,
+        1.3882123939089715e-16
+      ],
+      "orthogonality_error": 2.7308760253434203e-16,
+      "status": "passed"
+    },
+    {
+      "name": "zero-energy-sector-alg1-omp1",
+      "alg": 1,
+      "threads": 1,
+      "expected_failure": false,
+      "input_sha256": "f25283cfb02566ac6ddb9f0093294b057dbbc8b5579f5b054b1fe93b82debcdd",
+      "exit_code": 0,
+      "eigenvalues": [
+        0.0
+      ],
+      "residuals": [
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0
+      ],
+      "orthogonality_error": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "zero-energy-sector-alg1-omp2",
+      "alg": 1,
+      "threads": 2,
+      "expected_failure": false,
+      "input_sha256": "f25283cfb02566ac6ddb9f0093294b057dbbc8b5579f5b054b1fe93b82debcdd",
+      "exit_code": 0,
+      "eigenvalues": [
+        0.0
+      ],
+      "residuals": [
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0
+      ],
+      "orthogonality_error": 2.220446049250313e-16,
+      "status": "passed"
+    },
+    {
+      "name": "zero-energy-sector-alg2-omp1",
+      "alg": 2,
+      "threads": 1,
+      "expected_failure": false,
+      "input_sha256": "cce36458d9961ca3ffb21d09bad6b2f323ca5359cd34cd95077027cbc7f09ffe",
+      "exit_code": 0,
+      "eigenvalues": [
+        -0.0,
+        0.0
+      ],
+      "residuals": [
+        0.0,
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0,
+        0.0
+      ],
+      "orthogonality_error": 2.3395625974837427e-16,
+      "status": "passed"
+    },
+    {
+      "name": "zero-energy-sector-alg2-omp2",
+      "alg": 2,
+      "threads": 2,
+      "expected_failure": false,
+      "input_sha256": "cce36458d9961ca3ffb21d09bad6b2f323ca5359cd34cd95077027cbc7f09ffe",
+      "exit_code": 0,
+      "eigenvalues": [
+        -0.0,
+        0.0
+      ],
+      "residuals": [
+        0.0,
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0,
+        0.0
+      ],
+      "orthogonality_error": 1.6014955375599858e-16,
+      "status": "passed"
+    },
+    {
+      "name": "one-dimensional-alg1-omp1",
+      "alg": 1,
+      "threads": 1,
+      "expected_failure": false,
+      "input_sha256": "8faf5ca2f5eda0c7d704dc656a5b833d4ac06ffba76da95499c6fd7abfa2e23b",
+      "exit_code": 0,
+      "eigenvalues": [
+        1.0
+      ],
+      "residuals": [
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0
+      ],
+      "orthogonality_error": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "one-dimensional-alg1-omp2",
+      "alg": 1,
+      "threads": 2,
+      "expected_failure": false,
+      "input_sha256": "8faf5ca2f5eda0c7d704dc656a5b833d4ac06ffba76da95499c6fd7abfa2e23b",
+      "exit_code": 0,
+      "eigenvalues": [
+        0.9999999999999997
+      ],
+      "residuals": [
+        3.1401849173675503e-16
+      ],
+      "normalized_residuals": [
+        3.1401849173675503e-16
+      ],
+      "orthogonality_error": 3.3306690738754696e-16,
+      "status": "passed"
+    },
+    {
+      "name": "one-dimensional-alg2-omp1",
+      "alg": 2,
+      "threads": 1,
+      "expected_failure": false,
+      "input_sha256": "880b0bcbfb6567c4fe3c5ea6e2c8ed07f5b75b04eb4befd3e33408fdc26148d6",
+      "exit_code": 0,
+      "eigenvalues": [
+        1.0
+      ],
+      "residuals": [
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0
+      ],
+      "orthogonality_error": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "one-dimensional-alg2-omp2",
+      "alg": 2,
+      "threads": 2,
+      "expected_failure": false,
+      "input_sha256": "880b0bcbfb6567c4fe3c5ea6e2c8ed07f5b75b04eb4befd3e33408fdc26148d6",
+      "exit_code": 0,
+      "eigenvalues": [
+        1.0
+      ],
+      "residuals": [
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0
+      ],
+      "orthogonality_error": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "zero-one-dimensional-alg1-omp1",
+      "alg": 1,
+      "threads": 1,
+      "expected_failure": false,
+      "input_sha256": "4ca93b072a9d2d249ac657c3477588d73ada049ebf3fc8a319d7582245144a37",
+      "exit_code": 0,
+      "eigenvalues": [
+        0.0
+      ],
+      "residuals": [
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0
+      ],
+      "orthogonality_error": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "zero-one-dimensional-alg1-omp2",
+      "alg": 1,
+      "threads": 2,
+      "expected_failure": false,
+      "input_sha256": "4ca93b072a9d2d249ac657c3477588d73ada049ebf3fc8a319d7582245144a37",
+      "exit_code": 0,
+      "eigenvalues": [
+        0.0
+      ],
+      "residuals": [
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0
+      ],
+      "orthogonality_error": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "zero-one-dimensional-alg2-omp1",
+      "alg": 2,
+      "threads": 1,
+      "expected_failure": false,
+      "input_sha256": "1c7c1000b09013ce1fb4efe4432ce8466b92daf058733d0479e7b29ae2ca4416",
+      "exit_code": 0,
+      "eigenvalues": [
+        0.0
+      ],
+      "residuals": [
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0
+      ],
+      "orthogonality_error": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "zero-one-dimensional-alg2-omp2",
+      "alg": 2,
+      "threads": 2,
+      "expected_failure": false,
+      "input_sha256": "1c7c1000b09013ce1fb4efe4432ce8466b92daf058733d0479e7b29ae2ca4416",
+      "exit_code": 0,
+      "eigenvalues": [
+        0.0
+      ],
+      "residuals": [
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0
+      ],
+      "orthogonality_error": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "early-check-alg1-omp1",
+      "alg": 1,
+      "threads": 1,
+      "expected_failure": false,
+      "input_sha256": "4501699bcf5714dbfb3643cb16554673751c47e8e3793632e09182777a30a720",
+      "exit_code": 0,
+      "eigenvalues": [
+        -1.150963402530335
+      ],
+      "residuals": [
+        6.0751244280204884e-15
+      ],
+      "normalized_residuals": [
+        4.22267100079259e-15
+      ],
+      "orthogonality_error": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "early-check-alg1-omp2",
+      "alg": 1,
+      "threads": 2,
+      "expected_failure": false,
+      "input_sha256": "4501699bcf5714dbfb3643cb16554673751c47e8e3793632e09182777a30a720",
+      "exit_code": 0,
+      "eigenvalues": [
+        -1.150963402530335
+      ],
+      "residuals": [
+        1.4606769750180646e-15
+      ],
+      "normalized_residuals": [
+        1.015280983461928e-15
+      ],
+      "orthogonality_error": 2.220446049250313e-16,
+      "status": "passed"
+    },
+    {
+      "name": "insufficient-budget-alg1-omp1",
+      "alg": 1,
+      "threads": 1,
+      "expected_failure": true,
+      "input_sha256": "0f5ded1ad074e2ef3e22ee31908baf0e5655e09d82465e2512bd8db563eb4e6e",
+      "exit_code": 1,
+      "status": "passed"
+    },
+    {
+      "name": "insufficient-budget-alg1-omp2",
+      "alg": 1,
+      "threads": 2,
+      "expected_failure": true,
+      "input_sha256": "0f5ded1ad074e2ef3e22ee31908baf0e5655e09d82465e2512bd8db563eb4e6e",
+      "exit_code": 1,
+      "status": "passed"
+    },
+    {
+      "name": "insufficient-budget-alg2-omp1",
+      "alg": 2,
+      "threads": 1,
+      "expected_failure": true,
+      "input_sha256": "1e432e258c3531e5d3216af0a8ba3c6274b1e6c9c206035b3253fa8ab9606397",
+      "exit_code": 1,
+      "status": "passed"
+    },
+    {
+      "name": "insufficient-budget-alg2-omp2",
+      "alg": 2,
+      "threads": 2,
+      "expected_failure": true,
+      "input_sha256": "1e432e258c3531e5d3216af0a8ba3c6274b1e6c9c206035b3253fa8ab9606397",
+      "exit_code": 1,
+      "status": "passed"
+    }
+  ],
+  "passed": 26,
+  "failed": 0
+}

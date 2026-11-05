@@ -44,6 +44,7 @@ lapack_interface_check_SOURCES = lapack_interface_check.f90
 lapack_interface_check_LDADD = $(top_builddir)/source/blas_lapack_interfaces.o
 lapack_failure_check_SOURCES = lapack_failure_check.f90
 lapack_failure_check_LDADD = $(top_builddir)/source/eigen_solver.o \
+  $(top_builddir)/source/krylov_solvers.o \
   $(top_builddir)/source/ham2vec.o $(top_builddir)/source/state_lists.o \
   $(top_builddir)/source/input_param.o $(top_builddir)/source/blas_lapack_interfaces.o
 EXTRA_DIST += test_lapack_interfaces.sh
@@ -63,3 +64,19 @@ check-sparse-field: sparse_field_operator_check
 	$(PYTHON) $(srcdir)/sparse_field_validation.py \
 	  --exe "$(abs_top_builddir)/source/QS3ED2" --operator-exe "$(abs_builddir)/sparse_field_operator_check" \
 	  $(if $(SPARSE_FIELD_OUTPUT),--output "$(SPARSE_FIELD_OUTPUT)",)
+
+
+# Numerical kernel tests require only the existing optional NumPy test dependency.
+check_PROGRAMS += lanczos_stability_driver
+lanczos_stability_driver_SOURCES = lanczos_stability_driver.f90
+lanczos_stability_driver_LDADD = $(top_builddir)/source/krylov_solvers.o \
+  $(top_builddir)/source/blas_lapack_interfaces.o
+EXTRA_DIST += lanczos_stability.py lanczos_cli_stability.py
+.PHONY: check-lanczos
+check-lanczos: lanczos_stability_driver sparse_field_operator_check
+	$(PYTHON) $(srcdir)/lanczos_stability.py --driver "$(abs_builddir)/lanczos_stability_driver" \
+	  $(if $(LANCZOS_OUTPUT),--output "$(LANCZOS_OUTPUT)",)
+
+	$(PYTHON) $(srcdir)/lanczos_cli_stability.py --exe "$(abs_top_builddir)/source/QS3ED2" \
+	  --operator-exe "$(abs_builddir)/sparse_field_operator_check" \
+	  $(if $(LANCZOS_OUTPUT),--output "$(LANCZOS_OUTPUT)-cli",)

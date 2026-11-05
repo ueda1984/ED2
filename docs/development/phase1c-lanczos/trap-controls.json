@@ -1,0 +1,62 @@
+{
+  "flags": "-ffpe-trap=invalid,zero,overflow",
+  "cases": [
+    {
+      "case": "zero-alg1-omp1",
+      "kind": "kernel",
+      "exit_code": 0
+    },
+    {
+      "case": "scalar-alg1-omp1",
+      "kind": "kernel",
+      "exit_code": 0
+    },
+    {
+      "case": "one-dimensional-0.0-alg1-omp1",
+      "kind": "kernel",
+      "exit_code": 0
+    },
+    {
+      "case": "one-dimensional-2.5-alg1-omp1",
+      "kind": "kernel",
+      "exit_code": 0
+    },
+    {
+      "case": "exact-ground-start-alg1-omp1",
+      "kind": "kernel",
+      "exit_code": 0
+    },
+    {
+      "case": "near-breakdown-alg1-omp1",
+      "kind": "kernel",
+      "exit_code": 0
+    },
+    {
+      "case": "zero-alg1-omp1",
+      "kind": "CLI",
+      "exit_code": 0
+    },
+    {
+      "case": "zero-one-dimensional-alg1-omp1",
+      "kind": "CLI",
+      "exit_code": 0
+    },
+    {
+      "case": "one-dimensional-alg1-omp1",
+      "kind": "CLI",
+      "exit_code": 0
+    },
+    {
+      "case": "scalar-sector-alg1-omp1",
+      "kind": "CLI",
+      "exit_code": 0
+    },
+    {
+      "case": "zero-energy-sector-alg1-omp1",
+      "kind": "CLI",
+      "exit_code": 0
+    }
+  ],
+  "passed": 11,
+  "failed": 0
+}

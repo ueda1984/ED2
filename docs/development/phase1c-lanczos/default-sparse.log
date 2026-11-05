@@ -1,0 +1,17 @@
+make -C source all
+make[1]: Entering directory '/workspace/ed2-phase1c-validation/default/source'
+make[1]: Nothing to be done for 'all'.
+make[1]: Leaving directory '/workspace/ed2-phase1c-validation/default/source'
+make -C tests check-sparse-field SPARSE_FIELD_OUTPUT="/workspace/ed2-phase1c-validation/sparse-default"
+make[1]: Entering directory '/workspace/ed2-phase1c-validation/default/tests'
+python3 ./sparse_field_validation.py \
+  --exe "/workspace/ed2-phase1c-validation/default/source/QS3ED2" --operator-exe "/workspace/ed2-phase1c-validation/default/tests/sparse_field_operator_check" \
+  --output "/workspace/ed2-phase1c-validation/sparse-default"
+single-site4 : 14 CLI cases passed
+sparse-ordered : 14 CLI cases passed
+sparse-permuted : 14 CLI cases passed
+full-ordered : 14 CLI cases passed
+full-permuted : 14 CLI cases passed
+CLI: {'passed': 70, 'failed': 0} operator: {'passed': 10, 'failed': 0} permutations: {'passed': 28, 'failed': 0}
+Evidence: /workspace/ed2-phase1c-validation/sparse-default
+make[1]: Leaving directory '/workspace/ed2-phase1c-validation/default/tests'

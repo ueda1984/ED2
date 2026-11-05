@@ -1,0 +1,128 @@
+{
+  "schema": 1,
+  "numpy": "2.3.5",
+  "executable_sha256": "37a4fac0367937450150cf9aa17b9d8360582c0307fd0501c19fe400fc9152a4",
+  "tolerances": {
+    "absolute": 1e-09,
+    "relative": 1e-09
+  },
+  "cases": [
+    {
+      "name": "early-check-lanczos",
+      "algorithm": 1,
+      "threads": 1,
+      "cache": -1,
+      "expected_dimension": 16,
+      "expected_eigenvalues": [
+        -1.1509634025303355,
+        -1.0385497724691084,
+        -0.7728009256983627,
+        -0.4687188405884628,
+        -0.260387406885721,
+        -0.2294478314792852,
+        -0.16046649663493046,
+        -0.10193317679541132,
+        0.033102524926293606,
+        0.1697721994447623,
+        0.22959863076340156,
+        0.34178678626351805,
+        0.45017582011279583,
+        0.7114228199888343,
+        0.8087167304358048,
+        1.438692341146207
+      ],
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "input.dat": "508611fa784e28fc3ee8bfd2b92f1e17e9ebc61681148534219c7e949abc87bd",
+        "shift.dat": "b4d0dcf2751ab90738449eefee84233d38f60b30ee2c357dfa71fafd0d75c279",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "68b3c4fab85eab958893f2b89dbd348184f8ec3df646ae68e693c9a9e8406056"
+      },
+      "exit_code": 0,
+      "dimension": 16,
+      "eigenvalues": [
+        -0.1639646421360785
+      ],
+      "status": "failed",
+      "error": "\nNot equal to tolerance rtol=1e-09, atol=1e-09\n\nMismatched elements: 1 / 1 (100%)\nMax absolute difference among violations: 0.98699876\nMax relative difference among violations: 0.85754139\n ACTUAL: array([-0.163965])\n DESIRED: array([-1.150963])"
+    },
+    {
+      "name": "zero-alg1",
+      "algorithm": 1,
+      "threads": 1,
+      "cache": -1,
+      "expected_dimension": 16,
+      "expected_eigenvalues": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "input_sha256": {
+        "bonds.dat": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "input.dat": "1adf70b147809c6ada0568d6df31606811e8c8086c92612e612c87b800f3c905",
+        "shift.dat": "b4d0dcf2751ab90738449eefee84233d38f60b30ee2c357dfa71fafd0d75c279",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "cfce354283598f1506ff0256698e261770937621d23c95dead330658238148a3"
+      },
+      "exit_code": 0,
+      "status": "failed",
+      "error": "nonfinite numerical diagnostic in stdout"
+    },
+    {
+      "name": "zero-alg2",
+      "algorithm": 2,
+      "threads": 1,
+      "cache": -1,
+      "expected_dimension": 16,
+      "expected_eigenvalues": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "input_sha256": {
+        "bonds.dat": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "input.dat": "f12dd38b55832eee052a93815c17d57dc3c9225fe05b52727a541d51faaaf4e9",
+        "shift.dat": "b4d0dcf2751ab90738449eefee84233d38f60b30ee2c357dfa71fafd0d75c279",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "cfce354283598f1506ff0256698e261770937621d23c95dead330658238148a3"
+      },
+      "exit_code": 0,
+      "status": "failed",
+      "error": "nonfinite numerical diagnostic in stdout"
+    }
+  ],
+  "passed": 18,
+  "failed": 3
+}

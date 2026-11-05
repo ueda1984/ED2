@@ -1,5 +1,6 @@
 bin_PROGRAMS = QS3ED2
 QS3ED2_SOURCES = blas_lapack_interfaces.f90 \
+              krylov_solvers.f90 \
               input_param.f90 \
               state_lists.f90 \
               ham2vec.f90 \
@@ -19,13 +20,15 @@ state_lists.o: input_param.o
 ham2vec.o: input_param.o state_lists.o
 
 # lanczos uses ham2vec and input_param
-lanczos.o: input_param.o ham2vec.o blas_lapack_interfaces.o
+lanczos.o: input_param.o ham2vec.o blas_lapack_interfaces.o krylov_solvers.o
 
 # eigen_solver uses ham2vec (and possibly input_param)
-eigen_solver.o: input_param.o ham2vec.o blas_lapack_interfaces.o
+eigen_solver.o: input_param.o ham2vec.o blas_lapack_interfaces.o krylov_solvers.o
 
 # get_expectation_values uses input_param and ham2vec
 get_expectation_values.o: input_param.o ham2vec.o
 
 # main uses state_lists and input_param (+ calls others)
 main.o: input_param.o state_lists.o ham2vec.o lanczos.o eigen_solver.o get_expectation_values.o
+
+krylov_solvers.o: blas_lapack_interfaces.o

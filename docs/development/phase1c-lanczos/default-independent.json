@@ -1,0 +1,828 @@
+{
+  "schema": 1,
+  "numpy": "2.3.5",
+  "executable_sha256": "3cc2e95380cfeec5bc72c04ff1dd48838253feaebc73c4eef33a3dc544e9d3b0",
+  "tolerances": {
+    "absolute": 1e-09,
+    "relative": 1e-09
+  },
+  "cases": [
+    {
+      "name": "xyz-alg3-cache-1-omp1",
+      "algorithm": 3,
+      "threads": 1,
+      "cache": -1,
+      "expected_dimension": 16,
+      "expected_eigenvalues": [
+        -1.1509634025303355,
+        -1.0385497724691084,
+        -0.7728009256983627,
+        -0.4687188405884628,
+        -0.260387406885721,
+        -0.2294478314792852,
+        -0.16046649663493046,
+        -0.10193317679541132,
+        0.033102524926293606,
+        0.1697721994447623,
+        0.22959863076340156,
+        0.34178678626351805,
+        0.45017582011279583,
+        0.7114228199888343,
+        0.8087167304358048,
+        1.438692341146207
+      ],
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "input.dat": "3f57fa2c831c60fd2994b9135b208c7a6b26716c492bb183dbf884fcee1e0d92",
+        "shift.dat": "b4d0dcf2751ab90738449eefee84233d38f60b30ee2c357dfa71fafd0d75c279",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "68b3c4fab85eab958893f2b89dbd348184f8ec3df646ae68e693c9a9e8406056"
+      },
+      "exit_code": 0,
+      "dimension": 16,
+      "eigenvalues": [
+        -1.150963402530335,
+        -1.038549772469109,
+        -0.7728009256983628,
+        -0.4687188405884639,
+        -0.2603874068857219,
+        -0.2294478314792853,
+        -0.1604664966349314,
+        -0.1019331767954113,
+        0.03310252492629351,
+        0.1697721994447623,
+        0.2295986307633995,
+        0.3417867862635178,
+        0.4501758201127959,
+        0.7114228199888333,
+        0.8087167304358045,
+        1.438692341146202
+      ],
+      "status": "passed"
+    },
+    {
+      "name": "xyz-alg1-cache-1-omp1",
+      "algorithm": 1,
+      "threads": 1,
+      "cache": -1,
+      "expected_dimension": 16,
+      "expected_eigenvalues": [
+        -1.1509634025303355,
+        -1.0385497724691084,
+        -0.7728009256983627,
+        -0.4687188405884628,
+        -0.260387406885721,
+        -0.2294478314792852,
+        -0.16046649663493046,
+        -0.10193317679541132,
+        0.033102524926293606,
+        0.1697721994447623,
+        0.22959863076340156,
+        0.34178678626351805,
+        0.45017582011279583,
+        0.7114228199888343,
+        0.8087167304358048,
+        1.438692341146207
+      ],
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "input.dat": "1a28925afca17a88dceb763c724be513587225ca682acb5bb0d94fff0a73bb2f",
+        "shift.dat": "b4d0dcf2751ab90738449eefee84233d38f60b30ee2c357dfa71fafd0d75c279",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "68b3c4fab85eab958893f2b89dbd348184f8ec3df646ae68e693c9a9e8406056"
+      },
+      "exit_code": 0,
+      "dimension": 16,
+      "eigenvalues": [
+        -1.150963402530335
+      ],
+      "status": "passed"
+    },
+    {
+      "name": "xyz-alg1-cache0-omp1",
+      "algorithm": 1,
+      "threads": 1,
+      "cache": 0,
+      "expected_dimension": 16,
+      "expected_eigenvalues": [
+        -1.1509634025303355,
+        -1.0385497724691084,
+        -0.7728009256983627,
+        -0.4687188405884628,
+        -0.260387406885721,
+        -0.2294478314792852,
+        -0.16046649663493046,
+        -0.10193317679541132,
+        0.033102524926293606,
+        0.1697721994447623,
+        0.22959863076340156,
+        0.34178678626351805,
+        0.45017582011279583,
+        0.7114228199888343,
+        0.8087167304358048,
+        1.438692341146207
+      ],
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "input.dat": "40ea846e4a3c8497c5530ef830e5de54c19d5e96d53fca2c5cdd8089f346a0b4",
+        "shift.dat": "b4d0dcf2751ab90738449eefee84233d38f60b30ee2c357dfa71fafd0d75c279",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "68b3c4fab85eab958893f2b89dbd348184f8ec3df646ae68e693c9a9e8406056"
+      },
+      "exit_code": 0,
+      "dimension": 16,
+      "eigenvalues": [
+        -1.150963402530336
+      ],
+      "status": "passed"
+    },
+    {
+      "name": "xyz-alg1-cache3-omp1",
+      "algorithm": 1,
+      "threads": 1,
+      "cache": 3,
+      "expected_dimension": 16,
+      "expected_eigenvalues": [
+        -1.1509634025303355,
+        -1.0385497724691084,
+        -0.7728009256983627,
+        -0.4687188405884628,
+        -0.260387406885721,
+        -0.2294478314792852,
+        -0.16046649663493046,
+        -0.10193317679541132,
+        0.033102524926293606,
+        0.1697721994447623,
+        0.22959863076340156,
+        0.34178678626351805,
+        0.45017582011279583,
+        0.7114228199888343,
+        0.8087167304358048,
+        1.438692341146207
+      ],
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "input.dat": "25d89fb3f48338a79e3d024439250fffa356cbcf45dd11aafe74f7ca4d3005fe",
+        "shift.dat": "b4d0dcf2751ab90738449eefee84233d38f60b30ee2c357dfa71fafd0d75c279",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "68b3c4fab85eab958893f2b89dbd348184f8ec3df646ae68e693c9a9e8406056"
+      },
+      "exit_code": 0,
+      "dimension": 16,
+      "eigenvalues": [
+        -1.150963402530336
+      ],
+      "status": "passed"
+    },
+    {
+      "name": "xyz-alg2-cache-1-omp1",
+      "algorithm": 2,
+      "threads": 1,
+      "cache": -1,
+      "expected_dimension": 16,
+      "expected_eigenvalues": [
+        -1.1509634025303355,
+        -1.0385497724691084,
+        -0.7728009256983627,
+        -0.4687188405884628,
+        -0.260387406885721,
+        -0.2294478314792852,
+        -0.16046649663493046,
+        -0.10193317679541132,
+        0.033102524926293606,
+        0.1697721994447623,
+        0.22959863076340156,
+        0.34178678626351805,
+        0.45017582011279583,
+        0.7114228199888343,
+        0.8087167304358048,
+        1.438692341146207
+      ],
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "input.dat": "6468bfedf1c3a41d77b142b678efcbdaabeba214291d218d369771754f5c716e",
+        "shift.dat": "b4d0dcf2751ab90738449eefee84233d38f60b30ee2c357dfa71fafd0d75c279",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "68b3c4fab85eab958893f2b89dbd348184f8ec3df646ae68e693c9a9e8406056"
+      },
+      "exit_code": 0,
+      "dimension": 16,
+      "eigenvalues": [
+        -1.150963402530335,
+        -1.038549772469108
+      ],
+      "status": "passed"
+    },
+    {
+      "name": "xyz-alg3-cache-1-omp2",
+      "algorithm": 3,
+      "threads": 2,
+      "cache": -1,
+      "expected_dimension": 16,
+      "expected_eigenvalues": [
+        -1.1509634025303355,
+        -1.0385497724691084,
+        -0.7728009256983627,
+        -0.4687188405884628,
+        -0.260387406885721,
+        -0.2294478314792852,
+        -0.16046649663493046,
+        -0.10193317679541132,
+        0.033102524926293606,
+        0.1697721994447623,
+        0.22959863076340156,
+        0.34178678626351805,
+        0.45017582011279583,
+        0.7114228199888343,
+        0.8087167304358048,
+        1.438692341146207
+      ],
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "input.dat": "3f57fa2c831c60fd2994b9135b208c7a6b26716c492bb183dbf884fcee1e0d92",
+        "shift.dat": "b4d0dcf2751ab90738449eefee84233d38f60b30ee2c357dfa71fafd0d75c279",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "68b3c4fab85eab958893f2b89dbd348184f8ec3df646ae68e693c9a9e8406056"
+      },
+      "exit_code": 0,
+      "dimension": 16,
+      "eigenvalues": [
+        -1.150963402530335,
+        -1.038549772469109,
+        -0.7728009256983628,
+        -0.4687188405884639,
+        -0.2603874068857219,
+        -0.2294478314792853,
+        -0.1604664966349314,
+        -0.1019331767954113,
+        0.03310252492629351,
+        0.1697721994447623,
+        0.2295986307633995,
+        0.3417867862635178,
+        0.4501758201127959,
+        0.7114228199888333,
+        0.8087167304358045,
+        1.438692341146202
+      ],
+      "status": "passed"
+    },
+    {
+      "name": "xyz-alg1-cache-1-omp2",
+      "algorithm": 1,
+      "threads": 2,
+      "cache": -1,
+      "expected_dimension": 16,
+      "expected_eigenvalues": [
+        -1.1509634025303355,
+        -1.0385497724691084,
+        -0.7728009256983627,
+        -0.4687188405884628,
+        -0.260387406885721,
+        -0.2294478314792852,
+        -0.16046649663493046,
+        -0.10193317679541132,
+        0.033102524926293606,
+        0.1697721994447623,
+        0.22959863076340156,
+        0.34178678626351805,
+        0.45017582011279583,
+        0.7114228199888343,
+        0.8087167304358048,
+        1.438692341146207
+      ],
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "input.dat": "1a28925afca17a88dceb763c724be513587225ca682acb5bb0d94fff0a73bb2f",
+        "shift.dat": "b4d0dcf2751ab90738449eefee84233d38f60b30ee2c357dfa71fafd0d75c279",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "68b3c4fab85eab958893f2b89dbd348184f8ec3df646ae68e693c9a9e8406056"
+      },
+      "exit_code": 0,
+      "dimension": 16,
+      "eigenvalues": [
+        -1.150963402530335
+      ],
+      "status": "passed"
+    },
+    {
+      "name": "xyz-alg1-cache0-omp2",
+      "algorithm": 1,
+      "threads": 2,
+      "cache": 0,
+      "expected_dimension": 16,
+      "expected_eigenvalues": [
+        -1.1509634025303355,
+        -1.0385497724691084,
+        -0.7728009256983627,
+        -0.4687188405884628,
+        -0.260387406885721,
+        -0.2294478314792852,
+        -0.16046649663493046,
+        -0.10193317679541132,
+        0.033102524926293606,
+        0.1697721994447623,
+        0.22959863076340156,
+        0.34178678626351805,
+        0.45017582011279583,
+        0.7114228199888343,
+        0.8087167304358048,
+        1.438692341146207
+      ],
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "input.dat": "40ea846e4a3c8497c5530ef830e5de54c19d5e96d53fca2c5cdd8089f346a0b4",
+        "shift.dat": "b4d0dcf2751ab90738449eefee84233d38f60b30ee2c357dfa71fafd0d75c279",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "68b3c4fab85eab958893f2b89dbd348184f8ec3df646ae68e693c9a9e8406056"
+      },
+      "exit_code": 0,
+      "dimension": 16,
+      "eigenvalues": [
+        -1.150963402530336
+      ],
+      "status": "passed"
+    },
+    {
+      "name": "xyz-alg1-cache3-omp2",
+      "algorithm": 1,
+      "threads": 2,
+      "cache": 3,
+      "expected_dimension": 16,
+      "expected_eigenvalues": [
+        -1.1509634025303355,
+        -1.0385497724691084,
+        -0.7728009256983627,
+        -0.4687188405884628,
+        -0.260387406885721,
+        -0.2294478314792852,
+        -0.16046649663493046,
+        -0.10193317679541132,
+        0.033102524926293606,
+        0.1697721994447623,
+        0.22959863076340156,
+        0.34178678626351805,
+        0.45017582011279583,
+        0.7114228199888343,
+        0.8087167304358048,
+        1.438692341146207
+      ],
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "input.dat": "25d89fb3f48338a79e3d024439250fffa356cbcf45dd11aafe74f7ca4d3005fe",
+        "shift.dat": "b4d0dcf2751ab90738449eefee84233d38f60b30ee2c357dfa71fafd0d75c279",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "68b3c4fab85eab958893f2b89dbd348184f8ec3df646ae68e693c9a9e8406056"
+      },
+      "exit_code": 0,
+      "dimension": 16,
+      "eigenvalues": [
+        -1.150963402530335
+      ],
+      "status": "passed"
+    },
+    {
+      "name": "xyz-alg2-cache-1-omp2",
+      "algorithm": 2,
+      "threads": 2,
+      "cache": -1,
+      "expected_dimension": 16,
+      "expected_eigenvalues": [
+        -1.1509634025303355,
+        -1.0385497724691084,
+        -0.7728009256983627,
+        -0.4687188405884628,
+        -0.260387406885721,
+        -0.2294478314792852,
+        -0.16046649663493046,
+        -0.10193317679541132,
+        0.033102524926293606,
+        0.1697721994447623,
+        0.22959863076340156,
+        0.34178678626351805,
+        0.45017582011279583,
+        0.7114228199888343,
+        0.8087167304358048,
+        1.438692341146207
+      ],
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "input.dat": "6468bfedf1c3a41d77b142b678efcbdaabeba214291d218d369771754f5c716e",
+        "shift.dat": "b4d0dcf2751ab90738449eefee84233d38f60b30ee2c357dfa71fafd0d75c279",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "68b3c4fab85eab958893f2b89dbd348184f8ec3df646ae68e693c9a9e8406056"
+      },
+      "exit_code": 0,
+      "dimension": 16,
+      "eigenvalues": [
+        -1.150963402530336,
+        -1.038549772469108
+      ],
+      "status": "passed"
+    },
+    {
+      "name": "early-check-lanczos",
+      "algorithm": 1,
+      "threads": 1,
+      "cache": -1,
+      "expected_dimension": 16,
+      "expected_eigenvalues": [
+        -1.1509634025303355,
+        -1.0385497724691084,
+        -0.7728009256983627,
+        -0.4687188405884628,
+        -0.260387406885721,
+        -0.2294478314792852,
+        -0.16046649663493046,
+        -0.10193317679541132,
+        0.033102524926293606,
+        0.1697721994447623,
+        0.22959863076340156,
+        0.34178678626351805,
+        0.45017582011279583,
+        0.7114228199888343,
+        0.8087167304358048,
+        1.438692341146207
+      ],
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "input.dat": "508611fa784e28fc3ee8bfd2b92f1e17e9ebc61681148534219c7e949abc87bd",
+        "shift.dat": "b4d0dcf2751ab90738449eefee84233d38f60b30ee2c357dfa71fafd0d75c279",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "68b3c4fab85eab958893f2b89dbd348184f8ec3df646ae68e693c9a9e8406056"
+      },
+      "exit_code": 0,
+      "dimension": 16,
+      "eigenvalues": [
+        -1.150963402530335
+      ],
+      "status": "passed"
+    },
+    {
+      "name": "singlet-dimer",
+      "algorithm": 3,
+      "threads": 1,
+      "cache": -1,
+      "expected_dimension": 4,
+      "expected_eigenvalues": [
+        -0.75,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "input_sha256": {
+        "bonds.dat": "f2ea0b1364ac0b6e31a8f234d761d799ee781c99de8695cbfae3601fbb7832c5",
+        "input.dat": "df4ce55369b1e63b5a5c142a314829b6c014911b3f4dbca953852b35c40263d1",
+        "shift.dat": "451d660bc5f37a981539cf07c4c6a182693a7d165b4589ecb1165a72555ff90a",
+        "spins.dat": "1145e448ac954f4073d290b5b3295b06f447fe04ec959c4f2724683a6cf14cde",
+        "pairs.dat": "f251ddc12234e0da8d3b778bd0f7463fb477f16f47757f5617dc8b4ff4d4f14a",
+        "caps.dat": "ad0fadf63cc7cd779ce475e345bf4063565b63a3c2efef1eebc89790aaa6acba",
+        "fields.dat": "21b84e43281e20f1d46e06d129e8e67aa2726eb7396f07accff108df5911ed04"
+      },
+      "exit_code": 0,
+      "dimension": 4,
+      "eigenvalues": [
+        -0.7499999999999994,
+        0.25,
+        0.25,
+        0.25
+      ],
+      "status": "passed"
+    },
+    {
+      "name": "zero-alg3",
+      "algorithm": 3,
+      "threads": 1,
+      "cache": -1,
+      "expected_dimension": 16,
+      "expected_eigenvalues": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "input_sha256": {
+        "bonds.dat": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "input.dat": "61eeba58a4966c210f15f5f8129593f3b51ee1b0924c72531f9f37f1f65ad1fd",
+        "shift.dat": "b4d0dcf2751ab90738449eefee84233d38f60b30ee2c357dfa71fafd0d75c279",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "cfce354283598f1506ff0256698e261770937621d23c95dead330658238148a3"
+      },
+      "exit_code": 0,
+      "dimension": 16,
+      "eigenvalues": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "status": "passed"
+    },
+    {
+      "name": "zero-alg1",
+      "algorithm": 1,
+      "threads": 1,
+      "cache": -1,
+      "expected_dimension": 16,
+      "expected_eigenvalues": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "input_sha256": {
+        "bonds.dat": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "input.dat": "1adf70b147809c6ada0568d6df31606811e8c8086c92612e612c87b800f3c905",
+        "shift.dat": "b4d0dcf2751ab90738449eefee84233d38f60b30ee2c357dfa71fafd0d75c279",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "cfce354283598f1506ff0256698e261770937621d23c95dead330658238148a3"
+      },
+      "exit_code": 0,
+      "dimension": 16,
+      "eigenvalues": [
+        0.0
+      ],
+      "status": "passed"
+    },
+    {
+      "name": "zero-alg2",
+      "algorithm": 2,
+      "threads": 1,
+      "cache": -1,
+      "expected_dimension": 16,
+      "expected_eigenvalues": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "input_sha256": {
+        "bonds.dat": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "input.dat": "f12dd38b55832eee052a93815c17d57dc3c9225fe05b52727a541d51faaaf4e9",
+        "shift.dat": "b4d0dcf2751ab90738449eefee84233d38f60b30ee2c357dfa71fafd0d75c279",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "cfce354283598f1506ff0256698e261770937621d23c95dead330658238148a3"
+      },
+      "exit_code": 0,
+      "dimension": 16,
+      "eigenvalues": [
+        0.0,
+        0.0
+      ],
+      "status": "passed"
+    },
+    {
+      "name": "vacuum-lanczos",
+      "algorithm": 1,
+      "threads": 1,
+      "cache": -1,
+      "expected_dimension": 1,
+      "expected_eigenvalues": [
+        1.0
+      ],
+      "input_sha256": {
+        "bonds.dat": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "input.dat": "76ae58b35b82ac86459fbc5aa49d6838286a084d5f10e6d7a19e810f98759675",
+        "shift.dat": "451d660bc5f37a981539cf07c4c6a182693a7d165b4589ecb1165a72555ff90a",
+        "spins.dat": "1145e448ac954f4073d290b5b3295b06f447fe04ec959c4f2724683a6cf14cde",
+        "pairs.dat": "f251ddc12234e0da8d3b778bd0f7463fb477f16f47757f5617dc8b4ff4d4f14a",
+        "caps.dat": "ad0fadf63cc7cd779ce475e345bf4063565b63a3c2efef1eebc89790aaa6acba",
+        "fields.dat": "93470702b2cdeb81a9785c4e4c8438e4ba9c5dcc341f880b49a998044e1da6a6"
+      },
+      "exit_code": 0,
+      "dimension": 1,
+      "eigenvalues": [
+        0.9999999999999999
+      ],
+      "status": "passed"
+    },
+    {
+      "name": "ring-m1-omp1",
+      "algorithm": 3,
+      "threads": 1,
+      "cache": -1,
+      "expected_dimension": 2,
+      "expected_eigenvalues": [
+        -0.7999999999999998,
+        1.1999999999999997
+      ],
+      "input_sha256": {
+        "bonds.dat": "48c972631da8787a9ca906ab810ddc378a5fe045ff7476dee06f27ce17818a9f",
+        "input.dat": "bccac416cf7d5453ba185c44c9df56d58f0e1b2b5f21004d19f3412cb750eba9",
+        "shift.dat": "ddee7a11fc0c07bcc071d111ff0c84933750f33bd8c63dc5f5d17045e580a935",
+        "spins.dat": "c25a087bdf65865189e6b172a13b7603bddcbe1aecac3c57c876fc96f5b4757f",
+        "pairs.dat": "cf0dd778a61f04059aaf9c1c1258c2be1e971c8534c6c1722859bedc482a8efe",
+        "caps.dat": "ae84dc86f55bcd769723ff65fdacf7689908b9662f927becaa05f8e5da52a468",
+        "fields.dat": "9192a21651b31177c8804b4ac29fa2453eb5ee34445c81134f56abf3588b657e"
+      },
+      "exit_code": 0,
+      "dimension": 2,
+      "eigenvalues": [
+        -0.7999999999999999,
+        1.2
+      ],
+      "status": "passed"
+    },
+    {
+      "name": "ring-m1-omp2",
+      "algorithm": 3,
+      "threads": 2,
+      "cache": -1,
+      "expected_dimension": 2,
+      "expected_eigenvalues": [
+        -0.7999999999999998,
+        1.1999999999999997
+      ],
+      "input_sha256": {
+        "bonds.dat": "48c972631da8787a9ca906ab810ddc378a5fe045ff7476dee06f27ce17818a9f",
+        "input.dat": "bccac416cf7d5453ba185c44c9df56d58f0e1b2b5f21004d19f3412cb750eba9",
+        "shift.dat": "ddee7a11fc0c07bcc071d111ff0c84933750f33bd8c63dc5f5d17045e580a935",
+        "spins.dat": "c25a087bdf65865189e6b172a13b7603bddcbe1aecac3c57c876fc96f5b4757f",
+        "pairs.dat": "cf0dd778a61f04059aaf9c1c1258c2be1e971c8534c6c1722859bedc482a8efe",
+        "caps.dat": "ae84dc86f55bcd769723ff65fdacf7689908b9662f927becaa05f8e5da52a468",
+        "fields.dat": "9192a21651b31177c8804b4ac29fa2453eb5ee34445c81134f56abf3588b657e"
+      },
+      "exit_code": 0,
+      "dimension": 2,
+      "eigenvalues": [
+        -0.7999999999999999,
+        1.2
+      ],
+      "status": "passed"
+    },
+    {
+      "name": "ring-m3-omp1",
+      "algorithm": 3,
+      "threads": 1,
+      "cache": -1,
+      "expected_dimension": 2,
+      "expected_eigenvalues": [
+        -0.3000000000000001,
+        0.7000000000000003
+      ],
+      "input_sha256": {
+        "bonds.dat": "48c972631da8787a9ca906ab810ddc378a5fe045ff7476dee06f27ce17818a9f",
+        "input.dat": "0f849814a964cbe7f1e114c2401637dfea6ff02e136d538d11f26765bed18f79",
+        "shift.dat": "ddee7a11fc0c07bcc071d111ff0c84933750f33bd8c63dc5f5d17045e580a935",
+        "spins.dat": "c25a087bdf65865189e6b172a13b7603bddcbe1aecac3c57c876fc96f5b4757f",
+        "pairs.dat": "cf0dd778a61f04059aaf9c1c1258c2be1e971c8534c6c1722859bedc482a8efe",
+        "caps.dat": "ae84dc86f55bcd769723ff65fdacf7689908b9662f927becaa05f8e5da52a468",
+        "fields.dat": "9192a21651b31177c8804b4ac29fa2453eb5ee34445c81134f56abf3588b657e"
+      },
+      "exit_code": 0,
+      "dimension": 2,
+      "eigenvalues": [
+        -0.3,
+        0.7
+      ],
+      "status": "passed"
+    },
+    {
+      "name": "ring-m3-omp2",
+      "algorithm": 3,
+      "threads": 2,
+      "cache": -1,
+      "expected_dimension": 2,
+      "expected_eigenvalues": [
+        -0.3000000000000001,
+        0.7000000000000003
+      ],
+      "input_sha256": {
+        "bonds.dat": "48c972631da8787a9ca906ab810ddc378a5fe045ff7476dee06f27ce17818a9f",
+        "input.dat": "0f849814a964cbe7f1e114c2401637dfea6ff02e136d538d11f26765bed18f79",
+        "shift.dat": "ddee7a11fc0c07bcc071d111ff0c84933750f33bd8c63dc5f5d17045e580a935",
+        "spins.dat": "c25a087bdf65865189e6b172a13b7603bddcbe1aecac3c57c876fc96f5b4757f",
+        "pairs.dat": "cf0dd778a61f04059aaf9c1c1258c2be1e971c8534c6c1722859bedc482a8efe",
+        "caps.dat": "ae84dc86f55bcd769723ff65fdacf7689908b9662f927becaa05f8e5da52a468",
+        "fields.dat": "9192a21651b31177c8804b4ac29fa2453eb5ee34445c81134f56abf3588b657e"
+      },
+      "exit_code": 0,
+      "dimension": 2,
+      "eigenvalues": [
+        -0.3,
+        0.7
+      ],
+      "status": "passed"
+    },
+    {
+      "name": "truncated-dense",
+      "algorithm": 3,
+      "threads": 1,
+      "cache": -1,
+      "expected_dimension": 10,
+      "expected_eigenvalues": [
+        -1.0573274309557166,
+        -0.9695640669565931,
+        -0.3392499710744993,
+        -0.25957073815659815,
+        -0.010517226229846008,
+        0.09066335702335496,
+        0.13589326427608214,
+        0.3237784131395769,
+        0.6697381010260355,
+        1.1011562979082035
+      ],
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "input.dat": "d2f871b2f7774feffa0dc4efc1a9fbc4dae9895f0119e0d88fc56cae29c06418",
+        "shift.dat": "b4d0dcf2751ab90738449eefee84233d38f60b30ee2c357dfa71fafd0d75c279",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "68b3c4fab85eab958893f2b89dbd348184f8ec3df646ae68e693c9a9e8406056"
+      },
+      "exit_code": 0,
+      "dimension": 10,
+      "eigenvalues": [
+        -1.057327430955717,
+        -0.9695640669565937,
+        -0.3392499710744981,
+        -0.259570738156597,
+        -0.01051722622984586,
+        0.09066335702335504,
+        0.1358932642760824,
+        0.3237784131395769,
+        0.6697381010260359,
+        1.101156297908203
+      ],
+      "status": "passed"
+    }
+  ],
+  "passed": 21,
+  "failed": 0
+}

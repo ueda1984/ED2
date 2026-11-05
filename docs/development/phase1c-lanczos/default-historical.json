@@ -1,0 +1,434 @@
+{
+  "build": "/workspace/ed2-phase1c-validation/default",
+  "comparisons": [
+    {
+      "example": "chain",
+      "file": "eigenvalues.dat",
+      "atol": 1e-09,
+      "rtol": 1e-09,
+      "status": "passed",
+      "max_absolute_error": 1.0658141036401503e-14
+    },
+    {
+      "example": "chain",
+      "file": "local_mag.dat",
+      "atol": 1e-06,
+      "rtol": 1e-06,
+      "status": "passed",
+      "max_absolute_error": 6.650235917504688e-14
+    },
+    {
+      "example": "chain",
+      "file": "two_body_cf_xyz.dat",
+      "atol": 1e-06,
+      "rtol": 1e-06,
+      "status": "passed",
+      "max_absolute_error": 3.827011103851863e-11
+    },
+    {
+      "example": "cubic",
+      "file": "eigenvalues.dat",
+      "atol": 1e-09,
+      "rtol": 1e-09,
+      "status": "passed",
+      "max_absolute_error": 1.4210854715202004e-14
+    },
+    {
+      "example": "cubic",
+      "file": "local_mag.dat",
+      "atol": 1e-06,
+      "rtol": 1e-06,
+      "status": "passed",
+      "max_absolute_error": 3.7364555893759643e-13
+    },
+    {
+      "example": "cubic",
+      "file": "two_body_cf_xyz.dat",
+      "atol": 1e-06,
+      "rtol": 1e-06,
+      "status": "passed",
+      "max_absolute_error": 1.4538370507466425e-13
+    },
+    {
+      "example": "cubic_sp_HB",
+      "file": "eigenvalues.dat",
+      "atol": 1e-09,
+      "rtol": 1e-09,
+      "status": "passed",
+      "max_absolute_error": 1.1368683772161603e-13
+    },
+    {
+      "example": "cubic_sp_HB",
+      "file": "local_mag.dat",
+      "atol": 1e-06,
+      "rtol": 1e-06,
+      "status": "passed",
+      "max_absolute_error": 9.018896740542459e-13
+    },
+    {
+      "example": "cubic_sp_HB",
+      "file": "two_body_cf_xyz.dat",
+      "atol": 1e-06,
+      "rtol": 1e-06,
+      "status": "passed",
+      "max_absolute_error": 1.3255572879333698e-10
+    },
+    {
+      "example": "honeycomb",
+      "file": "eigenvalues.dat",
+      "atol": 1e-09,
+      "rtol": 1e-09,
+      "status": "passed",
+      "max_absolute_error": 1.1102230246251565e-15
+    },
+    {
+      "example": "honeycomb",
+      "file": "local_mag.dat",
+      "atol": 1e-06,
+      "rtol": 1e-06,
+      "status": "passed",
+      "max_absolute_error": 1.8168799797990687e-13
+    },
+    {
+      "example": "honeycomb",
+      "file": "two_body_cf_xyz.dat",
+      "atol": 1e-06,
+      "rtol": 1e-06,
+      "status": "passed",
+      "max_absolute_error": 9.178108034864352e-13
+    },
+    {
+      "example": "j1j2_chain",
+      "file": "eigenvalues.dat",
+      "atol": 1e-09,
+      "rtol": 1e-09,
+      "status": "passed",
+      "max_absolute_error": 7.993605777301127e-15
+    },
+    {
+      "example": "j1j2_chain",
+      "file": "local_mag.dat",
+      "atol": 1e-06,
+      "rtol": 1e-06,
+      "status": "passed",
+      "max_absolute_error": 2.7422508708241367e-14
+    },
+    {
+      "example": "j1j2_chain",
+      "file": "two_body_cf_xyz.dat",
+      "atol": 1e-06,
+      "rtol": 1e-06,
+      "status": "passed",
+      "max_absolute_error": 1.5832956473671445e-10
+    },
+    {
+      "example": "kagome",
+      "file": "eigenvalues.dat",
+      "atol": 1e-09,
+      "rtol": 1e-09,
+      "status": "passed",
+      "max_absolute_error": 0.0
+    },
+    {
+      "example": "kagome",
+      "file": "local_mag.dat",
+      "atol": 1e-06,
+      "rtol": 1e-06,
+      "status": "passed",
+      "max_absolute_error": 9.49074152600815e-13
+    },
+    {
+      "example": "kagome",
+      "file": "two_body_cf_xyz.dat",
+      "atol": 1e-06,
+      "rtol": 1e-06,
+      "status": "passed",
+      "max_absolute_error": 4.541009929193152e-12
+    },
+    {
+      "example": "mixed_spin_chain",
+      "file": "eigenvalues.dat",
+      "atol": 1e-09,
+      "rtol": 1e-09,
+      "status": "passed",
+      "max_absolute_error": 2.6645352591003757e-15
+    },
+    {
+      "example": "mixed_spin_chain",
+      "file": "local_mag.dat",
+      "atol": 1e-06,
+      "rtol": 1e-06,
+      "status": "passed",
+      "max_absolute_error": 4.036770917537069e-12
+    },
+    {
+      "example": "mixed_spin_chain",
+      "file": "two_body_cf_xyz.dat",
+      "atol": 1e-06,
+      "rtol": 1e-06,
+      "status": "passed",
+      "max_absolute_error": 1.6693623219876663e-10
+    },
+    {
+      "example": "square",
+      "file": "eigenvalues.dat",
+      "atol": 1e-09,
+      "rtol": 1e-09,
+      "status": "passed",
+      "max_absolute_error": 1.0658141036401503e-14
+    },
+    {
+      "example": "square",
+      "file": "local_mag.dat",
+      "atol": 1e-06,
+      "rtol": 1e-06,
+      "status": "passed",
+      "max_absolute_error": 7.654987754790454e-14
+    },
+    {
+      "example": "square",
+      "file": "two_body_cf_xyz.dat",
+      "atol": 1e-06,
+      "rtol": 1e-06,
+      "status": "passed",
+      "max_absolute_error": 1.6527005458621957e-12
+    },
+    {
+      "example": "triangular",
+      "file": "eigenvalues.dat",
+      "atol": 1e-09,
+      "rtol": 1e-09,
+      "status": "passed",
+      "max_absolute_error": 0.0
+    },
+    {
+      "example": "triangular",
+      "file": "local_mag.dat",
+      "atol": 1e-06,
+      "rtol": 1e-06,
+      "status": "passed",
+      "max_absolute_error": 4.801714581503802e-14
+    },
+    {
+      "example": "triangular",
+      "file": "two_body_cf_xyz.dat",
+      "atol": 1e-06,
+      "rtol": 1e-06,
+      "status": "passed",
+      "max_absolute_error": 4.199553931601846e-11
+    }
+  ],
+  "examples": [
+    {
+      "name": "chain",
+      "input_sha256": {
+        "input.dat": "bad91493a3c9b0cb62b77d45979762e02df13c4043d1c7fa4bbbeeb31aa9e72d",
+        "input_param.dat": "3043e8056c983a97326feec15aa61dcba160e84bd1882acf0cca969abd103560",
+        "list_NODmax.dat": "86aaa779cfdbd37c17f4830ed1133eb71bcaa48cb56728b319399ab7004ec107",
+        "list_hvec.dat": "5aa7c840f7302da8712a21d1b4138def54dd0061f0e7a3807c7c1811515d81d2",
+        "list_ij_cf.dat": "efc1be24e402bc4a8279680b327f4102c157ed76e9c020d1c152730e7aa8bf17",
+        "list_p1.dat": "02434c4c2f149cd10ec52553e2a7e9d86ff9db9498083616ac0f69e427283acc",
+        "list_spin.dat": "73ebde7841028907d70c8762027559b8e28ad9a1dc9962cd49a6f91dbe7ff768",
+        "list_xyz_dm_gamma.dat": "3bb5af132e180eb855f6e2929a2c73b85dd13c50f06f07ac414669ef781d6f0f"
+      },
+      "dimensions": {
+        "THS": 166751,
+        "THS(k)": 1669
+      },
+      "eigenvalues": [
+        [
+          -12.99620173300454
+        ]
+      ]
+    },
+    {
+      "name": "cubic",
+      "input_sha256": {
+        "input.dat": "5a6ed7f6922a2e66a23d923493e5be60914bb64ec061f12020deb14a2cce0c04",
+        "input_param.dat": "bc6289eb3cfe6197496377a48a792c9e7f5adfe6bbec36c123034ba72d24dce8",
+        "list_NODmax.dat": "2921487770bf5ca864c47a9bb94f525955ca27e77abd792684a55e50e0a443f8",
+        "list_hvec.dat": "64393b4d28b9dac017e6ba896dc997227f72967712b3273f25dfac6b4b4c2d3e",
+        "list_ij_cf.dat": "efc1be24e402bc4a8279680b327f4102c157ed76e9c020d1c152730e7aa8bf17",
+        "list_p1.dat": "046886a9356a21e1dd8735a608d857956e3c11a622281b906f3100228216add8",
+        "list_p2.dat": "09fa1b74c9fccbd105292b42975a26809c691b989c755afa56cb86e24358b871",
+        "list_p3.dat": "211b766aa697e0626a7e0d5b472b4e9b5fb26fe0aa3b7606d2394c41ade2da63",
+        "list_spin.dat": "7b70f272b7b53f242df38320d62592a593fc859faba11822a52310d5471e48bb",
+        "list_xyz_dm_gamma.dat": "b1acdf499f3cabae59121307d48c6b6c9ccd65cbd32c3200e302d06ed7a46169"
+      },
+      "dimensions": {
+        "THS": 1679797,
+        "THS(k)": 7790
+      },
+      "eigenvalues": [
+        [
+          32.91959953219395
+        ]
+      ]
+    },
+    {
+      "name": "cubic_sp_HB",
+      "input_sha256": {
+        "input.dat": "3195f81b3f78041da0b640475be334cbfffe97d30e93e12e8d76fc62dbcac7a2",
+        "input_param.dat": "f2337ac4cfdd913064258bfb53c503883c2cf557025c759909d8bb3b28ff59fe",
+        "list_NODmax.dat": "6ed6a38c476ccb26396f24553ffaf341cf8d72f60adc3a8d6cf44fc6a3fe19f8",
+        "list_hvec.dat": "60d62dcc9861eb4746d82f236feba8495c120a6e8297405eea37610f1677b303",
+        "list_ij_cf.dat": "efc1be24e402bc4a8279680b327f4102c157ed76e9c020d1c152730e7aa8bf17",
+        "list_p1.dat": "91ec5ddf296bdfb599b132015e5ef35b9cbb06edc846be9fed9af368ec4bbfbc",
+        "list_p2.dat": "a3a0b4b5d4242276a5726de3ad9a0ad5f9cbe9c260192242e43e9b80ee043d19",
+        "list_p3.dat": "130379c8d46eb555e219e6656081e5ae8aa52c185ebed481385753fc1028b7b0",
+        "list_p4.dat": "8d190926dd6d6215e2da35d52ce72b0e9c610564fe51a0bab2f81ef9a36116b8",
+        "list_p5.dat": "301e6845feb60c6eb7dfa57addef2d80338ad06f695ecee9c8d2928c557fad31",
+        "list_p6.dat": "7e3bef6105c45168758cf4d854f5f792a28eb0fc813452c319898bc00dca9673",
+        "list_spin.dat": "e1a9e52ee6d1b702c87cda03d4cc62f2b87e7cc06de792a19e1e1db9cba3954b",
+        "list_xyz_dm_gamma.dat": "5ea400878f05a1005d52dd58cfd59f6d6667327a9aaad88cc7abb7fef581e3eb"
+      },
+      "dimensions": {
+        "THS": 166167000,
+        "THS(k)": 23719
+      },
+      "eigenvalues": [
+        [
+          736.7224213680654
+        ]
+      ]
+    },
+    {
+      "name": "honeycomb",
+      "input_sha256": {
+        "input.dat": "7b174a01dd324f9255de0bc114f8ba7b26c59420be4edc6c8b44aadd661f215b",
+        "input_param.dat": "6a1879c17b6093f484230fb856507b143167dfffe2250c99844410654510456b",
+        "list_NODmax.dat": "1ec110f3bc65eb0a7631188185428b6a7ee9bc0c4d3f5ca6262b4c893ac5aff3",
+        "list_hvec.dat": "ab8ce7979e937f2cce46dab6c64fa9da5b7e55a80fc4536faf74949fe6dbd052",
+        "list_ij_cf.dat": "efc1be24e402bc4a8279680b327f4102c157ed76e9c020d1c152730e7aa8bf17",
+        "list_p1.dat": "8942e5b031d357ab4de5f3b3cabfb51620b28e31a67180bef4fd4f8343dab8d3",
+        "list_p2.dat": "163ebb4d742f4d048603a168f2a60625feba1a8557deed4329dae5d2b8d7edaa",
+        "list_spin.dat": "ca3b2f583de0f309d673551def81102e29cff8dbedb98205afe565d2c3a5821b",
+        "list_xyz_dm_gamma.dat": "f3109f02a389186375844322dd6fc6a81d4b7efba79d9ab48fb4b32db91df7d7"
+      },
+      "dimensions": {
+        "THS": 1333501,
+        "THS(k)": 13339
+      },
+      "eigenvalues": [
+        [
+          -1.047035063952752
+        ]
+      ]
+    },
+    {
+      "name": "j1j2_chain",
+      "input_sha256": {
+        "input.dat": "02e2715f54d26729db11d29ebbc8b9704c1666704d36fa07473a479859a592a9",
+        "input_param.dat": "86a7b6d198c46e8c3604b1f9916cfa0a44a12357a71a351fb5190f7bf58624d0",
+        "list_NODmax.dat": "86aaa779cfdbd37c17f4830ed1133eb71bcaa48cb56728b319399ab7004ec107",
+        "list_hvec.dat": "5aa7c840f7302da8712a21d1b4138def54dd0061f0e7a3807c7c1811515d81d2",
+        "list_ij_cf.dat": "efc1be24e402bc4a8279680b327f4102c157ed76e9c020d1c152730e7aa8bf17",
+        "list_p1.dat": "02434c4c2f149cd10ec52553e2a7e9d86ff9db9498083616ac0f69e427283acc",
+        "list_spin.dat": "73ebde7841028907d70c8762027559b8e28ad9a1dc9962cd49a6f91dbe7ff768",
+        "list_xyz_dm_gamma.dat": "a4ad2875755a61e4e3602d48ba3f1a35fed530186b4092b1193bc464f6773108"
+      },
+      "dimensions": {
+        "THS": 166751,
+        "THS(k)": 1669
+      },
+      "eigenvalues": [
+        [
+          -3.656548006870286
+        ]
+      ]
+    },
+    {
+      "name": "kagome",
+      "input_sha256": {
+        "input.dat": "6c1db6eabd3b63a4a1872f25159ff9f758a477cd933c7990ed9db34f597af457",
+        "input_param.dat": "dda3ee761a37f629a489a87f3a51f0886bf51581dd2bd4b78177294260a13c11",
+        "list_NODmax.dat": "b93f33339f4659234941a6737493f4a058c54f80b148bbbb03f36041f5911c07",
+        "list_hvec.dat": "b650879b5514ec627eadb42886390db691ccab5f7d23ce15c361b81701afd6c5",
+        "list_ij_cf.dat": "efc1be24e402bc4a8279680b327f4102c157ed76e9c020d1c152730e7aa8bf17",
+        "list_p1.dat": "850331c349a9954ff7016c9bb20cf5060591cef14b9aa6e691da5d780c65bba1",
+        "list_p2.dat": "507a23b6bbd2ae13e25b13a4cfb82d33c3d76320746c8e1eb0b21849102292ae",
+        "list_spin.dat": "a03c69e48a336df0c912a6556f23649b9a72f64314731595de03e4e7683a23d5",
+        "list_xyz_dm_gamma.dat": "5149fb98a887f065570e5d4d172d81da9bb5f34319bf59ac6a72d6d43e3eb039"
+      },
+      "dimensions": {
+        "THS": 210043,
+        "THS(k)": 5848
+      },
+      "eigenvalues": [
+        [
+          -5.909297683810853
+        ]
+      ]
+    },
+    {
+      "name": "mixed_spin_chain",
+      "input_sha256": {
+        "input.dat": "09d9eadefb3cbadb3e851c0338dfe0117711701c7613eb099832948bd8076713",
+        "input_param.dat": "f24c8418eadf95bfe2fc86373fcff5e95483a64b45003628da2f9c14a7a9f6d9",
+        "list_NODmax.dat": "1ae091d58f5b88df21d90982b21045745f682d54f36688ef5ff9994773157ded",
+        "list_hvec.dat": "5aa7c840f7302da8712a21d1b4138def54dd0061f0e7a3807c7c1811515d81d2",
+        "list_ij_cf.dat": "efc1be24e402bc4a8279680b327f4102c157ed76e9c020d1c152730e7aa8bf17",
+        "list_p1.dat": "e5c29e6ccb5ed611467d29cc1006e09ac18dbf5e5e102676ae41f9cf557118cd",
+        "list_spin.dat": "b7c05fb2fcb4f87cf770e131178add31b6004b6e96d3e3186d9c2e97f88e261e",
+        "list_xyz_dm_gamma.dat": "3bb5af132e180eb855f6e2929a2c73b85dd13c50f06f07ac414669ef781d6f0f"
+      },
+      "dimensions": {
+        "THS": 171801,
+        "THS(k)": 3438
+      },
+      "eigenvalues": [
+        [
+          -5.652675156567414
+        ]
+      ]
+    },
+    {
+      "name": "square",
+      "input_sha256": {
+        "input.dat": "2f9af1e9cb336d0ae71f5426a1d084398dbb94da0bf69e2471e5df39f586a6c1",
+        "input_param.dat": "a741400cd8f6c794ed2fad01132141fa6cab9c1a1c5e4f681257252ec8af3fd4",
+        "list_NODmax.dat": "86aaa779cfdbd37c17f4830ed1133eb71bcaa48cb56728b319399ab7004ec107",
+        "list_hvec.dat": "5aa7c840f7302da8712a21d1b4138def54dd0061f0e7a3807c7c1811515d81d2",
+        "list_ij_cf.dat": "efc1be24e402bc4a8279680b327f4102c157ed76e9c020d1c152730e7aa8bf17",
+        "list_p1.dat": "388229e18ba4542a1442d5d6dd6bef98c07ffbf690ec90e978637bb4133a14c5",
+        "list_p2.dat": "75b5fab0cbbab2f1c56736c2b5d8b77ca2afa427440d92f50086597a72c7fb77",
+        "list_spin.dat": "73ebde7841028907d70c8762027559b8e28ad9a1dc9962cd49a6f91dbe7ff768",
+        "list_xyz_dm_gamma.dat": "5bb8e426cac1ad14ea4b12d8ac6f74019b4782ed81997d9eb5baddede312e72d"
+      },
+      "dimensions": {
+        "THS": 166751,
+        "THS(k)": 1670
+      },
+      "eigenvalues": [
+        [
+          -10.43049543852546
+        ]
+      ]
+    },
+    {
+      "name": "triangular",
+      "input_sha256": {
+        "input.dat": "78bac680346b2d1a46e61dc525ef2fd3eccc90db92b14a1af8b6b3361f5c84c1",
+        "input_param.dat": "986244da865d1e23b9c7b580e72a075c3312109e4b6acfa16929b2c39d66f4a9",
+        "list_NODmax.dat": "86aaa779cfdbd37c17f4830ed1133eb71bcaa48cb56728b319399ab7004ec107",
+        "list_hvec.dat": "5aa7c840f7302da8712a21d1b4138def54dd0061f0e7a3807c7c1811515d81d2",
+        "list_ij_cf.dat": "efc1be24e402bc4a8279680b327f4102c157ed76e9c020d1c152730e7aa8bf17",
+        "list_p1.dat": "388229e18ba4542a1442d5d6dd6bef98c07ffbf690ec90e978637bb4133a14c5",
+        "list_p2.dat": "75b5fab0cbbab2f1c56736c2b5d8b77ca2afa427440d92f50086597a72c7fb77",
+        "list_spin.dat": "73ebde7841028907d70c8762027559b8e28ad9a1dc9962cd49a6f91dbe7ff768",
+        "list_xyz_dm_gamma.dat": "e944c69bd343453e482a72256b0e42e509823ed2cad04b88903450cbeddd0e67"
+      },
+      "dimensions": {
+        "THS": 166751,
+        "THS(k)": 1670
+      },
+      "eigenvalues": [
+        [
+          7.186891958806912
+        ]
+      ]
+    }
+  ],
+  "passed": 27,
+  "failed": 0
+}

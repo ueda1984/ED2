@@ -1,0 +1,2892 @@
+{
+  "schema": 1,
+  "numpy": "2.3.5",
+  "executable_sha256": "647ca1b7a652086fa377f882dc5a2914c21f5f45b04c801a42b7942dc06d1823",
+  "operator_executable_sha256": "9d418dd1b266eddb778805e34b5df2c99c7615302bc0674c4fdde283ec838429",
+  "harness_sha256": "2af3c42cc3631cbff8463946c94c37ca4291af89094cf276ca685ddf3c1a3e26",
+  "reference_constructor_sha256": "ec5d307b42df1845cbd91710ee3ce555a9bd22b2c0c94747c42336cc6e281bff",
+  "tolerances": {
+    "absolute": 1e-09,
+    "relative": 1e-09,
+    "operator_absolute": 1e-12
+  },
+  "fixtures": {
+    "single-site4": {
+      "records": [
+        [
+          3,
+          [
+            0.37,
+            -0.23,
+            0.41
+          ]
+        ]
+      ],
+      "ground_gap": 0.20806401984119738
+    },
+    "sparse-ordered": {
+      "records": [
+        [
+          0,
+          [
+            0.11,
+            -0.17,
+            0.29
+          ]
+        ],
+        [
+          2,
+          [
+            -0.31,
+            0.19,
+            0.43
+          ]
+        ]
+      ],
+      "ground_gap": 0.17481664763249416
+    },
+    "sparse-permuted": {
+      "records": [
+        [
+          2,
+          [
+            -0.31,
+            0.19,
+            0.43
+          ]
+        ],
+        [
+          0,
+          [
+            0.11,
+            -0.17,
+            0.29
+          ]
+        ]
+      ],
+      "ground_gap": 0.17481664763249416
+    },
+    "full-ordered": {
+      "records": [
+        [
+          0,
+          [
+            0.13,
+            -0.17,
+            0.21
+          ]
+        ],
+        [
+          1,
+          [
+            0.26,
+            -0.14,
+            0.13999999999999999
+          ]
+        ],
+        [
+          2,
+          [
+            0.39,
+            -0.11000000000000001,
+            0.06999999999999998
+          ]
+        ],
+        [
+          3,
+          [
+            0.52,
+            -0.08000000000000002,
+            -2.7755575615628914e-17
+          ]
+        ]
+      ],
+      "ground_gap": 0.11241363006122707
+    },
+    "full-permuted": {
+      "records": [
+        [
+          2,
+          [
+            0.39,
+            -0.11000000000000001,
+            0.06999999999999998
+          ]
+        ],
+        [
+          0,
+          [
+            0.13,
+            -0.17,
+            0.21
+          ]
+        ],
+        [
+          3,
+          [
+            0.52,
+            -0.08000000000000002,
+            -2.7755575615628914e-17
+          ]
+        ],
+        [
+          1,
+          [
+            0.26,
+            -0.14,
+            0.13999999999999999
+          ]
+        ]
+      ],
+      "ground_gap": 0.11241363006122707
+    }
+  },
+  "cli_counts": {
+    "passed": 70,
+    "failed": 0
+  },
+  "operator_counts": {
+    "passed": 10,
+    "failed": 0
+  },
+  "permutation_counts": {
+    "passed": 28,
+    "failed": 0
+  },
+  "cli": [
+    {
+      "fixture": "single-site4",
+      "alg": 1,
+      "cache": 0,
+      "threads": 1,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "ec5f4a910655f3920e3ead6ed8bf92126fe2f75fba6953ce084f1c6a515f10a5",
+        "input.dat": "184ef0002966bbd6aa71f97dbb4837fa189dcfb6e03face679b1054da4c534c7",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 2.220446049250313e-16,
+        "magnetization": 6.661338147750939e-16,
+        "correlation": 1.942890293094024e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.217152048813921
+      ]
+    },
+    {
+      "fixture": "single-site4",
+      "alg": 1,
+      "cache": 3,
+      "threads": 1,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "ec5f4a910655f3920e3ead6ed8bf92126fe2f75fba6953ce084f1c6a515f10a5",
+        "input.dat": "bf56e3453a91f8e8e60be7164e0601741710acb8ab0413ec120fdc7030db25a0",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 2.220446049250313e-16,
+        "magnetization": 4.996003610813204e-16,
+        "correlation": 1.942890293094024e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.217152048813921
+      ]
+    },
+    {
+      "fixture": "single-site4",
+      "alg": 1,
+      "cache": -1,
+      "threads": 1,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "ec5f4a910655f3920e3ead6ed8bf92126fe2f75fba6953ce084f1c6a515f10a5",
+        "input.dat": "8104065e2badc3f09bff25d0b05ce770901a681f68c1ab2fd4d37166e830718f",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 2.220446049250313e-16,
+        "magnetization": 6.106226635438361e-16,
+        "correlation": 2.220446049250313e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.217152048813921
+      ]
+    },
+    {
+      "fixture": "single-site4",
+      "alg": 2,
+      "cache": 0,
+      "threads": 1,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "ec5f4a910655f3920e3ead6ed8bf92126fe2f75fba6953ce084f1c6a515f10a5",
+        "input.dat": "91d553c9cb6fc3e108fef1eb5f4d971dd14207eeb95429e26a0f1381b90c3f51",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 2.220446049250313e-15,
+        "magnetization": 3.164135620181696e-15,
+        "correlation": 1.096345236817342e-15
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.217152048813919,
+        -1.009088028972722
+      ]
+    },
+    {
+      "fixture": "single-site4",
+      "alg": 2,
+      "cache": 3,
+      "threads": 1,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "ec5f4a910655f3920e3ead6ed8bf92126fe2f75fba6953ce084f1c6a515f10a5",
+        "input.dat": "586ff71cd5727a8e790150b0c100ef062b1bb27eb85471f7fd9a4d70e78d6c5c",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 3.1086244689504383e-15,
+        "magnetization": 3.4416913763379853e-15,
+        "correlation": 1.346470678009748e-15
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.217152048813918,
+        -1.009088028972722
+      ]
+    },
+    {
+      "fixture": "single-site4",
+      "alg": 2,
+      "cache": -1,
+      "threads": 1,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "ec5f4a910655f3920e3ead6ed8bf92126fe2f75fba6953ce084f1c6a515f10a5",
+        "input.dat": "e2d48c753b30ac1ba50b9e4eccc73497a938294555e06d1c321649f930b6e330",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 3.774758283725532e-15,
+        "magnetization": 1.3600232051658168e-15,
+        "correlation": 4.003416521902725e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.21715204881392,
+        -1.00908802897272
+      ]
+    },
+    {
+      "fixture": "single-site4",
+      "alg": 3,
+      "cache": -1,
+      "threads": 1,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "ec5f4a910655f3920e3ead6ed8bf92126fe2f75fba6953ce084f1c6a515f10a5",
+        "input.dat": "0f26fc8a5f1ef2f400327e267fc081c0f8e3b004558e90272aa67a6d45dc0b9b",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 3.1086244689504383e-15,
+        "magnetization": 4.551914400963142e-15,
+        "correlation": 1.9567680809018384e-15
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.217152048813918,
+        -1.009088028972721,
+        -0.5822380950723733,
+        -0.4306794700701451,
+        -0.3731456375183564,
+        -0.2842165239082817,
+        -0.1447516511526072,
+        0.009321855497993248,
+        0.1391769748825423,
+        0.2623204315308163,
+        0.3199225746794857,
+        0.3803141077513094,
+        0.5163981109450907,
+        0.6288182375014263,
+        0.8074181672365728,
+        0.9775809954831732
+      ]
+    },
+    {
+      "fixture": "single-site4",
+      "alg": 1,
+      "cache": 0,
+      "threads": 2,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "ec5f4a910655f3920e3ead6ed8bf92126fe2f75fba6953ce084f1c6a515f10a5",
+        "input.dat": "184ef0002966bbd6aa71f97dbb4837fa189dcfb6e03face679b1054da4c534c7",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 2.220446049250313e-16,
+        "magnetization": 6.661338147750939e-16,
+        "correlation": 3.0531133177191805e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.217152048813921
+      ]
+    },
+    {
+      "fixture": "single-site4",
+      "alg": 1,
+      "cache": 3,
+      "threads": 2,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "ec5f4a910655f3920e3ead6ed8bf92126fe2f75fba6953ce084f1c6a515f10a5",
+        "input.dat": "bf56e3453a91f8e8e60be7164e0601741710acb8ab0413ec120fdc7030db25a0",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 2.220446049250313e-16,
+        "magnetization": 4.996003610813204e-16,
+        "correlation": 1.942890293094024e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.217152048813921
+      ]
+    },
+    {
+      "fixture": "single-site4",
+      "alg": 1,
+      "cache": -1,
+      "threads": 2,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "ec5f4a910655f3920e3ead6ed8bf92126fe2f75fba6953ce084f1c6a515f10a5",
+        "input.dat": "8104065e2badc3f09bff25d0b05ce770901a681f68c1ab2fd4d37166e830718f",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 2.220446049250313e-16,
+        "magnetization": 4.440892098500626e-16,
+        "correlation": 1.942890293094024e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.217152048813921
+      ]
+    },
+    {
+      "fixture": "single-site4",
+      "alg": 2,
+      "cache": 0,
+      "threads": 2,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "ec5f4a910655f3920e3ead6ed8bf92126fe2f75fba6953ce084f1c6a515f10a5",
+        "input.dat": "91d553c9cb6fc3e108fef1eb5f4d971dd14207eeb95429e26a0f1381b90c3f51",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 2.220446049250313e-16,
+        "magnetization": 6.800116025829084e-16,
+        "correlation": 3.0531133177191805e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.217152048813921,
+        -1.009088028972724
+      ]
+    },
+    {
+      "fixture": "single-site4",
+      "alg": 2,
+      "cache": 3,
+      "threads": 2,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "ec5f4a910655f3920e3ead6ed8bf92126fe2f75fba6953ce084f1c6a515f10a5",
+        "input.dat": "586ff71cd5727a8e790150b0c100ef062b1bb27eb85471f7fd9a4d70e78d6c5c",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 3.774758283725532e-15,
+        "magnetization": 2.6645352591003757e-15,
+        "correlation": 1.2032475710244128e-15
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.217152048813919,
+        -1.00908802897272
+      ]
+    },
+    {
+      "fixture": "single-site4",
+      "alg": 2,
+      "cache": -1,
+      "threads": 2,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "ec5f4a910655f3920e3ead6ed8bf92126fe2f75fba6953ce084f1c6a515f10a5",
+        "input.dat": "e2d48c753b30ac1ba50b9e4eccc73497a938294555e06d1c321649f930b6e330",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 2.6645352591003757e-15,
+        "magnetization": 1.7486012637846216e-15,
+        "correlation": 6.14742631799281e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.21715204881392,
+        -1.009088028972721
+      ]
+    },
+    {
+      "fixture": "single-site4",
+      "alg": 3,
+      "cache": -1,
+      "threads": 2,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "ec5f4a910655f3920e3ead6ed8bf92126fe2f75fba6953ce084f1c6a515f10a5",
+        "input.dat": "0f26fc8a5f1ef2f400327e267fc081c0f8e3b004558e90272aa67a6d45dc0b9b",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 3.1086244689504383e-15,
+        "magnetization": 4.551914400963142e-15,
+        "correlation": 1.9567680809018384e-15
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.217152048813918,
+        -1.009088028972721,
+        -0.5822380950723733,
+        -0.4306794700701451,
+        -0.3731456375183564,
+        -0.2842165239082817,
+        -0.1447516511526072,
+        0.009321855497993248,
+        0.1391769748825423,
+        0.2623204315308163,
+        0.3199225746794857,
+        0.3803141077513094,
+        0.5163981109450907,
+        0.6288182375014263,
+        0.8074181672365728,
+        0.9775809954831732
+      ]
+    },
+    {
+      "fixture": "sparse-ordered",
+      "alg": 1,
+      "cache": 0,
+      "threads": 1,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "bd27288bb23dc83b258ad604cfdfc39ccaed3d60c9f4192017ab01d00a0fd392",
+        "input.dat": "7a86889e16c33357dc8c186f632240191e59ab2015a6114eb37bc86ca09b1e87",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 4.440892098500626e-16,
+        "magnetization": 7.355227538141662e-16,
+        "correlation": 2.2898349882893854e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.174776509542116
+      ]
+    },
+    {
+      "fixture": "sparse-ordered",
+      "alg": 1,
+      "cache": 3,
+      "threads": 1,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "bd27288bb23dc83b258ad604cfdfc39ccaed3d60c9f4192017ab01d00a0fd392",
+        "input.dat": "1210bf5682f21f45880f2c2714a8bb2bade29dad0d2240bbc4e4842621dd6fea",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 4.440892098500626e-16,
+        "magnetization": 3.608224830031759e-16,
+        "correlation": 1.8041124150158794e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.174776509542116
+      ]
+    },
+    {
+      "fixture": "sparse-ordered",
+      "alg": 1,
+      "cache": -1,
+      "threads": 1,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "bd27288bb23dc83b258ad604cfdfc39ccaed3d60c9f4192017ab01d00a0fd392",
+        "input.dat": "05275381cea1791db2729fe7c0efb9c37bae7ce5c8c6057c80e66d2337c882f5",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 4.440892098500626e-16,
+        "magnetization": 3.469446951953614e-16,
+        "correlation": 2.0122792321330962e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.174776509542116
+      ]
+    },
+    {
+      "fixture": "sparse-ordered",
+      "alg": 2,
+      "cache": 0,
+      "threads": 1,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "bd27288bb23dc83b258ad604cfdfc39ccaed3d60c9f4192017ab01d00a0fd392",
+        "input.dat": "b2aa8bf69928a17a162c99b83d2338eab7de661ab89ace47788e756446beafeb",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 1.6653345369377348e-15,
+        "magnetization": 1.7208456881689926e-15,
+        "correlation": 7.771561172376096e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.174776509542115,
+        -0.9999598619096198
+      ]
+    },
+    {
+      "fixture": "sparse-ordered",
+      "alg": 2,
+      "cache": 3,
+      "threads": 1,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "bd27288bb23dc83b258ad604cfdfc39ccaed3d60c9f4192017ab01d00a0fd392",
+        "input.dat": "306237526c3f27c262d9cc80f04d5d46c772907f1492122fcd08d4cd26769284",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 1.5543122344752192e-15,
+        "magnetization": 3.3480163086352377e-16,
+        "correlation": 1.5959455978986625e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.174776509542116,
+        -0.9999598619096199
+      ]
+    },
+    {
+      "fixture": "sparse-ordered",
+      "alg": 2,
+      "cache": -1,
+      "threads": 1,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "bd27288bb23dc83b258ad604cfdfc39ccaed3d60c9f4192017ab01d00a0fd392",
+        "input.dat": "ee90c6d39602dd5133ab0ffa8e24320ce5ac297d8241c61b359f32283143a221",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 3.9968028886505635e-15,
+        "magnetization": 7.896461262646426e-15,
+        "correlation": 3.95516952522712e-15
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.174776509542116,
+        -0.9999598619096175
+      ]
+    },
+    {
+      "fixture": "sparse-ordered",
+      "alg": 3,
+      "cache": -1,
+      "threads": 1,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "bd27288bb23dc83b258ad604cfdfc39ccaed3d60c9f4192017ab01d00a0fd392",
+        "input.dat": "2ed828e97ee693568f1a920374e6f3be7f07ff66b510e86b4e894492a699a0f0",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 3.4416913763379853e-15,
+        "magnetization": 4.211908599671688e-15,
+        "correlation": 1.7225804116449694e-15
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.174776509542116,
+        -0.999959861909618,
+        -0.6883049204641346,
+        -0.6116002418587742,
+        -0.3574528938538054,
+        -0.238807253658628,
+        -0.1539023835743368,
+        -0.04510182505345495,
+        0.1310542506106476,
+        0.3039887562073532,
+        0.3992771231642477,
+        0.4775604655753888,
+        0.5670703188392452,
+        0.6326466230444439,
+        0.8331374043496322,
+        0.9251709481239124
+      ]
+    },
+    {
+      "fixture": "sparse-ordered",
+      "alg": 1,
+      "cache": 0,
+      "threads": 2,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "bd27288bb23dc83b258ad604cfdfc39ccaed3d60c9f4192017ab01d00a0fd392",
+        "input.dat": "7a86889e16c33357dc8c186f632240191e59ab2015a6114eb37bc86ca09b1e87",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 4.440892098500626e-16,
+        "magnetization": 4.0245584642661925e-16,
+        "correlation": 2.0122792321330962e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.174776509542116
+      ]
+    },
+    {
+      "fixture": "sparse-ordered",
+      "alg": 1,
+      "cache": 3,
+      "threads": 2,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "bd27288bb23dc83b258ad604cfdfc39ccaed3d60c9f4192017ab01d00a0fd392",
+        "input.dat": "1210bf5682f21f45880f2c2714a8bb2bade29dad0d2240bbc4e4842621dd6fea",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 4.440892098500626e-16,
+        "magnetization": 3.157196726277789e-16,
+        "correlation": 1.8041124150158794e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.174776509542116
+      ]
+    },
+    {
+      "fixture": "sparse-ordered",
+      "alg": 1,
+      "cache": -1,
+      "threads": 2,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "bd27288bb23dc83b258ad604cfdfc39ccaed3d60c9f4192017ab01d00a0fd392",
+        "input.dat": "05275381cea1791db2729fe7c0efb9c37bae7ce5c8c6057c80e66d2337c882f5",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 4.440892098500626e-16,
+        "magnetization": 4.0245584642661925e-16,
+        "correlation": 1.6653345369377348e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.174776509542116
+      ]
+    },
+    {
+      "fixture": "sparse-ordered",
+      "alg": 2,
+      "cache": 0,
+      "threads": 2,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "bd27288bb23dc83b258ad604cfdfc39ccaed3d60c9f4192017ab01d00a0fd392",
+        "input.dat": "b2aa8bf69928a17a162c99b83d2338eab7de661ab89ace47788e756446beafeb",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 1.3322676295501878e-15,
+        "magnetization": 1.227316859253591e-15,
+        "correlation": 5.238864897449957e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.174776509542117,
+        -0.9999598619096217
+      ]
+    },
+    {
+      "fixture": "sparse-ordered",
+      "alg": 2,
+      "cache": 3,
+      "threads": 2,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "bd27288bb23dc83b258ad604cfdfc39ccaed3d60c9f4192017ab01d00a0fd392",
+        "input.dat": "306237526c3f27c262d9cc80f04d5d46c772907f1492122fcd08d4cd26769284",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 1.2212453270876722e-15,
+        "magnetization": 4.718447854656915e-16,
+        "correlation": 2.220446049250313e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.174776509542116,
+        -0.9999598619096203
+      ]
+    },
+    {
+      "fixture": "sparse-ordered",
+      "alg": 2,
+      "cache": -1,
+      "threads": 2,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "bd27288bb23dc83b258ad604cfdfc39ccaed3d60c9f4192017ab01d00a0fd392",
+        "input.dat": "ee90c6d39602dd5133ab0ffa8e24320ce5ac297d8241c61b359f32283143a221",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 1.5543122344752192e-15,
+        "magnetization": 2.498001805406602e-16,
+        "correlation": 1.457167719820518e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.174776509542116,
+        -0.9999598619096199
+      ]
+    },
+    {
+      "fixture": "sparse-ordered",
+      "alg": 3,
+      "cache": -1,
+      "threads": 2,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "bd27288bb23dc83b258ad604cfdfc39ccaed3d60c9f4192017ab01d00a0fd392",
+        "input.dat": "2ed828e97ee693568f1a920374e6f3be7f07ff66b510e86b4e894492a699a0f0",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 3.4416913763379853e-15,
+        "magnetization": 4.211908599671688e-15,
+        "correlation": 1.7225804116449694e-15
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.174776509542116,
+        -0.999959861909618,
+        -0.6883049204641346,
+        -0.6116002418587742,
+        -0.3574528938538054,
+        -0.238807253658628,
+        -0.1539023835743368,
+        -0.04510182505345495,
+        0.1310542506106476,
+        0.3039887562073532,
+        0.3992771231642477,
+        0.4775604655753888,
+        0.5670703188392452,
+        0.6326466230444439,
+        0.8331374043496322,
+        0.9251709481239124
+      ]
+    },
+    {
+      "fixture": "sparse-permuted",
+      "alg": 1,
+      "cache": 0,
+      "threads": 1,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "4adf28dd5147ed964c5c93df60ee56ec6166d71fb2521c2f595e2b9b30f52e00",
+        "input.dat": "7a86889e16c33357dc8c186f632240191e59ab2015a6114eb37bc86ca09b1e87",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 4.440892098500626e-16,
+        "magnetization": 4.718447854656915e-16,
+        "correlation": 2.220446049250313e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.174776509542116
+      ]
+    },
+    {
+      "fixture": "sparse-permuted",
+      "alg": 1,
+      "cache": 3,
+      "threads": 1,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "4adf28dd5147ed964c5c93df60ee56ec6166d71fb2521c2f595e2b9b30f52e00",
+        "input.dat": "1210bf5682f21f45880f2c2714a8bb2bade29dad0d2240bbc4e4842621dd6fea",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 4.440892098500626e-16,
+        "magnetization": 3.608224830031759e-16,
+        "correlation": 1.6653345369377348e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.174776509542116
+      ]
+    },
+    {
+      "fixture": "sparse-permuted",
+      "alg": 1,
+      "cache": -1,
+      "threads": 1,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "4adf28dd5147ed964c5c93df60ee56ec6166d71fb2521c2f595e2b9b30f52e00",
+        "input.dat": "05275381cea1791db2729fe7c0efb9c37bae7ce5c8c6057c80e66d2337c882f5",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 4.440892098500626e-16,
+        "magnetization": 3.469446951953614e-16,
+        "correlation": 1.6653345369377348e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.174776509542116
+      ]
+    },
+    {
+      "fixture": "sparse-permuted",
+      "alg": 2,
+      "cache": 0,
+      "threads": 1,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "4adf28dd5147ed964c5c93df60ee56ec6166d71fb2521c2f595e2b9b30f52e00",
+        "input.dat": "b2aa8bf69928a17a162c99b83d2338eab7de661ab89ace47788e756446beafeb",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 1.1102230246251565e-15,
+        "magnetization": 9.376180387654642e-16,
+        "correlation": 4.2674197509029455e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.174776509542116,
+        -0.9999598619096204
+      ]
+    },
+    {
+      "fixture": "sparse-permuted",
+      "alg": 2,
+      "cache": 3,
+      "threads": 1,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "4adf28dd5147ed964c5c93df60ee56ec6166d71fb2521c2f595e2b9b30f52e00",
+        "input.dat": "306237526c3f27c262d9cc80f04d5d46c772907f1492122fcd08d4cd26769284",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 1.3322676295501878e-15,
+        "magnetization": 4.0245584642661925e-16,
+        "correlation": 1.8735013540549517e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.174776509542116,
+        -0.9999598619096202
+      ]
+    },
+    {
+      "fixture": "sparse-permuted",
+      "alg": 2,
+      "cache": -1,
+      "threads": 1,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "4adf28dd5147ed964c5c93df60ee56ec6166d71fb2521c2f595e2b9b30f52e00",
+        "input.dat": "ee90c6d39602dd5133ab0ffa8e24320ce5ac297d8241c61b359f32283143a221",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 1.3322676295501878e-15,
+        "magnetization": 3.0531133177191805e-16,
+        "correlation": 1.6653345369377348e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.174776509542117,
+        -0.9999598619096205
+      ]
+    },
+    {
+      "fixture": "sparse-permuted",
+      "alg": 3,
+      "cache": -1,
+      "threads": 1,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "4adf28dd5147ed964c5c93df60ee56ec6166d71fb2521c2f595e2b9b30f52e00",
+        "input.dat": "2ed828e97ee693568f1a920374e6f3be7f07ff66b510e86b4e894492a699a0f0",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 3.4416913763379853e-15,
+        "magnetization": 4.211908599671688e-15,
+        "correlation": 1.7225804116449694e-15
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.174776509542116,
+        -0.999959861909618,
+        -0.6883049204641346,
+        -0.6116002418587742,
+        -0.3574528938538054,
+        -0.238807253658628,
+        -0.1539023835743368,
+        -0.04510182505345495,
+        0.1310542506106476,
+        0.3039887562073532,
+        0.3992771231642477,
+        0.4775604655753888,
+        0.5670703188392452,
+        0.6326466230444439,
+        0.8331374043496322,
+        0.9251709481239124
+      ]
+    },
+    {
+      "fixture": "sparse-permuted",
+      "alg": 1,
+      "cache": 0,
+      "threads": 2,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "4adf28dd5147ed964c5c93df60ee56ec6166d71fb2521c2f595e2b9b30f52e00",
+        "input.dat": "7a86889e16c33357dc8c186f632240191e59ab2015a6114eb37bc86ca09b1e87",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 1.3322676295501878e-15,
+        "magnetization": 3.608224830031759e-16,
+        "correlation": 1.8041124150158794e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.174776509542117
+      ]
+    },
+    {
+      "fixture": "sparse-permuted",
+      "alg": 1,
+      "cache": 3,
+      "threads": 2,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "4adf28dd5147ed964c5c93df60ee56ec6166d71fb2521c2f595e2b9b30f52e00",
+        "input.dat": "1210bf5682f21f45880f2c2714a8bb2bade29dad0d2240bbc4e4842621dd6fea",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 1.3322676295501878e-15,
+        "magnetization": 3.608224830031759e-16,
+        "correlation": 1.5959455978986625e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.174776509542117
+      ]
+    },
+    {
+      "fixture": "sparse-permuted",
+      "alg": 1,
+      "cache": -1,
+      "threads": 2,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "4adf28dd5147ed964c5c93df60ee56ec6166d71fb2521c2f595e2b9b30f52e00",
+        "input.dat": "05275381cea1791db2729fe7c0efb9c37bae7ce5c8c6057c80e66d2337c882f5",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 4.440892098500626e-16,
+        "magnetization": 4.718447854656915e-16,
+        "correlation": 1.8041124150158794e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.174776509542116
+      ]
+    },
+    {
+      "fixture": "sparse-permuted",
+      "alg": 2,
+      "cache": 0,
+      "threads": 2,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "4adf28dd5147ed964c5c93df60ee56ec6166d71fb2521c2f595e2b9b30f52e00",
+        "input.dat": "b2aa8bf69928a17a162c99b83d2338eab7de661ab89ace47788e756446beafeb",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 1.3322676295501878e-15,
+        "magnetization": 3.677613769070831e-16,
+        "correlation": 2.498001805406602e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.174776509542117,
+        -0.9999598619096209
+      ]
+    },
+    {
+      "fixture": "sparse-permuted",
+      "alg": 2,
+      "cache": 3,
+      "threads": 2,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "4adf28dd5147ed964c5c93df60ee56ec6166d71fb2521c2f595e2b9b30f52e00",
+        "input.dat": "306237526c3f27c262d9cc80f04d5d46c772907f1492122fcd08d4cd26769284",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 8.881784197001252e-16,
+        "magnetization": 2.6558616417204917e-15,
+        "correlation": 1.141448047192739e-15
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.174776509542116,
+        -0.9999598619096206
+      ]
+    },
+    {
+      "fixture": "sparse-permuted",
+      "alg": 2,
+      "cache": -1,
+      "threads": 2,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "4adf28dd5147ed964c5c93df60ee56ec6166d71fb2521c2f595e2b9b30f52e00",
+        "input.dat": "ee90c6d39602dd5133ab0ffa8e24320ce5ac297d8241c61b359f32283143a221",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 3.9968028886505635e-15,
+        "magnetization": 1.5543122344752192e-15,
+        "correlation": 5.984795992119984e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.174776509542116,
+        -0.9999598619096175
+      ]
+    },
+    {
+      "fixture": "sparse-permuted",
+      "alg": 3,
+      "cache": -1,
+      "threads": 2,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "4adf28dd5147ed964c5c93df60ee56ec6166d71fb2521c2f595e2b9b30f52e00",
+        "input.dat": "2ed828e97ee693568f1a920374e6f3be7f07ff66b510e86b4e894492a699a0f0",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 3.4416913763379853e-15,
+        "magnetization": 4.211908599671688e-15,
+        "correlation": 1.7225804116449694e-15
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.174776509542116,
+        -0.999959861909618,
+        -0.6883049204641346,
+        -0.6116002418587742,
+        -0.3574528938538054,
+        -0.238807253658628,
+        -0.1539023835743368,
+        -0.04510182505345495,
+        0.1310542506106476,
+        0.3039887562073532,
+        0.3992771231642477,
+        0.4775604655753888,
+        0.5670703188392452,
+        0.6326466230444439,
+        0.8331374043496322,
+        0.9251709481239124
+      ]
+    },
+    {
+      "fixture": "full-ordered",
+      "alg": 1,
+      "cache": 0,
+      "threads": 1,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "68b3c4fab85eab958893f2b89dbd348184f8ec3df646ae68e693c9a9e8406056",
+        "input.dat": "e8505a1b32a9a861f0bcca8de8b083d283d85363bb820bf62b6aaf7603d556d2",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 4.440892098500626e-16,
+        "magnetization": 2.024422296464934e-15,
+        "correlation": 1.0195837230053684e-15
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.150963402530335
+      ]
+    },
+    {
+      "fixture": "full-ordered",
+      "alg": 1,
+      "cache": 3,
+      "threads": 1,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "68b3c4fab85eab958893f2b89dbd348184f8ec3df646ae68e693c9a9e8406056",
+        "input.dat": "db4a46150df15a364521f682e54a8a2fb3504a2ba1286595ff7a52dd3f4a23bd",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 4.440892098500626e-16,
+        "magnetization": 1.7503359872605984e-15,
+        "correlation": 8.816732066652122e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.150963402530335
+      ]
+    },
+    {
+      "fixture": "full-ordered",
+      "alg": 1,
+      "cache": -1,
+      "threads": 1,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "68b3c4fab85eab958893f2b89dbd348184f8ec3df646ae68e693c9a9e8406056",
+        "input.dat": "66981cbd479f0da857ec2def7445327e358bd414f3875c22d0ecdcd226bfae56",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 4.440892098500626e-16,
+        "magnetization": 1.3869114190434573e-15,
+        "correlation": 6.934557095217286e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.150963402530335
+      ]
+    },
+    {
+      "fixture": "full-ordered",
+      "alg": 2,
+      "cache": 0,
+      "threads": 1,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "68b3c4fab85eab958893f2b89dbd348184f8ec3df646ae68e693c9a9e8406056",
+        "input.dat": "5546d99aa9a4b0663a1aeb5509b31fad73e01a4bad713761f233a79f0aa94f47",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 4.440892098500626e-16,
+        "magnetization": 2.8570895649338013e-15,
+        "correlation": 1.429412144204889e-15
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.150963402530335,
+        -1.038549772469108
+      ]
+    },
+    {
+      "fixture": "full-ordered",
+      "alg": 2,
+      "cache": 3,
+      "threads": 1,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "68b3c4fab85eab958893f2b89dbd348184f8ec3df646ae68e693c9a9e8406056",
+        "input.dat": "fe41ae37570d1b7c0a15419b432ddf6188f09bc2332f230d70796ad969e25912",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 4.440892098500626e-16,
+        "magnetization": 1.6106907474444654e-15,
+        "correlation": 7.853960537484994e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.150963402530335,
+        -1.038549772469108
+      ]
+    },
+    {
+      "fixture": "full-ordered",
+      "alg": 2,
+      "cache": -1,
+      "threads": 1,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "68b3c4fab85eab958893f2b89dbd348184f8ec3df646ae68e693c9a9e8406056",
+        "input.dat": "002fac93cb2304bc4228f8ebdd179f9feea8a0c9f6661d260130aa365877ab23",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 4.440892098500626e-16,
+        "magnetization": 2.576931723563547e-15,
+        "correlation": 1.2954047556856807e-15
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.150963402530335,
+        -1.038549772469108
+      ]
+    },
+    {
+      "fixture": "full-ordered",
+      "alg": 3,
+      "cache": -1,
+      "threads": 1,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "68b3c4fab85eab958893f2b89dbd348184f8ec3df646ae68e693c9a9e8406056",
+        "input.dat": "b03aeebe9ecc66c10fce8bf846f6cdbe2f5963e78cdaaff408da809218593545",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 4.884981308350689e-15,
+        "magnetization": 2.035697999058783e-15,
+        "correlation": 1.0256552551712872e-15
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.150963402530335,
+        -1.038549772469109,
+        -0.7728009256983628,
+        -0.4687188405884639,
+        -0.2603874068857219,
+        -0.2294478314792853,
+        -0.1604664966349314,
+        -0.1019331767954113,
+        0.03310252492629351,
+        0.1697721994447623,
+        0.2295986307633995,
+        0.3417867862635178,
+        0.4501758201127959,
+        0.7114228199888333,
+        0.8087167304358045,
+        1.438692341146202
+      ]
+    },
+    {
+      "fixture": "full-ordered",
+      "alg": 1,
+      "cache": 0,
+      "threads": 2,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "68b3c4fab85eab958893f2b89dbd348184f8ec3df646ae68e693c9a9e8406056",
+        "input.dat": "e8505a1b32a9a861f0bcca8de8b083d283d85363bb820bf62b6aaf7603d556d2",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 4.440892098500626e-16,
+        "magnetization": 1.9524312722118964e-15,
+        "correlation": 9.575673587391975e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.150963402530335
+      ]
+    },
+    {
+      "fixture": "full-ordered",
+      "alg": 1,
+      "cache": 3,
+      "threads": 2,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "68b3c4fab85eab958893f2b89dbd348184f8ec3df646ae68e693c9a9e8406056",
+        "input.dat": "db4a46150df15a364521f682e54a8a2fb3504a2ba1286595ff7a52dd3f4a23bd",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 4.440892098500626e-16,
+        "magnetization": 1.6332421526321639e-15,
+        "correlation": 8.135853102331225e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.150963402530335
+      ]
+    },
+    {
+      "fixture": "full-ordered",
+      "alg": 1,
+      "cache": -1,
+      "threads": 2,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "68b3c4fab85eab958893f2b89dbd348184f8ec3df646ae68e693c9a9e8406056",
+        "input.dat": "66981cbd479f0da857ec2def7445327e358bd414f3875c22d0ecdcd226bfae56",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 4.440892098500626e-16,
+        "magnetization": 1.7546727959505404e-15,
+        "correlation": 8.556523545255601e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.150963402530335
+      ]
+    },
+    {
+      "fixture": "full-ordered",
+      "alg": 2,
+      "cache": 0,
+      "threads": 2,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "68b3c4fab85eab958893f2b89dbd348184f8ec3df646ae68e693c9a9e8406056",
+        "input.dat": "5546d99aa9a4b0663a1aeb5509b31fad73e01a4bad713761f233a79f0aa94f47",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 4.440892098500626e-16,
+        "magnetization": 1.1466522176206695e-15,
+        "correlation": 5.84601811404184e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.150963402530336,
+        -1.038549772469108
+      ]
+    },
+    {
+      "fixture": "full-ordered",
+      "alg": 2,
+      "cache": 3,
+      "threads": 2,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "68b3c4fab85eab958893f2b89dbd348184f8ec3df646ae68e693c9a9e8406056",
+        "input.dat": "fe41ae37570d1b7c0a15419b432ddf6188f09bc2332f230d70796ad969e25912",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 4.440892098500626e-16,
+        "magnetization": 1.785897818518123e-15,
+        "correlation": 8.886121005691194e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.150963402530335,
+        -1.038549772469108
+      ]
+    },
+    {
+      "fixture": "full-ordered",
+      "alg": 2,
+      "cache": -1,
+      "threads": 2,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "68b3c4fab85eab958893f2b89dbd348184f8ec3df646ae68e693c9a9e8406056",
+        "input.dat": "002fac93cb2304bc4228f8ebdd179f9feea8a0c9f6661d260130aa365877ab23",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 4.440892098500626e-16,
+        "magnetization": 3.4139358007223564e-15,
+        "correlation": 1.6943911551603463e-15
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.150963402530335,
+        -1.038549772469108
+      ]
+    },
+    {
+      "fixture": "full-ordered",
+      "alg": 3,
+      "cache": -1,
+      "threads": 2,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "68b3c4fab85eab958893f2b89dbd348184f8ec3df646ae68e693c9a9e8406056",
+        "input.dat": "b03aeebe9ecc66c10fce8bf846f6cdbe2f5963e78cdaaff408da809218593545",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 4.884981308350689e-15,
+        "magnetization": 2.033095913844818e-15,
+        "correlation": 1.0256552551712872e-15
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.150963402530335,
+        -1.038549772469109,
+        -0.7728009256983628,
+        -0.4687188405884639,
+        -0.2603874068857219,
+        -0.2294478314792853,
+        -0.1604664966349314,
+        -0.1019331767954113,
+        0.03310252492629351,
+        0.1697721994447623,
+        0.2295986307633995,
+        0.3417867862635178,
+        0.4501758201127959,
+        0.7114228199888333,
+        0.8087167304358045,
+        1.438692341146202
+      ]
+    },
+    {
+      "fixture": "full-permuted",
+      "alg": 1,
+      "cache": 0,
+      "threads": 1,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "fca7766d60f08af8ceb48bd731841eff1741570cb163ea9074653e98955fc7ad",
+        "input.dat": "e8505a1b32a9a861f0bcca8de8b083d283d85363bb820bf62b6aaf7603d556d2",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 4.440892098500626e-16,
+        "magnetization": 1.7017637299332478e-15,
+        "correlation": 8.534839501805891e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.150963402530335
+      ]
+    },
+    {
+      "fixture": "full-permuted",
+      "alg": 1,
+      "cache": 3,
+      "threads": 1,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "fca7766d60f08af8ceb48bd731841eff1741570cb163ea9074653e98955fc7ad",
+        "input.dat": "db4a46150df15a364521f682e54a8a2fb3504a2ba1286595ff7a52dd3f4a23bd",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 4.440892098500626e-16,
+        "magnetization": 2.3349377986647823e-15,
+        "correlation": 1.1657341758564144e-15
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.150963402530335
+      ]
+    },
+    {
+      "fixture": "full-permuted",
+      "alg": 1,
+      "cache": -1,
+      "threads": 1,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "fca7766d60f08af8ceb48bd731841eff1741570cb163ea9074653e98955fc7ad",
+        "input.dat": "66981cbd479f0da857ec2def7445327e358bd414f3875c22d0ecdcd226bfae56",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 4.440892098500626e-16,
+        "magnetization": 1.951563910473908e-15,
+        "correlation": 9.645062526431047e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.150963402530336
+      ]
+    },
+    {
+      "fixture": "full-permuted",
+      "alg": 2,
+      "cache": 0,
+      "threads": 1,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "fca7766d60f08af8ceb48bd731841eff1741570cb163ea9074653e98955fc7ad",
+        "input.dat": "5546d99aa9a4b0663a1aeb5509b31fad73e01a4bad713761f233a79f0aa94f47",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 4.440892098500626e-16,
+        "magnetization": 4.589210955696643e-15,
+        "correlation": 2.2616457318047622e-15
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.150963402530336,
+        -1.038549772469108
+      ]
+    },
+    {
+      "fixture": "full-permuted",
+      "alg": 2,
+      "cache": 3,
+      "threads": 1,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "fca7766d60f08af8ceb48bd731841eff1741570cb163ea9074653e98955fc7ad",
+        "input.dat": "fe41ae37570d1b7c0a15419b432ddf6188f09bc2332f230d70796ad969e25912",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 4.440892098500626e-16,
+        "magnetization": 2.060851489460447e-15,
+        "correlation": 1.07032438467769e-15
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.150963402530336,
+        -1.038549772469108
+      ]
+    },
+    {
+      "fixture": "full-permuted",
+      "alg": 2,
+      "cache": -1,
+      "threads": 1,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "fca7766d60f08af8ceb48bd731841eff1741570cb163ea9074653e98955fc7ad",
+        "input.dat": "002fac93cb2304bc4228f8ebdd179f9feea8a0c9f6661d260130aa365877ab23",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 6.661338147750939e-16,
+        "magnetization": 2.3496829482105852e-15,
+        "correlation": 1.1674688993323912e-15
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.150963402530336,
+        -1.038549772469109
+      ]
+    },
+    {
+      "fixture": "full-permuted",
+      "alg": 3,
+      "cache": -1,
+      "threads": 1,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "fca7766d60f08af8ceb48bd731841eff1741570cb163ea9074653e98955fc7ad",
+        "input.dat": "b03aeebe9ecc66c10fce8bf846f6cdbe2f5963e78cdaaff408da809218593545",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 4.884981308350689e-15,
+        "magnetization": 1.925543058334256e-15,
+        "correlation": 9.71445146547012e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.150963402530335,
+        -1.038549772469108,
+        -0.7728009256983628,
+        -0.4687188405884638,
+        -0.2603874068857214,
+        -0.2294478314792856,
+        -0.1604664966349311,
+        -0.1019331767954115,
+        0.03310252492629284,
+        0.1697721994447623,
+        0.2295986307634001,
+        0.3417867862635178,
+        0.4501758201127952,
+        0.7114228199888333,
+        0.8087167304358049,
+        1.438692341146202
+      ]
+    },
+    {
+      "fixture": "full-permuted",
+      "alg": 1,
+      "cache": 0,
+      "threads": 2,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "fca7766d60f08af8ceb48bd731841eff1741570cb163ea9074653e98955fc7ad",
+        "input.dat": "e8505a1b32a9a861f0bcca8de8b083d283d85363bb820bf62b6aaf7603d556d2",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 4.440892098500626e-16,
+        "magnetization": 1.9402882078800587e-15,
+        "correlation": 9.224392083506672e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.150963402530336
+      ]
+    },
+    {
+      "fixture": "full-permuted",
+      "alg": 1,
+      "cache": 3,
+      "threads": 2,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "fca7766d60f08af8ceb48bd731841eff1741570cb163ea9074653e98955fc7ad",
+        "input.dat": "db4a46150df15a364521f682e54a8a2fb3504a2ba1286595ff7a52dd3f4a23bd",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 4.440892098500626e-16,
+        "magnetization": 1.929879867024198e-15,
+        "correlation": 9.484600604903193e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.150963402530335
+      ]
+    },
+    {
+      "fixture": "full-permuted",
+      "alg": 1,
+      "cache": -1,
+      "threads": 2,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "fca7766d60f08af8ceb48bd731841eff1741570cb163ea9074653e98955fc7ad",
+        "input.dat": "66981cbd479f0da857ec2def7445327e358bd414f3875c22d0ecdcd226bfae56",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 4.440892098500626e-16,
+        "magnetization": 1.7486012637846216e-15,
+        "correlation": 8.816732066652122e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.150963402530335
+      ]
+    },
+    {
+      "fixture": "full-permuted",
+      "alg": 2,
+      "cache": 0,
+      "threads": 2,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "fca7766d60f08af8ceb48bd731841eff1741570cb163ea9074653e98955fc7ad",
+        "input.dat": "5546d99aa9a4b0663a1aeb5509b31fad73e01a4bad713761f233a79f0aa94f47",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 6.661338147750939e-16,
+        "magnetization": 1.822327011513636e-15,
+        "correlation": 9.17668718791731e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.150963402530335,
+        -1.038549772469109
+      ]
+    },
+    {
+      "fixture": "full-permuted",
+      "alg": 2,
+      "cache": 3,
+      "threads": 2,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "fca7766d60f08af8ceb48bd731841eff1741570cb163ea9074653e98955fc7ad",
+        "input.dat": "fe41ae37570d1b7c0a15419b432ddf6188f09bc2332f230d70796ad969e25912",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 6.661338147750939e-16,
+        "magnetization": 1.2906342661267445e-15,
+        "correlation": 6.826136877968736e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.150963402530336,
+        -1.038549772469109
+      ]
+    },
+    {
+      "fixture": "full-permuted",
+      "alg": 2,
+      "cache": -1,
+      "threads": 2,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "fca7766d60f08af8ceb48bd731841eff1741570cb163ea9074653e98955fc7ad",
+        "input.dat": "002fac93cb2304bc4228f8ebdd179f9feea8a0c9f6661d260130aa365877ab23",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 4.440892098500626e-16,
+        "magnetization": 1.56472057533108e-15,
+        "correlation": 7.684824998577255e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.150963402530335,
+        -1.038549772469108
+      ]
+    },
+    {
+      "fixture": "full-permuted",
+      "alg": 3,
+      "cache": -1,
+      "threads": 2,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "fca7766d60f08af8ceb48bd731841eff1741570cb163ea9074653e98955fc7ad",
+        "input.dat": "b03aeebe9ecc66c10fce8bf846f6cdbe2f5963e78cdaaff408da809218593545",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "errors": {
+        "energy": 4.884981308350689e-15,
+        "magnetization": 1.9272777818102327e-15,
+        "correlation": 9.71445146547012e-16
+      },
+      "status": "passed",
+      "eigenvalues": [
+        -1.150963402530335,
+        -1.038549772469108,
+        -0.7728009256983628,
+        -0.4687188405884638,
+        -0.2603874068857214,
+        -0.2294478314792856,
+        -0.1604664966349311,
+        -0.1019331767954115,
+        0.03310252492629284,
+        0.1697721994447623,
+        0.2295986307634001,
+        0.3417867862635178,
+        0.4501758201127952,
+        0.7114228199888333,
+        0.8087167304358049,
+        1.438692341146202
+      ]
+    }
+  ],
+  "operators": [
+    {
+      "fixture": "single-site4",
+      "threads": 1,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "ec5f4a910655f3920e3ead6ed8bf92126fe2f75fba6953ce084f1c6a515f10a5",
+        "input.dat": "0f26fc8a5f1ef2f400327e267fc081c0f8e3b004558e90272aa67a6d45dc0b9b",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "status": "passed",
+      "errors": {
+        "dense_reference": 5.551115123125783e-17,
+        "dense_hermiticity": 0.0,
+        "cache0_reference": 5.551115123125783e-17,
+        "cache0_dense": 0.0,
+        "cache0_hermiticity": 0.0,
+        "cache3_reference": 5.551115123125783e-17,
+        "cache3_dense": 0.0,
+        "cache3_hermiticity": 0.0,
+        "cache-1_reference": 5.551115123125783e-17,
+        "cache-1_dense": 0.0,
+        "cache-1_hermiticity": 0.0
+      },
+      "basis_permutation": [
+        0,
+        8,
+        4,
+        12,
+        2,
+        10,
+        6,
+        14,
+        1,
+        9,
+        5,
+        13,
+        3,
+        11,
+        7,
+        15
+      ]
+    },
+    {
+      "fixture": "single-site4",
+      "threads": 2,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "ec5f4a910655f3920e3ead6ed8bf92126fe2f75fba6953ce084f1c6a515f10a5",
+        "input.dat": "0f26fc8a5f1ef2f400327e267fc081c0f8e3b004558e90272aa67a6d45dc0b9b",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "status": "passed",
+      "errors": {
+        "dense_reference": 5.551115123125783e-17,
+        "dense_hermiticity": 0.0,
+        "cache0_reference": 5.551115123125783e-17,
+        "cache0_dense": 0.0,
+        "cache0_hermiticity": 0.0,
+        "cache3_reference": 5.551115123125783e-17,
+        "cache3_dense": 0.0,
+        "cache3_hermiticity": 0.0,
+        "cache-1_reference": 5.551115123125783e-17,
+        "cache-1_dense": 0.0,
+        "cache-1_hermiticity": 0.0
+      },
+      "basis_permutation": [
+        0,
+        8,
+        4,
+        12,
+        2,
+        10,
+        6,
+        14,
+        1,
+        9,
+        5,
+        13,
+        3,
+        11,
+        7,
+        15
+      ]
+    },
+    {
+      "fixture": "sparse-ordered",
+      "threads": 1,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "bd27288bb23dc83b258ad604cfdfc39ccaed3d60c9f4192017ab01d00a0fd392",
+        "input.dat": "2ed828e97ee693568f1a920374e6f3be7f07ff66b510e86b4e894492a699a0f0",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "status": "passed",
+      "errors": {
+        "dense_reference": 5.551115123125783e-17,
+        "dense_hermiticity": 0.0,
+        "cache0_reference": 5.551115123125783e-17,
+        "cache0_dense": 0.0,
+        "cache0_hermiticity": 0.0,
+        "cache3_reference": 5.551115123125783e-17,
+        "cache3_dense": 0.0,
+        "cache3_hermiticity": 0.0,
+        "cache-1_reference": 5.551115123125783e-17,
+        "cache-1_dense": 0.0,
+        "cache-1_hermiticity": 0.0
+      },
+      "basis_permutation": [
+        0,
+        8,
+        4,
+        12,
+        2,
+        10,
+        6,
+        14,
+        1,
+        9,
+        5,
+        13,
+        3,
+        11,
+        7,
+        15
+      ]
+    },
+    {
+      "fixture": "sparse-ordered",
+      "threads": 2,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "bd27288bb23dc83b258ad604cfdfc39ccaed3d60c9f4192017ab01d00a0fd392",
+        "input.dat": "2ed828e97ee693568f1a920374e6f3be7f07ff66b510e86b4e894492a699a0f0",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "status": "passed",
+      "errors": {
+        "dense_reference": 5.551115123125783e-17,
+        "dense_hermiticity": 0.0,
+        "cache0_reference": 5.551115123125783e-17,
+        "cache0_dense": 0.0,
+        "cache0_hermiticity": 0.0,
+        "cache3_reference": 5.551115123125783e-17,
+        "cache3_dense": 0.0,
+        "cache3_hermiticity": 0.0,
+        "cache-1_reference": 5.551115123125783e-17,
+        "cache-1_dense": 0.0,
+        "cache-1_hermiticity": 0.0
+      },
+      "basis_permutation": [
+        0,
+        8,
+        4,
+        12,
+        2,
+        10,
+        6,
+        14,
+        1,
+        9,
+        5,
+        13,
+        3,
+        11,
+        7,
+        15
+      ]
+    },
+    {
+      "fixture": "sparse-permuted",
+      "threads": 1,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "4adf28dd5147ed964c5c93df60ee56ec6166d71fb2521c2f595e2b9b30f52e00",
+        "input.dat": "2ed828e97ee693568f1a920374e6f3be7f07ff66b510e86b4e894492a699a0f0",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "status": "passed",
+      "errors": {
+        "dense_reference": 5.551115123125783e-17,
+        "dense_hermiticity": 0.0,
+        "cache0_reference": 5.551115123125783e-17,
+        "cache0_dense": 0.0,
+        "cache0_hermiticity": 0.0,
+        "cache3_reference": 5.551115123125783e-17,
+        "cache3_dense": 0.0,
+        "cache3_hermiticity": 0.0,
+        "cache-1_reference": 5.551115123125783e-17,
+        "cache-1_dense": 0.0,
+        "cache-1_hermiticity": 0.0
+      },
+      "basis_permutation": [
+        0,
+        8,
+        4,
+        12,
+        2,
+        10,
+        6,
+        14,
+        1,
+        9,
+        5,
+        13,
+        3,
+        11,
+        7,
+        15
+      ]
+    },
+    {
+      "fixture": "sparse-permuted",
+      "threads": 2,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "4adf28dd5147ed964c5c93df60ee56ec6166d71fb2521c2f595e2b9b30f52e00",
+        "input.dat": "2ed828e97ee693568f1a920374e6f3be7f07ff66b510e86b4e894492a699a0f0",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "status": "passed",
+      "errors": {
+        "dense_reference": 5.551115123125783e-17,
+        "dense_hermiticity": 0.0,
+        "cache0_reference": 5.551115123125783e-17,
+        "cache0_dense": 0.0,
+        "cache0_hermiticity": 0.0,
+        "cache3_reference": 5.551115123125783e-17,
+        "cache3_dense": 0.0,
+        "cache3_hermiticity": 0.0,
+        "cache-1_reference": 5.551115123125783e-17,
+        "cache-1_dense": 0.0,
+        "cache-1_hermiticity": 0.0
+      },
+      "basis_permutation": [
+        0,
+        8,
+        4,
+        12,
+        2,
+        10,
+        6,
+        14,
+        1,
+        9,
+        5,
+        13,
+        3,
+        11,
+        7,
+        15
+      ]
+    },
+    {
+      "fixture": "full-ordered",
+      "threads": 1,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "68b3c4fab85eab958893f2b89dbd348184f8ec3df646ae68e693c9a9e8406056",
+        "input.dat": "b03aeebe9ecc66c10fce8bf846f6cdbe2f5963e78cdaaff408da809218593545",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "status": "passed",
+      "errors": {
+        "dense_reference": 5.721958498152797e-17,
+        "dense_hermiticity": 0.0,
+        "cache0_reference": 5.721958498152797e-17,
+        "cache0_dense": 0.0,
+        "cache0_hermiticity": 0.0,
+        "cache3_reference": 5.721958498152797e-17,
+        "cache3_dense": 0.0,
+        "cache3_hermiticity": 0.0,
+        "cache-1_reference": 5.721958498152797e-17,
+        "cache-1_dense": 0.0,
+        "cache-1_hermiticity": 0.0
+      },
+      "basis_permutation": [
+        0,
+        8,
+        4,
+        12,
+        2,
+        10,
+        6,
+        14,
+        1,
+        9,
+        5,
+        13,
+        3,
+        11,
+        7,
+        15
+      ]
+    },
+    {
+      "fixture": "full-ordered",
+      "threads": 2,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "68b3c4fab85eab958893f2b89dbd348184f8ec3df646ae68e693c9a9e8406056",
+        "input.dat": "b03aeebe9ecc66c10fce8bf846f6cdbe2f5963e78cdaaff408da809218593545",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "status": "passed",
+      "errors": {
+        "dense_reference": 5.721958498152797e-17,
+        "dense_hermiticity": 0.0,
+        "cache0_reference": 5.721958498152797e-17,
+        "cache0_dense": 0.0,
+        "cache0_hermiticity": 0.0,
+        "cache3_reference": 5.721958498152797e-17,
+        "cache3_dense": 0.0,
+        "cache3_hermiticity": 0.0,
+        "cache-1_reference": 5.721958498152797e-17,
+        "cache-1_dense": 0.0,
+        "cache-1_hermiticity": 0.0
+      },
+      "basis_permutation": [
+        0,
+        8,
+        4,
+        12,
+        2,
+        10,
+        6,
+        14,
+        1,
+        9,
+        5,
+        13,
+        3,
+        11,
+        7,
+        15
+      ]
+    },
+    {
+      "fixture": "full-permuted",
+      "threads": 1,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "fca7766d60f08af8ceb48bd731841eff1741570cb163ea9074653e98955fc7ad",
+        "input.dat": "b03aeebe9ecc66c10fce8bf846f6cdbe2f5963e78cdaaff408da809218593545",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "status": "passed",
+      "errors": {
+        "dense_reference": 1.1102230246251565e-16,
+        "dense_hermiticity": 0.0,
+        "cache0_reference": 1.1102230246251565e-16,
+        "cache0_dense": 0.0,
+        "cache0_hermiticity": 0.0,
+        "cache3_reference": 1.1102230246251565e-16,
+        "cache3_dense": 0.0,
+        "cache3_hermiticity": 0.0,
+        "cache-1_reference": 1.1102230246251565e-16,
+        "cache-1_dense": 0.0,
+        "cache-1_hermiticity": 0.0
+      },
+      "basis_permutation": [
+        0,
+        8,
+        4,
+        12,
+        2,
+        10,
+        6,
+        14,
+        1,
+        9,
+        5,
+        13,
+        3,
+        11,
+        7,
+        15
+      ]
+    },
+    {
+      "fixture": "full-permuted",
+      "threads": 2,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "fca7766d60f08af8ceb48bd731841eff1741570cb163ea9074653e98955fc7ad",
+        "input.dat": "b03aeebe9ecc66c10fce8bf846f6cdbe2f5963e78cdaaff408da809218593545",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "status": "passed",
+      "errors": {
+        "dense_reference": 1.1102230246251565e-16,
+        "dense_hermiticity": 0.0,
+        "cache0_reference": 1.1102230246251565e-16,
+        "cache0_dense": 0.0,
+        "cache0_hermiticity": 0.0,
+        "cache3_reference": 1.1102230246251565e-16,
+        "cache3_dense": 0.0,
+        "cache3_hermiticity": 0.0,
+        "cache-1_reference": 1.1102230246251565e-16,
+        "cache-1_dense": 0.0,
+        "cache-1_hermiticity": 0.0
+      },
+      "basis_permutation": [
+        0,
+        8,
+        4,
+        12,
+        2,
+        10,
+        6,
+        14,
+        1,
+        9,
+        5,
+        13,
+        3,
+        11,
+        7,
+        15
+      ]
+    }
+  ],
+  "permutations": [
+    {
+      "fixtures": [
+        "sparse-ordered",
+        "sparse-permuted"
+      ],
+      "alg": 1,
+      "cache": 0,
+      "threads": 1,
+      "errors": {
+        "eigenvalues": 0.0,
+        "magnetization": 8.118505867571457e-16,
+        "correlations": 3.400058012914542e-16
+      },
+      "status": "passed"
+    },
+    {
+      "fixtures": [
+        "sparse-ordered",
+        "sparse-permuted"
+      ],
+      "alg": 1,
+      "cache": 3,
+      "threads": 1,
+      "errors": {
+        "eigenvalues": 0.0,
+        "magnetization": 1.3704315460216776e-16,
+        "correlations": 1.0061396160665481e-16
+      },
+      "status": "passed"
+    },
+    {
+      "fixtures": [
+        "sparse-ordered",
+        "sparse-permuted"
+      ],
+      "alg": 1,
+      "cache": -1,
+      "threads": 1,
+      "errors": {
+        "eigenvalues": 0.0,
+        "magnetization": 3.7903707950093235e-16,
+        "correlations": 1.8041124150158794e-16
+      },
+      "status": "passed"
+    },
+    {
+      "fixtures": [
+        "sparse-ordered",
+        "sparse-permuted"
+      ],
+      "alg": 2,
+      "cache": 0,
+      "threads": 1,
+      "errors": {
+        "eigenvalues": 1.1102230246251565e-15,
+        "magnetization": 7.832276494035284e-16,
+        "correlations": 3.5041414214731503e-16
+      },
+      "status": "passed"
+    },
+    {
+      "fixtures": [
+        "sparse-ordered",
+        "sparse-permuted"
+      ],
+      "alg": 2,
+      "cache": 3,
+      "threads": 1,
+      "errors": {
+        "eigenvalues": 2.220446049250313e-16,
+        "magnetization": 3.5301622736128024e-16,
+        "correlations": 1.5265566588595902e-16
+      },
+      "status": "passed"
+    },
+    {
+      "fixtures": [
+        "sparse-ordered",
+        "sparse-permuted"
+      ],
+      "alg": 2,
+      "cache": -1,
+      "threads": 1,
+      "errors": {
+        "eigenvalues": 2.9976021664879227e-15,
+        "magnetization": 8.201772594418344e-15,
+        "correlations": 3.8441472227646045e-15
+      },
+      "status": "passed"
+    },
+    {
+      "fixtures": [
+        "sparse-ordered",
+        "sparse-permuted"
+      ],
+      "alg": 3,
+      "cache": -1,
+      "threads": 1,
+      "errors": {
+        "eigenvalues": 0.0,
+        "magnetization": 0.0,
+        "correlations": 0.0
+      },
+      "status": "passed"
+    },
+    {
+      "fixtures": [
+        "sparse-ordered",
+        "sparse-permuted"
+      ],
+      "alg": 1,
+      "cache": 0,
+      "threads": 2,
+      "errors": {
+        "eigenvalues": 8.881784197001252e-16,
+        "magnetization": 1.734723475976807e-16,
+        "correlations": 9.71445146547012e-17
+      },
+      "status": "passed"
+    },
+    {
+      "fixtures": [
+        "sparse-ordered",
+        "sparse-permuted"
+      ],
+      "alg": 1,
+      "cache": 3,
+      "threads": 2,
+      "errors": {
+        "eigenvalues": 8.881784197001252e-16,
+        "magnetization": 4.518954654919582e-16,
+        "correlations": 2.0816681711721685e-16
+      },
+      "status": "passed"
+    },
+    {
+      "fixtures": [
+        "sparse-ordered",
+        "sparse-permuted"
+      ],
+      "alg": 1,
+      "cache": -1,
+      "threads": 2,
+      "errors": {
+        "eigenvalues": 0.0,
+        "magnetization": 2.220446049250313e-16,
+        "correlations": 1.1102230246251565e-16
+      },
+      "status": "passed"
+    },
+    {
+      "fixtures": [
+        "sparse-ordered",
+        "sparse-permuted"
+      ],
+      "alg": 2,
+      "cache": 0,
+      "threads": 2,
+      "errors": {
+        "eigenvalues": 7.771561172376096e-16,
+        "magnetization": 1.403391292065237e-15,
+        "correlations": 6.522560269672795e-16
+      },
+      "status": "passed"
+    },
+    {
+      "fixtures": [
+        "sparse-ordered",
+        "sparse-permuted"
+      ],
+      "alg": 2,
+      "cache": 3,
+      "threads": 2,
+      "errors": {
+        "eigenvalues": 3.3306690738754696e-16,
+        "magnetization": 2.5179511253803355e-15,
+        "correlations": 1.1275702593849246e-15
+      },
+      "status": "passed"
+    },
+    {
+      "fixtures": [
+        "sparse-ordered",
+        "sparse-permuted"
+      ],
+      "alg": 2,
+      "cache": -1,
+      "threads": 2,
+      "errors": {
+        "eigenvalues": 2.4424906541753444e-15,
+        "magnetization": 1.672273430841642e-15,
+        "correlations": 6.800116025829084e-16
+      },
+      "status": "passed"
+    },
+    {
+      "fixtures": [
+        "sparse-ordered",
+        "sparse-permuted"
+      ],
+      "alg": 3,
+      "cache": -1,
+      "threads": 2,
+      "errors": {
+        "eigenvalues": 0.0,
+        "magnetization": 0.0,
+        "correlations": 0.0
+      },
+      "status": "passed"
+    },
+    {
+      "fixtures": [
+        "full-ordered",
+        "full-permuted"
+      ],
+      "alg": 1,
+      "cache": 0,
+      "threads": 1,
+      "errors": {
+        "eigenvalues": 0.0,
+        "magnetization": 4.40619762898109e-16,
+        "correlations": 2.0296264668928643e-16
+      },
+      "status": "passed"
+    },
+    {
+      "fixtures": [
+        "full-ordered",
+        "full-permuted"
+      ],
+      "alg": 1,
+      "cache": 3,
+      "threads": 1,
+      "errors": {
+        "eigenvalues": 0.0,
+        "magnetization": 5.84601811404184e-16,
+        "correlations": 2.983724378680108e-16
+      },
+      "status": "passed"
+    },
+    {
+      "fixtures": [
+        "full-ordered",
+        "full-permuted"
+      ],
+      "alg": 1,
+      "cache": -1,
+      "threads": 1,
+      "errors": {
+        "eigenvalues": 8.881784197001252e-16,
+        "magnetization": 6.938893903907228e-16,
+        "correlations": 2.8796409701215e-16
+      },
+      "status": "passed"
+    },
+    {
+      "fixtures": [
+        "full-ordered",
+        "full-permuted"
+      ],
+      "alg": 2,
+      "cache": 0,
+      "threads": 1,
+      "errors": {
+        "eigenvalues": 8.881784197001252e-16,
+        "magnetization": 2.2620794126737565e-15,
+        "correlations": 1.0321604682062002e-15
+      },
+      "status": "passed"
+    },
+    {
+      "fixtures": [
+        "full-ordered",
+        "full-permuted"
+      ],
+      "alg": 2,
+      "cache": 3,
+      "threads": 1,
+      "errors": {
+        "eigenvalues": 8.881784197001252e-16,
+        "magnetization": 2.14064876935538e-15,
+        "correlations": 1.1518563880486e-15
+      },
+      "status": "passed"
+    },
+    {
+      "fixtures": [
+        "full-ordered",
+        "full-permuted"
+      ],
+      "alg": 2,
+      "cache": -1,
+      "threads": 1,
+      "errors": {
+        "eigenvalues": 1.1102230246251565e-15,
+        "magnetization": 4.163336342344337e-16,
+        "correlations": 1.6653345369377348e-16
+      },
+      "status": "passed"
+    },
+    {
+      "fixtures": [
+        "full-ordered",
+        "full-permuted"
+      ],
+      "alg": 3,
+      "cache": -1,
+      "threads": 1,
+      "errors": {
+        "eigenvalues": 1.1102230246251565e-15,
+        "magnetization": 4.198030811863873e-16,
+        "correlations": 1.9081958235744878e-16
+      },
+      "status": "passed"
+    },
+    {
+      "fixtures": [
+        "full-ordered",
+        "full-permuted"
+      ],
+      "alg": 1,
+      "cache": 0,
+      "threads": 2,
+      "errors": {
+        "eigenvalues": 8.881784197001252e-16,
+        "magnetization": 1.942890293094024e-16,
+        "correlations": 4.579669976578771e-16
+      },
+      "status": "passed"
+    },
+    {
+      "fixtures": [
+        "full-ordered",
+        "full-permuted"
+      ],
+      "alg": 1,
+      "cache": 3,
+      "threads": 2,
+      "errors": {
+        "eigenvalues": 0.0,
+        "magnetization": 2.96637714392034e-16,
+        "correlations": 7.840950111415168e-16
+      },
+      "status": "passed"
+    },
+    {
+      "fixtures": [
+        "full-ordered",
+        "full-permuted"
+      ],
+      "alg": 1,
+      "cache": -1,
+      "threads": 2,
+      "errors": {
+        "eigenvalues": 0.0,
+        "magnetization": 6.487865800153259e-16,
+        "correlations": 2.975050761300224e-16
+      },
+      "status": "passed"
+    },
+    {
+      "fixtures": [
+        "full-ordered",
+        "full-permuted"
+      ],
+      "alg": 2,
+      "cache": 0,
+      "threads": 2,
+      "errors": {
+        "eigenvalues": 1.1102230246251565e-15,
+        "magnetization": 1.1102230246251565e-15,
+        "correlations": 5.204170427930421e-16
+      },
+      "status": "passed"
+    },
+    {
+      "fixtures": [
+        "full-ordered",
+        "full-permuted"
+      ],
+      "alg": 2,
+      "cache": 3,
+      "threads": 2,
+      "errors": {
+        "eigenvalues": 1.1102230246251565e-15,
+        "magnetization": 2.530094189712173e-15,
+        "correlations": 1.2910679469957387e-15
+      },
+      "status": "passed"
+    },
+    {
+      "fixtures": [
+        "full-ordered",
+        "full-permuted"
+      ],
+      "alg": 2,
+      "cache": -1,
+      "threads": 2,
+      "errors": {
+        "eigenvalues": 0.0,
+        "magnetization": 1.8492152253912764e-15,
+        "correlations": 9.259086553026208e-16
+      },
+      "status": "passed"
+    },
+    {
+      "fixtures": [
+        "full-ordered",
+        "full-permuted"
+      ],
+      "alg": 3,
+      "cache": -1,
+      "threads": 2,
+      "errors": {
+        "eigenvalues": 1.1102230246251565e-15,
+        "magnetization": 4.198030811863873e-16,
+        "correlations": 1.9081958235744878e-16
+      },
+      "status": "passed"
+    }
+  ]
+}

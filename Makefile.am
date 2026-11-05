@@ -24,3 +24,8 @@ check-lapack:
 check-sparse-field:
 	$(AM_V_at)$(MAKE) -C source all
 	$(AM_V_at)$(MAKE) -C tests check-sparse-field SPARSE_FIELD_OUTPUT="$(SPARSE_FIELD_OUTPUT)"
+
+.PHONY: check-lanczos
+check-lanczos:
+	$(AM_V_at)$(MAKE) -C source all
+	$(AM_V_at)$(MAKE) -C tests check-lanczos LANCZOS_OUTPUT="$(LANCZOS_OUTPUT)"

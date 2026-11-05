@@ -1,13 +1,21 @@
 module eigen_solver
-  use blas_lapack_interfaces, only: zheevr, dstevx, dlamch, dznrm2, zdotc, &
-    zgemm, zcopy, zaxpy, zscal, zdscal, check_lapack_info, zheevr_workspace_lengths
+  use blas_lapack_interfaces, only: zheevr, dlamch, zcopy, check_lapack_info, zheevr_workspace_lengths
   use ham2vec
   implicit none
+  private :: apply_hamiltonian
   integer :: NOE,NOK, NOM, maxitr, ite_lancz, i_vec_min, i_vec_max
   integer :: dim
   real(8) :: lnc_ene_conv
   namelist /input_TRLan/ NOE, NOK, NOM, maxitr, lnc_ene_conv, i_vec_min, i_vec_max
 contains
+  subroutine apply_hamiltonian(n,x,y)
+    use input_param, only: NODmax,NODmin,list_s,list_r,explist
+    integer, intent(in) :: n
+    complex(8), intent(in) :: x(n)
+    complex(8), intent(out) :: y(n)
+    call ham_to_vec_wave_vector(y,x,n,NODmax,NODmin,list_s,list_r,explist)
+  end subroutine apply_hamiltonian
+
   subroutine my_trlanczos_routines_complex(ene,psi,THS) 
     use input_param, only : OUTDIR
     real(8), allocatable, intent(out) :: ene(:)
@@ -17,10 +25,12 @@ contains
     read(*,input_TRLan)
     write(*,input_TRLan)
 
-    if(NOE > NOK) stop "ne must be eaqual or smaller than NOK!"
+    if(NOE > NOK) error stop 'NOE must not exceed NOK'
     if(NOM < 2*NOK) NOM = 2*NOK
+    NOM=min(NOM,THS)
+    NOK=min(NOK,THS)
     dim = THS
-    if(dim < NOE .or. dim < NOE .or. dim < NOK .or. dim < NOM) stop 999
+    if(NOE<1 .or. NOE>dim .or. NOK<NOE) error stop 'invalid TRLan eigenpair count'
     allocate( psi(dim,NOM+1), ene(NOM) )
     write(*,*) "Reduced THS=", THS 
     write(*,'("************************************************************************************")')
@@ -70,181 +80,19 @@ contains
 
   end subroutine Full_diag_routines
 
-  subroutine lancz_eigen_val_complex(ene, psi) 
-    use input_param, only: NODmax, NODmin, list_s, list_r, explist 
+  subroutine lancz_eigen_val_complex(ene, psi)
+    use input_param, only: NODmax, NODmin, list_s, list_r, explist
+    use krylov_solvers, only: restarted_hermitian
     real(8), intent(inout) :: ene(1:NOM)
     complex(8), intent(inout) :: psi(1:dim,1:NOM+1)
-    real(8), allocatable :: alpha(:), beta(:), coef(:,:), conv(:)
-    complex(8),allocatable:: T(:,:), Qk(:,:), overlap(:),calpha(:),cbeta(:),ccoef(:,:)
-    integer, allocatable :: isuppz(:), iwork_lanc(:), ifail_lanc(:)
-    complex(8), allocatable :: work_lanc(:)
-    real(8),allocatable::rwork_lanc(:)
-    integer :: count_ne, info, lwork, lrwork,liwork, tritr, flag
-    integer :: i, j, ell
-    real(8) :: abstol, max_conv,tmp(2)
-    integer t1,t2,t3,t4,t_rate,t_max
-    complex(8) :: prdct 
-    flag = 0
-    allocate(conv(NOK), alpha(NOM), beta(0:NOM), coef(NOM,NOM), isuppz(2*NOM), &
-      overlap(NOM), T(NOM, NOM), Qk(dim,NOK),ccoef(NOM,NOM), calpha(NOM), cbeta(0:NOM))
-
-    !*********************************
-    !***** initial lanczos step ******
-    !*********************************
-    !$OMP parallel do private(i,tmp)
-    do i = 1, dim
-      call random_number(tmp)
-      psi(i,1) = cmplx(tmp(1),tmp(2),8)
-      psi(i,1) = psi(i,1) - (0.5d0, 0.5d0)
-    end do
-    !
-    beta(0) = dznrm2( dim, psi(1,1), 1 )
-    do i = 1, NOM
-      call zdscal( dim, 1.0d0/beta(i-1), psi(1,i), 1 )
-      call system_clock(t1)
-      call ham_to_vec_wave_vector(Qk(:,1),psi(:,i),dim,NODmax,NODmin,list_s,list_r,explist) 
-      call system_clock(t2,t_rate, t_max)
-      alpha(i) = dble(zdotc(dim,psi(1,i),1,Qk(:,1),1))
-      if(i > 1)then
-        !$OMP parallel do private(ell)
-        do ell = 1, dim
-          psi(ell,i+1) = Qk(ell,1) - alpha(i)*psi(ell,i)-beta(i-1)*psi(ell,i-1)
-        end do
-        !
-        call full_reorthogonalization_complex 
-      else
-        !$OMP parallel do private(ell)
-        do ell = 1, dim
-          psi(ell,i+1) = Qk(ell,1) - alpha(i)*psi(ell,i)
-        end do
-        !
-      end if
-      beta(i) = dznrm2( dim, psi(1,i+1), 1 )
-    end do
-    !
-    call zdscal( dim, 1.0d0/beta(NOM), psi(1,NOM+1), 1 )
-    !
-    abstol = 2.0d0*dlamch('S')
-    allocate(iwork_lanc(5*NOM), ifail_lanc(NOM), rwork_lanc(5*NOM))
-    call dstevx('V', 'A', NOM, alpha, beta(1), 0.0d0, 1.0d0, 1, NOM, abstol, &
-      count_ne, ene, coef, NOM, rwork_lanc, iwork_lanc, ifail_lanc, info)
-    call check_lapack_info('DSTEVX (TRLan)', info)
-    deallocate(iwork_lanc, ifail_lanc, rwork_lanc)
-    !
-    !*********************************
-    !***** restart lanczos step ******
-    !*********************************
-    ccoef = cmplx(coef,0.0d0,8)
-    calpha = cmplx(alpha,0.0d0,8)
-    cbeta = cmplx(beta,0.0d0,8)
-    deallocate(coef,alpha,beta)
-    do tritr = 1, maxitr
-      call system_clock(t3)
-      !
-      !ccoef = conjg(ccoef)
-      call zgemm('N', 'N', dim, NOK, NOM, (1.0d0,0.0d0), &
-        psi, dim, ccoef, NOM, (0.0d0,0.0d0), Qk, dim)
-      call zcopy(dim*NOK,Qk,1,psi,1)
-      conv(1:NOK) = abs(calpha(1:NOK)/ene(1:NOK) - 1.0d0)
-      max_conv = maxval(conv)
-      if(max_conv < lnc_ene_conv)then
-        flag = flag + 1
-      else
-        flag = 0
-      end if
-      write(*,'("tritr, ene(NOK), max_conv, flag: ", i5, es25.15, es11.1, i5)') &
-        tritr, ene(NOK), max_conv, flag
-      if(flag == 2) exit
-      if(tritr == maxitr)then
-        write(*,*) "tritr = maxitr in trlanczos!"; exit
-      end if
-      call zcopy(dim,psi(1,NOM+1),1,psi(1,NOK+1),1)
-      calpha(1:NOK) = cmplx(ene(1:NOK),0.0d0,8)
-      !
-      forall(j=1:NOK) cbeta(j) = cbeta(NOM) * ccoef(NOM,j)
-      i = NOK+1
-      call ham_to_vec_wave_vector(Qk(:,1),psi(:,i),dim,&
-        NODmax,NODmin,list_s,list_r,explist) 
-      calpha(i) = zdotc(dim,psi(1,i),1,Qk(1,1),1)
-      do j=1, NOK
-        call zaxpy(dim, -cbeta(j),psi(1,j),1,Qk(1,1),1)
-      end do
-      !$OMP parallel do private(ell)
-      do ell = 1, dim
-        psi(ell,i+1) = Qk(ell,1) - calpha(i)*psi(ell,i)
-      end do
-      !
-      call full_reorthogonalization_complex
-      cbeta(i) = cmplx(dznrm2( dim, psi(1,i+1), 1 ),0.0d0,8)
-      do i = NOK+2, NOM
-        call zscal( dim, (1.0d0,0.0d0)/cbeta(i-1), psi(1,i), 1 )
-        call ham_to_vec_wave_vector(Qk(:,1),psi(:,i),dim,&
-          NODmax,NODmin,list_s,list_r,explist)
-        calpha(i) = zdotc(dim,psi(1,i),1,Qk(:,1),1)
-        !$OMP parallel do private(ell)
-        do ell = 1, dim
-          psi(ell,i+1) = Qk(ell,1) - calpha(i)*psi(ell,i)-cbeta(i-1)*psi(ell,i-1)
-        end do
-        !
-        call full_reorthogonalization_complex 
-        cbeta(i) = cmplx(dznrm2( dim, psi(1,i+1), 1 ),0.0d0,8)
-      end do
-      call zscal( dim, (1.0d0,0.0d0)/cbeta(NOM), psi(1,NOM+1), 1 )
-      T = (0.0d0,0.0d0)
-      do j = 1, NOM
-        T(j,j) = calpha(j)
-      end do
-      call zcopy(NOK,cbeta(1),1,T(1,NOK+1),1)
-      do j = NOK+1, NOM-1
-        T(j,j+1) = cbeta(j)
-      end do
-      if(tritr == 1) call get_work_mem_for_zheevr 
-      call zheevr('V', 'A', 'U', NOM, T, NOM, 0.0d0, 1.0d0, 1, 1, abstol, &
-        count_ne, ene, ccoef, NOM, isuppz, work_lanc, lwork, &
-        rwork_lanc, lrwork, iwork_lanc, liwork, info)
-      call check_lapack_info('ZHEEVR (TRLan solve)', info)
-
-      call system_clock(t4,t_rate, t_max)
-      !write(*,*) "time for 1 iteration", (t4-t3)/dble(t_rate), "sec"
-
-    end do
-    ite_lancz = tritr*NOM
-
-    !check accuracy: calcu <Phi|H|Phi> 2020/7/30-add
-    print *, "Check accuracy <Phi|H|Phi>"
-    do j=1, NOE
-      call ham_to_vec_wave_vector(Qk(1:dim,j),psi(1:dim,j),dim,&
-        NODmax,NODmin,list_s,list_r,explist)
-      prdct=(0.0d0,0.0d0)
-      do i=1, dim
-        prdct=prdct+conjg(psi(i,j))*Qk(i,j)
-      end do
-      print *, j, prdct  
-    end do
-
-    return
-  contains
-    !
-    subroutine full_reorthogonalization_complex 
-      do j = 1, i-1 
-        overlap(j) = zdotc(dim,psi(1,j),1,psi(:,i+1),1) 
-        call zaxpy(dim,-overlap(j),psi(1,j),1,psi(:,i+1),1) 
-      end do
-    end subroutine full_reorthogonalization_complex
-    !
-    subroutine get_work_mem_for_zheevr
-      complex(8) :: work_query(1)
-      real(8) :: rwork_query(1)
-      integer :: iwork_query(1)
-      abstol = dlamch('S')
-      call zheevr('V', 'A', 'U', NOM, T, NOM, 0.0d0, 1.0d0, 1, 1, abstol, &
-        count_ne, ene, ccoef, NOM, isuppz, work_query, -1, &
-        rwork_query, -1, iwork_query, -1, info)
-      call check_lapack_info('ZHEEVR (TRLan workspace query)', info)
-      call zheevr_workspace_lengths(NOM, work_query(1), rwork_query(1), iwork_query(1), lwork, lrwork, liwork)
-      allocate(work_lanc(lwork), iwork_lanc(liwork), rwork_lanc(lrwork))
-    end subroutine get_work_mem_for_zheevr
-    !
+    integer :: status
+    real(8) :: residuals(NOE)
+    character(120) :: reason
+    call restarted_hermitian(apply_hamiltonian,dim,NOE,NOK,NOM,lnc_ene_conv,maxitr,ene,psi(:,1:NOE), &
+                              ite_lancz,status,reason,residuals)
+    write(*,'(a,a)') 'TRLan status: ',trim(reason)
+    write(*,'(a,100es25.15)') 'Eigenpair residual norms: ',residuals
+    if(status/=0) error stop 'TRLan did not converge'
   end subroutine lancz_eigen_val_complex
 
   subroutine fulldia_routines_with_momentum(n,a,w,jobz) 

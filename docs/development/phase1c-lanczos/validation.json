@@ -1,0 +1,286 @@
+{
+  "schema": 1,
+  "date_utc": "2026-11-05",
+  "base_commit": "2050208999940044c155cce7fb60d42b7228481d",
+  "branch": "codex/ed2-phase1c-lanczos-stability",
+  "source_sha256": {
+    "Makefile.am": "8564c4da5a506be7f83acb5b122309e3b3f96251408fc2da2e1b1aa57ac4fbd6",
+    "source/Makefile.am": "e8569fb6c545be818e49e31b67050be3808eb72e5346ef3a1d2f9321f58e8aee",
+    "tests/Makefile.am": "1bb52d6456b43b235c5bc03688358d4b9885f2bf3b502fc4909d5d6358f6e921",
+    "source/krylov_solvers.f90": "18c43ab3d4cafc0617bf915df347c70f59c9a80739ebebe9f6bcb4d1bfcd50a8",
+    "source/lanczos.f90": "198bd57f9c6c9dcaa972e78cfd101a2528ecad6f2223a9b86c97c9df64652eba",
+    "source/eigen_solver.f90": "feeb0b79c3135d76ca7674fe3a61fa9b43f7c714feb5032c33bb393f8fe2798e",
+    "tests/lanczos_stability_driver.f90": "df00799d23d6992e7dba461341b52f1d80e8c1eddbc8be241d1a5a8ebf680d5d",
+    "tests/lanczos_stability.py": "ff35997049c7e674ac55b9dd24ac4fa17ba968b8ecf9af8752d410fa2318d25c",
+    "tests/lanczos_cli_stability.py": "099cdf90473df1f3bb73e21a55a8d13649bc802d536546e43b512a0822135749"
+  },
+  "unchanged_source_oracle_sha256": {
+    "source/ham2vec.f90": "148ee9d28fbef2053ad86dcb702e4e3a3bbcd518c137e33581f3261a1bdeeaf2",
+    "source/state_lists.f90": "977c6f513a351ab087da648795ff15cae83248f22b9476fb1135ae12b76b5f1a",
+    "source/input_param.f90": "96f83ae7b6af3188de463e285a349e4f055ffc92bff49a53aed2b0acb19e82f4",
+    "source/main.f90": "fffca6f3035492f347e30e1897f2bfcb4c29921dfa9006844dc149dae9e2cbf3",
+    "source/blas_lapack_interfaces.f90": "d32e3dd65a61961867c3d156d9d27b545406f6616e788d1f7c75df6997402abc",
+    "configure.ac": "29135ba1452b3483daa92c1d58bf6ab67c862d139bf07f3f496b1589fa5e76f1",
+    "tests/numerical_baseline.py": "ec5d307b42df1845cbd91710ee3ce555a9bd22b2c0c94747c42336cc6e281bff",
+    "tests/sparse_field_validation.py": "2af3c42cc3631cbff8463946c94c37ca4291af89094cf276ca685ddf3c1a3e26",
+    "tests/sparse_field_operator_check.f90": "7e4c570d50a0ed5ab7b10fe9152a57423cf2ba88c9b6c7cf60033401f9a09496",
+    "tests/compare_historical.py": "80db844107af590591e190091e7c1388db9f27907defea1856f6e8f566e31d6d",
+    "tests/lapack_interface_check.f90": "be6a2f5c92e8332428aefab919ac2de0533c5cbbe09be53efeee51850c14564b",
+    "tests/lapack_failure_check.f90": "12a863f1171730ab90ea68abbf41ec09562f26ef67bb79b407d4bea031965829",
+    "tests/test_lapack_interfaces.sh": "d2e49ab5754d2dedf46c4fe563fe3d703c76d051c41e5d666f635cfa28b1e8f2"
+  },
+  "thread_environment": {
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1/2 inside kernel, CLI, independent and sparse suites; 1 for standard/extended"
+  },
+  "profiles": {
+    "default": {
+      "FCFLAGS": "-fopenmp -Ofast",
+      "clean_build": "passed",
+      "argument_mismatch_workaround": false,
+      "tested_source_bytes_match": true,
+      "executable_sha256": "3cc2e95380cfeec5bc72c04ff1dd48838253feaebc73c4eef33a3dc544e9d3b0",
+      "kernel": {
+        "passed": 82,
+        "failed": 0,
+        "intentional_error_controls": 16,
+        "max_normalized_residual": 3.494926955484778e-15,
+        "max_projector_error": 3.0071373655556735e-15
+      },
+      "cli": {
+        "passed": 26,
+        "failed": 0,
+        "intentional_insufficient_budget_controls": 4,
+        "max_normalized_residual": 3.4652368384119643e-15
+      },
+      "independent": {
+        "passed": 21,
+        "failed": 0
+      },
+      "sparse_cli": {
+        "passed": 70,
+        "failed": 0
+      },
+      "operator": {
+        "passed": 10,
+        "failed": 0
+      },
+      "permutation": {
+        "passed": 28,
+        "failed": 0
+      },
+      "lapack": {
+        "passed": 11,
+        "failed": 0
+      },
+      "standard": {
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0
+      },
+      "extended": {
+        "passed": 9,
+        "failed": 0
+      },
+      "historical": {
+        "passed": 27,
+        "failed": 0,
+        "max_errors": {
+          "eigenvalues.dat": 1.1368683772161603e-13,
+          "local_mag.dat": 4.036770917537069e-12,
+          "two_body_cf_xyz.dat": 1.6693623219876663e-10
+        }
+      }
+    },
+    "normal": {
+      "FCFLAGS": "-O2 -fopenmp",
+      "clean_build": "passed",
+      "argument_mismatch_workaround": false,
+      "tested_source_bytes_match": true,
+      "executable_sha256": "b185c47d1bd7503ffcb13c5b6232a94e9c4cca22b6c994084feb8d28a4ee1714",
+      "kernel": {
+        "passed": 82,
+        "failed": 0,
+        "intentional_error_controls": 16,
+        "max_normalized_residual": 3.74207693944056e-15,
+        "max_projector_error": 2.4241958112790033e-15
+      },
+      "cli": {
+        "passed": 26,
+        "failed": 0,
+        "intentional_insufficient_budget_controls": 4,
+        "max_normalized_residual": 2.0564943289936296e-14
+      },
+      "independent": {
+        "passed": 21,
+        "failed": 0
+      },
+      "sparse_cli": {
+        "passed": 70,
+        "failed": 0
+      },
+      "operator": {
+        "passed": 10,
+        "failed": 0
+      },
+      "permutation": {
+        "passed": 28,
+        "failed": 0
+      },
+      "lapack": {
+        "passed": 11,
+        "failed": 0
+      },
+      "standard": {
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0
+      },
+      "extended": {
+        "passed": 9,
+        "failed": 0
+      },
+      "historical": {
+        "passed": 27,
+        "failed": 0,
+        "max_errors": {
+          "eigenvalues.dat": 1.4210854715202004e-14,
+          "local_mag.dat": 8.215039759562615e-12,
+          "two_body_cf_xyz.dat": 1.4735708920438073e-10
+        }
+      }
+    },
+    "bounds": {
+      "FCFLAGS": "-O2 -g -fopenmp -fcheck=all -fbacktrace -Wall -Wextra",
+      "clean_build": "passed",
+      "argument_mismatch_workaround": false,
+      "tested_source_bytes_match": true,
+      "executable_sha256": "647ca1b7a652086fa377f882dc5a2914c21f5f45b04c801a42b7942dc06d1823",
+      "kernel": {
+        "passed": 82,
+        "failed": 0,
+        "intentional_error_controls": 16,
+        "max_normalized_residual": 3.995926130694354e-15,
+        "max_projector_error": 2.395089645033557e-15
+      },
+      "cli": {
+        "passed": 26,
+        "failed": 0,
+        "intentional_insufficient_budget_controls": 4,
+        "max_normalized_residual": 4.22267100079259e-15
+      },
+      "independent": {
+        "passed": 21,
+        "failed": 0
+      },
+      "sparse_cli": {
+        "passed": 70,
+        "failed": 0
+      },
+      "operator": {
+        "passed": 10,
+        "failed": 0
+      },
+      "permutation": {
+        "passed": 28,
+        "failed": 0
+      },
+      "lapack": {
+        "passed": 11,
+        "failed": 0
+      },
+      "standard": {
+        "passed": 1,
+        "failed": 0,
+        "skipped": 0
+      },
+      "extended": {
+        "passed": 9,
+        "failed": 0
+      },
+      "historical": {
+        "passed": 27,
+        "failed": 0,
+        "max_errors": {
+          "eigenvalues.dat": 2.2737367544323206e-13,
+          "local_mag.dat": 2.490008199629301e-12,
+          "two_body_cf_xyz.dat": 1.5530914401762352e-10
+        }
+      }
+    }
+  },
+  "pre_fix": {
+    "passed": 18,
+    "failed": 3,
+    "executable_sha256": "37a4fac0367937450150cf9aa17b9d8360582c0307fd0501c19fe400fc9152a4",
+    "failure_names": [
+      "early-check-lanczos",
+      "zero-alg1",
+      "zero-alg2"
+    ],
+    "verified_against": "docs/development/phase1b-sparse-field/validation.json"
+  },
+  "trap_controls": {
+    "passed": 11,
+    "failed": 0,
+    "scope": "ALG=1 only, no ZHEEVR IEEE-probe claim"
+  },
+  "compiler": {
+    "fortran": "GNU Fortran (Debian 14.2.0-19) 14.2.0",
+    "autoconf": "autoconf (GNU Autoconf) 2.72",
+    "automake": "automake (GNU automake) 1.17",
+    "make": "GNU Make 4.4.1",
+    "python": "Python 3.12.14"
+  },
+  "platform": {
+    "system": "Linux-6.18.57-x86_64-with-glibc2.41",
+    "os_release": "PRETTY_NAME=\"Debian GNU/Linux 13 (trixie)\"\nNAME=\"Debian GNU/Linux\"\nVERSION_ID=\"13\"\nVERSION=\"13 (trixie)\"\nVERSION_CODENAME=trixie\nDEBIAN_VERSION_FULL=13.6\nID=debian\nHOME_URL=\"https://www.debian.org/\"\nSUPPORT_URL=\"https://www.debian.org/support\"\nBUG_REPORT_URL=\"https://bugs.debian.org/\"\n",
+    "numpy": "2.3.5"
+  },
+  "runtime_libraries": [
+    {
+      "name": "liblapack.so.3",
+      "resolved_path": "/workspace/.ed2-env/toolchain/usr/lib/x86_64-linux-gnu/openblas-pthread/liblapack.so.3",
+      "sha256": "336a9b0a527ae2d558b4ff59844e787e49e38d5a1c39d5ae36651252badf28cd"
+    },
+    {
+      "name": "libopenblas.so.0",
+      "resolved_path": "/workspace/.ed2-env/toolchain/usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.29.so",
+      "sha256": "10d1c640ecccd21063a7d80f90e949b1d48202830b6ec0b52b2796c5d0fbce63"
+    },
+    {
+      "name": "libgfortran.so.5",
+      "resolved_path": "/usr/lib/x86_64-linux-gnu/libgfortran.so.5.0.0",
+      "sha256": "d1c716d10039872bb5481b921d2142577c7873cad4d8d9f09028231aa7e42127"
+    },
+    {
+      "name": "libm.so.6",
+      "resolved_path": "/usr/lib/x86_64-linux-gnu/libm.so.6",
+      "sha256": "6d567d53e895273ca14a1f9dc164fc6c8d39aed2f60aa46a733c2784228915f3"
+    },
+    {
+      "name": "libgomp.so.1",
+      "resolved_path": "/usr/lib/x86_64-linux-gnu/libgomp.so.1.0.0",
+      "sha256": "6456b504ac347bd50c419667440b691f6966ad8aff5309d2f06c977fe2f9debe"
+    },
+    {
+      "name": "libc.so.6",
+      "resolved_path": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+      "sha256": "9792e3cbb541c8f44c7acf5f14f4022ea62998ecc787d326bed4d8b6547dfd92"
+    },
+    {
+      "name": "libgcc_s.so.1",
+      "resolved_path": "/usr/lib/x86_64-linux-gnu/libgcc_s.so.1",
+      "sha256": "30c61ab012a4241bed033725a09b61f5fdd3bb7df95ee852d0b096520524c7af"
+    }
+  ],
+  "review": {
+    "protected_sources_unchanged": true,
+    "dense_alg3_body_byte_identical": true,
+    "explicit_interfaces": "gfortran -O2 -fopenmp -Werror=implicit-interface -fsyntax-only for core and both production wrappers: exit 0",
+    "reference_data_unchanged": true,
+    "log_normalization": "Trailing whitespace and trailing blank lines removed only. JSON and hashes are not normalized.",
+    "bulk_arrays_omitted": "Independent magnetization/correlation arrays and sparse observable arrays omitted; checks/errors and input hashes retained."
+  }
+}

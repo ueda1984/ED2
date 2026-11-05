@@ -1,0 +1,13 @@
+autoreconf: export WARNINGS=
+autoreconf: Entering directory '.'
+autoreconf: configure.ac: not using Gettext
+autoreconf: running: /workspace/.ed2-env/bin/aclocal --automake-acdir=/workspace/.ed2-env/toolchain/usr/share/aclocal-1.17 --system-acdir=/workspace/.ed2-env/toolchain/usr/share/aclocal --force
+autoreconf: configure.ac: tracing
+autoreconf: configure.ac: not using Libtool
+autoreconf: configure.ac: not using Intltool
+autoreconf: configure.ac: not using Gtkdoc
+autoreconf: running: /workspace/.ed2-env/toolchain/usr/bin/autoconf --force
+autoreconf: running: /workspace/.ed2-env/toolchain/usr/bin/autoheader --force
+autoreconf: running: /workspace/.ed2-env/bin/automake --add-missing --copy --force-missing
+parallel-tests: installing './test-driver'
+autoreconf: Leaving directory '.'

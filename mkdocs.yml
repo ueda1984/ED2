@@ -58,5 +58,6 @@ nav:
       - CPC library plan: development/cpc-library-plan.md
       - Phase 1 LAPACK interfaces: development/phase1-lapack-interfaces.md
       - Phase 1-B sparse fields: development/phase1b-sparse-field-indexing.md
+      - Phase 1-C Lanczos stability: development/phase1c-lanczos-stability.md
   - Reference:
       - Citation & Versioning: reference/citation-versioning.md      
