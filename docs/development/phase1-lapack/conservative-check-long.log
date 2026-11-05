@@ -1,0 +1,23 @@
+make -C tests check-long
+make[1]: Entering directory '/workspace/ed2-phase1-final/conservative/tests'
+== Running long tests: test_ex1.sh test_ex2.sh test_ex3.sh test_ex4.sh test_ex5.sh test_ex6.sh test_ex7.sh test_ex8.sh test_ex9.sh ==
+---- test_ex1.sh ----
+PASS: test_ex1.sh
+---- test_ex2.sh ----
+PASS: test_ex2.sh
+---- test_ex3.sh ----
+PASS: test_ex3.sh
+---- test_ex4.sh ----
+PASS: test_ex4.sh
+---- test_ex5.sh ----
+PASS: test_ex5.sh
+---- test_ex6.sh ----
+PASS: test_ex6.sh
+---- test_ex7.sh ----
+PASS: test_ex7.sh
+---- test_ex8.sh ----
+PASS: test_ex8.sh
+---- test_ex9.sh ----
+PASS: test_ex9.sh
+OK: check-long finished.
+make[1]: Leaving directory '/workspace/ed2-phase1-final/conservative/tests'

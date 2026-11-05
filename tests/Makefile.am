@@ -36,3 +36,17 @@ check-long:
 	  echo "PASS: $$t"; \
 	done; \
 	echo "OK: check-long finished."
+
+# Separate target preserves the historical one-test Automake baseline.
+check_PROGRAMS = lapack_interface_check lapack_failure_check
+AM_FCFLAGS = -I$(abs_top_builddir)/source
+lapack_interface_check_SOURCES = lapack_interface_check.f90
+lapack_interface_check_LDADD = $(top_builddir)/source/blas_lapack_interfaces.o
+lapack_failure_check_SOURCES = lapack_failure_check.f90
+lapack_failure_check_LDADD = $(top_builddir)/source/eigen_solver.o \
+  $(top_builddir)/source/ham2vec.o $(top_builddir)/source/state_lists.o \
+  $(top_builddir)/source/input_param.o $(top_builddir)/source/blas_lapack_interfaces.o
+EXTRA_DIST += test_lapack_interfaces.sh
+.PHONY: check-lapack
+check-lapack: $(check_PROGRAMS)
+	$(SHELL) $(srcdir)/test_lapack_interfaces.sh ./lapack_interface_check ./lapack_failure_check

@@ -1,4 +1,6 @@
 module eigen_solver
+  use blas_lapack_interfaces, only: zheevr, dstevx, dlamch, dznrm2, zdotc, &
+    zgemm, zcopy, zaxpy, zscal, zdscal, check_lapack_info, zheevr_workspace_lengths
   use ham2vec
   implicit none
   integer :: NOE,NOK, NOM, maxitr, ite_lancz, i_vec_min, i_vec_max
@@ -79,9 +81,8 @@ contains
     real(8),allocatable::rwork_lanc(:)
     integer :: count_ne, info, lwork, lrwork,liwork, tritr, flag
     integer :: i, j, ell
-    real(8) :: eps, dlamch, dznrm2, abstol, max_conv,tmp(2)
+    real(8) :: abstol, max_conv,tmp(2)
     integer t1,t2,t3,t4,t_rate,t_max
-    complex(8) :: zdotc
     complex(8) :: prdct 
     flag = 0
     allocate(conv(NOK), alpha(NOM), beta(0:NOM), coef(NOM,NOM), isuppz(2*NOM), &
@@ -125,13 +126,10 @@ contains
     !
     abstol = 2.0d0*dlamch('S')
     allocate(iwork_lanc(5*NOM), ifail_lanc(NOM), rwork_lanc(5*NOM))
-    call dstevx('V', 'A', NOM, alpha, beta(1), 0.0d0, 1.0d0, 1, NOM, eps, &
+    call dstevx('V', 'A', NOM, alpha, beta(1), 0.0d0, 1.0d0, 1, NOM, abstol, &
       count_ne, ene, coef, NOM, rwork_lanc, iwork_lanc, ifail_lanc, info)
-    if(info /= 0)then
-      write(*,*) "error in dstevx in eigen_solver.f90. info =", info; stop
-    end if
+    call check_lapack_info('DSTEVX (TRLan)', info)
     deallocate(iwork_lanc, ifail_lanc, rwork_lanc)
-    allocate(ifail_lanc(2*NOM))
     !
     !*********************************
     !***** restart lanczos step ******
@@ -204,9 +202,7 @@ contains
       call zheevr('V', 'A', 'U', NOM, T, NOM, 0.0d0, 1.0d0, 1, 1, abstol, &
         count_ne, ene, ccoef, NOM, isuppz, work_lanc, lwork, &
         rwork_lanc, lrwork, iwork_lanc, liwork, info)
-      if(info /= 0)then
-        write(*,*) "error in dxyevr in eigen_solver.f90. info =", info; stop 4
-      end if
+      call check_lapack_info('ZHEEVR (TRLan solve)', info)
 
       call system_clock(t4,t_rate, t_max)
       !write(*,*) "time for 1 iteration", (t4-t3)/dble(t_rate), "sec"
@@ -236,23 +232,16 @@ contains
       end do
     end subroutine full_reorthogonalization_complex
     !
-    subroutine get_work_mem_for_zheevr 
+    subroutine get_work_mem_for_zheevr
+      complex(8) :: work_query(1)
+      real(8) :: rwork_query(1)
+      integer :: iwork_query(1)
       abstol = dlamch('S')
-      lwork = -1
-      lrwork = -1
-      liwork= -1
-      allocate(iwork_lanc(1), work_lanc(1), rwork_lanc(1))
       call zheevr('V', 'A', 'U', NOM, T, NOM, 0.0d0, 1.0d0, 1, 1, abstol, &
-        count_ne, ene, ccoef, NOM, ifail_lanc, work_lanc, lwork, &
-        rwork_lanc, lrwork, iwork_lanc, liwork, info)
-      if(info /= 0)then
-        write(*,*) "error in dxyevr in eigen_solver.f90. info =", info
-        stop 3
-      end if
-      lwork = nint(dble(work_lanc(1)))
-      lrwork = nint(rwork_lanc(1))
-      liwork= iwork_lanc(1)
-      deallocate(iwork_lanc, work_lanc, rwork_lanc)
+        count_ne, ene, ccoef, NOM, isuppz, work_query, -1, &
+        rwork_query, -1, iwork_query, -1, info)
+      call check_lapack_info('ZHEEVR (TRLan workspace query)', info)
+      call zheevr_workspace_lengths(NOM, work_query(1), rwork_query(1), iwork_query(1), lwork, lrwork, liwork)
       allocate(work_lanc(lwork), iwork_lanc(liwork), rwork_lanc(lrwork))
     end subroutine get_work_mem_for_zheevr
     !
@@ -267,9 +256,9 @@ contains
     character(1), intent(in) :: jobz
     complex(8), allocatable :: z(:,:)
     !
-    integer :: m, lda, vl, vu, il, iu, ldz, info
+    integer :: m, lda, il, iu, ldz, info
     integer, allocatable :: isuppz(:)
-    real(8) :: dlamch, abstol
+    real(8) :: vl, vu, abstol
     complex(8), allocatable :: work(:)
     integer :: lwork
     real(8), allocatable :: rwork(:)
@@ -277,9 +266,9 @@ contains
     integer, allocatable :: iwork(:)
     integer :: liwork
     !
-    complex(8) :: ztmp
-    real(8) :: dtmp
-    integer :: itmp
+    complex(8) :: ztmp(1)
+    real(8) :: dtmp(1)
+    integer :: itmp(1)
     !
     if(jobz=='N')then
       allocate(z(1,1))
@@ -304,10 +293,8 @@ contains
     call zheevr(jobz, 'A', 'U', n, a, lda, vl, vu, il, iu, abstol, &
       m, w, z, ldz, isuppz, ztmp, lwork, dtmp, lrwork, itmp, liwork, info)
 
-    !     Make sure that there is enough workspace for block size nb.
-    lwork = nint(dble(ztmp))
-    lrwork = nint(dtmp)
-    liwork = itmp
+    call check_lapack_info('ZHEEVR (dense workspace query)', info)
+    call zheevr_workspace_lengths(n, ztmp(1), dtmp(1), itmp(1), lwork, lrwork, liwork)
     allocate (work(lwork))
     allocate (rwork(lrwork))
     allocate (iwork(liwork))
@@ -316,13 +303,10 @@ contains
     call zheevr(jobz, 'A', 'U', n, a, lda, vl, vu, il, iu, abstol, &
       m, w, z, ldz, isuppz, work, lwork, rwork, lrwork, iwork, liwork, info)
 
-    if(info==0)then
-      print *, "Eigenvalues by Full Diagonalization"
-      call write_index_ene(w,n)
-      if(jobz=='V') call zcopy(n*n,z,1,a,1)
-    else 
-      print *, "Failure in ZHEEVR. INFO =", info
-    end if
+    call check_lapack_info('ZHEEVR (dense solve)', info)
+    print *, "Eigenvalues by Full Diagonalization"
+    call write_index_ene(w,n)
+    if(jobz=='V') call zcopy(n*n,z,1,a,1)
   end subroutine fulldia_routines_with_momentum
 
 end module eigen_solver

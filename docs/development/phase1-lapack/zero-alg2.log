@@ -1,0 +1,96 @@
+Note: The following floating-point exceptions are signalling: IEEE_INVALID_FLAG IEEE_DIVIDE_BY_ZERO IEEE_UNDERFLOW_FLAG IEEE_DENORMAL
+******************************* Start QS^3 ED2 *************************************
+ ### Read input_parameters.
+&INPUT_PARAMETERS
+ NOS=4          ,
+ NODMAX=4          ,
+ NODMIN=0          ,
+ L1=1          ,
+ L2=1          ,
+ L3=1          ,
+ L4=1          ,
+ L5=1          ,
+ L6=1          ,
+ M1=0          ,
+ M2=0          ,
+ M3=0          ,
+ M4=0          ,
+ M5=0          ,
+ M6=0          ,
+ NO_ONE=4          ,
+ NO_TWO=0          ,
+ WK_DIM=-1         ,
+ MNTE=-1         ,
+ ALG=2          ,
+ FILE_XYZ_DM_GAMMA="bonds.dat                                                                                           ",
+ FILE_HVEC="fields.dat                                                                                          ",
+ OUTDIR="./                                                                                                  ",
+ FILE_S1="shift.dat                                                                                           ",
+ FILE_S2="                                                                                                    ",
+ FILE_S3="                                                                                                    ",
+ FILE_S4="                                                                                                    ",
+ FILE_S5="                                                                                                    ",
+ FILE_S6="                                                                                                    ",
+ FILE_NODMAX="caps.dat                                                                                            ",
+ FILE_SPIN="spins.dat                                                                                           ",
+ FILE_WF="./                                                                                                  ",
+ RE_WF=0          ,
+ WR_WF=0          ,
+ CAL_LM=0          ,
+ CAL_CF=0          ,
+ NO_TWO_CF=6          ,
+ FILE_TWO_CF="pairs.dat                                                                                           ",
+ /
+ ### Set wavevectors.
+ ### Set random_seed.
+ ### Allocation arrays.
+ ### Set phase factors.
+ ### Read FILE_xyz_dm_gamma.
+ ### Read FILE_hvec.
+ ### Set translational operations.
+ ### Read FILE_NODmax.
+ ### Read FILE_spin.
+ ### Store cum_ltd_rep_combination numbers.
+ ### Set THS.
+   THS   =           16
+ ### Allocate and Set arrays for state_list.
+ ********************
+ max_threads           1
+ ********************
+ ### Count # of representative states.
+ ### Allocate work arrays for lists.
+ ### Store representative states.
+ ### Allocate arrays for lists.
+ ### Store reordered lists.
+   THS(k)   =           16
+ ### Make wk_loc and wk_ele array.
+ Current MNTE =            8
+ Optimal MNTE =            1
+ ### Start the thick-restarted Lanczos method.
+&INPUT_TRLAN
+ NOE=2          ,
+ NOK=4          ,
+ NOM=8          ,
+ MAXITR=1000       ,
+ LNC_ENE_CONV=  1.0000000000000000E-013,
+ I_VEC_MIN=1          ,
+ I_VEC_MAX=2          ,
+ /
+ Reduced THS=          16
+************************************************************************************
+ Eigen solver: my thick restart Lanczos
+tritr, ene(NOK), max_conv, flag:     1    1.697596633118064-313    1.0E+00    0
+tritr, ene(NOK), max_conv, flag:     2    1.697596633118064-313    0.0E+00    1
+tritr, ene(NOK), max_conv, flag:     3    1.697596633118064-313    0.0E+00    2
+ Check accuracy <Phi|H|Phi>
+           1                                             (NaN,NaN)
+           2                                             (NaN,NaN)
+***********************************************************************************
+ total lanczos step:          24
+***********************************************************************************
+    i           E(i)
+    1    1.143540789729143-313
+    2    0.000000000000000E+00
+***********************************************************************************
+Time:     0.001 [sec]
+****************************************************************************************

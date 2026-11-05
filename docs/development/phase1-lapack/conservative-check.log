@@ -1,0 +1,67 @@
+Making check in source
+make[1]: Entering directory '/workspace/ed2-phase1-final/conservative/source'
+make[1]: Nothing to be done for 'check'.
+make[1]: Leaving directory '/workspace/ed2-phase1-final/conservative/source'
+Making check in tests
+make[1]: Entering directory '/workspace/ed2-phase1-final/conservative/tests'
+make  lapack_interface_check lapack_failure_check
+make[2]: Entering directory '/workspace/ed2-phase1-final/conservative/tests'
+make[2]: 'lapack_interface_check' is up to date.
+make[2]: 'lapack_failure_check' is up to date.
+make[2]: Leaving directory '/workspace/ed2-phase1-final/conservative/tests'
+make  check-TESTS
+make[2]: Entering directory '/workspace/ed2-phase1-final/conservative/tests'
+make[3]: Entering directory '/workspace/ed2-phase1-final/conservative/tests'
+PASS: test_ex1.sh
+============================================================================
+Testsuite summary for QS3-ED2 1.0.0
+============================================================================
+# TOTAL: 1
+# PASS:  1
+# SKIP:  0
+# XFAIL: 0
+# FAIL:  0
+# XPASS: 0
+# ERROR: 0
+============================================================================
+make[3]: Leaving directory '/workspace/ed2-phase1-final/conservative/tests'
+make[2]: Leaving directory '/workspace/ed2-phase1-final/conservative/tests'
+make[1]: Leaving directory '/workspace/ed2-phase1-final/conservative/tests'
+Making check in script_chain
+make[1]: Entering directory '/workspace/ed2-phase1-final/conservative/script_chain'
+make[1]: Nothing to be done for 'check'.
+make[1]: Leaving directory '/workspace/ed2-phase1-final/conservative/script_chain'
+Making check in script_cubic
+make[1]: Entering directory '/workspace/ed2-phase1-final/conservative/script_cubic'
+make[1]: Nothing to be done for 'check'.
+make[1]: Leaving directory '/workspace/ed2-phase1-final/conservative/script_cubic'
+Making check in script_cubic_sp_HB
+make[1]: Entering directory '/workspace/ed2-phase1-final/conservative/script_cubic_sp_HB'
+make[1]: Nothing to be done for 'check'.
+make[1]: Leaving directory '/workspace/ed2-phase1-final/conservative/script_cubic_sp_HB'
+Making check in script_honeycomb
+make[1]: Entering directory '/workspace/ed2-phase1-final/conservative/script_honeycomb'
+make[1]: Nothing to be done for 'check'.
+make[1]: Leaving directory '/workspace/ed2-phase1-final/conservative/script_honeycomb'
+Making check in script_j1j2_chain
+make[1]: Entering directory '/workspace/ed2-phase1-final/conservative/script_j1j2_chain'
+make[1]: Nothing to be done for 'check'.
+make[1]: Leaving directory '/workspace/ed2-phase1-final/conservative/script_j1j2_chain'
+Making check in script_kagome
+make[1]: Entering directory '/workspace/ed2-phase1-final/conservative/script_kagome'
+make[1]: Nothing to be done for 'check'.
+make[1]: Leaving directory '/workspace/ed2-phase1-final/conservative/script_kagome'
+Making check in script_mixed_spin_chain
+make[1]: Entering directory '/workspace/ed2-phase1-final/conservative/script_mixed_spin_chain'
+make[1]: Nothing to be done for 'check'.
+make[1]: Leaving directory '/workspace/ed2-phase1-final/conservative/script_mixed_spin_chain'
+Making check in script_square
+make[1]: Entering directory '/workspace/ed2-phase1-final/conservative/script_square'
+make[1]: Nothing to be done for 'check'.
+make[1]: Leaving directory '/workspace/ed2-phase1-final/conservative/script_square'
+Making check in script_triangular
+make[1]: Entering directory '/workspace/ed2-phase1-final/conservative/script_triangular'
+make[1]: Nothing to be done for 'check'.
+make[1]: Leaving directory '/workspace/ed2-phase1-final/conservative/script_triangular'
+make[1]: Entering directory '/workspace/ed2-phase1-final/conservative'
+make[1]: Leaving directory '/workspace/ed2-phase1-final/conservative'

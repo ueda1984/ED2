@@ -56,5 +56,6 @@ nav:
   - Development:
       - Baseline audit: development/baseline-audit.md
       - CPC library plan: development/cpc-library-plan.md
+      - Phase 1 LAPACK interfaces: development/phase1-lapack-interfaces.md
   - Reference:
       - Citation & Versioning: reference/citation-versioning.md      

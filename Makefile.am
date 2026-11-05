@@ -14,3 +14,8 @@ SUBDIRS = \
 .PHONY: check-long
 check-long:
 	$(AM_V_at)$(MAKE) -C tests check-long
+
+.PHONY: check-lapack
+check-lapack:
+	$(AM_V_at)$(MAKE) -C source all
+	$(AM_V_at)$(MAKE) -C tests check-lapack
