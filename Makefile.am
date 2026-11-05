@@ -19,3 +19,8 @@ check-long:
 check-lapack:
 	$(AM_V_at)$(MAKE) -C source all
 	$(AM_V_at)$(MAKE) -C tests check-lapack
+
+.PHONY: check-sparse-field
+check-sparse-field:
+	$(AM_V_at)$(MAKE) -C source all
+	$(AM_V_at)$(MAKE) -C tests check-sparse-field SPARSE_FIELD_OUTPUT="$(SPARSE_FIELD_OUTPUT)"

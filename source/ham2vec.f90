@@ -50,11 +50,12 @@ contains
       n0 = count(st_list == 0 )
       !
       do j = 1, NO_one
+        ! j selects the field record; i1 selects the site acted on.
         i1 = p_one(j)
         n1 = count(st_list == i1)
-        wk_ele(1,i) = wk_ele(1,i) + hvec(3,i1) * (local_spin(i1)-n1)
+        wk_ele(1,i) = wk_ele(1,i) + hvec(3,j) * (local_spin(i1)-n1)
         ! - term
-        c = 0.5d0 * ( hvec(1,i1) + zi * hvec(2,i1) )
+        c = 0.5d0 * ( hvec(1,j) + zi * hvec(2,j) )
         if(n0 < dN .and. n1>0 .and. abs(c) > eps)then
           ni = a_down_spin(i1,st_list,NODmax)
           call representative_SQ(NODmax,s,ell,ni)
@@ -69,7 +70,7 @@ contains
           end if
         end if
         ! + term
-        c = 0.5d0 * ( hvec(1,i1) - zi * hvec(2,i1) )
+        c = 0.5d0 * ( hvec(1,j) - zi * hvec(2,j) )
         if( n0>0 .and. n1<local_NODmax(i1) .and. abs(c) > eps )then
           ni = c_down_spin(i1,st_list,NODmax)
           call representative_SQ(NODmax,s,ell,ni)
@@ -263,11 +264,12 @@ contains
       n0 = count(st_list == 0 )
       !
       do j = 1, NO_one
+        ! j selects the field record; i1 selects the site acted on.
         i1 = p_one(j)
         n1 = count(st_list == i1)
-        Ham(i,i) = Ham(i,i) + hvec(3,i1) * (local_spin(i1)-n1)
+        Ham(i,i) = Ham(i,i) + hvec(3,j) * (local_spin(i1)-n1)
         ! - term
-        c = 0.5d0 * ( hvec(1,i1) + zi * hvec(2,i1) )
+        c = 0.5d0 * ( hvec(1,j) + zi * hvec(2,j) )
         if(n1>0 .and. n0 < dN .and. abs(c) > eps)then
           ni = a_down_spin(i1,st_list,NODmax)
           call representative_SQ(NODmax,s,ell,ni)
@@ -280,7 +282,7 @@ contains
           end if
         end if
         ! + term
-        c = 0.5d0 * ( hvec(1,i1) - zi * hvec(2,i1) )
+        c = 0.5d0 * ( hvec(1,j) - zi * hvec(2,j) )
         if( n0 > 0 .and. n1<local_NODmax(i1) .and. abs(c) > eps )then
           ni = c_down_spin(i1,st_list,NODmax)
           call representative_SQ(NODmax,s,ell,ni)
@@ -462,11 +464,12 @@ contains
       n0 = count(st_list == 0 )
       !
       do j = 1, NO_one
+        ! j selects the field record; i1 selects the site acted on.
         i1 = p_one(j)
         n1 = count(st_list == i1)
-        v0(i) = v0(i) + hvec(3,i1) * (local_spin(i1)-n1) * v1(i)
+        v0(i) = v0(i) + hvec(3,j) * (local_spin(i1)-n1) * v1(i)
         ! - term
-        c = 0.5d0 * ( hvec(1,i1) + zi * hvec(2,i1) )
+        c = 0.5d0 * ( hvec(1,j) + zi * hvec(2,j) )
         if(n0 < dN .and. n1>0 .and. abs(c) > eps)then
           ni = a_down_spin(i1,st_list,NODmax)
           call representative_SQ(NODmax,s,ell,ni)
@@ -478,7 +481,7 @@ contains
           end if
         end if
         ! + term
-        c = 0.5d0 * ( hvec(1,i1) - zi * hvec(2,i1) )
+        c = 0.5d0 * ( hvec(1,j) - zi * hvec(2,j) )
         if( n0>0 .and. n1<local_NODmax(i1) .and. abs(c) > eps )then
           ni = c_down_spin(i1,st_list,NODmax)
           call representative_SQ(NODmax,s,ell,ni)

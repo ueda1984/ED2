@@ -1,0 +1,104 @@
+{
+  "base_commit": "233b78551aac7dcef9f106bf1fe2d7ed3491b228",
+  "executable_sha256": "c5b27475fbab832d224eae1a46ae2761f8ef34c9ab8bc9aa9703db685b9954fa",
+  "operator_executable_sha256": "a3b521540ad2fc8b1a1edb6a5e164b8e9c1c9243206abbfe06ec73629abb1da4",
+  "harness_sha256": "2af3c42cc3631cbff8463946c94c37ca4291af89094cf276ca685ddf3c1a3e26",
+  "cli_counts": {
+    "passed": 14,
+    "failed": 56
+  },
+  "operator_counts": {
+    "passed": 2,
+    "failed": 8
+  },
+  "permutation_counts": {
+    "passed": 0,
+    "failed": 28
+  },
+  "sparse_failures": [
+    {
+      "alg": 1,
+      "cache": -1,
+      "exit_code": 2,
+      "diagnostic": "At line 55 of file ham2vec.f90\nFortran runtime error: Index '4' of dimension 2 of array 'hvec' above upper bound of 1",
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "ec5f4a910655f3920e3ead6ed8bf92126fe2f75fba6953ce084f1c6a515f10a5",
+        "input.dat": "8104065e2badc3f09bff25d0b05ce770901a681f68c1ab2fd4d37166e830718f",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      }
+    },
+    {
+      "alg": 1,
+      "cache": 0,
+      "exit_code": 2,
+      "diagnostic": "At line 467 of file ham2vec.f90\nFortran runtime error: Index '4' of dimension 2 of array 'hvec' above upper bound of 1",
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "ec5f4a910655f3920e3ead6ed8bf92126fe2f75fba6953ce084f1c6a515f10a5",
+        "input.dat": "184ef0002966bbd6aa71f97dbb4837fa189dcfb6e03face679b1054da4c534c7",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      }
+    },
+    {
+      "alg": 3,
+      "cache": -1,
+      "exit_code": 2,
+      "diagnostic": "At line 268 of file ham2vec.f90\nFortran runtime error: Index '4' of dimension 2 of array 'hvec' above upper bound of 1",
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "ec5f4a910655f3920e3ead6ed8bf92126fe2f75fba6953ce084f1c6a515f10a5",
+        "input.dat": "0f26fc8a5f1ef2f400327e267fc081c0f8e3b004558e90272aa67a6d45dc0b9b",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      }
+    }
+  ],
+  "permuted_full_records": {
+    "max_energy_error": 0.10941785756180884,
+    "max_operator_error": 0.21,
+    "hermiticity_error": 0.0,
+    "actual_eigenvalues": [
+      -1.236899586632045,
+      -1.018035071451479,
+      -0.7601789959396834,
+      -0.3771008430111418,
+      -0.3306075293590182,
+      -0.2292482988341522,
+      -0.104916343413564,
+      0.007484680766397522,
+      0.03675371438937702,
+      0.1082923088459535,
+      0.1804602627207439,
+      0.3203984824333179,
+      0.4407313756705495,
+      0.6701047841014038,
+      0.8917956575845434,
+      1.400965402128792
+    ],
+    "expected_eigenvalues": [
+      -1.1509634025303355,
+      -1.0385497724691084,
+      -0.7728009256983627,
+      -0.4687188405884628,
+      -0.260387406885721,
+      -0.2294478314792852,
+      -0.16046649663493046,
+      -0.10193317679541132,
+      0.033102524926293606,
+      0.1697721994447623,
+      0.22959863076340156,
+      0.34178678626351805,
+      0.45017582011279583,
+      0.7114228199888343,
+      0.8087167304358048,
+      1.438692341146207
+    ],
+    "exit_code": 0
+  }
+}

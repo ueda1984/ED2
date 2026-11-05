@@ -50,3 +50,16 @@ EXTRA_DIST += test_lapack_interfaces.sh
 .PHONY: check-lapack
 check-lapack: $(check_PROGRAMS)
 	$(SHELL) $(srcdir)/test_lapack_interfaces.sh ./lapack_interface_check ./lapack_failure_check
+
+# Optional numerical validation; Python/NumPy are not runtime/build dependencies.
+check_PROGRAMS += sparse_field_operator_check
+sparse_field_operator_check_SOURCES = sparse_field_operator_check.f90
+sparse_field_operator_check_LDADD = $(top_builddir)/source/ham2vec.o \
+  $(top_builddir)/source/state_lists.o $(top_builddir)/source/input_param.o
+EXTRA_DIST += sparse_field_validation.py numerical_baseline.py
+PYTHON ?= python3
+.PHONY: check-sparse-field
+check-sparse-field: sparse_field_operator_check
+	$(PYTHON) $(srcdir)/sparse_field_validation.py \
+	  --exe "$(abs_top_builddir)/source/QS3ED2" --operator-exe "$(abs_builddir)/sparse_field_operator_check" \
+	  $(if $(SPARSE_FIELD_OUTPUT),--output "$(SPARSE_FIELD_OUTPUT)",)

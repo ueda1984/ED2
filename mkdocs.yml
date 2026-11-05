@@ -57,5 +57,6 @@ nav:
       - Baseline audit: development/baseline-audit.md
       - CPC library plan: development/cpc-library-plan.md
       - Phase 1 LAPACK interfaces: development/phase1-lapack-interfaces.md
+      - Phase 1-B sparse fields: development/phase1b-sparse-field-indexing.md
   - Reference:
       - Citation & Versioning: reference/citation-versioning.md      

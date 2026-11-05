@@ -1,0 +1,66 @@
+make  all-recursive
+make[1]: Entering directory '/workspace/ed2-phase1b-final/default'
+Making all in source
+make[2]: Entering directory '/workspace/ed2-phase1b-final/default/source'
+gfortran  -fopenmp -Ofast -c -o blas_lapack_interfaces.o blas_lapack_interfaces.f90
+gfortran  -fopenmp -Ofast -c -o input_param.o input_param.f90
+gfortran  -fopenmp -Ofast -c -o state_lists.o state_lists.f90
+gfortran  -fopenmp -Ofast -c -o ham2vec.o ham2vec.f90
+gfortran  -fopenmp -Ofast -c -o lanczos.o lanczos.f90
+gfortran  -fopenmp -Ofast -c -o eigen_solver.o eigen_solver.f90
+gfortran  -fopenmp -Ofast -c -o get_expectation_values.o get_expectation_values.f90
+gfortran  -fopenmp -Ofast -c -o main.o main.f90
+gfortran  -fopenmp -Ofast   -o QS3ED2 blas_lapack_interfaces.o input_param.o state_lists.o ham2vec.o lanczos.o eigen_solver.o get_expectation_values.o main.o  -llapack -lopenblas
+make[2]: Leaving directory '/workspace/ed2-phase1b-final/default/source'
+Making all in tests
+make[2]: Entering directory '/workspace/ed2-phase1b-final/default/tests'
+make[2]: Nothing to be done for 'all'.
+make[2]: Leaving directory '/workspace/ed2-phase1b-final/default/tests'
+Making all in script_chain
+make[2]: Entering directory '/workspace/ed2-phase1b-final/default/script_chain'
+gfortran  -fopenmp -Ofast -c -o mk_input.o mk_input.f90
+gfortran  -fopenmp -Ofast   -o mk_input mk_input.o  -llapack -lopenblas
+make[2]: Leaving directory '/workspace/ed2-phase1b-final/default/script_chain'
+Making all in script_cubic
+make[2]: Entering directory '/workspace/ed2-phase1b-final/default/script_cubic'
+gfortran  -fopenmp -Ofast -c -o mk_input.o mk_input.f90
+gfortran  -fopenmp -Ofast   -o mk_input mk_input.o  -llapack -lopenblas
+make[2]: Leaving directory '/workspace/ed2-phase1b-final/default/script_cubic'
+Making all in script_cubic_sp_HB
+make[2]: Entering directory '/workspace/ed2-phase1b-final/default/script_cubic_sp_HB'
+gfortran  -fopenmp -Ofast -c -o mk_input.o mk_input.f90
+gfortran  -fopenmp -Ofast   -o mk_input mk_input.o  -llapack -lopenblas
+make[2]: Leaving directory '/workspace/ed2-phase1b-final/default/script_cubic_sp_HB'
+Making all in script_honeycomb
+make[2]: Entering directory '/workspace/ed2-phase1b-final/default/script_honeycomb'
+gfortran  -fopenmp -Ofast -c -o mk_input.o mk_input.f90
+gfortran  -fopenmp -Ofast   -o mk_input mk_input.o  -llapack -lopenblas
+make[2]: Leaving directory '/workspace/ed2-phase1b-final/default/script_honeycomb'
+Making all in script_j1j2_chain
+make[2]: Entering directory '/workspace/ed2-phase1b-final/default/script_j1j2_chain'
+gfortran  -fopenmp -Ofast -c -o mk_input.o mk_input.f90
+gfortran  -fopenmp -Ofast   -o mk_input mk_input.o  -llapack -lopenblas
+make[2]: Leaving directory '/workspace/ed2-phase1b-final/default/script_j1j2_chain'
+Making all in script_kagome
+make[2]: Entering directory '/workspace/ed2-phase1b-final/default/script_kagome'
+gfortran  -fopenmp -Ofast -c -o mk_input.o mk_input.f90
+gfortran  -fopenmp -Ofast   -o mk_input mk_input.o  -llapack -lopenblas
+make[2]: Leaving directory '/workspace/ed2-phase1b-final/default/script_kagome'
+Making all in script_mixed_spin_chain
+make[2]: Entering directory '/workspace/ed2-phase1b-final/default/script_mixed_spin_chain'
+gfortran  -fopenmp -Ofast -c -o mk_input.o mk_input.f90
+gfortran  -fopenmp -Ofast   -o mk_input mk_input.o  -llapack -lopenblas
+make[2]: Leaving directory '/workspace/ed2-phase1b-final/default/script_mixed_spin_chain'
+Making all in script_square
+make[2]: Entering directory '/workspace/ed2-phase1b-final/default/script_square'
+gfortran  -fopenmp -Ofast -c -o mk_input.o mk_input.f90
+gfortran  -fopenmp -Ofast   -o mk_input mk_input.o  -llapack -lopenblas
+make[2]: Leaving directory '/workspace/ed2-phase1b-final/default/script_square'
+Making all in script_triangular
+make[2]: Entering directory '/workspace/ed2-phase1b-final/default/script_triangular'
+gfortran  -fopenmp -Ofast -c -o mk_input.o mk_input.f90
+gfortran  -fopenmp -Ofast   -o mk_input mk_input.o  -llapack -lopenblas
+make[2]: Leaving directory '/workspace/ed2-phase1b-final/default/script_triangular'
+make[2]: Entering directory '/workspace/ed2-phase1b-final/default'
+make[2]: Leaving directory '/workspace/ed2-phase1b-final/default'
+make[1]: Leaving directory '/workspace/ed2-phase1b-final/default'

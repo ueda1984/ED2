@@ -1,0 +1,82 @@
+At line 55 of file ham2vec.f90
+Fortran runtime error: Index '4' of dimension 2 of array 'hvec' above upper bound of 1
+
+Error termination. Backtrace:
+#0  0x7f8b054dc2ba in ???
+#1  0x7f8b054dcdb9 in ???
+#2  0x7f8b054dd349 in ???
+#3  0x55af41bf96dc in __ham2vec_MOD_make_wk_loc_and_ele._omp_fn.0
+	at /workspace/ed2-phase1-final/bounds/source/ham2vec.f90:55
+#4  0x7f8b0538bfe5 in ???
+#5  0x55af41bfba6c in __ham2vec_MOD_make_wk_loc_and_ele
+	at /workspace/ed2-phase1-final/bounds/source/ham2vec.f90:43
+#6  0x55af41c0a78a in MAIN__
+	at /workspace/ed2-phase1-final/bounds/source/main.f90:37
+#7  0x55af41bd241e in main
+	at /workspace/ed2-phase1-final/bounds/source/main.f90:2
+******************************* Start QS^3 ED2 *************************************
+ ### Read input_parameters.
+&INPUT_PARAMETERS
+ NOS=4          ,
+ NODMAX=4          ,
+ NODMIN=0          ,
+ L1=1          ,
+ L2=1          ,
+ L3=1          ,
+ L4=1          ,
+ L5=1          ,
+ L6=1          ,
+ M1=0          ,
+ M2=0          ,
+ M3=0          ,
+ M4=0          ,
+ M5=0          ,
+ M6=0          ,
+ NO_ONE=1          ,
+ NO_TWO=3          ,
+ WK_DIM=-1         ,
+ MNTE=-1         ,
+ ALG=1          ,
+ FILE_XYZ_DM_GAMMA="bonds.dat                                                                                           ",
+ FILE_HVEC="fields.dat                                                                                          ",
+ OUTDIR="./                                                                                                  ",
+ FILE_S1="                                                                                                    ",
+ FILE_S2="                                                                                                    ",
+ FILE_S3="                                                                                                    ",
+ FILE_S4="                                                                                                    ",
+ FILE_S5="                                                                                                    ",
+ FILE_S6="                                                                                                    ",
+ FILE_NODMAX="caps.dat                                                                                            ",
+ FILE_SPIN="spins.dat                                                                                           ",
+ FILE_WF="./                                                                                                  ",
+ RE_WF=0          ,
+ WR_WF=0          ,
+ CAL_LM=1          ,
+ CAL_CF=1          ,
+ NO_TWO_CF=6          ,
+ FILE_TWO_CF="pairs.dat                                                                                           ",
+ /
+ ### Set wavevectors.
+ ### Set random_seed.
+ ### Allocation arrays.
+ ### Set phase factors.
+ ### Read FILE_xyz_dm_gamma.
+ ### Read FILE_hvec.
+ ### Set translational operations.
+ ### Read FILE_NODmax.
+ ### Read FILE_spin.
+ ### Read FILE_two_cf.
+ ### Store cum_ltd_rep_combination numbers.
+ ### Set THS.
+   THS   =           16
+ ### Allocate and Set arrays for state_list.
+ ********************
+ max_threads           1
+ ********************
+ ### Count # of representative states.
+ ### Allocate work arrays for lists.
+ ### Store representative states.
+ ### Allocate arrays for lists.
+ ### Store reordered lists.
+   THS(k)   =           16
+ ### Make wk_loc and wk_ele array.

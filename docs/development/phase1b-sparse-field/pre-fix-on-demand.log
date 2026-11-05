@@ -1,0 +1,97 @@
+At line 467 of file ham2vec.f90
+Fortran runtime error: Index '4' of dimension 2 of array 'hvec' above upper bound of 1
+
+Error termination. Backtrace:
+#0  0x7fde3bcec2ba in ???
+#1  0x7fde3bcecdb9 in ???
+#2  0x7fde3bced349 in ???
+#3  0x559f8bfe30bd in __ham2vec_MOD_ham_to_vec_wave_vector._omp_fn.1
+	at /workspace/ed2-phase1-final/bounds/source/ham2vec.f90:467
+#4  0x7fde3bb9bfe5 in ???
+#5  0x559f8bff4451 in __ham2vec_MOD_ham_to_vec_wave_vector
+	at /workspace/ed2-phase1-final/bounds/source/ham2vec.f90:458
+#6  0x559f8bff6456 in __lanczos_MOD_lancz_eigen_val
+	at /workspace/ed2-phase1-final/bounds/source/lanczos.f90:73
+#7  0x559f8bff8186 in __lanczos_MOD_lanczos_routines
+	at /workspace/ed2-phase1-final/bounds/source/lanczos.f90:47
+#8  0x559f8c00381d in MAIN__
+	at /workspace/ed2-phase1-final/bounds/source/main.f90:41
+#9  0x559f8bfcb41e in main
+	at /workspace/ed2-phase1-final/bounds/source/main.f90:2
+******************************* Start QS^3 ED2 *************************************
+ ### Read input_parameters.
+&INPUT_PARAMETERS
+ NOS=4          ,
+ NODMAX=4          ,
+ NODMIN=0          ,
+ L1=1          ,
+ L2=1          ,
+ L3=1          ,
+ L4=1          ,
+ L5=1          ,
+ L6=1          ,
+ M1=0          ,
+ M2=0          ,
+ M3=0          ,
+ M4=0          ,
+ M5=0          ,
+ M6=0          ,
+ NO_ONE=1          ,
+ NO_TWO=3          ,
+ WK_DIM=0          ,
+ MNTE=-1         ,
+ ALG=1          ,
+ FILE_XYZ_DM_GAMMA="bonds.dat                                                                                           ",
+ FILE_HVEC="fields.dat                                                                                          ",
+ OUTDIR="./                                                                                                  ",
+ FILE_S1="                                                                                                    ",
+ FILE_S2="                                                                                                    ",
+ FILE_S3="                                                                                                    ",
+ FILE_S4="                                                                                                    ",
+ FILE_S5="                                                                                                    ",
+ FILE_S6="                                                                                                    ",
+ FILE_NODMAX="caps.dat                                                                                            ",
+ FILE_SPIN="spins.dat                                                                                           ",
+ FILE_WF="./                                                                                                  ",
+ RE_WF=0          ,
+ WR_WF=0          ,
+ CAL_LM=1          ,
+ CAL_CF=1          ,
+ NO_TWO_CF=6          ,
+ FILE_TWO_CF="pairs.dat                                                                                           ",
+ /
+ ### Set wavevectors.
+ ### Set random_seed.
+ ### Allocation arrays.
+ ### Set phase factors.
+ ### Read FILE_xyz_dm_gamma.
+ ### Read FILE_hvec.
+ ### Set translational operations.
+ ### Read FILE_NODmax.
+ ### Read FILE_spin.
+ ### Read FILE_two_cf.
+ ### Store cum_ltd_rep_combination numbers.
+ ### Set THS.
+   THS   =           16
+ ### Allocate and Set arrays for state_list.
+ ********************
+ max_threads           1
+ ********************
+ ### Count # of representative states.
+ ### Allocate work arrays for lists.
+ ### Store representative states.
+ ### Allocate arrays for lists.
+ ### Store reordered lists.
+   THS(k)   =           16
+ ### Make wk_loc and wk_ele array.
+ Current MNTE =           26
+ Optimal MNTE =            0
+ ### Start the Lanczos method.
+&INPUT_LANCZ
+ LNC_ENE_CONV=  1.0000000000000000E-014,
+ MAXITR=1000       ,
+ MINITR=5          ,
+ ITRINT=1          ,
+ /
+************************************************************************************
+ Eigen solver: Lanczos

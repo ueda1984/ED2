@@ -1,0 +1,19 @@
+make -C source all
+make[1]: Entering directory '/workspace/ed2-phase1b-final/bounds/source'
+make[1]: Nothing to be done for 'all'.
+make[1]: Leaving directory '/workspace/ed2-phase1b-final/bounds/source'
+make -C tests check-sparse-field SPARSE_FIELD_OUTPUT="/workspace/ed2-phase1b-final/sparse-bounds"
+make[1]: Entering directory '/workspace/ed2-phase1b-final/bounds/tests'
+gfortran -I/workspace/ed2-phase1b-final/bounds/source -O2 -g -fopenmp -fcheck=all -fbacktrace -Wall -Wextra -c -o sparse_field_operator_check.o sparse_field_operator_check.f90
+gfortran -I/workspace/ed2-phase1b-final/bounds/source -O2 -g -fopenmp -fcheck=all -fbacktrace -Wall -Wextra   -o sparse_field_operator_check sparse_field_operator_check.o ../source/ham2vec.o ../source/state_lists.o ../source/input_param.o -llapack -lopenblas
+python3 ./sparse_field_validation.py \
+  --exe "/workspace/ed2-phase1b-final/bounds/source/QS3ED2" --operator-exe "/workspace/ed2-phase1b-final/bounds/tests/sparse_field_operator_check" \
+  --output "/workspace/ed2-phase1b-final/sparse-bounds"
+single-site4 : 14 CLI cases passed
+sparse-ordered : 14 CLI cases passed
+sparse-permuted : 14 CLI cases passed
+full-ordered : 14 CLI cases passed
+full-permuted : 14 CLI cases passed
+CLI: {'passed': 70, 'failed': 0} operator: {'passed': 10, 'failed': 0} permutations: {'passed': 28, 'failed': 0}
+Evidence: /workspace/ed2-phase1b-final/sparse-bounds
+make[1]: Leaving directory '/workspace/ed2-phase1b-final/bounds/tests'
