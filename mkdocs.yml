@@ -53,5 +53,8 @@ nav:
       - symmetry_breaking_response: vp/symmetry_breaking_response.md
   - Theory / Algorithms:
       - Overview: theory/algorithms.md
+  - Development:
+      - Baseline audit: development/baseline-audit.md
+      - CPC library plan: development/cpc-library-plan.md
   - Reference:
       - Citation & Versioning: reference/citation-versioning.md      

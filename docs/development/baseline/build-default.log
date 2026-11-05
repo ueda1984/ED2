@@ -1,0 +1,119 @@
+make  all-recursive
+make[1]: Entering directory '/workspace/ed2-cpc-baseline-final/release'
+Making all in source
+make[2]: Entering directory '/workspace/ed2-cpc-baseline-final/release/source'
+gfortran  -fopenmp -Ofast -c -o input_param.o input_param.f90
+gfortran  -fopenmp -Ofast -c -o state_lists.o state_lists.f90
+gfortran  -fopenmp -Ofast -c -o ham2vec.o ham2vec.f90
+gfortran  -fopenmp -Ofast -c -o lanczos.o lanczos.f90
+gfortran  -fopenmp -Ofast -c -o eigen_solver.o eigen_solver.f90
+eigen_solver.f90:317:28:
+
+  305 |       m, w, z, ldz, isuppz, ztmp, lwork, dtmp, lrwork, itmp, liwork, info)
+      |                            2
+......
+  317 |       m, w, z, ldz, isuppz, work, lwork, rwork, lrwork, iwork, liwork, info)
+      |                            1
+Error: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+eigen_solver.f90:317:41:
+
+  305 |       m, w, z, ldz, isuppz, ztmp, lwork, dtmp, lrwork, itmp, liwork, info)
+      |                                         2
+......
+  317 |       m, w, z, ldz, isuppz, work, lwork, rwork, lrwork, iwork, liwork, info)
+      |                                         1
+Error: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+eigen_solver.f90:317:56:
+
+  305 |       m, w, z, ldz, isuppz, ztmp, lwork, dtmp, lrwork, itmp, liwork, info)
+      |                                                       2
+......
+  317 |       m, w, z, ldz, isuppz, work, lwork, rwork, lrwork, iwork, liwork, info)
+      |                                                        1
+Error: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+eigen_solver.f90:204:46:
+
+  204 |       call zheevr('V', 'A', 'U', NOM, T, NOM, 0.0d0, 1.0d0, 1, 1, abstol, &
+      |                                              1
+......
+  304 |     call zheevr(jobz, 'A', 'U', n, a, lda, vl, vu, il, iu, abstol, &
+      |                                           2
+Error: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(8)/INTEGER(4)).
+eigen_solver.f90:204:53:
+
+  204 |       call zheevr('V', 'A', 'U', NOM, T, NOM, 0.0d0, 1.0d0, 1, 1, abstol, &
+      |                                                     1
+......
+  304 |     call zheevr(jobz, 'A', 'U', n, a, lda, vl, vu, il, iu, abstol, &
+      |                                               2
+Error: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(8)/INTEGER(4)).
+eigen_solver.f90:205:43:
+
+  205 |         count_ne, ene, ccoef, NOM, isuppz, work_lanc, lwork, &
+      |                                           1
+......
+  305 |       m, w, z, ldz, isuppz, ztmp, lwork, dtmp, lrwork, itmp, liwork, info)
+      |                            2
+Error: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+eigen_solver.f90:206:8:
+
+  206 |         rwork_lanc, lrwork, iwork_lanc, liwork, info)
+      |        1
+......
+  305 |       m, w, z, ldz, isuppz, ztmp, lwork, dtmp, lrwork, itmp, liwork, info)
+      |                                         2
+Error: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+eigen_solver.f90:206:28:
+
+  206 |         rwork_lanc, lrwork, iwork_lanc, liwork, info)
+      |                            1
+......
+  305 |       m, w, z, ldz, isuppz, ztmp, lwork, dtmp, lrwork, itmp, liwork, info)
+      |                                                       2
+Error: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+eigen_solver.f90:245:46:
+
+  245 |       call zheevr('V', 'A', 'U', NOM, T, NOM, 0.0d0, 1.0d0, 1, 1, abstol, &
+      |                                              1
+......
+  304 |     call zheevr(jobz, 'A', 'U', n, a, lda, vl, vu, il, iu, abstol, &
+      |                                           2
+Error: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(8)/INTEGER(4)).
+eigen_solver.f90:245:53:
+
+  245 |       call zheevr('V', 'A', 'U', NOM, T, NOM, 0.0d0, 1.0d0, 1, 1, abstol, &
+      |                                                     1
+......
+  304 |     call zheevr(jobz, 'A', 'U', n, a, lda, vl, vu, il, iu, abstol, &
+      |                                               2
+Error: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(8)/INTEGER(4)).
+eigen_solver.f90:246:47:
+
+  246 |         count_ne, ene, ccoef, NOM, ifail_lanc, work_lanc, lwork, &
+      |                                               1
+......
+  305 |       m, w, z, ldz, isuppz, ztmp, lwork, dtmp, lrwork, itmp, liwork, info)
+      |                            2
+Error: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+eigen_solver.f90:247:8:
+
+  247 |         rwork_lanc, lrwork, iwork_lanc, liwork, info)
+      |        1
+......
+  305 |       m, w, z, ldz, isuppz, ztmp, lwork, dtmp, lrwork, itmp, liwork, info)
+      |                                         2
+Error: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+eigen_solver.f90:247:28:
+
+  247 |         rwork_lanc, lrwork, iwork_lanc, liwork, info)
+      |                            1
+......
+  305 |       m, w, z, ldz, isuppz, ztmp, lwork, dtmp, lrwork, itmp, liwork, info)
+      |                                                       2
+Error: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+make[2]: *** [Makefile:348: eigen_solver.o] Error 1
+make[2]: *** Waiting for unfinished jobs....
+make[2]: Leaving directory '/workspace/ed2-cpc-baseline-final/release/source'
+make[1]: *** [Makefile:371: all-recursive] Error 1
+make[1]: Leaving directory '/workspace/ed2-cpc-baseline-final/release'
+make: *** [Makefile:312: all] Error 2

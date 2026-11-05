@@ -1,0 +1,30 @@
+=========================================
+   QS3-ED2 1.0.0: tests/test-suite.log
+=========================================
+
+# TOTAL: 1
+# PASS:  0
+# SKIP:  0
+# XFAIL: 0
+# FAIL:  1
+# XPASS: 0
+# ERROR: 0
+
+System information (uname -a): Linux 6.18.57 #1 SMP Tue Oct 20 21:56:04 UTC 2026 x86_64
+Distribution information (/etc/os-release):
+PRETTY_NAME="Debian GNU/Linux 13 (trixie)"
+NAME="Debian GNU/Linux"
+VERSION_ID="13"
+VERSION="13 (trixie)"
+VERSION_CODENAME=trixie
+DEBIAN_VERSION_FULL=13.6
+ID=debian
+HOME_URL="https://www.debian.org/"
+
+.. contents:: :depth: 2
+
+FAIL: test_ex1.sh
+=================
+
+./test_common.sh: 28: exec: ./test_common_strict.sh: not found
+FAIL test_ex1.sh (exit status: 127)

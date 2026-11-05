@@ -1,0 +1,96 @@
+******************************* Start QS^3 ED2 *************************************
+ ### Read input_parameters.
+&INPUT_PARAMETERS
+ NOS=4          ,
+ NODMAX=4          ,
+ NODMIN=0          ,
+ L1=1          ,
+ L2=1          ,
+ L3=1          ,
+ L4=1          ,
+ L5=1          ,
+ L6=1          ,
+ M1=0          ,
+ M2=0          ,
+ M3=0          ,
+ M4=0          ,
+ M5=0          ,
+ M6=0          ,
+ NO_ONE=4          ,
+ NO_TWO=3          ,
+ WK_DIM=-1         ,
+ MNTE=-1         ,
+ ALG=1          ,
+ FILE_XYZ_DM_GAMMA="bonds.dat                                                                                           ",
+ FILE_HVEC="fields.dat                                                                                          ",
+ OUTDIR="./                                                                                                  ",
+ FILE_S1="shift.dat                                                                                           ",
+ FILE_S2="                                                                                                    ",
+ FILE_S3="                                                                                                    ",
+ FILE_S4="                                                                                                    ",
+ FILE_S5="                                                                                                    ",
+ FILE_S6="                                                                                                    ",
+ FILE_NODMAX="caps.dat                                                                                            ",
+ FILE_SPIN="spins.dat                                                                                           ",
+ FILE_WF="./                                                                                                  ",
+ RE_WF=0          ,
+ WR_WF=0          ,
+ CAL_LM=1          ,
+ CAL_CF=1          ,
+ NO_TWO_CF=6          ,
+ FILE_TWO_CF="pairs.dat                                                                                           ",
+ /
+ ### Set wavevectors.
+ ### Set random_seed.
+ ### Allocation arrays.
+ ### Set phase factors.
+ ### Read FILE_xyz_dm_gamma.
+ ### Read FILE_hvec.
+ ### Set translational operations.
+ ### Read FILE_NODmax.
+ ### Read FILE_spin.
+ ### Read FILE_two_cf.
+ ### Store cum_ltd_rep_combination numbers.
+ ### Set THS.
+   THS   =           16
+ ### Allocate and Set arrays for state_list.
+ ********************
+ max_threads           1
+ ********************
+ ### Count # of representative states.
+ ### Allocate work arrays for lists.
+ ### Store representative states.
+ ### Allocate arrays for lists.
+ ### Store reordered lists.
+   THS(k)   =           16
+ ### Make wk_loc and wk_ele array.
+ Current MNTE =           32
+ Optimal MNTE =           14
+ ### Start the Lanczos method.
+&INPUT_LANCZ
+ LNC_ENE_CONV=  1.0000000000000000E-014,
+ MAXITR=1000       ,
+ MINITR=1          ,
+ ITRINT=1          ,
+ /
+************************************************************************************
+ Eigen solver: Lanczos
+ ### dim == 1
+itr, ene, conv:     1    1.102868227807564E-01    0.0E+00
+************************************************************************************
+ total lanczos step:           0
+************************************************************************************
+E_0 =     1.102868227807564E-01
+************************************************************************************
+************************************************************************************
+quality of eigenvector
+                   <GS| H |GS>  =     5.683845233755351E-01
+|1 - (<GS|H|GS>)^2/<GS|H^2|GS>| =     5.999384605132092E-01
+************************************************************************************
+ ### Get local magnetizations.
+ ### write ouput/local_mag.dat.
+ ### Get two-point correlation functions.
+ ### write ouput/two_body_cf_z+-.dat.
+ ### write ouput/two_body_cf_xyz.dat.
+Time:     0.001 [sec]
+****************************************************************************************

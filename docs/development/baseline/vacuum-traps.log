@@ -1,0 +1,18 @@
+
+Program received signal SIGFPE: Floating-point exception - erroneous arithmetic operation.
+
+Backtrace for this error:
+#0  0x7f297e6a42ba in ???
+#1  0x7f297e6a3375 in ???
+#2  0x7f297e387d6f in ???
+#3  0x55e2527ffc61 in __lanczos_MOD_lancz_eigen_val._omp_fn.2
+	at /workspace/ed2-cpc-audit/debug/source/lanczos.f90:88
+#4  0x7f297e553fe5 in ???
+#5  0x55e2528019d7 in __lanczos_MOD_lancz_eigen_val
+	at /workspace/ed2-cpc-audit/debug/source/lanczos.f90:86
+#6  0x55e252804390 in __lanczos_MOD_lanczos_routines
+	at /workspace/ed2-cpc-audit/debug/source/lanczos.f90:47
+#7  0x55e2528133f8 in MAIN__
+	at /workspace/ed2-cpc-audit/debug/source/main.f90:41
+#8  0x55e252813aaa in main
+	at /workspace/ed2-cpc-audit/debug/source/main.f90:2

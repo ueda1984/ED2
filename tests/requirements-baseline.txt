@@ -1,0 +1,2 @@
+# Test-only independent dense reference; not a solver/build/runtime dependency.
+numpy==2.3.5

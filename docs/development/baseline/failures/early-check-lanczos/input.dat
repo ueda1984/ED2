@@ -1,0 +1,16 @@
+&input_parameters
+NOS=4, NODmin=0, NODmax=4, ALG=1,
+L1=1, L2=1,L3=1,L4=1,L5=1,L6=1,
+M1=0,M2=0,M3=0,M4=0,M5=0,M6=0,
+NO_one=4,NO_two=3,wk_dim=-1,MNTE=-1,
+FILE_xyz_dm_gamma='bonds.dat',FILE_hvec='fields.dat',
+FILE_spin='spins.dat',FILE_NODmax='caps.dat',FILE_S1='shift.dat',
+OUTDIR='./',FILE_wf='./',wr_wf=0,re_wf=0,
+cal_lm=1,cal_cf=1,NO_two_cf=6,FILE_two_cf='pairs.dat'
+/
+&input_lancz
+lnc_ene_conv=1d-14,minitr=1,maxitr=1000,itrint=1
+/
+&input_TRLan
+NOE=2,NOK=4,NOM=8,maxitr=1000,lnc_ene_conv=1d-13,i_vec_min=1,i_vec_max=2
+/

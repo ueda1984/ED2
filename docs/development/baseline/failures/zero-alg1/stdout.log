@@ -1,0 +1,101 @@
+******************************* Start QS^3 ED2 *************************************
+ ### Read input_parameters.
+&INPUT_PARAMETERS
+ NOS=4          ,
+ NODMAX=4          ,
+ NODMIN=0          ,
+ L1=1          ,
+ L2=1          ,
+ L3=1          ,
+ L4=1          ,
+ L5=1          ,
+ L6=1          ,
+ M1=0          ,
+ M2=0          ,
+ M3=0          ,
+ M4=0          ,
+ M5=0          ,
+ M6=0          ,
+ NO_ONE=4          ,
+ NO_TWO=0          ,
+ WK_DIM=-1         ,
+ MNTE=-1         ,
+ ALG=1          ,
+ FILE_XYZ_DM_GAMMA="bonds.dat                                                                                           ",
+ FILE_HVEC="fields.dat                                                                                          ",
+ OUTDIR="./                                                                                                  ",
+ FILE_S1="shift.dat                                                                                           ",
+ FILE_S2="                                                                                                    ",
+ FILE_S3="                                                                                                    ",
+ FILE_S4="                                                                                                    ",
+ FILE_S5="                                                                                                    ",
+ FILE_S6="                                                                                                    ",
+ FILE_NODMAX="caps.dat                                                                                            ",
+ FILE_SPIN="spins.dat                                                                                           ",
+ FILE_WF="./                                                                                                  ",
+ RE_WF=0          ,
+ WR_WF=0          ,
+ CAL_LM=0          ,
+ CAL_CF=0          ,
+ NO_TWO_CF=6          ,
+ FILE_TWO_CF="pairs.dat                                                                                           ",
+ /
+ ### Set wavevectors.
+ ### Set random_seed.
+ ### Allocation arrays.
+ ### Set phase factors.
+ ### Read FILE_xyz_dm_gamma.
+ ### Read FILE_hvec.
+ ### Set translational operations.
+ ### Read FILE_NODmax.
+ ### Read FILE_spin.
+ ### Store cum_ltd_rep_combination numbers.
+ ### Set THS.
+   THS   =           16
+ ### Allocate and Set arrays for state_list.
+ ********************
+ max_threads           1
+ ********************
+ ### Count # of representative states.
+ ### Allocate work arrays for lists.
+ ### Store representative states.
+ ### Allocate arrays for lists.
+ ### Store reordered lists.
+   THS(k)   =           16
+ ### Make wk_loc and wk_ele array.
+ Current MNTE =            8
+ Optimal MNTE =            1
+ ### Start the Lanczos method.
+&INPUT_LANCZ
+ LNC_ENE_CONV=  1.0000000000000000E-014,
+ MAXITR=1000       ,
+ MINITR=5          ,
+ ITRINT=1          ,
+ /
+************************************************************************************
+ Eigen solver: Lanczos
+itr, ene, conv:     5    1.139350972885985-313    1.0E+00
+itr, ene, conv:     6    6.928971229284951-310    1.0E+00
+itr, ene, conv:     7    4.667797412875816-310    4.8E-01
+itr, ene, conv:     8    1.139350972787172-313    4.1E+03
+itr, ene, conv:     9    4.667797413126455-310    1.0E+00
+itr, ene, conv:    10    6.928971229284951-310    3.3E-01
+itr, ene, conv:    11    4.667797417831096-310    4.8E-01
+itr, ene, conv:    12    4.667797414626438-310    6.9E-10
+itr, ene, conv:    13    4.667797414709441-310    1.8E-11
+itr, ene, conv:    14    1.139350973083612-313    4.1E+03
+itr, ene, conv:    15    4.667797417741819-310    1.0E+00
+itr, ene, conv:    16    1.139350972787172-313    4.1E+03
+************************************************************************************
+ total lanczos step:          16
+************************************************************************************
+E_0 =     1.139350972787172-313
+************************************************************************************
+Note: The following floating-point exceptions are signalling: IEEE_INVALID_FLAG IEEE_UNDERFLOW_FLAG IEEE_DENORMAL
+************************************************************************************
+quality of eigenvector
+                   <GS| H |GS>  =                       NaN
+|1 - (<GS|H|GS>)^2/<GS|H^2|GS>| =                       NaN
+************************************************************************************
+Time:     0.001 [sec]
+****************************************************************************************

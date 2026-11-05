@@ -1,0 +1,3 @@
+Command: python3 tests/numerical_baseline.py --exe <checked-workflow>/release/source/QS3ED2 --output <existing completed numerical-release>
+Exit: 1
+Refused with FileExistsError; completed report SHA-256 unchanged: 0b4d5f79ab6a956ed074ecdb95b94c9a1f59dc21cea8fbd804f9ea28da2e9ea7

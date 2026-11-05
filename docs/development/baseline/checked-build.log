@@ -1,0 +1,276 @@
+make  all-recursive
+make[1]: Entering directory '/workspace/ed2-cpc-audit/final-workflow-checked/debug'
+Making all in source
+make[2]: Entering directory '/workspace/ed2-cpc-audit/final-workflow-checked/debug/source'
+gfortran  -Og -g -fopenmp -fallow-argument-mismatch -fcheck=all -fbacktrace -Wall -Wextra -c -o input_param.o input_param.f90
+gfortran  -Og -g -fopenmp -fallow-argument-mismatch -fcheck=all -fbacktrace -Wall -Wextra -c -o state_lists.o state_lists.f90
+state_lists.f90:279:35:
+
+  279 |   function list_fly(t,NODmax,NODmin,NOS) result(ni)
+      |                                   1
+Warning: Unused dummy argument ‘nodmin’ at (1) [-Wunused-dummy-argument]
+state_lists.f90:407:24:
+
+  407 |     nd(:kl-1) = n(:kl-1)
+      |                        ^
+Warning: ‘kl’ may be used uninitialized [-Wmaybe-uninitialized]
+state_lists.f90:376:21:
+
+  376 |     integer :: kr, kl
+      |                     ^
+note: ‘kl’ was declared here
+state_lists.f90:408:24:
+
+  408 |     nd(kr+1:) = n(kr+1:)
+      |                        ^
+Warning: ‘kr’ may be used uninitialized [-Wmaybe-uninitialized]
+state_lists.f90:376:17:
+
+  376 |     integer :: kr, kl
+      |                 ^
+note: ‘kr’ was declared here
+gfortran  -Og -g -fopenmp -fallow-argument-mismatch -fcheck=all -fbacktrace -Wall -Wextra -c -o ham2vec.o ham2vec.f90
+gfortran  -Og -g -fopenmp -fallow-argument-mismatch -fcheck=all -fbacktrace -Wall -Wextra -c -o lanczos.o lanczos.f90
+gfortran  -Og -g -fopenmp -fallow-argument-mismatch -fcheck=all -fbacktrace -Wall -Wextra -c -o eigen_solver.o eigen_solver.f90
+eigen_solver.f90:110:75:
+
+  101 |     do i = 1, NOM
+      |                 2
+......
+  110 |           psi(ell,i+1) = Qk(ell,1) - alpha(i)*psi(ell,i)-beta(i-1)*psi(ell,i-1)
+      |                                                                           1
+Warning: Array reference at (1) out of bounds (0 < 1) in loop beginning at (2) [-Wdo-subscript]
+eigen_solver.f90:317:28:
+
+  305 |       m, w, z, ldz, isuppz, ztmp, lwork, dtmp, lrwork, itmp, liwork, info)
+      |                            2
+......
+  317 |       m, w, z, ldz, isuppz, work, lwork, rwork, lrwork, iwork, liwork, info)
+      |                            1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+eigen_solver.f90:317:41:
+
+  305 |       m, w, z, ldz, isuppz, ztmp, lwork, dtmp, lrwork, itmp, liwork, info)
+      |                                         2
+......
+  317 |       m, w, z, ldz, isuppz, work, lwork, rwork, lrwork, iwork, liwork, info)
+      |                                         1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+eigen_solver.f90:317:56:
+
+  305 |       m, w, z, ldz, isuppz, ztmp, lwork, dtmp, lrwork, itmp, liwork, info)
+      |                                                       2
+......
+  317 |       m, w, z, ldz, isuppz, work, lwork, rwork, lrwork, iwork, liwork, info)
+      |                                                        1
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+eigen_solver.f90:204:46:
+
+  204 |       call zheevr('V', 'A', 'U', NOM, T, NOM, 0.0d0, 1.0d0, 1, 1, abstol, &
+      |                                              1
+......
+  304 |     call zheevr(jobz, 'A', 'U', n, a, lda, vl, vu, il, iu, abstol, &
+      |                                           2
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(8)/INTEGER(4)).
+eigen_solver.f90:204:53:
+
+  204 |       call zheevr('V', 'A', 'U', NOM, T, NOM, 0.0d0, 1.0d0, 1, 1, abstol, &
+      |                                                     1
+......
+  304 |     call zheevr(jobz, 'A', 'U', n, a, lda, vl, vu, il, iu, abstol, &
+      |                                               2
+Warning: Type mismatch between actual argument at (1) and actual argument at (2) (REAL(8)/INTEGER(4)).
+eigen_solver.f90:205:43:
+
+  205 |         count_ne, ene, ccoef, NOM, isuppz, work_lanc, lwork, &
+      |                                           1
+......
+  305 |       m, w, z, ldz, isuppz, ztmp, lwork, dtmp, lrwork, itmp, liwork, info)
+      |                            2
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+eigen_solver.f90:206:8:
+
+  206 |         rwork_lanc, lrwork, iwork_lanc, liwork, info)
+      |        1
+......
+  305 |       m, w, z, ldz, isuppz, ztmp, lwork, dtmp, lrwork, itmp, liwork, info)
+      |                                         2
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+eigen_solver.f90:206:28:
+
+  206 |         rwork_lanc, lrwork, iwork_lanc, liwork, info)
+      |                            1
+......
+  305 |       m, w, z, ldz, isuppz, ztmp, lwork, dtmp, lrwork, itmp, liwork, info)
+      |                                                       2
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+eigen_solver.f90:246:47:
+
+  246 |         count_ne, ene, ccoef, NOM, ifail_lanc, work_lanc, lwork, &
+      |                                               1
+......
+  305 |       m, w, z, ldz, isuppz, ztmp, lwork, dtmp, lrwork, itmp, liwork, info)
+      |                            2
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+eigen_solver.f90:247:8:
+
+  247 |         rwork_lanc, lrwork, iwork_lanc, liwork, info)
+      |        1
+......
+  305 |       m, w, z, ldz, isuppz, ztmp, lwork, dtmp, lrwork, itmp, liwork, info)
+      |                                         2
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+eigen_solver.f90:247:28:
+
+  247 |         rwork_lanc, lrwork, iwork_lanc, liwork, info)
+      |                            1
+......
+  305 |       m, w, z, ldz, isuppz, ztmp, lwork, dtmp, lrwork, itmp, liwork, info)
+      |                                                       2
+Warning: Rank mismatch between actual argument at (1) and actual argument at (2) (scalar and rank-1)
+gfortran  -Og -g -fopenmp -fallow-argument-mismatch -fcheck=all -fbacktrace -Wall -Wextra -c -o get_expectation_values.o get_expectation_values.f90
+get_expectation_values.f90:54:24:
+
+   54 |     integer :: j, k, non
+      |                        1
+Warning: Unused variable ‘non’ declared at (1) [-Wunused-variable]
+gfortran  -Og -g -fopenmp -fallow-argument-mismatch -fcheck=all -fbacktrace -Wall -Wextra -c -o main.o main.f90
+gfortran  -Og -g -fopenmp -fallow-argument-mismatch -fcheck=all -fbacktrace -Wall -Wextra   -o QS3ED2 input_param.o state_lists.o ham2vec.o lanczos.o eigen_solver.o get_expectation_values.o main.o  -llapack -lopenblas
+make[2]: Leaving directory '/workspace/ed2-cpc-audit/final-workflow-checked/debug/source'
+Making all in tests
+make[2]: Entering directory '/workspace/ed2-cpc-audit/final-workflow-checked/debug/tests'
+make[2]: Nothing to be done for 'all'.
+make[2]: Leaving directory '/workspace/ed2-cpc-audit/final-workflow-checked/debug/tests'
+Making all in script_chain
+make[2]: Entering directory '/workspace/ed2-cpc-audit/final-workflow-checked/debug/script_chain'
+gfortran  -Og -g -fopenmp -fallow-argument-mismatch -fcheck=all -fbacktrace -Wall -Wextra -c -o mk_input.o mk_input.f90
+mk_input.f90:5:15:
+
+    5 |   integer :: iu = 1
+      |               1
+Warning: Unused variable ‘iu’ declared at (1) [-Wunused-variable]
+mk_input.f90:8:20:
+
+    8 |   integer :: i, j, k, l
+      |                    1
+Warning: Unused variable ‘k’ declared at (1) [-Wunused-variable]
+gfortran  -Og -g -fopenmp -fallow-argument-mismatch -fcheck=all -fbacktrace -Wall -Wextra   -o mk_input mk_input.o  -llapack -lopenblas
+make[2]: Leaving directory '/workspace/ed2-cpc-audit/final-workflow-checked/debug/script_chain'
+Making all in script_cubic
+make[2]: Entering directory '/workspace/ed2-cpc-audit/final-workflow-checked/debug/script_cubic'
+gfortran  -Og -g -fopenmp -fallow-argument-mismatch -fcheck=all -fbacktrace -Wall -Wextra -c -o mk_input.o mk_input.f90
+mk_input.f90:7:17:
+
+    7 |   integer :: i, j, k, l
+      |                 1
+Warning: Unused variable ‘j’ declared at (1) [-Wunused-variable]
+mk_input.f90:7:20:
+
+    7 |   integer :: i, j, k, l
+      |                    1
+Warning: Unused variable ‘k’ declared at (1) [-Wunused-variable]
+gfortran  -Og -g -fopenmp -fallow-argument-mismatch -fcheck=all -fbacktrace -Wall -Wextra   -o mk_input mk_input.o  -llapack -lopenblas
+make[2]: Leaving directory '/workspace/ed2-cpc-audit/final-workflow-checked/debug/script_cubic'
+Making all in script_cubic_sp_HB
+make[2]: Entering directory '/workspace/ed2-cpc-audit/final-workflow-checked/debug/script_cubic_sp_HB'
+gfortran  -Og -g -fopenmp -fallow-argument-mismatch -fcheck=all -fbacktrace -Wall -Wextra -c -o mk_input.o mk_input.f90
+mk_input.f90:3:37:
+
+    3 |   integer function f_p(i,j,k,LX,LY,LZ)
+      |                                     1
+Warning: Unused dummy argument ‘lz’ at (1) [-Wunused-dummy-argument]
+gfortran  -Og -g -fopenmp -fallow-argument-mismatch -fcheck=all -fbacktrace -Wall -Wextra   -o mk_input mk_input.o  -llapack -lopenblas
+make[2]: Leaving directory '/workspace/ed2-cpc-audit/final-workflow-checked/debug/script_cubic_sp_HB'
+Making all in script_honeycomb
+make[2]: Entering directory '/workspace/ed2-cpc-audit/final-workflow-checked/debug/script_honeycomb'
+gfortran  -Og -g -fopenmp -fallow-argument-mismatch -fcheck=all -fbacktrace -Wall -Wextra -c -o mk_input.o mk_input.f90
+mk_input.f90:5:15:
+
+    5 |   integer :: iu = 1
+      |               1
+Warning: Unused variable ‘iu’ declared at (1) [-Wunused-variable]
+mk_input.f90:8:20:
+
+    8 |   integer :: i, j, k, l
+      |                    1
+Warning: Unused variable ‘k’ declared at (1) [-Wunused-variable]
+gfortran  -Og -g -fopenmp -fallow-argument-mismatch -fcheck=all -fbacktrace -Wall -Wextra   -o mk_input mk_input.o  -llapack -lopenblas
+make[2]: Leaving directory '/workspace/ed2-cpc-audit/final-workflow-checked/debug/script_honeycomb'
+Making all in script_j1j2_chain
+make[2]: Entering directory '/workspace/ed2-cpc-audit/final-workflow-checked/debug/script_j1j2_chain'
+gfortran  -Og -g -fopenmp -fallow-argument-mismatch -fcheck=all -fbacktrace -Wall -Wextra -c -o mk_input.o mk_input.f90
+mk_input.f90:5:15:
+
+    5 |   integer :: iu = 1
+      |               1
+Warning: Unused variable ‘iu’ declared at (1) [-Wunused-variable]
+mk_input.f90:9:20:
+
+    9 |   integer :: i, j, k, l
+      |                    1
+Warning: Unused variable ‘k’ declared at (1) [-Wunused-variable]
+gfortran  -Og -g -fopenmp -fallow-argument-mismatch -fcheck=all -fbacktrace -Wall -Wextra   -o mk_input mk_input.o  -llapack -lopenblas
+make[2]: Leaving directory '/workspace/ed2-cpc-audit/final-workflow-checked/debug/script_j1j2_chain'
+Making all in script_kagome
+make[2]: Entering directory '/workspace/ed2-cpc-audit/final-workflow-checked/debug/script_kagome'
+gfortran  -Og -g -fopenmp -fallow-argument-mismatch -fcheck=all -fbacktrace -Wall -Wextra -c -o mk_input.o mk_input.f90
+mk_input.f90:5:15:
+
+    5 |   integer :: iu = 1
+      |               1
+Warning: Unused variable ‘iu’ declared at (1) [-Wunused-variable]
+mk_input.f90:8:20:
+
+    8 |   integer :: i, j, k, l
+      |                    1
+Warning: Unused variable ‘k’ declared at (1) [-Wunused-variable]
+gfortran  -Og -g -fopenmp -fallow-argument-mismatch -fcheck=all -fbacktrace -Wall -Wextra   -o mk_input mk_input.o  -llapack -lopenblas
+make[2]: Leaving directory '/workspace/ed2-cpc-audit/final-workflow-checked/debug/script_kagome'
+Making all in script_mixed_spin_chain
+make[2]: Entering directory '/workspace/ed2-cpc-audit/final-workflow-checked/debug/script_mixed_spin_chain'
+gfortran  -Og -g -fopenmp -fallow-argument-mismatch -fcheck=all -fbacktrace -Wall -Wextra -c -o mk_input.o mk_input.f90
+mk_input.f90:7:20:
+
+    7 |   integer :: i, j, k, l
+      |                    1
+Warning: Unused variable ‘k’ declared at (1) [-Wunused-variable]
+mk_input.f90:5:24:
+
+    5 |   real(8) :: SPIN, SPIN2, HX, HY, HZ, JX, JY, JZ, DX, DY, DZ, GX, GY, GZ
+      |                        1
+Warning: Unused variable ‘spin2’ declared at (1) [-Wunused-variable]
+gfortran  -Og -g -fopenmp -fallow-argument-mismatch -fcheck=all -fbacktrace -Wall -Wextra   -o mk_input mk_input.o  -llapack -lopenblas
+make[2]: Leaving directory '/workspace/ed2-cpc-audit/final-workflow-checked/debug/script_mixed_spin_chain'
+Making all in script_square
+make[2]: Entering directory '/workspace/ed2-cpc-audit/final-workflow-checked/debug/script_square'
+gfortran  -Og -g -fopenmp -fallow-argument-mismatch -fcheck=all -fbacktrace -Wall -Wextra -c -o mk_input.o mk_input.f90
+mk_input.f90:5:15:
+
+    5 |   integer :: iu = 1
+      |               1
+Warning: Unused variable ‘iu’ declared at (1) [-Wunused-variable]
+mk_input.f90:8:20:
+
+    8 |   integer :: i, j, k, l
+      |                    1
+Warning: Unused variable ‘k’ declared at (1) [-Wunused-variable]
+gfortran  -Og -g -fopenmp -fallow-argument-mismatch -fcheck=all -fbacktrace -Wall -Wextra   -o mk_input mk_input.o  -llapack -lopenblas
+make[2]: Leaving directory '/workspace/ed2-cpc-audit/final-workflow-checked/debug/script_square'
+Making all in script_triangular
+make[2]: Entering directory '/workspace/ed2-cpc-audit/final-workflow-checked/debug/script_triangular'
+gfortran  -Og -g -fopenmp -fallow-argument-mismatch -fcheck=all -fbacktrace -Wall -Wextra -c -o mk_input.o mk_input.f90
+mk_input.f90:5:15:
+
+    5 |   integer :: iu = 1
+      |               1
+Warning: Unused variable ‘iu’ declared at (1) [-Wunused-variable]
+mk_input.f90:8:20:
+
+    8 |   integer :: i, j, k, l
+      |                    1
+Warning: Unused variable ‘k’ declared at (1) [-Wunused-variable]
+gfortran  -Og -g -fopenmp -fallow-argument-mismatch -fcheck=all -fbacktrace -Wall -Wextra   -o mk_input mk_input.o  -llapack -lopenblas
+make[2]: Leaving directory '/workspace/ed2-cpc-audit/final-workflow-checked/debug/script_triangular'
+make[2]: Entering directory '/workspace/ed2-cpc-audit/final-workflow-checked/debug'
+make[2]: Leaving directory '/workspace/ed2-cpc-audit/final-workflow-checked/debug'
+make[1]: Leaving directory '/workspace/ed2-cpc-audit/final-workflow-checked/debug'

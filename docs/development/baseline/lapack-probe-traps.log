@@ -1,0 +1,13 @@
+
+Program received signal SIGFPE: Floating-point exception - erroneous arithmetic operation.
+
+Backtrace for this error:
+#0  0x7f39169942ba in ???
+#1  0x7f3916993375 in ???
+#2  0x7f39166ccd6f in ???
+#3  0x7f39170fe011 in ???
+#4  0x7f391730d38a in ???
+#5  0x558e1cc74318 in probe
+	at /workspace/ed2-cpc-audit/lapack_probe.f90:12
+#6  0x558e1cc744e8 in main
+	at /workspace/ed2-cpc-audit/lapack_probe.f90:15

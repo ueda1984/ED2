@@ -1,0 +1,62 @@
+Making check in source
+make[1]: Entering directory '/workspace/ed2-cpc-baseline-final/release/source'
+make[1]: Nothing to be done for 'check'.
+make[1]: Leaving directory '/workspace/ed2-cpc-baseline-final/release/source'
+Making check in tests
+make[1]: Entering directory '/workspace/ed2-cpc-baseline-final/release/tests'
+make  check-TESTS
+make[2]: Entering directory '/workspace/ed2-cpc-baseline-final/release/tests'
+make[3]: Entering directory '/workspace/ed2-cpc-baseline-final/release/tests'
+PASS: test_ex1.sh
+============================================================================
+Testsuite summary for QS3-ED2 1.0.0
+============================================================================
+# TOTAL: 1
+# PASS:  1
+# SKIP:  0
+# XFAIL: 0
+# FAIL:  0
+# XPASS: 0
+# ERROR: 0
+============================================================================
+make[3]: Leaving directory '/workspace/ed2-cpc-baseline-final/release/tests'
+make[2]: Leaving directory '/workspace/ed2-cpc-baseline-final/release/tests'
+make[1]: Leaving directory '/workspace/ed2-cpc-baseline-final/release/tests'
+Making check in script_chain
+make[1]: Entering directory '/workspace/ed2-cpc-baseline-final/release/script_chain'
+make[1]: Nothing to be done for 'check'.
+make[1]: Leaving directory '/workspace/ed2-cpc-baseline-final/release/script_chain'
+Making check in script_cubic
+make[1]: Entering directory '/workspace/ed2-cpc-baseline-final/release/script_cubic'
+make[1]: Nothing to be done for 'check'.
+make[1]: Leaving directory '/workspace/ed2-cpc-baseline-final/release/script_cubic'
+Making check in script_cubic_sp_HB
+make[1]: Entering directory '/workspace/ed2-cpc-baseline-final/release/script_cubic_sp_HB'
+make[1]: Nothing to be done for 'check'.
+make[1]: Leaving directory '/workspace/ed2-cpc-baseline-final/release/script_cubic_sp_HB'
+Making check in script_honeycomb
+make[1]: Entering directory '/workspace/ed2-cpc-baseline-final/release/script_honeycomb'
+make[1]: Nothing to be done for 'check'.
+make[1]: Leaving directory '/workspace/ed2-cpc-baseline-final/release/script_honeycomb'
+Making check in script_j1j2_chain
+make[1]: Entering directory '/workspace/ed2-cpc-baseline-final/release/script_j1j2_chain'
+make[1]: Nothing to be done for 'check'.
+make[1]: Leaving directory '/workspace/ed2-cpc-baseline-final/release/script_j1j2_chain'
+Making check in script_kagome
+make[1]: Entering directory '/workspace/ed2-cpc-baseline-final/release/script_kagome'
+make[1]: Nothing to be done for 'check'.
+make[1]: Leaving directory '/workspace/ed2-cpc-baseline-final/release/script_kagome'
+Making check in script_mixed_spin_chain
+make[1]: Entering directory '/workspace/ed2-cpc-baseline-final/release/script_mixed_spin_chain'
+make[1]: Nothing to be done for 'check'.
+make[1]: Leaving directory '/workspace/ed2-cpc-baseline-final/release/script_mixed_spin_chain'
+Making check in script_square
+make[1]: Entering directory '/workspace/ed2-cpc-baseline-final/release/script_square'
+make[1]: Nothing to be done for 'check'.
+make[1]: Leaving directory '/workspace/ed2-cpc-baseline-final/release/script_square'
+Making check in script_triangular
+make[1]: Entering directory '/workspace/ed2-cpc-baseline-final/release/script_triangular'
+make[1]: Nothing to be done for 'check'.
+make[1]: Leaving directory '/workspace/ed2-cpc-baseline-final/release/script_triangular'
+make[1]: Entering directory '/workspace/ed2-cpc-baseline-final/release'
+make[1]: Leaving directory '/workspace/ed2-cpc-baseline-final/release'

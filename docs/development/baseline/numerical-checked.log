@@ -1,0 +1,22 @@
+PASSED: xyz-alg3-cache-1-omp1
+PASSED: xyz-alg1-cache-1-omp1
+PASSED: xyz-alg1-cache0-omp1
+PASSED: xyz-alg1-cache3-omp1
+PASSED: xyz-alg2-cache-1-omp1
+PASSED: xyz-alg3-cache-1-omp2
+PASSED: xyz-alg1-cache-1-omp2
+PASSED: xyz-alg1-cache0-omp2
+PASSED: xyz-alg1-cache3-omp2
+PASSED: xyz-alg2-cache-1-omp2
+FAILED: early-check-lanczos
+PASSED: singlet-dimer
+PASSED: zero-alg3
+FAILED: zero-alg1
+FAILED: zero-alg2
+PASSED: vacuum-lanczos
+PASSED: ring-m1-omp1
+PASSED: ring-m1-omp2
+PASSED: ring-m3-omp1
+PASSED: ring-m3-omp2
+PASSED: truncated-dense
+18 passed; 3 failed; 21 executed

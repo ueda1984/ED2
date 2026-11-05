@@ -1,0 +1,237 @@
+{
+  "schema": 1,
+  "source_commit": "ca812ca0ca402bed2525556bd797cec5e0a002e8",
+  "source_archive_sha256": "d064fddf05e02ec72796a4ddbb9731d16a39eb72903fe7103d4f1d88a8aaa69d",
+  "harness_sha256": "b26609b3c248f805864fe953d32ad2aeb748beba6abbef7894c6b6fba24eb8a9",
+  "numerical_harness_sha256": "ec5d307b42df1845cbd91710ee3ce555a9bd22b2c0c94747c42336cc6e281bff",
+  "working_tree_status": " M mkdocs.yml\n?? docs/development/\n?? tests/numerical_baseline.py\n?? tests/requirements-baseline.txt\n?? tools/\n",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+  "numpy": "2.3.5",
+  "thread_settings": {
+    "OMP_NUM_THREADS": "1",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1"
+  },
+  "commands": [
+    {
+      "name": "gfortran-version",
+      "command": [
+        "gfortran",
+        "--version"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.0029008840001552016,
+      "required": true
+    },
+    {
+      "name": "autoconf-version",
+      "command": [
+        "autoconf",
+        "--version"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.035287004000110755,
+      "required": true
+    },
+    {
+      "name": "automake-version",
+      "command": [
+        "automake",
+        "--version"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.06315219600014643,
+      "required": true
+    },
+    {
+      "name": "make-version",
+      "command": [
+        "make",
+        "--version"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.0021797849999529717,
+      "required": true
+    },
+    {
+      "name": "cpu",
+      "command": [
+        "lscpu"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.006906072999981916,
+      "required": false
+    },
+    {
+      "name": "autoreconf",
+      "command": [
+        "autoreconf",
+        "-vfi"
+      ],
+      "cwd": "release",
+      "exit_code": 0,
+      "seconds": 2.046841357999938,
+      "required": true
+    },
+    {
+      "name": "configure-default",
+      "command": [
+        "./configure",
+        "FC=gfortran"
+      ],
+      "cwd": "release",
+      "exit_code": 0,
+      "seconds": 1.243936223999981,
+      "required": true
+    },
+    {
+      "name": "build-default",
+      "command": [
+        "make",
+        "-j2"
+      ],
+      "cwd": "release",
+      "exit_code": 2,
+      "seconds": 3.030487702999835,
+      "required": false
+    },
+    {
+      "name": "configure-baseline",
+      "command": [
+        "./configure",
+        "FC=gfortran",
+        "FCFLAGS=-O2 -fopenmp -fallow-argument-mismatch"
+      ],
+      "cwd": "release",
+      "exit_code": 0,
+      "seconds": 1.4165510240000003,
+      "required": true
+    },
+    {
+      "name": "clean",
+      "command": [
+        "make",
+        "clean"
+      ],
+      "cwd": "release",
+      "exit_code": 0,
+      "seconds": 0.12143399100000352,
+      "required": true
+    },
+    {
+      "name": "build-baseline",
+      "command": [
+        "make",
+        "-j2"
+      ],
+      "cwd": "release",
+      "exit_code": 0,
+      "seconds": 4.392889967999963,
+      "required": true
+    },
+    {
+      "name": "linked-libraries",
+      "command": [
+        "ldd",
+        "/workspace/ed2-cpc-audit/final-workflow-checked/release/source/QS3ED2"
+      ],
+      "cwd": ".",
+      "exit_code": 0,
+      "seconds": 0.0076172250001036446,
+      "required": true
+    },
+    {
+      "name": "check",
+      "command": [
+        "make",
+        "check"
+      ],
+      "cwd": "release",
+      "exit_code": 0,
+      "seconds": 0.5071428070000366,
+      "required": true
+    },
+    {
+      "name": "numerical-release",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "/workspace/ED2/tests/numerical_baseline.py",
+        "--exe",
+        "/workspace/ed2-cpc-audit/final-workflow-checked/release/source/QS3ED2",
+        "--output",
+        "/workspace/ed2-cpc-audit/final-workflow-checked/numerical-release"
+      ],
+      "cwd": ".",
+      "exit_code": 1,
+      "seconds": 0.4120795650001128,
+      "required": true
+    },
+    {
+      "name": "debug-autoreconf",
+      "command": [
+        "autoreconf",
+        "-vfi"
+      ],
+      "cwd": "debug",
+      "exit_code": 0,
+      "seconds": 2.011158929999965,
+      "required": true
+    },
+    {
+      "name": "debug-configure",
+      "command": [
+        "./configure",
+        "FC=gfortran",
+        "FCFLAGS=-Og -g -fopenmp -fallow-argument-mismatch -fcheck=all -fbacktrace -Wall -Wextra"
+      ],
+      "cwd": "debug",
+      "exit_code": 0,
+      "seconds": 1.1656009349999294,
+      "required": true
+    },
+    {
+      "name": "debug-build",
+      "command": [
+        "make",
+        "-j2"
+      ],
+      "cwd": "debug",
+      "exit_code": 0,
+      "seconds": 3.0963226419999046,
+      "required": true
+    },
+    {
+      "name": "numerical-debug",
+      "command": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "/workspace/ED2/tests/numerical_baseline.py",
+        "--exe",
+        "/workspace/ed2-cpc-audit/final-workflow-checked/debug/source/QS3ED2",
+        "--output",
+        "/workspace/ed2-cpc-audit/final-workflow-checked/numerical-debug"
+      ],
+      "cwd": ".",
+      "exit_code": 1,
+      "seconds": 0.38059047399997326,
+      "required": true
+    }
+  ],
+  "reference_comparisons": [],
+  "baseline_flags": "-O2 -fopenmp -fallow-argument-mismatch",
+  "executable_sha256": "f636bcddaa28c029a9a6fc81fbc76c55d24c5e81fe1ff618340e3fb756d1cf87",
+  "automake_counts": {
+    "TOTAL": 1,
+    "PASS": 1,
+    "SKIP": 0,
+    "FAIL": 0,
+    "ERROR": 0
+  },
+  "automake_count_check": true,
+  "debug_flags": "-Og -g -fopenmp -fallow-argument-mismatch -fcheck=all -fbacktrace -Wall -Wextra"
+}
