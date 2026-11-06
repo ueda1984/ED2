@@ -1,0 +1,103 @@
+[
+  {
+    "profile": "gnu13",
+    "name": "autoreconf",
+    "command": [
+      "autoreconf",
+      "-vfi"
+    ],
+    "exit_code": 0
+  },
+  {
+    "profile": "gnu13",
+    "name": "configure",
+    "command": [
+      "./configure",
+      "FC=/workspace/ed2-phase1d/gfortran13/gfortran13",
+      "FCFLAGS=-O2 -fopenmp"
+    ],
+    "exit_code": 0
+  },
+  {
+    "profile": "gnu13",
+    "name": "build",
+    "command": [
+      "make",
+      "-j2"
+    ],
+    "exit_code": 0
+  },
+  {
+    "profile": "gnu13",
+    "name": "lapack",
+    "command": [
+      "make",
+      "check-lapack"
+    ],
+    "exit_code": 0
+  },
+  {
+    "profile": "gnu13",
+    "name": "stability",
+    "command": [
+      "make",
+      "check-lanczos",
+      "LANCZOS_OUTPUT=/workspace/ed2-phase1d/gnu13-stability"
+    ],
+    "exit_code": 0
+  },
+  {
+    "profile": "gnu13",
+    "name": "sparse",
+    "command": [
+      "make",
+      "check-sparse-field",
+      "SPARSE_FIELD_OUTPUT=/workspace/ed2-phase1d/gnu13-sparse"
+    ],
+    "exit_code": 2
+  },
+  {
+    "profile": "gnu13",
+    "name": "standard",
+    "command": [
+      "make",
+      "check"
+    ],
+    "exit_code": 0
+  },
+  {
+    "profile": "gnu13",
+    "name": "extended",
+    "command": [
+      "make",
+      "check-long"
+    ],
+    "exit_code": 0
+  },
+  {
+    "profile": "gnu13",
+    "name": "historical",
+    "command": [
+      "python3",
+      "/workspace/ED2/tests/compare_historical.py",
+      "--build",
+      "/workspace/ed2-phase1d/gnu13",
+      "--output",
+      "/workspace/ed2-phase1d/gnu13-historical.json"
+    ],
+    "exit_code": 0
+  },
+  {
+    "profile": "gnu13",
+    "name": "independent",
+    "command": [
+      "python3",
+      "/workspace/ED2/tests/numerical_baseline.py",
+      "--exe",
+      "/workspace/ed2-phase1d/gnu13/source/QS3ED2",
+      "--output",
+      "/workspace/ed2-phase1d/gnu13-independent"
+    ],
+    "exit_code": 0
+  }
+]

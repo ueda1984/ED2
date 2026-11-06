@@ -1,0 +1,20 @@
+[
+  {
+    "suite": "sparse-cli",
+    "fixture": "single-site4",
+    "alg": 1,
+    "cache": -1,
+    "threads": 2,
+    "input_sha256": {
+      "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+      "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+      "fields.dat": "ec5f4a910655f3920e3ead6ed8bf92126fe2f75fba6953ce084f1c6a515f10a5",
+      "input.dat": "8104065e2badc3f09bff25d0b05ce770901a681f68c1ab2fd4d37166e830718f",
+      "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+      "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+    },
+    "exit_code": 0,
+    "status": "failed",
+    "error": "\nNot equal to tolerance rtol=1e-09, atol=1e-09\nmagnetization\nMismatched elements: 10 / 12 (83.3%)\nMax absolute difference among violations: 1.53227552e-08\nMax relative difference among violations: 1.41378683e-07\n ACTUAL: array([[ 0.108381, -0.06011 ,  0.202701],\n       [-0.142368,  0.05716 , -0.126662],\n       [ 0.270407, -0.136441,  0.279645],\n       [-0.320989,  0.158369, -0.287781]])\n DESIRED: array([[ 0.108381, -0.06011 ,  0.202701],\n       [-0.142368,  0.05716 , -0.126662],\n       [ 0.270407, -0.136441,  0.279645],\n       [-0.320989,  0.158369, -0.287781]])"
+  }
+]

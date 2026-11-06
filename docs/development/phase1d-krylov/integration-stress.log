@@ -1,0 +1,23 @@
+make -C source all
+make[1]: Entering directory '/workspace/ed2-phase1d/integration/source'
+make[1]: Nothing to be done for 'all'.
+make[1]: Leaving directory '/workspace/ed2-phase1d/integration/source'
+make -C tests check-krylov-stress KRYLOV_OUTPUT="/workspace/ed2-phase1d/stress-integrated"
+make[1]: Entering directory '/workspace/ed2-phase1d/integration/tests'
+gfortran -I/workspace/ed2-phase1d/integration/source -O2 -fopenmp -c -o krylov_stress_driver.o krylov_stress_driver.f90
+gfortran -I/workspace/ed2-phase1d/integration/source -O2 -fopenmp   -o krylov_stress_driver krylov_stress_driver.o ../source/krylov_solvers.o ../source/blas_lapack_interfaces.o -llapack -lopenblas
+python3 ./krylov_stress.py --driver "/workspace/ed2-phase1d/integration/tests/krylov_stress_driver" \
+  --output "/workspace/ed2-phase1d/stress-integrated"
+0 accepted_accuracy_or_inclusion_warning
+20 accepted_accuracy_or_inclusion_warning
+40 accepted_accuracy_or_inclusion_warning
+60 nonconvergence
+80 accepted_accuracy_or_inclusion_warning
+100 nonconvergence
+120 accepted_strict
+140 accepted_strict
+160 nonconvergence
+180 nonconvergence
+200 nonconvergence
+{'accepted_accuracy_or_inclusion_warning': 135, 'accepted_strict': 164, 'nonconvergence': 119}
+make[1]: Leaving directory '/workspace/ed2-phase1d/integration/tests'

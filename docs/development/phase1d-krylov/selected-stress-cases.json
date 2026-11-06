@@ -1,0 +1,253 @@
+[
+  {
+    "family": "separated",
+    "n": 32,
+    "alg": 2,
+    "tol": 1e-20,
+    "seed": 19,
+    "wanted": 3,
+    "keep": 6,
+    "capacity": 12,
+    "budget": 120,
+    "id": "0015-omp1",
+    "threads": 1,
+    "input_sha256": "7f72bcd829b944159906a0f7c4acce02baa293677bcfe8cc71d747c0c26ccc08",
+    "matrix_sha256": "7d90d6d75dc220f98d0a9cfdc51d42c358934e92c3095fead1f5e368f847fe8b",
+    "exit_code": 1,
+    "wall_seconds": 0.015867903000071237,
+    "solver_status": 1,
+    "reason": "maximum restart iterations without convergence",
+    "iterations": 1800,
+    "restart_cycles": 120,
+    "rng_state": [
+      "           0          56          93         130         167         204         241         278         315"
+    ],
+    "h_applications": 1800,
+    "solver_seconds": 0.007792966000124579,
+    "classification": "nonconvergence",
+    "last_reported_residuals": [
+      1.847017294383335e-15,
+      1.675101156399186e-15,
+      2.008978213328206e-15
+    ],
+    "last_actual_residuals": [
+      2.0215895093377906e-15,
+      1.7025697417344046e-15,
+      2.123836050293469e-15
+    ],
+    "last_eigenvalue_errors": [
+      2.220446049250313e-16,
+      1.1102230246251565e-16,
+      1.1102230246251565e-16
+    ],
+    "last_candidate_meets_strict_energy_and_residual": true
+  },
+  {
+    "family": "separated",
+    "n": 96,
+    "alg": 1,
+    "tol": 1e-06,
+    "seed": 19,
+    "wanted": 1,
+    "keep": 6,
+    "capacity": 12,
+    "budget": 96,
+    "id": "0090-omp1",
+    "threads": 1,
+    "input_sha256": "35d048721f2af9e13ce6a5eb6669a1dec23d57cb6843de3de721e3ca58df21df",
+    "matrix_sha256": "af619470975db2416a23a3ed656e25327a85217fc670fca47156135e188a81fa",
+    "exit_code": 0,
+    "wall_seconds": 0.015889746000084415,
+    "solver_status": 0,
+    "reason": "energy convergence (residual certified)",
+    "iterations": 37,
+    "restart_cycles": 0,
+    "rng_state": [
+      "           0          56          93         130         167         204         241         278         315"
+    ],
+    "h_applications": 74,
+    "solver_seconds": 0.0010772680002446577,
+    "eigenvalues": [
+      -0.999999073117799
+    ],
+    "reference_eigenvalues": [
+      -1.0
+    ],
+    "eigenvalue_errors": [
+      9.268822009911304e-07
+    ],
+    "nearest_spectral_errors": [
+      9.268822009911304e-07
+    ],
+    "residual_norms": [
+      0.0006957412526561179
+    ],
+    "normalized_residuals": [
+      0.00034787062632805893
+    ],
+    "orthogonality_error": 1.1102230246251565e-16,
+    "requested_space_leakage": 0.0024339507339105784,
+    "cluster_space_leakage": 0.0024339507339105784,
+    "projector_error": 0.0024339507339105858,
+    "strict_energy_target_met": false,
+    "requested_space_target_met": false,
+    "valid_pair_under_loose_assessment": true,
+    "classification": "accepted_accuracy_or_inclusion_warning"
+  },
+  {
+    "family": "clustered",
+    "n": 96,
+    "alg": 1,
+    "tol": 1e-12,
+    "seed": 19,
+    "wanted": 1,
+    "keep": 6,
+    "capacity": 12,
+    "budget": 96,
+    "id": "0129-omp1",
+    "threads": 1,
+    "input_sha256": "770d6dc692fad1c92662af143845c8a764ae669a2e3e4368fcf1a22fee2d3a9a",
+    "matrix_sha256": "e51c274f861a7b394163a89b33eaf8021690a47888a81689484a82a3c0b93682",
+    "exit_code": 0,
+    "wall_seconds": 0.06675358199981929,
+    "solver_status": 0,
+    "reason": "energy convergence (residual certified)",
+    "iterations": 21,
+    "restart_cycles": 0,
+    "rng_state": [
+      "           0          56          93         130         167         204         241         278         315"
+    ],
+    "h_applications": 42,
+    "solver_seconds": 0.0036750059998666984,
+    "eigenvalues": [
+      -0.9999999997823085
+    ],
+    "reference_eigenvalues": [
+      -1.0
+    ],
+    "eigenvalue_errors": [
+      2.1769153146777853e-10
+    ],
+    "nearest_spectral_errors": [
+      1.7691514919704332e-11
+    ],
+    "residual_norms": [
+      2.7443641730101554e-07
+    ],
+    "normalized_residuals": [
+      1.3721820865050777e-07
+    ],
+    "orthogonality_error": 0.0,
+    "requested_space_leakage": 0.9668695430127421,
+    "cluster_space_leakage": 2.603367028959634e-07,
+    "projector_error": 0.9668695430127423,
+    "strict_energy_target_met": false,
+    "requested_space_target_met": false,
+    "valid_pair_under_loose_assessment": true,
+    "classification": "accepted_accuracy_or_inclusion_warning"
+  },
+  {
+    "family": "excluded-ground",
+    "n": 4,
+    "alg": 1,
+    "tol": 1e-12,
+    "seed": 19,
+    "wanted": 1,
+    "keep": 2,
+    "capacity": 4,
+    "budget": 4,
+    "id": "0207-omp1",
+    "threads": 1,
+    "input_sha256": "70010ccd4e7d6607871e1ac4b7db0572178f23c5256d569b0b9790f9c70a4e22",
+    "matrix_sha256": "64ce301d3bce6ab32b2fe7abea559d40ec7eff42aa6805e7959f845dcc5a90d3",
+    "exit_code": 0,
+    "wall_seconds": 0.00496253000028446,
+    "solver_status": 0,
+    "reason": "happy breakdown (exact zero beta; residual certified)",
+    "iterations": 1,
+    "restart_cycles": 0,
+    "rng_state": [
+      "           0          56          93         130         167         204         241         278         315"
+    ],
+    "h_applications": 2,
+    "solver_seconds": 4.2671999835874885e-05,
+    "eigenvalues": [
+      -0.9999999999
+    ],
+    "reference_eigenvalues": [
+      -1.0
+    ],
+    "eigenvalue_errors": [
+      1.000000082740371e-10
+    ],
+    "nearest_spectral_errors": [
+      0.0
+    ],
+    "residual_norms": [
+      0.0
+    ],
+    "normalized_residuals": [
+      0.0
+    ],
+    "orthogonality_error": 0.0,
+    "requested_space_leakage": 1.0,
+    "cluster_space_leakage": 0.0,
+    "projector_error": 1.0,
+    "strict_energy_target_met": true,
+    "requested_space_target_met": false,
+    "valid_pair_under_loose_assessment": true,
+    "classification": "accepted_accuracy_or_inclusion_warning"
+  },
+  {
+    "family": "weak-ground-overlap",
+    "n": 4,
+    "alg": 1,
+    "tol": 1e-12,
+    "seed": 19,
+    "wanted": 1,
+    "keep": 2,
+    "capacity": 4,
+    "budget": 4,
+    "id": "0208-omp1",
+    "threads": 1,
+    "input_sha256": "744760990588ba907aafc2622f67cfa445ee69af9f427d90aeb0aa099645bdb6",
+    "matrix_sha256": "64ce301d3bce6ab32b2fe7abea559d40ec7eff42aa6805e7959f845dcc5a90d3",
+    "exit_code": 0,
+    "wall_seconds": 0.0038002989999768033,
+    "solver_status": 0,
+    "reason": "numerical near-breakdown (residual certified)",
+    "iterations": 1,
+    "restart_cycles": 0,
+    "rng_state": [
+      "           0          56          93         130         167         204         241         278         315"
+    ],
+    "h_applications": 2,
+    "solver_seconds": 3.34169999405276e-05,
+    "eigenvalues": [
+      -0.9999999999000001
+    ],
+    "reference_eigenvalues": [
+      -1.0
+    ],
+    "eigenvalue_errors": [
+      9.999989725173464e-11
+    ],
+    "nearest_spectral_errors": [
+      1.1102230246251565e-16
+    ],
+    "residual_norms": [
+      1.1102680595724626e-16
+    ],
+    "normalized_residuals": [
+      5.551340297862313e-17
+    ],
+    "orthogonality_error": 0.0,
+    "requested_space_leakage": 1.0,
+    "cluster_space_leakage": 0.0,
+    "projector_error": 1.0,
+    "strict_energy_target_met": true,
+    "requested_space_target_met": false,
+    "valid_pair_under_loose_assessment": true,
+    "classification": "accepted_accuracy_or_inclusion_warning"
+  }
+]

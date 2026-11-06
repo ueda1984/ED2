@@ -1,0 +1,107 @@
+******************************* Start QS^3 ED2 *************************************
+ ### Read input_parameters.
+&INPUT_PARAMETERS
+ NOS=4          ,
+ NODMAX=4          ,
+ NODMIN=0          ,
+ L1=1          ,
+ L2=1          ,
+ L3=1          ,
+ L4=1          ,
+ L5=1          ,
+ L6=1          ,
+ M1=0          ,
+ M2=0          ,
+ M3=0          ,
+ M4=0          ,
+ M5=0          ,
+ M6=0          ,
+ NO_ONE=1          ,
+ NO_TWO=3          ,
+ WK_DIM=-1         ,
+ MNTE=-1         ,
+ ALG=1          ,
+ FILE_XYZ_DM_GAMMA="bonds.dat                                                                                           ",
+ FILE_HVEC="fields.dat                                                                                          ",
+ OUTDIR="./                                                                                                  ",
+ FILE_S1="                                                                                                    ",
+ FILE_S2="                                                                                                    ",
+ FILE_S3="                                                                                                    ",
+ FILE_S4="                                                                                                    ",
+ FILE_S5="                                                                                                    ",
+ FILE_S6="                                                                                                    ",
+ FILE_NODMAX="caps.dat                                                                                            ",
+ FILE_SPIN="spins.dat                                                                                           ",
+ FILE_WF="./                                                                                                  ",
+ RE_WF=0          ,
+ WR_WF=0          ,
+ CAL_LM=1          ,
+ CAL_CF=1          ,
+ NO_TWO_CF=6          ,
+ FILE_TWO_CF="pairs.dat                                                                                           ",
+ /
+ ### Set wavevectors.
+ ### Set random_seed.
+ ### Allocation arrays.
+ ### Set phase factors.
+ ### Read FILE_xyz_dm_gamma.
+ ### Read FILE_hvec.
+ ### Set translational operations.
+ ### Read FILE_NODmax.
+ ### Read FILE_spin.
+ ### Read FILE_two_cf.
+ ### Store cum_ltd_rep_combination numbers.
+ ### Set THS.
+   THS   =           16
+ ### Allocate and Set arrays for state_list.
+ ********************
+ max_threads           2
+ ********************
+ ### Count # of representative states.
+ ### Allocate work arrays for lists.
+ ### Store representative states.
+ ### Allocate arrays for lists.
+ ### Store reordered lists.
+   THS(k)   =           16
+ ### Make wk_loc and wk_ele array.
+ Current MNTE =           26
+ Optimal MNTE =           11
+ ### Start the Lanczos method.
+&INPUT_LANCZ
+ LNC_ENE_CONV=  1.0000000000000000E-014,
+ MAXITR=1000       ,
+ MINITR=5          ,
+ ITRINT=1          ,
+ /
+************************************************************************************
+ Eigen solver: Lanczos
+itr, ene, conv:     5   -1.206183349863382E+00    1.0E+00
+itr, ene, conv:     6   -1.213431879964803E+00    6.0E-03
+itr, ene, conv:     7   -1.216456283796917E+00    2.5E-03
+itr, ene, conv:     8   -1.217110352083653E+00    5.4E-04
+itr, ene, conv:     9   -1.217149105799722E+00    3.2E-05
+itr, ene, conv:    10   -1.217151910722528E+00    2.3E-06
+itr, ene, conv:    11   -1.217152043793150E+00    1.1E-07
+itr, ene, conv:    12   -1.217152048676455E+00    4.0E-09
+itr, ene, conv:    13   -1.217152048812747E+00    1.1E-10
+itr, ene, conv:    14   -1.217152048813909E+00    9.5E-13
+itr, ene, conv:    15   -1.217152048813920E+00    9.4E-15
+Lanczos status: energy convergence (residual certified)
+Eigenpair residual norm:     2.644543803251125E-08
+************************************************************************************
+ total lanczos step:          15
+************************************************************************************
+E_0 =    -1.217152048813920E+00
+************************************************************************************
+************************************************************************************
+quality of eigenvector
+                   <GS| H |GS>  =    -1.217152048813920E+00
+|1 - (<GS|H|GS>)^2/<GS|H^2|GS>| =     4.440892098500626E-16
+************************************************************************************
+ ### Get local magnetizations.
+ ### write ouput/local_mag.dat.
+ ### Get two-point correlation functions.
+ ### write ouput/two_body_cf_z+-.dat.
+ ### write ouput/two_body_cf_xyz.dat.
+Time:     0.001 [sec]
+****************************************************************************************

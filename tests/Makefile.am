@@ -80,3 +80,14 @@ check-lanczos: lanczos_stability_driver sparse_field_operator_check
 	$(PYTHON) $(srcdir)/lanczos_cli_stability.py --exe "$(abs_top_builddir)/source/QS3ED2" \
 	  --operator-exe "$(abs_builddir)/sparse_field_operator_check" \
 	  $(if $(LANCZOS_OUTPUT),--output "$(LANCZOS_OUTPUT)-cli",)
+
+# Characterization is optional and records numerical findings without hiding them.
+EXTRA_PROGRAMS = krylov_stress_driver
+krylov_stress_driver_SOURCES = krylov_stress_driver.f90
+krylov_stress_driver_LDADD = $(top_builddir)/source/krylov_solvers.o \
+  $(top_builddir)/source/blas_lapack_interfaces.o
+EXTRA_DIST += krylov_stress.py krylov_benchmarks.py krylov_benchmark_probe.f90 krylov_acceptance_probe.py
+.PHONY: check-krylov-stress
+check-krylov-stress: krylov_stress_driver
+	$(PYTHON) $(srcdir)/krylov_stress.py --driver "$(abs_builddir)/krylov_stress_driver" \
+	  $(if $(KRYLOV_OUTPUT),--output "$(KRYLOV_OUTPUT)",)

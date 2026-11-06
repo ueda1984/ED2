@@ -29,3 +29,8 @@ check-sparse-field:
 check-lanczos:
 	$(AM_V_at)$(MAKE) -C source all
 	$(AM_V_at)$(MAKE) -C tests check-lanczos LANCZOS_OUTPUT="$(LANCZOS_OUTPUT)"
+
+.PHONY: check-krylov-stress
+check-krylov-stress:
+	$(AM_V_at)$(MAKE) -C source all
+	$(AM_V_at)$(MAKE) -C tests check-krylov-stress KRYLOV_OUTPUT="$(KRYLOV_OUTPUT)"

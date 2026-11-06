@@ -1,0 +1,18 @@
+make -C source all
+make[1]: Entering directory '/workspace/ed2-phase1d/o2/source'
+make[1]: Nothing to be done for 'all'.
+make[1]: Leaving directory '/workspace/ed2-phase1d/o2/source'
+make -C tests check-lapack
+make[1]: Entering directory '/workspace/ed2-phase1d/o2/tests'
+gfortran -I/workspace/ed2-phase1d/o2/source -O2 -fopenmp -c -o lapack_interface_check.o lapack_interface_check.f90
+gfortran -I/workspace/ed2-phase1d/o2/source -O2 -fopenmp   -o lapack_interface_check lapack_interface_check.o ../source/blas_lapack_interfaces.o -llapack -lopenblas
+gfortran -I/workspace/ed2-phase1d/o2/source -O2 -fopenmp -c -o lapack_failure_check.o lapack_failure_check.f90
+gfortran -I/workspace/ed2-phase1d/o2/source -O2 -fopenmp   -o lapack_failure_check lapack_failure_check.o ../source/eigen_solver.o ../source/krylov_solvers.o ../source/ham2vec.o ../source/state_lists.o ../source/input_param.o ../source/blas_lapack_interfaces.o -llapack -lopenblas
+gfortran -I/workspace/ed2-phase1d/o2/source -O2 -fopenmp -c -o sparse_field_operator_check.o sparse_field_operator_check.f90
+gfortran -I/workspace/ed2-phase1d/o2/source -O2 -fopenmp   -o sparse_field_operator_check sparse_field_operator_check.o ../source/ham2vec.o ../source/state_lists.o ../source/input_param.o -llapack -lopenblas
+gfortran -I/workspace/ed2-phase1d/o2/source -O2 -fopenmp -c -o lanczos_stability_driver.o lanczos_stability_driver.f90
+gfortran -I/workspace/ed2-phase1d/o2/source -O2 -fopenmp   -o lanczos_stability_driver lanczos_stability_driver.o ../source/krylov_solvers.o ../source/blas_lapack_interfaces.o -llapack -lopenblas
+/bin/bash ./test_lapack_interfaces.sh ./lapack_interface_check ./lapack_failure_check
+ PASS: ZHEEVR/DSTEVX spectra, residuals, query ranks and workspace guards
+PASS: 11 interface/error-path checks
+make[1]: Leaving directory '/workspace/ed2-phase1d/o2/tests'

@@ -1,0 +1,12 @@
+[
+  {
+    "id": "alg1-tol1e-14-omp1-seed1000003",
+    "input_sha256": {
+      "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+      "input.dat": "26408a6413c38c7e06f0fa096152eb402f2fbb846307b0947f46d6aa78da8732",
+      "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45",
+      "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+      "fields.dat": "ec5f4a910655f3920e3ead6ed8bf92126fe2f75fba6953ce084f1c6a515f10a5"
+    }
+  }
+]

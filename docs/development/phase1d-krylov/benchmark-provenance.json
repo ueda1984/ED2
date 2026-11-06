@@ -1,0 +1,41 @@
+{
+  "compiler": "GNU Fortran (Debian 14.2.0-19) 14.2.0",
+  "flags": "-O2 -fopenmp",
+  "binary_sha256": {
+    "phase1b": "58db92c153fb2c517b1022173e268800ccb014e6f2f9c9c75c9d36c611225604",
+    "phase1c": "b423b9366222acf5c91b23b95335b0c872b0f92491d0df0afdd23fd4d78e5357"
+  },
+  "probe_sha256": "110e8031b6f6c2995af5fc6e7844e47e69706278942834a80f6ea07a892fe1dc",
+  "harness_sha256": "806592fb5da9dc7a1b399022ccdf915e85912a7881c2b7f2a80e0cb5cf975ec5",
+  "thread_environment": {
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1",
+    "OMP_DYNAMIC": "FALSE",
+    "OMP_PROC_BIND": "close",
+    "OMP_PLACES": "cores"
+  },
+  "affinity": [
+    0,
+    1,
+    2,
+    3,
+    4
+  ],
+  "metadata": {
+    "cpu": ": INTEL(R) XEON(R) PLATINUM 8573C",
+    "load_start": [
+      1.33642578125,
+      1.6201171875,
+      1.046875
+    ],
+    "cpu_max": "400000 100000",
+    "memory_max": "34359738368",
+    "ldd": "\tlinux-vdso.so.1 (0x00007f28c0e14000)\n\tliblapack.so.3 => /workspace/.ed2-env/toolchain/usr/lib/x86_64-linux-gnu/openblas-pthread/liblapack.so.3 (0x00007f28c06a3000)\n\tlibopenblas.so.0 => /workspace/.ed2-env/toolchain/usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblas.so.0 (0x00007f28be0c8000)\n\tlibgfortran.so.5 => /lib/x86_64-linux-gnu/libgfortran.so.5 (0x00007f28bdda1000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f28bdcb1000)\n\tlibgomp.so.1 => /lib/x86_64-linux-gnu/libgomp.so.1 (0x00007f28bdc5c000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f28bda68000)\n\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f28bda3b000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f28c0e16000)\n",
+    "numpy": "2.3.5"
+  },
+  "load_latest": [
+    1.3271484375,
+    1.5546875,
+    1.06884765625
+  ]
+}

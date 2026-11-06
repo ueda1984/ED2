@@ -1,0 +1,44 @@
+checking for a BSD-compatible install... /usr/bin/install -c
+checking whether sleep supports fractional seconds... yes
+checking filesystem timestamp resolution... 0.01
+checking whether build environment is sane... yes
+checking for a race-free mkdir -p... /usr/bin/mkdir -p
+checking for gawk... no
+checking for mawk... mawk
+checking whether make sets $(MAKE)... yes
+checking whether make supports nested variables... yes
+checking xargs -n works... yes
+checking for gcc... gcc
+checking whether the C compiler works... yes
+checking for C compiler default output file name... a.out
+checking for suffix of executables...
+checking whether we are cross compiling... no
+checking for suffix of object files... o
+checking whether the compiler supports GNU C... yes
+checking whether gcc accepts -g... yes
+checking for gcc option to enable C11 features... none needed
+checking whether gcc understands -c and -o together... yes
+checking whether make supports the include directive... yes (GNU style)
+checking dependency style of gcc... gcc3
+checking whether the compiler supports GNU Fortran... yes
+checking whether /workspace/ed2-phase1d/gfortran13/gfortran13 accepts -g... yes
+checking for dsymv in -lopenblas... yes
+configure: BLAS... found in -lopenblas
+checking for dsyevx in -llapack... yes
+configure: LAPACK... found in -llapack
+checking that generated files are newer than configure... done
+configure: creating ./config.status
+config.status: creating Makefile
+config.status: creating source/Makefile
+config.status: creating tests/Makefile
+config.status: creating script_chain/Makefile
+config.status: creating script_cubic/Makefile
+config.status: creating script_cubic_sp_HB/Makefile
+config.status: creating script_honeycomb/Makefile
+config.status: creating script_j1j2_chain/Makefile
+config.status: creating script_kagome/Makefile
+config.status: creating script_mixed_spin_chain/Makefile
+config.status: creating script_square/Makefile
+config.status: creating script_triangular/Makefile
+config.status: creating config.h
+config.status: executing depfiles commands

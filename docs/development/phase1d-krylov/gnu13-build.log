@@ -1,0 +1,67 @@
+make  all-recursive
+make[1]: Entering directory '/workspace/ed2-phase1d/gnu13'
+Making all in source
+make[2]: Entering directory '/workspace/ed2-phase1d/gnu13/source'
+/workspace/ed2-phase1d/gfortran13/gfortran13  -O2 -fopenmp -c -o blas_lapack_interfaces.o blas_lapack_interfaces.f90
+/workspace/ed2-phase1d/gfortran13/gfortran13  -O2 -fopenmp -c -o input_param.o input_param.f90
+/workspace/ed2-phase1d/gfortran13/gfortran13  -O2 -fopenmp -c -o krylov_solvers.o krylov_solvers.f90
+/workspace/ed2-phase1d/gfortran13/gfortran13  -O2 -fopenmp -c -o state_lists.o state_lists.f90
+/workspace/ed2-phase1d/gfortran13/gfortran13  -O2 -fopenmp -c -o ham2vec.o ham2vec.f90
+/workspace/ed2-phase1d/gfortran13/gfortran13  -O2 -fopenmp -c -o lanczos.o lanczos.f90
+/workspace/ed2-phase1d/gfortran13/gfortran13  -O2 -fopenmp -c -o eigen_solver.o eigen_solver.f90
+/workspace/ed2-phase1d/gfortran13/gfortran13  -O2 -fopenmp -c -o get_expectation_values.o get_expectation_values.f90
+/workspace/ed2-phase1d/gfortran13/gfortran13  -O2 -fopenmp -c -o main.o main.f90
+/workspace/ed2-phase1d/gfortran13/gfortran13  -O2 -fopenmp   -o QS3ED2 blas_lapack_interfaces.o krylov_solvers.o input_param.o state_lists.o ham2vec.o lanczos.o eigen_solver.o get_expectation_values.o main.o  -llapack -lopenblas
+make[2]: Leaving directory '/workspace/ed2-phase1d/gnu13/source'
+Making all in tests
+make[2]: Entering directory '/workspace/ed2-phase1d/gnu13/tests'
+make[2]: Nothing to be done for 'all'.
+make[2]: Leaving directory '/workspace/ed2-phase1d/gnu13/tests'
+Making all in script_chain
+make[2]: Entering directory '/workspace/ed2-phase1d/gnu13/script_chain'
+/workspace/ed2-phase1d/gfortran13/gfortran13  -O2 -fopenmp -c -o mk_input.o mk_input.f90
+/workspace/ed2-phase1d/gfortran13/gfortran13  -O2 -fopenmp   -o mk_input mk_input.o  -llapack -lopenblas
+make[2]: Leaving directory '/workspace/ed2-phase1d/gnu13/script_chain'
+Making all in script_cubic
+make[2]: Entering directory '/workspace/ed2-phase1d/gnu13/script_cubic'
+/workspace/ed2-phase1d/gfortran13/gfortran13  -O2 -fopenmp -c -o mk_input.o mk_input.f90
+/workspace/ed2-phase1d/gfortran13/gfortran13  -O2 -fopenmp   -o mk_input mk_input.o  -llapack -lopenblas
+make[2]: Leaving directory '/workspace/ed2-phase1d/gnu13/script_cubic'
+Making all in script_cubic_sp_HB
+make[2]: Entering directory '/workspace/ed2-phase1d/gnu13/script_cubic_sp_HB'
+/workspace/ed2-phase1d/gfortran13/gfortran13  -O2 -fopenmp -c -o mk_input.o mk_input.f90
+/workspace/ed2-phase1d/gfortran13/gfortran13  -O2 -fopenmp   -o mk_input mk_input.o  -llapack -lopenblas
+make[2]: Leaving directory '/workspace/ed2-phase1d/gnu13/script_cubic_sp_HB'
+Making all in script_honeycomb
+make[2]: Entering directory '/workspace/ed2-phase1d/gnu13/script_honeycomb'
+/workspace/ed2-phase1d/gfortran13/gfortran13  -O2 -fopenmp -c -o mk_input.o mk_input.f90
+/workspace/ed2-phase1d/gfortran13/gfortran13  -O2 -fopenmp   -o mk_input mk_input.o  -llapack -lopenblas
+make[2]: Leaving directory '/workspace/ed2-phase1d/gnu13/script_honeycomb'
+Making all in script_j1j2_chain
+make[2]: Entering directory '/workspace/ed2-phase1d/gnu13/script_j1j2_chain'
+/workspace/ed2-phase1d/gfortran13/gfortran13  -O2 -fopenmp -c -o mk_input.o mk_input.f90
+/workspace/ed2-phase1d/gfortran13/gfortran13  -O2 -fopenmp   -o mk_input mk_input.o  -llapack -lopenblas
+make[2]: Leaving directory '/workspace/ed2-phase1d/gnu13/script_j1j2_chain'
+Making all in script_kagome
+make[2]: Entering directory '/workspace/ed2-phase1d/gnu13/script_kagome'
+/workspace/ed2-phase1d/gfortran13/gfortran13  -O2 -fopenmp -c -o mk_input.o mk_input.f90
+/workspace/ed2-phase1d/gfortran13/gfortran13  -O2 -fopenmp   -o mk_input mk_input.o  -llapack -lopenblas
+make[2]: Leaving directory '/workspace/ed2-phase1d/gnu13/script_kagome'
+Making all in script_mixed_spin_chain
+make[2]: Entering directory '/workspace/ed2-phase1d/gnu13/script_mixed_spin_chain'
+/workspace/ed2-phase1d/gfortran13/gfortran13  -O2 -fopenmp -c -o mk_input.o mk_input.f90
+/workspace/ed2-phase1d/gfortran13/gfortran13  -O2 -fopenmp   -o mk_input mk_input.o  -llapack -lopenblas
+make[2]: Leaving directory '/workspace/ed2-phase1d/gnu13/script_mixed_spin_chain'
+Making all in script_square
+make[2]: Entering directory '/workspace/ed2-phase1d/gnu13/script_square'
+/workspace/ed2-phase1d/gfortran13/gfortran13  -O2 -fopenmp -c -o mk_input.o mk_input.f90
+/workspace/ed2-phase1d/gfortran13/gfortran13  -O2 -fopenmp   -o mk_input mk_input.o  -llapack -lopenblas
+make[2]: Leaving directory '/workspace/ed2-phase1d/gnu13/script_square'
+Making all in script_triangular
+make[2]: Entering directory '/workspace/ed2-phase1d/gnu13/script_triangular'
+/workspace/ed2-phase1d/gfortran13/gfortran13  -O2 -fopenmp -c -o mk_input.o mk_input.f90
+/workspace/ed2-phase1d/gfortran13/gfortran13  -O2 -fopenmp   -o mk_input mk_input.o  -llapack -lopenblas
+make[2]: Leaving directory '/workspace/ed2-phase1d/gnu13/script_triangular'
+make[2]: Entering directory '/workspace/ed2-phase1d/gnu13'
+make[2]: Leaving directory '/workspace/ed2-phase1d/gnu13'
+make[1]: Leaving directory '/workspace/ed2-phase1d/gnu13'

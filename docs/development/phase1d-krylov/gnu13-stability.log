@@ -1,0 +1,122 @@
+make -C source all
+make[1]: Entering directory '/workspace/ed2-phase1d/gnu13/source'
+make[1]: Nothing to be done for 'all'.
+make[1]: Leaving directory '/workspace/ed2-phase1d/gnu13/source'
+make -C tests check-lanczos LANCZOS_OUTPUT="/workspace/ed2-phase1d/gnu13-stability"
+make[1]: Entering directory '/workspace/ed2-phase1d/gnu13/tests'
+python3 ./lanczos_stability.py --driver "/workspace/ed2-phase1d/gnu13/tests/lanczos_stability_driver" \
+  --output "/workspace/ed2-phase1d/gnu13-stability"
+PASSED: zero-alg1-omp1
+PASSED: zero-alg1-omp2
+PASSED: scalar-alg1-omp1
+PASSED: scalar-alg1-omp2
+PASSED: one-dimensional-0.0-alg1-omp1
+PASSED: one-dimensional-0.0-alg1-omp2
+PASSED: one-dimensional-2.5-alg1-omp1
+PASSED: one-dimensional-2.5-alg1-omp2
+PASSED: zero-energy-alg1-omp1
+PASSED: zero-energy-alg1-omp2
+PASSED: exact-ground-start-alg1-omp1
+PASSED: exact-ground-start-alg1-omp2
+PASSED: zero-start-alg1-omp1
+PASSED: zero-start-alg1-omp2
+PASSED: nonfinite-start-alg1-omp1
+PASSED: nonfinite-start-alg1-omp2
+PASSED: invalid-budget-alg1-omp1
+PASSED: invalid-budget-alg1-omp2
+PASSED: zero-closed-block-alg1-omp1
+PASSED: zero-closed-block-alg1-omp2
+PASSED: scalar-closed-block-alg1-omp1
+PASSED: scalar-closed-block-alg1-omp2
+PASSED: minimal-budget-closed-block-alg1-omp1
+PASSED: minimal-budget-closed-block-alg1-omp2
+PASSED: insufficient-iterations-alg1-omp1
+PASSED: insufficient-iterations-alg1-omp2
+PASSED: scaled-1e-09-alg1-omp1
+PASSED: scaled-1e-09-alg1-omp2
+PASSED: scaled-1000000000.0-alg1-omp1
+PASSED: scaled-1000000000.0-alg1-omp2
+PASSED: zero-alg2-omp1
+PASSED: zero-alg2-omp2
+PASSED: scalar-alg2-omp1
+PASSED: scalar-alg2-omp2
+PASSED: one-dimensional-0.0-alg2-omp1
+PASSED: one-dimensional-0.0-alg2-omp2
+PASSED: one-dimensional-2.5-alg2-omp1
+PASSED: one-dimensional-2.5-alg2-omp2
+PASSED: zero-energy-alg2-omp1
+PASSED: zero-energy-alg2-omp2
+PASSED: exact-ground-start-alg2-omp1
+PASSED: exact-ground-start-alg2-omp2
+PASSED: zero-start-alg2-omp1
+PASSED: zero-start-alg2-omp2
+PASSED: nonfinite-start-alg2-omp1
+PASSED: nonfinite-start-alg2-omp2
+PASSED: invalid-budget-alg2-omp1
+PASSED: invalid-budget-alg2-omp2
+PASSED: zero-closed-block-alg2-omp1
+PASSED: zero-closed-block-alg2-omp2
+PASSED: scalar-closed-block-alg2-omp1
+PASSED: scalar-closed-block-alg2-omp2
+PASSED: minimal-budget-closed-block-alg2-omp1
+PASSED: minimal-budget-closed-block-alg2-omp2
+PASSED: insufficient-iterations-alg2-omp1
+PASSED: insufficient-iterations-alg2-omp2
+PASSED: scaled-1e-09-alg2-omp1
+PASSED: scaled-1e-09-alg2-omp2
+PASSED: scaled-1000000000.0-alg2-omp1
+PASSED: scaled-1000000000.0-alg2-omp2
+PASSED: early-check-alg1-omp1
+PASSED: early-check-alg1-omp2
+PASSED: near-breakdown-alg1-omp1
+PASSED: near-breakdown-alg1-omp2
+PASSED: exact-excited-start-alg1-omp1
+PASSED: exact-excited-start-alg1-omp2
+PASSED: excited-start-restart-alg2-omp1
+PASSED: excited-start-restart-alg2-omp2
+PASSED: degenerate-full-space-alg2-omp1
+PASSED: degenerate-full-space-alg2-omp2
+PASSED: degenerate-restarts-alg2-omp1
+PASSED: degenerate-restarts-alg2-omp2
+PASSED: excited-start-degenerate-restarts-alg2-omp1
+PASSED: excited-start-degenerate-restarts-alg2-omp2
+PASSED: diagonal-excited-degenerate-restarts-alg2-omp1
+PASSED: diagonal-excited-degenerate-restarts-alg2-omp2
+PASSED: zero-energy-restarts-alg2-omp1
+PASSED: zero-energy-restarts-alg2-omp2
+PASSED: general-restarts-alg2-omp1
+PASSED: general-restarts-alg2-omp2
+PASSED: minimal-budget-happy-alg2-omp1
+PASSED: minimal-budget-happy-alg2-omp2
+82 passed; 0 failed; evidence: /workspace/ed2-phase1d/gnu13-stability
+python3 ./lanczos_cli_stability.py --exe "/workspace/ed2-phase1d/gnu13/source/QS3ED2" \
+  --operator-exe "/workspace/ed2-phase1d/gnu13/tests/sparse_field_operator_check" \
+  --output "/workspace/ed2-phase1d/gnu13-stability-cli"
+PASSED: zero-alg1-omp1
+PASSED: zero-alg1-omp2
+PASSED: zero-alg2-omp1
+PASSED: zero-alg2-omp2
+PASSED: scalar-sector-alg1-omp1
+PASSED: scalar-sector-alg1-omp2
+PASSED: scalar-sector-alg2-omp1
+PASSED: scalar-sector-alg2-omp2
+PASSED: zero-energy-sector-alg1-omp1
+PASSED: zero-energy-sector-alg1-omp2
+PASSED: zero-energy-sector-alg2-omp1
+PASSED: zero-energy-sector-alg2-omp2
+PASSED: one-dimensional-alg1-omp1
+PASSED: one-dimensional-alg1-omp2
+PASSED: one-dimensional-alg2-omp1
+PASSED: one-dimensional-alg2-omp2
+PASSED: zero-one-dimensional-alg1-omp1
+PASSED: zero-one-dimensional-alg1-omp2
+PASSED: zero-one-dimensional-alg2-omp1
+PASSED: zero-one-dimensional-alg2-omp2
+PASSED: early-check-alg1-omp1
+PASSED: early-check-alg1-omp2
+PASSED: insufficient-budget-alg1-omp1
+PASSED: insufficient-budget-alg1-omp2
+PASSED: insufficient-budget-alg2-omp1
+PASSED: insufficient-budget-alg2-omp2
+26 passed; 0 failed; evidence: /workspace/ed2-phase1d/gnu13-stability-cli
+make[1]: Leaving directory '/workspace/ed2-phase1d/gnu13/tests'
