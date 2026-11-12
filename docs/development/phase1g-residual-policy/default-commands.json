@@ -1,0 +1,387 @@
+{
+  "base": "00702f66d404f9b81fd7db241b7b5da30fb71e2d",
+  "head": "00702f66d404f9b81fd7db241b7b5da30fb71e2d",
+  "working_tree": " M Makefile.am\n M source/Makefile.am\n M source/eigen_solver.f90\n M source/krylov_observations.f90\n M source/krylov_solvers.f90\n M source/lanczos.f90\n M tests/Makefile.am\n M tests/krylov_benchmarks.py\n?? docs/development/phase1g-optin-residual-policy.md\n?? source/krylov_residual_policy.f90\n?? tests/krylov_policy_driver.F90\n?? tests/residual_policy_validation.py\n?? tools/phase1g_policy_timing.py\n?? tools/phase1g_validation.py\n",
+  "archives": {
+    "before-source.tar": "d892f7cb6e263c3ffbf9e1f2057ddf804add21ee8f14575121e59649aad81900",
+    "after-source.tar": "35f497a5dbfdea1dad7c785a97b2c494392c228b0164684253f49fe7a885fedc"
+  },
+  "harness_sha256": "7f946e6d1fc1723b770a4f1d989e5418e0985151e4853cbef78d04cb8ea9ec1d",
+  "quick": true,
+  "commands": [
+    {
+      "profile": "default",
+      "label": "before-autoreconf",
+      "args": [
+        "autoreconf",
+        "-vfi"
+      ],
+      "cwd": "/workspace/phase1g-default-validation/default/before",
+      "exit_code": 0,
+      "seconds": 2.2278906009996717,
+      "required": true,
+      "log_sha256": "ecebd478a6ba551eb8b6d8a20aa86f558c9a753dcf0efc7c0ba991adf6e45538"
+    },
+    {
+      "profile": "default",
+      "label": "before-configure",
+      "args": [
+        "./configure",
+        "FC=gfortran",
+        "FCFLAGS=-fopenmp -Ofast",
+        "LDFLAGS=-L/workspace/ed2-env/tools/usr/lib/x86_64-linux-gnu/openblas-pthread -L/workspace/ed2-env/tools/usr/lib/gcc/x86_64-linux-gnu/14"
+      ],
+      "cwd": "/workspace/phase1g-default-validation/default/before",
+      "exit_code": 0,
+      "seconds": 1.0720427059986832,
+      "required": true,
+      "log_sha256": "4526f79a5f8344730a166963a137f4d019e817bc9cc02b26263847ae0ff29ec7"
+    },
+    {
+      "profile": "default",
+      "label": "before-clean",
+      "args": [
+        "make",
+        "clean"
+      ],
+      "cwd": "/workspace/phase1g-default-validation/default/before",
+      "exit_code": 0,
+      "seconds": 0.11554286400132696,
+      "required": true,
+      "log_sha256": "6f264b98312d6ec9714e1e3834899e21dabe2034db11ad54765e4a958fef1204"
+    },
+    {
+      "profile": "default",
+      "label": "before-build",
+      "args": [
+        "make",
+        "-j2"
+      ],
+      "cwd": "/workspace/phase1g-default-validation/default/before",
+      "exit_code": 0,
+      "seconds": 3.7829668880003737,
+      "required": true,
+      "log_sha256": "1a106ccbdf91d92f12e219583a5473bc1ec180f5e7048a59e5b978408919b38d"
+    },
+    {
+      "profile": "default",
+      "label": "after-autoreconf",
+      "args": [
+        "autoreconf",
+        "-vfi"
+      ],
+      "cwd": "/workspace/phase1g-default-validation/default/after",
+      "exit_code": 0,
+      "seconds": 1.9709925669994846,
+      "required": true,
+      "log_sha256": "ecebd478a6ba551eb8b6d8a20aa86f558c9a753dcf0efc7c0ba991adf6e45538"
+    },
+    {
+      "profile": "default",
+      "label": "after-configure",
+      "args": [
+        "./configure",
+        "FC=gfortran",
+        "FCFLAGS=-fopenmp -Ofast",
+        "LDFLAGS=-L/workspace/ed2-env/tools/usr/lib/x86_64-linux-gnu/openblas-pthread -L/workspace/ed2-env/tools/usr/lib/gcc/x86_64-linux-gnu/14"
+      ],
+      "cwd": "/workspace/phase1g-default-validation/default/after",
+      "exit_code": 0,
+      "seconds": 0.9667663219988754,
+      "required": true,
+      "log_sha256": "4526f79a5f8344730a166963a137f4d019e817bc9cc02b26263847ae0ff29ec7"
+    },
+    {
+      "profile": "default",
+      "label": "after-clean",
+      "args": [
+        "make",
+        "clean"
+      ],
+      "cwd": "/workspace/phase1g-default-validation/default/after",
+      "exit_code": 0,
+      "seconds": 0.1174256049998803,
+      "required": true,
+      "log_sha256": "983858fffa925ab967f598136f2cd8e63ebe4ce28284981e298e4640ccc3b651"
+    },
+    {
+      "profile": "default",
+      "label": "after-build",
+      "args": [
+        "make",
+        "-j2"
+      ],
+      "cwd": "/workspace/phase1g-default-validation/default/after",
+      "exit_code": 0,
+      "seconds": 4.251533329999802,
+      "required": true,
+      "log_sha256": "9ee548d008d0f90620acf8852f80899cf42dac7653a4454e7d924032d9713233"
+    },
+    {
+      "profile": "default",
+      "label": "diagnostics-driver",
+      "args": [
+        "make",
+        "-C",
+        "tests",
+        "krylov_diagnostics_driver",
+        "krylov_policy_driver"
+      ],
+      "cwd": "/workspace/phase1g-default-validation/default/after",
+      "exit_code": 0,
+      "seconds": 0.5668143400016561,
+      "required": true,
+      "log_sha256": "bfcc1d2bbf7dd4d7d9f6361b1b082672e5d81038b7e2b1cb2e07218f1daac00d"
+    },
+    {
+      "profile": "default",
+      "label": "before-driver",
+      "args": [
+        "gfortran",
+        "-fopenmp",
+        "-Ofast",
+        "-cpp",
+        "-DPHASE1F",
+        "-I/workspace/phase1g-default-validation/default/before/source",
+        "/workspace/phase1g-default-validation/default/after/tests/krylov_diagnostics_driver.F90",
+        "/workspace/phase1g-default-validation/default/before/source/krylov_solvers.o",
+        "/workspace/phase1g-default-validation/default/before/source/krylov_observations.o",
+        "/workspace/phase1g-default-validation/default/before/source/blas_lapack_interfaces.o",
+        "-L/workspace/ed2-env/tools/usr/lib/x86_64-linux-gnu/openblas-pthread",
+        "-L/workspace/ed2-env/tools/usr/lib/gcc/x86_64-linux-gnu/14",
+        "-llapack",
+        "-lopenblas",
+        "-o",
+        "/workspace/phase1g-default-validation/default/before-diagnostics-driver"
+      ],
+      "cwd": "/workspace/phase1g-default-validation/default",
+      "exit_code": 0,
+      "seconds": 0.2647080949991505,
+      "required": true,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "profile": "default",
+      "label": "before-policy-driver",
+      "args": [
+        "gfortran",
+        "-fopenmp",
+        "-Ofast",
+        "-cpp",
+        "-DPHASE1F",
+        "-I/workspace/phase1g-default-validation/default/before/source",
+        "/workspace/phase1g-default-validation/default/after/tests/krylov_policy_driver.F90",
+        "/workspace/phase1g-default-validation/default/before/source/krylov_solvers.o",
+        "/workspace/phase1g-default-validation/default/before/source/krylov_observations.o",
+        "/workspace/phase1g-default-validation/default/before/source/blas_lapack_interfaces.o",
+        "-L/workspace/ed2-env/tools/usr/lib/x86_64-linux-gnu/openblas-pthread",
+        "-L/workspace/ed2-env/tools/usr/lib/gcc/x86_64-linux-gnu/14",
+        "-llapack",
+        "-lopenblas",
+        "-o",
+        "/workspace/phase1g-default-validation/default/before-policy-driver"
+      ],
+      "cwd": "/workspace/phase1g-default-validation/default",
+      "exit_code": 0,
+      "seconds": 0.31586850799976673,
+      "required": true,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "profile": "default",
+      "label": "residual-policy",
+      "args": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "-B",
+        "/workspace/phase1g-default-validation/default/after/tests/residual_policy_validation.py",
+        "--driver",
+        "/workspace/phase1g-default-validation/default/after/tests/krylov_policy_driver",
+        "--before-driver",
+        "/workspace/phase1g-default-validation/default/before-policy-driver",
+        "--exe",
+        "/workspace/phase1g-default-validation/default/after/source/QS3ED2",
+        "--output",
+        "/workspace/phase1g-default-validation/default/residual-policy"
+      ],
+      "cwd": "/workspace/phase1g-default-validation/default/after",
+      "exit_code": 0,
+      "seconds": 17.01197875899925,
+      "required": true,
+      "log_sha256": "4da3ea68607928e7e766a333a43fbbaab517e8c77f19536f8f83cae5144cc91c"
+    },
+    {
+      "profile": "default",
+      "label": "policy-timing",
+      "args": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "-B",
+        "/workspace/phase1g-default-validation/default/after/tools/phase1g_policy_timing.py",
+        "--driver",
+        "/workspace/phase1g-default-validation/default/after/tests/krylov_policy_driver",
+        "--output",
+        "/workspace/phase1g-default-validation/default/policy-timing"
+      ],
+      "cwd": "/workspace/phase1g-default-validation/default/after",
+      "exit_code": 0,
+      "seconds": 11.521989270999256,
+      "required": true,
+      "log_sha256": "10831f54f235caf3f8d7934370da28386c04f320c84a15cf0f791d3c3bfedc30"
+    },
+    {
+      "profile": "default",
+      "label": "diagnostics",
+      "args": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "-B",
+        "/workspace/phase1g-default-validation/default/after/tests/diagnostics_reproducibility.py",
+        "--driver",
+        "/workspace/phase1g-default-validation/default/after/tests/krylov_diagnostics_driver",
+        "--before-driver",
+        "/workspace/phase1g-default-validation/default/before-diagnostics-driver",
+        "--exe",
+        "/workspace/phase1g-default-validation/default/after/source/QS3ED2",
+        "--output",
+        "/workspace/phase1g-default-validation/default/diagnostics",
+        "--performance"
+      ],
+      "cwd": "/workspace/phase1g-default-validation/default/after",
+      "exit_code": 1,
+      "seconds": 4.090488842999548,
+      "required": true,
+      "log_sha256": "1df0740c48a1c81b4e27e08f85517f0cce6108976fe20d3bf837a39aab551661"
+    },
+    {
+      "profile": "default",
+      "label": "lapack",
+      "args": [
+        "make",
+        "check-lapack"
+      ],
+      "cwd": "/workspace/phase1g-default-validation/default/after",
+      "exit_code": 0,
+      "seconds": 0.6237800300004892,
+      "required": true,
+      "log_sha256": "76af770ae0fb6de09daafd7b6ad1b6ad92c23c891c835a791497b3bb78acb12d"
+    },
+    {
+      "profile": "default",
+      "label": "standard",
+      "args": [
+        "make",
+        "check"
+      ],
+      "cwd": "/workspace/phase1g-default-validation/default/after",
+      "exit_code": 0,
+      "seconds": 0.5678738619990327,
+      "required": true,
+      "log_sha256": "5691a06ac8ba05dd8d30e92c42eeaba387ac35e15d7a17e0a43b19efa14dbf5e"
+    },
+    {
+      "profile": "default",
+      "label": "stability",
+      "args": [
+        "make",
+        "check-lanczos",
+        "LANCZOS_OUTPUT=/workspace/phase1g-default-validation/default/stability"
+      ],
+      "cwd": "/workspace/phase1g-default-validation/default/after",
+      "exit_code": 0,
+      "seconds": 1.2688688839989481,
+      "required": true,
+      "log_sha256": "931fec223a9bd2883b71c61888669c3caa33c8cccd2ab56298713f1f8c9fc462"
+    },
+    {
+      "profile": "default",
+      "label": "fields",
+      "args": [
+        "make",
+        "check-sparse-field",
+        "SPARSE_FIELD_OUTPUT=/workspace/phase1g-default-validation/default/fields"
+      ],
+      "cwd": "/workspace/phase1g-default-validation/default/after",
+      "exit_code": 0,
+      "seconds": 1.1686027209998429,
+      "required": true,
+      "log_sha256": "f2910013dabe12789123d44006993ce8ced2de4124e2e23423ae1d5a4e94a889"
+    },
+    {
+      "profile": "default",
+      "label": "stress",
+      "args": [
+        "make",
+        "check-krylov-stress",
+        "KRYLOV_OUTPUT=/workspace/phase1g-default-validation/default/stress"
+      ],
+      "cwd": "/workspace/phase1g-default-validation/default/after",
+      "exit_code": 0,
+      "seconds": 14.772041057000024,
+      "required": true,
+      "log_sha256": "fec5ef81e477d11a7c78aadbbb0717cc0d54e4e79f9c3d556231271f611139f2"
+    },
+    {
+      "profile": "default",
+      "label": "precision",
+      "args": [
+        "make",
+        "check-precision-contract",
+        "PRECISION_OUTPUT=/workspace/phase1g-default-validation/default/precision"
+      ],
+      "cwd": "/workspace/phase1g-default-validation/default/after",
+      "exit_code": 0,
+      "seconds": 2.421411478000664,
+      "required": true,
+      "log_sha256": "414d5fc5019e22a5b24f65a9df6ac87ce9161f7089793064ca12753120c6af36"
+    },
+    {
+      "profile": "default",
+      "label": "independent",
+      "args": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "-B",
+        "tests/numerical_baseline.py",
+        "--exe",
+        "/workspace/phase1g-default-validation/default/after/source/QS3ED2",
+        "--output",
+        "/workspace/phase1g-default-validation/default/independent"
+      ],
+      "cwd": "/workspace/phase1g-default-validation/default/after",
+      "exit_code": 0,
+      "seconds": 0.36504587099989294,
+      "required": true,
+      "log_sha256": "5501ff3454d6b356eb1d1a1cffb5e19a1b3f54f9916f17c11016feffe71670e7"
+    }
+  ],
+  "profiles": {
+    "default": {
+      "compiler": "GNU Fortran (Debian 14.2.0-19) 14.2.0",
+      "flags": "-fopenmp -Ofast",
+      "ldflags": "-L/workspace/ed2-env/tools/usr/lib/x86_64-linux-gnu/openblas-pthread -L/workspace/ed2-env/tools/usr/lib/gcc/x86_64-linux-gnu/14",
+      "after_source_sha256": {
+        "krylov_residual_policy.f90": "9b0fb4424fab08ee77c9d2eb051d1284f46c0e88df8a8fc1d1e3b19999769afc",
+        "eigen_solver.f90": "7066977836ae5846fa24cd9e3dc5e2413212a164c6b6afa043b50730d2233944",
+        "lanczos.f90": "d09558e0b052b21f08e441d0ecf5baef594270831ce0be2f7807993ebcb6e2e4",
+        "input_param.f90": "96f83ae7b6af3188de463e285a349e4f055ffc92bff49a53aed2b0acb19e82f4",
+        "krylov_solvers.f90": "93780395bf30f5f808f8619244ad7121baaebf76c522286d8d5799e2c0669cc5",
+        "krylov_observations.f90": "516417e3d7b900173f5875b66ed6171267d01ffdebcf32bc0ce8f4c424ded142",
+        "state_lists.f90": "977c6f513a351ab087da648795ff15cae83248f22b9476fb1135ae12b76b5f1a",
+        "main.f90": "fffca6f3035492f347e30e1897f2bfcb4c29921dfa9006844dc149dae9e2cbf3",
+        "blas_lapack_interfaces.f90": "d32e3dd65a61961867c3d156d9d27b545406f6616e788d1f7c75df6997402abc",
+        "get_expectation_values.f90": "766439b901c3c3a985f6983542451d8d02a39eef4837fe7254da1506c6bbc34b",
+        "ham2vec.f90": "148ee9d28fbef2053ad86dcb702e4e3a3bbcd518c137e33581f3261a1bdeeaf2"
+      },
+      "before_source_sha256": {
+        "eigen_solver.f90": "63d6c661d698e685a757db31c72a165eb149a65bb291fb63cd027ba2ca449cf3",
+        "lanczos.f90": "3387a45149558ec77e7eca2cb71f463eb3586c26266f8f6fe384c492fc326cb0",
+        "input_param.f90": "96f83ae7b6af3188de463e285a349e4f055ffc92bff49a53aed2b0acb19e82f4",
+        "krylov_solvers.f90": "a4bc3d5a0eca1e4c21fa295365c7a854fc1745db81a8f27ef19bc4af72b625be",
+        "krylov_observations.f90": "a93c3df3d86a176eebdbd5a07eb7b8ab90b8201d82cc279ece6b888f5f200160",
+        "state_lists.f90": "977c6f513a351ab087da648795ff15cae83248f22b9476fb1135ae12b76b5f1a",
+        "main.f90": "fffca6f3035492f347e30e1897f2bfcb4c29921dfa9006844dc149dae9e2cbf3",
+        "blas_lapack_interfaces.f90": "d32e3dd65a61961867c3d156d9d27b545406f6616e788d1f7c75df6997402abc",
+        "get_expectation_values.f90": "766439b901c3c3a985f6983542451d8d02a39eef4837fe7254da1506c6bbc34b",
+        "ham2vec.f90": "148ee9d28fbef2053ad86dcb702e4e3a3bbcd518c137e33581f3261a1bdeeaf2"
+      },
+      "linked_libraries": "\tlinux-vdso.so.1 (0x00007f8b90882000)\n\tliblapack.so.3 => /workspace/ed2-env/tools/usr/lib/x86_64-linux-gnu/openblas-pthread/liblapack.so.3 (0x00007f8b90108000)\n\tlibopenblas.so.0 => /workspace/ed2-env/tools/usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblas.so.0 (0x00007f8b8db28000)\n\tlibgfortran.so.5 => /workspace/ed2-env/tools/usr/lib/x86_64-linux-gnu/libgfortran.so.5 (0x00007f8b8d824000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f8b8d711000)\n\tlibmvec.so.1 => /lib/x86_64-linux-gnu/libmvec.so.1 (0x00007f8b8d618000)\n\tlibgomp.so.1 => /lib/x86_64-linux-gnu/libgomp.so.1 (0x00007f8b8d5c3000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f8b8d3cf000)\n\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f8b8d3a2000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f8b90884000)\n"
+    }
+  }
+}

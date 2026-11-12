@@ -1,0 +1,222 @@
+{
+  "harness_sha256": "cc1fa0648f726c2b7e78a080c39d90189bcfa04a5d5800864414b4a215f4b021",
+  "test_source_sha256": {
+    "krylov_diagnostics_driver.F90": "cb85a47e56db2be2c9d7c96a75083b74ffb3b1a05038e71df3ac3f307e890ad9",
+    "diagnostics_reproducibility.py": "9d0aabafe80e35e33ecda5f0615b831d788089f7c30746171d740039ad420e09"
+  },
+  "commands": [
+    {
+      "profile": "o2",
+      "args": [
+        "make",
+        "-C",
+        "/workspace/phase1g-validation/o2/after/tests",
+        "krylov_diagnostics_driver"
+      ],
+      "exit_code": 0,
+      "log_sha256": "7b9a883ecfaf36f5015fe0dcffc3f95c5eb6a8f1467bcebaefafaa5042b03a7f"
+    },
+    {
+      "profile": "o2",
+      "args": [
+        "gfortran",
+        "-O2",
+        "-fopenmp",
+        "-cpp",
+        "-DPHASE1F",
+        "-I/workspace/phase1g-validation/o2/before/source",
+        "/workspace/ED2/tests/krylov_diagnostics_driver.F90",
+        "/workspace/phase1g-validation/o2/before/source/krylov_solvers.o",
+        "/workspace/phase1g-validation/o2/before/source/krylov_observations.o",
+        "/workspace/phase1g-validation/o2/before/source/blas_lapack_interfaces.o",
+        "-L/workspace/ed2-env/tools/usr/lib/x86_64-linux-gnu/openblas-pthread",
+        "-L/workspace/ed2-env/tools/usr/lib/gcc/x86_64-linux-gnu/14",
+        "-llapack",
+        "-lopenblas",
+        "-o",
+        "/workspace/phase1g-fp-final/o2/before-driver"
+      ],
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "profile": "o2",
+      "args": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "-B",
+        "/workspace/ED2/tests/diagnostics_reproducibility.py",
+        "--driver",
+        "/workspace/phase1g-validation/o2/after/tests/krylov_diagnostics_driver",
+        "--before-driver",
+        "/workspace/phase1g-fp-final/o2/before-driver",
+        "--exe",
+        "/workspace/phase1g-validation/o2/after/source/QS3ED2",
+        "--output",
+        "/workspace/phase1g-fp-final/o2/results"
+      ],
+      "exit_code": 0,
+      "log_sha256": "c968a16c3dab5f37440bf490b505c3fa988d3317a6e3cc21386c546eec370cdd"
+    },
+    {
+      "profile": "gnu13",
+      "args": [
+        "make",
+        "-C",
+        "/workspace/phase1g-validation/gnu13/after/tests",
+        "krylov_diagnostics_driver"
+      ],
+      "exit_code": 0,
+      "log_sha256": "bda38024a7ab9a74c0ca91f4131e3f01779349cca52d7d94cabb69f0d205a5ec"
+    },
+    {
+      "profile": "gnu13",
+      "args": [
+        "/workspace/ed2-env/gnu13/usr/bin/gfortran-13",
+        "-O2",
+        "-fopenmp",
+        "-cpp",
+        "-DPHASE1F",
+        "-I/workspace/phase1g-validation/gnu13/before/source",
+        "/workspace/ED2/tests/krylov_diagnostics_driver.F90",
+        "/workspace/phase1g-validation/gnu13/before/source/krylov_solvers.o",
+        "/workspace/phase1g-validation/gnu13/before/source/krylov_observations.o",
+        "/workspace/phase1g-validation/gnu13/before/source/blas_lapack_interfaces.o",
+        "-L/workspace/ed2-env/tools/usr/lib/x86_64-linux-gnu/openblas-pthread",
+        "-L/workspace/ed2-env/tools/usr/lib/gcc/x86_64-linux-gnu/14",
+        "-llapack",
+        "-lopenblas",
+        "-o",
+        "/workspace/phase1g-fp-final/gnu13/before-driver"
+      ],
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "profile": "gnu13",
+      "args": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "-B",
+        "/workspace/ED2/tests/diagnostics_reproducibility.py",
+        "--driver",
+        "/workspace/phase1g-validation/gnu13/after/tests/krylov_diagnostics_driver",
+        "--before-driver",
+        "/workspace/phase1g-fp-final/gnu13/before-driver",
+        "--exe",
+        "/workspace/phase1g-validation/gnu13/after/source/QS3ED2",
+        "--output",
+        "/workspace/phase1g-fp-final/gnu13/results"
+      ],
+      "exit_code": 0,
+      "log_sha256": "c968a16c3dab5f37440bf490b505c3fa988d3317a6e3cc21386c546eec370cdd"
+    },
+    {
+      "profile": "bounds",
+      "args": [
+        "make",
+        "-C",
+        "/workspace/phase1g-validation/bounds/after/tests",
+        "krylov_diagnostics_driver"
+      ],
+      "exit_code": 0,
+      "log_sha256": "812f97092fbbc7e9772cf69694a315c34b54668f22658763a00f007f3a40cd04"
+    },
+    {
+      "profile": "bounds",
+      "args": [
+        "gfortran",
+        "-O2",
+        "-g",
+        "-fopenmp",
+        "-fcheck=all",
+        "-fbacktrace",
+        "-Wall",
+        "-Wextra",
+        "-cpp",
+        "-DPHASE1F",
+        "-I/workspace/phase1g-validation/bounds/before/source",
+        "/workspace/ED2/tests/krylov_diagnostics_driver.F90",
+        "/workspace/phase1g-validation/bounds/before/source/krylov_solvers.o",
+        "/workspace/phase1g-validation/bounds/before/source/krylov_observations.o",
+        "/workspace/phase1g-validation/bounds/before/source/blas_lapack_interfaces.o",
+        "-L/workspace/ed2-env/tools/usr/lib/x86_64-linux-gnu/openblas-pthread",
+        "-L/workspace/ed2-env/tools/usr/lib/gcc/x86_64-linux-gnu/14",
+        "-llapack",
+        "-lopenblas",
+        "-o",
+        "/workspace/phase1g-fp-final/bounds/before-driver"
+      ],
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "profile": "bounds",
+      "args": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "-B",
+        "/workspace/ED2/tests/diagnostics_reproducibility.py",
+        "--driver",
+        "/workspace/phase1g-validation/bounds/after/tests/krylov_diagnostics_driver",
+        "--before-driver",
+        "/workspace/phase1g-fp-final/bounds/before-driver",
+        "--exe",
+        "/workspace/phase1g-validation/bounds/after/source/QS3ED2",
+        "--output",
+        "/workspace/phase1g-fp-final/bounds/results"
+      ],
+      "exit_code": 0,
+      "log_sha256": "c968a16c3dab5f37440bf490b505c3fa988d3317a6e3cc21386c546eec370cdd"
+    },
+    {
+      "profile": "default",
+      "args": [
+        "make",
+        "-C",
+        "/workspace/phase1g-default-validation/default/after/tests",
+        "krylov_diagnostics_driver"
+      ],
+      "exit_code": 0,
+      "log_sha256": "3d0e310cb3e3c009cbff41c9dbff0a21fc3e6ad7da81a6c46ac9a27d0647a105"
+    },
+    {
+      "profile": "default",
+      "args": [
+        "gfortran",
+        "-fopenmp",
+        "-Ofast",
+        "-cpp",
+        "-DPHASE1F",
+        "-I/workspace/phase1g-default-validation/default/before/source",
+        "/workspace/ED2/tests/krylov_diagnostics_driver.F90",
+        "/workspace/phase1g-default-validation/default/before/source/krylov_solvers.o",
+        "/workspace/phase1g-default-validation/default/before/source/krylov_observations.o",
+        "/workspace/phase1g-default-validation/default/before/source/blas_lapack_interfaces.o",
+        "-L/workspace/ed2-env/tools/usr/lib/x86_64-linux-gnu/openblas-pthread",
+        "-L/workspace/ed2-env/tools/usr/lib/gcc/x86_64-linux-gnu/14",
+        "-llapack",
+        "-lopenblas",
+        "-o",
+        "/workspace/phase1g-fp-final/default/before-driver"
+      ],
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "profile": "default",
+      "args": [
+        "/opt/codex/runtimes/codex-primary-runtime/dependencies/python/bin/python3",
+        "-B",
+        "/workspace/ED2/tests/diagnostics_reproducibility.py",
+        "--driver",
+        "/workspace/phase1g-default-validation/default/after/tests/krylov_diagnostics_driver",
+        "--before-driver",
+        "/workspace/phase1g-fp-final/default/before-driver",
+        "--exe",
+        "/workspace/phase1g-default-validation/default/after/source/QS3ED2",
+        "--output",
+        "/workspace/phase1g-fp-final/default/results"
+      ],
+      "exit_code": 0,
+      "log_sha256": "6ec14891f101524ab04bf29207e50e059530405da06d70465126948dafbea422"
+    }
+  ]
+}

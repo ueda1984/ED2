@@ -1,0 +1,152 @@
+{
+  "cluster_mixture": {
+    "residual_norms": [
+      4.999998687045415e-11
+    ],
+    "spectral_scale": 2.0,
+    "centered_scale": 1.5,
+    "boundary_gap": 1.000000082740371e-10,
+    "reference_separation": 4.9999782092413625e-11,
+    "reference_subspace_bound": 1.0,
+    "reference_eigensystem_residual": 0.0,
+    "reference_bound_correction": 0.0,
+    "orthogonality_error": 2.220446049250313e-16,
+    "requested_space_leakage": 0.7071067811865475,
+    "projector_error": 0.7071067811865475,
+    "complete_cluster": true,
+    "broad_cluster_leakage": 0.0,
+    "lowest_eigenvalue_errors": [
+      5.0000226181623475e-11
+    ],
+    "absolute_residual_le_1e_minus10": true,
+    "relative_residual_le_1e_minus10": true,
+    "centered_residual_le_1e_minus10": true,
+    "reference_subspace_le_1e_minus5": false,
+    "energy_change_for_identical_candidates": 0.0
+  },
+  "shifted_cluster_mixture": {
+    "residual_norms": [
+      1.1641532182693481e-10
+    ],
+    "spectral_scale": 1000002.0,
+    "centered_scale": 1.5,
+    "boundary_gap": 1.1641532182693481e-10,
+    "reference_separation": 1.1641532182693481e-10,
+    "reference_subspace_bound": 1.0,
+    "reference_eigensystem_residual": 0.0,
+    "reference_bound_correction": 0.0,
+    "orthogonality_error": 2.220446049250313e-16,
+    "requested_space_leakage": 0.7071067811865475,
+    "projector_error": 0.7071067811865475,
+    "complete_cluster": true,
+    "broad_cluster_leakage": 0.0,
+    "lowest_eigenvalue_errors": [
+      0.0
+    ],
+    "absolute_residual_le_1e_minus10": false,
+    "relative_residual_le_1e_minus10": true,
+    "centered_residual_le_1e_minus10": true,
+    "reference_subspace_le_1e_minus5": false
+  },
+  "excluded_ground": {
+    "residual_norms": [
+      0.0
+    ],
+    "spectral_scale": 2.0,
+    "centered_scale": 1.5,
+    "boundary_gap": 1.000000082740371e-10,
+    "reference_separation": 0.0,
+    "reference_subspace_bound": null,
+    "reference_eigensystem_residual": 0.0,
+    "reference_bound_correction": 0.0,
+    "orthogonality_error": 0.0,
+    "requested_space_leakage": 1.0,
+    "projector_error": 1.0,
+    "complete_cluster": true,
+    "broad_cluster_leakage": 0.0,
+    "lowest_eigenvalue_errors": [
+      1.000000082740371e-10
+    ],
+    "absolute_residual_le_1e_minus10": true,
+    "relative_residual_le_1e_minus10": true,
+    "centered_residual_le_1e_minus10": true,
+    "reference_subspace_le_1e_minus5": false
+  },
+  "degenerate_complete": {
+    "residual_norms": [
+      0.0,
+      0.0
+    ],
+    "spectral_scale": 2.0,
+    "centered_scale": 1.5,
+    "boundary_gap": 1.0,
+    "reference_separation": 1.0,
+    "reference_subspace_bound": 0.0,
+    "reference_eigensystem_residual": 0.0,
+    "reference_bound_correction": 0.0,
+    "orthogonality_error": 2.4441574809578864e-16,
+    "requested_space_leakage": 0.0,
+    "projector_error": 2.4441574809578864e-16,
+    "complete_cluster": true,
+    "broad_cluster_leakage": 0.0,
+    "lowest_eigenvalue_errors": [
+      0.0,
+      0.0
+    ],
+    "absolute_residual_le_1e_minus10": true,
+    "relative_residual_le_1e_minus10": true,
+    "centered_residual_le_1e_minus10": true,
+    "reference_subspace_le_1e_minus5": true
+  },
+  "degenerate_partial": {
+    "residual_norms": [
+      0.0
+    ],
+    "spectral_scale": 2.0,
+    "centered_scale": 1.5,
+    "boundary_gap": 0.0,
+    "reference_separation": 1.0,
+    "reference_subspace_bound": 0.0,
+    "reference_eigensystem_residual": 0.0,
+    "reference_bound_correction": 0.0,
+    "orthogonality_error": 2.220446049250313e-16,
+    "requested_space_leakage": 0.0,
+    "projector_error": null,
+    "complete_cluster": false,
+    "broad_cluster_leakage": 0.0,
+    "lowest_eigenvalue_errors": [
+      0.0
+    ],
+    "absolute_residual_le_1e_minus10": true,
+    "relative_residual_le_1e_minus10": true,
+    "centered_residual_le_1e_minus10": true,
+    "reference_subspace_le_1e_minus5": false
+  },
+  "constructed_physical_state": {
+    "residual_norms": [
+      1.040320100033874e-08
+    ],
+    "spectral_scale": 1.2171520488139211,
+    "centered_scale": 1.0973665221485474,
+    "boundary_gap": 0.20806401984119738,
+    "reference_separation": 0.20806401984119716,
+    "reference_subspace_bound": 5.000000241923799e-08,
+    "reference_eigensystem_residual": 1.4149781600585322e-15,
+    "reference_bound_correction": 4.950774986597721e-16,
+    "orthogonality_error": 6.661338147750939e-16,
+    "requested_space_leakage": 4.999999998798977e-08,
+    "projector_error": 5.0000000112305654e-08,
+    "complete_cluster": true,
+    "broad_cluster_leakage": 4.999999998798977e-08,
+    "lowest_eigenvalue_errors": [
+      2.220446049250313e-16
+    ],
+    "absolute_residual_le_1e_minus10": false,
+    "relative_residual_le_1e_minus10": false,
+    "centered_residual_le_1e_minus10": false,
+    "reference_subspace_le_1e_minus5": true,
+    "magnetization_error": 3.1383972476373145e-08,
+    "correlation_error": 1.2068352289729134e-08,
+    "legacy_residual_envelope_at_tol_1e14": 1.217152048813921e-07
+  }
+}

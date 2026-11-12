@@ -2,6 +2,8 @@ module lanczos
   use blas_lapack_interfaces, only: dznrm2, zdotc
   use ham2vec
   use krylov_observations, only: krylov_diagnostics,read_krylov_controls,write_krylov_diagnostics
+  use krylov_residual_policy, only: residual_policy
+  use krylov_observations, only: read_residual_controls
   implicit none
   private :: apply_hamiltonian
   integer :: ite_lancz, maxitr, dim, minitr, itrint
@@ -68,13 +70,15 @@ contains
     real(8) :: residual
     character(120) :: reason
     type(krylov_diagnostics), allocatable :: observation
+    type(residual_policy), allocatable :: policy
     complex(8), allocatable :: initial(:)
     integer, allocatable :: seed
     character(:), allocatable :: diagnostic_path
     call read_krylov_controls(dim,initial,seed,diagnostic_path)
+    call read_residual_controls(policy)
     if(len(diagnostic_path)>0)allocate(observation)
     call lanczos_ground(apply_hamiltonian,dim,lnc_ene_conv,maxitr,minitr,itrint,ene,psi_io, &
-                        ite_lancz,status,reason,residual,initial,observation,seed)
+                        ite_lancz,status,reason,residual,initial,observation,seed,policy)
     if(allocated(observation))call write_krylov_diagnostics(diagnostic_path,observation)
     write(*,'(a,a)') 'Lanczos status: ',trim(reason)
     write(*,'(a,es25.15)') 'Eigenpair residual norm: ',residual

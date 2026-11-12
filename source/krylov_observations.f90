@@ -2,11 +2,13 @@
 module krylov_observations
   use iso_fortran_env, only: int64,compiler_version
   use blas_lapack_interfaces, only: dznrm2,zdotc
+  use krylov_residual_policy, only: residual_policy
   !$ use omp_lib, only: omp_get_max_threads
   implicit none
   private
   public :: krylov_diagnostics, begin_observation, finish_observation, observe_pair, observe_gram
-  public :: read_krylov_controls, write_krylov_diagnostics
+  public :: read_krylov_controls, write_krylov_diagnostics,read_residual_controls
+  public :: record_residual_policy,observe_requested_residual
   type :: krylov_diagnostics
     integer :: algorithm=0,dimension=0,wanted=0,status=-1,iterations=0,cycles=0
     integer :: requested_budget=0,effective_budget=0,miniter=0,interval=0,keep=0,capacity=0
@@ -21,6 +23,11 @@ module krylov_observations
     logical :: energy_change_available=.false.,orthogonality_available=.false.
     logical :: explicit_initial=.false.,seed_specified=.false.,roundoff_risk=.false.
     logical :: roundoff_limit_proven=.false.
+    logical :: residual_policy_enabled=.false.,requested_scale_provided=.false.
+    logical :: all_requested_residuals_met=.false.
+    real(8) :: requested_atol=0d0,requested_rtol=0d0,requested_operator_scale=0d0,requested_origin=0d0
+    real(8), allocatable :: requested_scale(:),requested_threshold(:)
+    logical, allocatable :: requested_met(:),combined_certified(:)
     integer :: seed=0
     integer, allocatable :: rng_initial_state(:,:)
     character(120) :: reason='',termination='not_started'
@@ -65,6 +72,7 @@ contains
       d%termination='numerical_failure'
     case(0)
       d%termination='legacy_policy_satisfied'
+      if(d%residual_policy_enabled)d%termination='legacy_and_requested_residual_satisfied'
     end select
     if(index(reason,'happy breakdown')>0) d%termination='exact_subspace_closed'
     if(index(reason,'numerical near-breakdown')>0) d%termination='numerical_subspace_closed'
@@ -72,6 +80,10 @@ contains
     if(allocated(d%pair_available))then
       d%candidate_role='last observed diagnostic candidate; not a successful output'
       if(status==0)d%candidate_role='returned successful candidate under the legacy policy'
+    end if
+    if(d%residual_policy_enabled .and. allocated(d%requested_met))then
+      d%all_requested_residuals_met=all(d%requested_met .and. d%pair_available)
+      if(status==0)d%candidate_role='returned candidate under legacy plus requested residual policy'
     end if
     ! A residual certificate never supplies independent lowest-state evidence.
   end subroutine
@@ -112,6 +124,59 @@ contains
       end do
     end do
     d%orthogonality_available=.true.
+  end subroutine
+
+  subroutine record_residual_policy(d,p)
+    type(krylov_diagnostics), intent(inout) :: d
+    type(residual_policy), intent(in) :: p
+    d%residual_policy_enabled=.true.;d%requested_scale_provided=p%scale_provided
+    d%requested_atol=p%atol;d%requested_rtol=p%rtol
+    d%requested_operator_scale=p%operator_scale;d%requested_origin=p%origin
+  end subroutine
+
+  subroutine observe_requested_residual(d,j,count,scale,threshold,met)
+    type(krylov_diagnostics), intent(inout) :: d
+    integer, intent(in) :: j,count
+    real(8), intent(in) :: scale,threshold
+    logical, intent(in) :: met
+    if(.not.allocated(d%requested_met))then
+      allocate(d%requested_scale(count),d%requested_threshold(count),d%requested_met(count),d%combined_certified(count))
+      d%requested_scale=0d0;d%requested_threshold=0d0;d%requested_met=.false.;d%combined_certified=.false.
+    end if
+    d%requested_scale(j)=scale;d%requested_threshold(j)=threshold;d%requested_met(j)=met
+    d%combined_certified(j)=d%residual_certified(j) .and. met
+  end subroutine
+
+  subroutine read_control_real(text,value)
+    character(*), intent(in) :: text
+    real(8), intent(out) :: value
+    character(1) :: extra
+    integer :: rc
+    real(8) :: parsed
+    read(text,*,iostat=rc)value
+    if(rc/=0)error stop 'invalid residual policy real value'
+    read(text,*,iostat=rc)parsed,extra
+    if(rc>=0)error stop 'extra data in residual policy real value'
+  end subroutine
+
+  subroutine read_residual_controls(p)
+    type(residual_policy), allocatable, intent(out) :: p
+    character(:), allocatable :: atol,rtol,scale,origin
+    call environment_text('ED2_RESIDUAL_ATOL',atol)
+    call environment_text('ED2_RESIDUAL_RTOL',rtol)
+    call environment_text('ED2_RESIDUAL_SCALE',scale)
+    call environment_text('ED2_ENERGY_ORIGIN',origin)
+    if(len(atol)==0 .and. len(rtol)==0)then
+      if(len(scale)>0 .or. len(origin)>0)error stop 'residual scale/origin requires an explicit residual tolerance'
+      return
+    end if
+    allocate(p)
+    if(len(atol)>0)call read_control_real(atol,p%atol)
+    if(len(rtol)>0)call read_control_real(rtol,p%rtol)
+    if(len(scale)>0)then
+      call read_control_real(scale,p%operator_scale);p%scale_provided=.true.
+    end if
+    if(len(origin)>0)call read_control_real(origin,p%origin)
   end subroutine
 
   subroutine environment_text(name,text)
@@ -231,6 +296,25 @@ contains
         write(unit,'(i0,2(1x,l1),5(1x,es26.16e3))')j,d%pair_available(j),d%residual_certified(j), &
           d%ritz(j),d%rayleigh(j),d%residual(j),d%norm(j),d%residual_threshold(j)
       end do
+    end if
+    if(d%residual_policy_enabled)then
+      write(unit,'(a,l1)') 'residual_policy_enabled=',d%residual_policy_enabled
+      write(unit,'(a,es26.16e3)') 'requested_residual_atol=',d%requested_atol
+      write(unit,'(a,es26.16e3)') 'requested_residual_rtol=',d%requested_rtol
+      write(unit,'(a,l1)') 'requested_scale_provided=',d%requested_scale_provided
+      write(unit,'(a,es26.16e3)') 'requested_operator_scale=',d%requested_operator_scale
+      write(unit,'(a,es26.16e3)') 'requested_energy_origin=',d%requested_origin
+      write(unit,'(a)') 'requested_scale_source=caller supplied H-origin*I scale; not independently verified'
+      write(unit,'(a)') 'requested_scale_rule=rtol>0: max(supplied scale,abs(Ritz-origin)); rtol=0: unused (0)'
+      write(unit,'(a,l1)') 'all_requested_residuals_met=',d%all_requested_residuals_met
+      if(allocated(d%requested_met))then
+        do j=1,size(d%requested_met)
+          write(unit,'(a,i0,a,es26.16e3)') 'requested_residual_scale_',j,'=',d%requested_scale(j)
+          write(unit,'(a,i0,a,es26.16e3)') 'requested_residual_threshold_',j,'=',d%requested_threshold(j)
+          write(unit,'(a,i0,a,l1)') 'requested_residual_met_',j,'=',d%requested_met(j)
+          write(unit,'(a,i0,a,l1)') 'combined_residual_certified_',j,'=',d%combined_certified(j)
+        end do
+      end if
     end if
     close(unit,iostat=rc)
     if(rc/=0)error stop 'cannot close ED2_DIAGNOSTICS file'

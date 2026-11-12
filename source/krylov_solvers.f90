@@ -4,11 +4,13 @@ module krylov_solvers
   use blas_lapack_interfaces, only: dznrm2, zdotc, dstevx, zheevr, zgemm, dlamch, &
     check_lapack_info, zheevr_workspace_lengths
   use krylov_observations, only: krylov_diagnostics,begin_observation,finish_observation,observe_pair,observe_gram
+  use krylov_residual_policy, only: residual_policy,valid_residual_policy,requested_residual_limit
+  use krylov_observations, only: record_residual_policy,observe_requested_residual
   !$ use omp_lib, only: omp_get_thread_num,omp_get_num_threads
   implicit none
   private
   public :: lanczos_ground, restarted_hermitian, energy_change, residual_limit, krylov_diagnostics
-  public :: finite_real, normalize_vector
+  public :: finite_real, normalize_vector, residual_policy
   abstract interface
     subroutine operator_action(n,x,y)
       integer, intent(in) :: n
@@ -118,7 +120,7 @@ contains
 
   ! Optional trailing arguments preserve every existing call site.
   subroutine lanczos_ground(apply,n,tol,maxiter,miniter,interval,value,vector, &
-                            iterations,status,reason,residual,initial,diagnostics,rng_seed)
+                            iterations,status,reason,residual,initial,diagnostics,rng_seed,policy)
     procedure(operator_action) :: apply
     integer, intent(in) :: n,maxiter,miniter,interval
     real(8), intent(in) :: tol
@@ -129,14 +131,23 @@ contains
     complex(8), intent(in), optional :: initial(n)
     type(krylov_diagnostics), intent(out), optional :: diagnostics
     integer, intent(in), optional :: rng_seed
+    type(residual_policy), intent(in), optional :: policy
     if(present(diagnostics))call begin_observation(diagnostics,1,n,1,maxiter,tol,present(initial),rng_seed)
+    if(present(policy))then
+      if(present(diagnostics))call record_residual_policy(diagnostics,policy)
+      if(.not.valid_residual_policy(policy,reason))then
+        status=-1;iterations=0;value=0d0;residual=huge(1d0);vector=(0d0,0d0)
+        if(present(diagnostics))call finish_observation(diagnostics,status,reason,iterations)
+        return
+      end if
+    end if
     call lanczos_ground_core(apply,n,tol,maxiter,miniter,interval,value,vector, &
-                             iterations,status,reason,residual,initial,diagnostics,rng_seed)
+                             iterations,status,reason,residual,initial,diagnostics,rng_seed,policy)
     if(present(diagnostics))call finish_observation(diagnostics,status,reason,iterations)
   end subroutine
 
   subroutine restarted_hermitian(apply,n,wanted,keep,capacity,tol,maxcycles,values,vectors,iterations, &
-                                status,reason,residuals,initial,diagnostics,rng_seed)
+                                status,reason,residuals,initial,diagnostics,rng_seed,policy)
     procedure(operator_action) :: apply
     integer, intent(in) :: n,wanted,keep,capacity,maxcycles
     real(8), intent(in) :: tol
@@ -147,9 +158,18 @@ contains
     complex(8), intent(in), optional :: initial(n)
     type(krylov_diagnostics), intent(out), optional :: diagnostics
     integer, intent(in), optional :: rng_seed
+    type(residual_policy), intent(in), optional :: policy
     if(present(diagnostics))call begin_observation(diagnostics,2,n,wanted,maxcycles,tol,present(initial),rng_seed)
+    if(present(policy))then
+      if(present(diagnostics))call record_residual_policy(diagnostics,policy)
+      if(.not.valid_residual_policy(policy,reason))then
+        status=-1;iterations=0;values=0d0;residuals=huge(1d0);vectors=(0d0,0d0)
+        if(present(diagnostics))call finish_observation(diagnostics,status,reason,iterations)
+        return
+      end if
+    end if
     call restarted_hermitian_core(apply,n,wanted,keep,capacity,tol,maxcycles,values,vectors,iterations, &
-                                  status,reason,residuals,initial,diagnostics,rng_seed)
+                                  status,reason,residuals,initial,diagnostics,rng_seed,policy)
     if(present(diagnostics))then
       call observe_gram(diagnostics,vectors)
       call finish_observation(diagnostics,status,reason,iterations)
@@ -157,7 +177,7 @@ contains
   end subroutine
 
   subroutine lanczos_ground_core(apply,n,tol,maxiter,miniter,interval,value,vector, &
-                                 iterations,status,reason,residual,initial,diagnostics,rng_seed)
+                                 iterations,status,reason,residual,initial,diagnostics,rng_seed,policy)
     procedure(operator_action) :: apply
     integer, intent(in) :: n,maxiter,miniter,interval
     real(8), intent(in) :: tol
@@ -168,13 +188,15 @@ contains
     complex(8), intent(in), optional :: initial(n)
     type(krylov_diagnostics), intent(inout), optional :: diagnostics
     integer, intent(in), optional :: rng_seed
+    type(residual_policy), intent(in), optional :: policy
     integer :: draw_index
     complex(8), allocatable :: q(:,:),start(:),r(:),candidate(:),action(:)
     real(8), allocatable :: alpha(:),beta(:),d(:),e(:),w(:),z(:,:),work(:)
     integer, allocatable :: iwork(:),ifail(:)
     integer :: k,limit,info,m
     real(8) :: scale,hnorm,previous,change,bnorm
-    logical :: breakdown,have_previous,energy_ok,qualified
+    logical :: breakdown,have_previous,energy_ok,qualified,requested_ok
+    real(8) :: requested_scale,requested_threshold
     draw_index=0
     status=1;reason='maximum iterations without convergence';iterations=0
     value=0d0;residual=huge(1d0);vector=(0d0,0d0)
@@ -257,6 +279,18 @@ contains
                                                        residual,residual_limit(tol,scale,value))
           end if
           if(qualified) qualified=residual<=residual_limit(tol,scale,value)
+          requested_ok=.true.
+          if(present(policy))then
+            if(.not.requested_residual_limit(policy,value,requested_scale,requested_threshold))then
+              status=2;reason='nonfinite requested residual scale or threshold';return
+            end if
+            requested_ok=finite_real(residual)
+            if(requested_ok)requested_ok=residual<=requested_threshold
+            if(present(diagnostics) .and. finite_real(residual)) &
+              call observe_requested_residual(diagnostics,1,1,requested_scale,requested_threshold,requested_ok)
+            qualified=qualified .and. requested_ok
+            if(k==limit .and. .not.requested_ok)reason='maximum iterations without requested residual convergence'
+          end if
           if(qualified .and. (energy_ok .or. breakdown .or. k==n))then
             vector=candidate;status=0
             if(abs(value)<=sqrt(epsilon(1d0))*max(scale,tiny(1d0))) &
@@ -275,7 +309,11 @@ contains
             return
           end if
           if(breakdown)then
-            status=2;reason='numerical breakdown without residual convergence';return
+            status=2;reason='numerical breakdown without residual convergence'
+            if(present(policy))then
+              if(.not.requested_ok)reason='breakdown without requested residual convergence'
+            end if
+            return
           end if
         end if
         previous=value;have_previous=.true.
@@ -343,7 +381,7 @@ contains
   end function complement
 
   subroutine restarted_hermitian_core(apply,n,wanted,keep,capacity,tol,maxcycles,values,vectors,iterations, &
-                                       status,reason,residuals,initial,diagnostics,rng_seed)
+                                       status,reason,residuals,initial,diagnostics,rng_seed,policy)
     procedure(operator_action) :: apply
     integer, intent(in) :: n,wanted,keep,capacity,maxcycles
     real(8), intent(in) :: tol
@@ -354,6 +392,7 @@ contains
     complex(8), intent(in), optional :: initial(n)
     type(krylov_diagnostics), intent(inout), optional :: diagnostics
     integer, intent(in), optional :: rng_seed
+    type(residual_policy), intent(in), optional :: policy
     integer :: draw_index
     complex(8), allocatable :: q(:,:),hq(:,:),t(:,:),z(:,:),ritz(:,:),x(:),work(:)
     real(8), allocatable :: eig(:),rwork(:),previous(:)
@@ -361,7 +400,8 @@ contains
     complex(8) :: wquery(1)
     real(8) :: rquery(1),scale,bnorm,change,closure,hnorm
     integer :: iquery(1),info,lw,lrw,liw,count,cap,retained,m,cursor,cycle,j,flag,seeds
-    logical :: found,certified,have_previous
+    logical :: found,certified,have_previous,requested_ok,requested_all
+    real(8) :: requested_scale,requested_threshold
     draw_index=0
     status=1;reason='maximum restart iterations without convergence';iterations=0
     values=0d0;vectors=(0d0,0d0);residuals=huge(1d0)
@@ -494,7 +534,7 @@ contains
       call zgemm('N','N',n,m,m,(1d0,0d0),q,n,z,cap,(0d0,0d0),ritz,n)
       values(1:m)=eig(1:m)
       vectors=ritz(:,1:wanted)
-      certified=.true.
+      certified=.true.;requested_all=.true.
       do j=1,wanted
         if(.not.normalize_vector(vectors(:,j)))then
           status=2;reason='invalid Ritz vector';return
@@ -508,7 +548,17 @@ contains
         if(present(diagnostics))call observe_pair(diagnostics,j,wanted,eig(j),vectors(:,j),x, &
                                                  residuals(j),residual_limit(tol,scale,eig(j)))
         certified=certified .and. residuals(j)<=residual_limit(tol,scale,eig(j))
+        if(present(policy))then
+          if(.not.requested_residual_limit(policy,eig(j),requested_scale,requested_threshold))then
+            status=2;reason='nonfinite requested residual scale or threshold';return
+          end if
+          requested_ok=residuals(j)<=requested_threshold
+          if(present(diagnostics))call observe_requested_residual(diagnostics,j,wanted, &
+                                               requested_scale,requested_threshold,requested_ok)
+          requested_all=requested_all .and. requested_ok
+        end if
       end do
+      if(present(policy))certified=certified .and. requested_all
       change=1d0
       if(have_previous)then
         change=0d0
@@ -549,7 +599,12 @@ contains
         end if
         return
       end if
-      if(cycle==maxcycles) return
+      if(cycle==maxcycles)then
+        if(present(policy))then
+          if(.not.requested_all)reason='maximum restart iterations without requested residual convergence'
+        end if
+        return
+      end if
       previous=eig(1:retained);have_previous=.true.
       m=retained
       do j=1,m

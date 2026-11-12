@@ -1,0 +1,930 @@
+[
+  {
+    "profile": "o2",
+    "alg": 1,
+    "threads": 1,
+    "modes": {
+      "legacy": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.005031239999880199,
+        "min_seconds": 0.004404735000207438,
+        "max_seconds": 0.005207434000112698,
+        "rss_range_kib": [
+          5132,
+          5244
+        ],
+        "h_calls": [
+          122
+        ],
+        "max_reported_residual": 6.077287897200982e-06,
+        "max_independent_residual": 6.077287897175809e-06
+      },
+      "loose": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.0049947640000027604,
+        "min_seconds": 0.0043273479996059905,
+        "max_seconds": 0.00525057899994863,
+        "rss_range_kib": [
+          5136,
+          5204
+        ],
+        "h_calls": [
+          122
+        ],
+        "max_reported_residual": 6.077287897200982e-06,
+        "max_independent_residual": 6.077287897175809e-06
+      },
+      "strict": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.07929555499958951,
+        "min_seconds": 0.07287587500013615,
+        "max_seconds": 0.08392806299980293,
+        "rss_range_kib": [
+          5168,
+          5292
+        ],
+        "h_calls": [
+          2355
+        ],
+        "max_reported_residual": 9.643914236950227e-11,
+        "max_independent_residual": 9.643916316268732e-11
+      }
+    }
+  },
+  {
+    "profile": "o2",
+    "alg": 1,
+    "threads": 2,
+    "modes": {
+      "legacy": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.0049648679996607825,
+        "min_seconds": 0.00463918800051033,
+        "max_seconds": 0.007232674999613664,
+        "rss_range_kib": [
+          5228,
+          5312
+        ],
+        "h_calls": [
+          124
+        ],
+        "max_reported_residual": 5.645043866299531e-06,
+        "max_independent_residual": 5.645043866256746e-06
+      },
+      "loose": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.005141454999829875,
+        "min_seconds": 0.004594650999933947,
+        "max_seconds": 0.00997131999974954,
+        "rss_range_kib": [
+          5236,
+          5360
+        ],
+        "h_calls": [
+          124
+        ],
+        "max_reported_residual": 5.645043866299531e-06,
+        "max_independent_residual": 5.645043866256746e-06
+      },
+      "strict": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.07710081900040677,
+        "min_seconds": 0.07172627200088755,
+        "max_seconds": 0.07906190199992125,
+        "rss_range_kib": [
+          5256,
+          5324
+        ],
+        "h_calls": [
+          2294
+        ],
+        "max_reported_residual": 8.128115345204749e-11,
+        "max_independent_residual": 8.128117074688841e-11
+      }
+    }
+  },
+  {
+    "profile": "o2",
+    "alg": 2,
+    "threads": 1,
+    "modes": {
+      "legacy": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.06014973400033341,
+        "min_seconds": 0.05780171700007486,
+        "max_seconds": 0.06102827799986699,
+        "rss_range_kib": [
+          6296,
+          6552
+        ],
+        "h_calls": [
+          1020
+        ],
+        "max_reported_residual": 1.244363754788939e-15,
+        "max_independent_residual": 1.197156760534097e-15
+      },
+      "loose": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.06072799499997927,
+        "min_seconds": 0.058200396999382065,
+        "max_seconds": 0.07058589900043444,
+        "rss_range_kib": [
+          6424,
+          6536
+        ],
+        "h_calls": [
+          1020
+        ],
+        "max_reported_residual": 1.244363754788939e-15,
+        "max_independent_residual": 1.197156760534097e-15
+      },
+      "strict": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.061094267000044056,
+        "min_seconds": 0.057508103999680316,
+        "max_seconds": 0.06294395300028555,
+        "rss_range_kib": [
+          6424,
+          6504
+        ],
+        "h_calls": [
+          1020
+        ],
+        "max_reported_residual": 1.244363754788939e-15,
+        "max_independent_residual": 1.197156760534097e-15
+      }
+    }
+  },
+  {
+    "profile": "o2",
+    "alg": 2,
+    "threads": 2,
+    "modes": {
+      "legacy": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.059281988000293495,
+        "min_seconds": 0.05826900099964405,
+        "max_seconds": 0.061947897000209196,
+        "rss_range_kib": [
+          6392,
+          6552
+        ],
+        "h_calls": [
+          1020
+        ],
+        "max_reported_residual": 1.3676667652144057e-15,
+        "max_independent_residual": 1.3767979360306002e-15
+      },
+      "loose": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.05653784300011466,
+        "min_seconds": 0.055763057000149274,
+        "max_seconds": 0.06054441800006316,
+        "rss_range_kib": [
+          6392,
+          6576
+        ],
+        "h_calls": [
+          1020
+        ],
+        "max_reported_residual": 1.3676667652144057e-15,
+        "max_independent_residual": 1.3767979360306002e-15
+      },
+      "strict": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.059148155999537266,
+        "min_seconds": 0.057058298999436374,
+        "max_seconds": 0.06030470699988655,
+        "rss_range_kib": [
+          6524,
+          6576
+        ],
+        "h_calls": [
+          1020
+        ],
+        "max_reported_residual": 1.3676667652144057e-15,
+        "max_independent_residual": 1.3767979360306002e-15
+      }
+    }
+  },
+  {
+    "profile": "gnu13",
+    "alg": 1,
+    "threads": 1,
+    "modes": {
+      "legacy": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.004476103000342846,
+        "min_seconds": 0.004392466000354034,
+        "max_seconds": 0.005234706000919687,
+        "rss_range_kib": [
+          5128,
+          5196
+        ],
+        "h_calls": [
+          122
+        ],
+        "max_reported_residual": 6.077287897200982e-06,
+        "max_independent_residual": 6.077287897175809e-06
+      },
+      "loose": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.0047652979992562905,
+        "min_seconds": 0.004339527000411181,
+        "max_seconds": 0.006984290999753284,
+        "rss_range_kib": [
+          5136,
+          5204
+        ],
+        "h_calls": [
+          122
+        ],
+        "max_reported_residual": 6.077287897200982e-06,
+        "max_independent_residual": 6.077287897175809e-06
+      },
+      "strict": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.07035853799970937,
+        "min_seconds": 0.06542337400060205,
+        "max_seconds": 0.07578814699991199,
+        "rss_range_kib": [
+          5136,
+          5232
+        ],
+        "h_calls": [
+          2355
+        ],
+        "max_reported_residual": 9.643914236950227e-11,
+        "max_independent_residual": 9.643916316268732e-11
+      }
+    }
+  },
+  {
+    "profile": "gnu13",
+    "alg": 1,
+    "threads": 2,
+    "modes": {
+      "legacy": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.006776267999157426,
+        "min_seconds": 0.004855945000599604,
+        "max_seconds": 0.007266085000082967,
+        "rss_range_kib": [
+          5224,
+          5316
+        ],
+        "h_calls": [
+          124
+        ],
+        "max_reported_residual": 5.645043866299531e-06,
+        "max_independent_residual": 5.645043866256746e-06
+      },
+      "loose": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.007055988000502111,
+        "min_seconds": 0.004669764000936993,
+        "max_seconds": 0.009962221998648602,
+        "rss_range_kib": [
+          5232,
+          5296
+        ],
+        "h_calls": [
+          124
+        ],
+        "max_reported_residual": 5.645043866299531e-06,
+        "max_independent_residual": 5.645043866256746e-06
+      },
+      "strict": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.07454078599948843,
+        "min_seconds": 0.06863663299918699,
+        "max_seconds": 0.0848919880008907,
+        "rss_range_kib": [
+          5256,
+          5324
+        ],
+        "h_calls": [
+          2294
+        ],
+        "max_reported_residual": 8.128115345204749e-11,
+        "max_independent_residual": 8.128117074688841e-11
+      }
+    }
+  },
+  {
+    "profile": "gnu13",
+    "alg": 2,
+    "threads": 1,
+    "modes": {
+      "legacy": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.06565308800054481,
+        "min_seconds": 0.061676757999521215,
+        "max_seconds": 0.10710289800044848,
+        "rss_range_kib": [
+          6296,
+          6472
+        ],
+        "h_calls": [
+          1020
+        ],
+        "max_reported_residual": 1.244363754788939e-15,
+        "max_independent_residual": 1.197156760534097e-15
+      },
+      "loose": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.06132432800040988,
+        "min_seconds": 0.05711331299971789,
+        "max_seconds": 0.0701472479995573,
+        "rss_range_kib": [
+          6324,
+          6580
+        ],
+        "h_calls": [
+          1020
+        ],
+        "max_reported_residual": 1.244363754788939e-15,
+        "max_independent_residual": 1.197156760534097e-15
+      },
+      "strict": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.06175883200012322,
+        "min_seconds": 0.0569519010005024,
+        "max_seconds": 0.10612012099954882,
+        "rss_range_kib": [
+          6376,
+          6460
+        ],
+        "h_calls": [
+          1020
+        ],
+        "max_reported_residual": 1.244363754788939e-15,
+        "max_independent_residual": 1.197156760534097e-15
+      }
+    }
+  },
+  {
+    "profile": "gnu13",
+    "alg": 2,
+    "threads": 2,
+    "modes": {
+      "legacy": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.062374979999731295,
+        "min_seconds": 0.06193136200090521,
+        "max_seconds": 0.07879599599982612,
+        "rss_range_kib": [
+          6556,
+          6680
+        ],
+        "h_calls": [
+          1020
+        ],
+        "max_reported_residual": 1.3676667652144057e-15,
+        "max_independent_residual": 1.3767979360306002e-15
+      },
+      "loose": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.06520950000049197,
+        "min_seconds": 0.06034719499984931,
+        "max_seconds": 0.06577097499939555,
+        "rss_range_kib": [
+          6388,
+          6648
+        ],
+        "h_calls": [
+          1020
+        ],
+        "max_reported_residual": 1.3676667652144057e-15,
+        "max_independent_residual": 1.3767979360306002e-15
+      },
+      "strict": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.066156515998955,
+        "min_seconds": 0.06266798500109871,
+        "max_seconds": 0.08255043200006185,
+        "rss_range_kib": [
+          6476,
+          6564
+        ],
+        "h_calls": [
+          1020
+        ],
+        "max_reported_residual": 1.3676667652144057e-15,
+        "max_independent_residual": 1.3767979360306002e-15
+      }
+    }
+  },
+  {
+    "profile": "bounds",
+    "alg": 1,
+    "threads": 1,
+    "modes": {
+      "legacy": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.004617721000613528,
+        "min_seconds": 0.0043307489995640935,
+        "max_seconds": 0.008213052999053616,
+        "rss_range_kib": [
+          5216,
+          5280
+        ],
+        "h_calls": [
+          122
+        ],
+        "max_reported_residual": 6.077287897200982e-06,
+        "max_independent_residual": 6.077287897175809e-06
+      },
+      "loose": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.004615207000824739,
+        "min_seconds": 0.004391219999888563,
+        "max_seconds": 0.004766895001012017,
+        "rss_range_kib": [
+          5160,
+          5224
+        ],
+        "h_calls": [
+          122
+        ],
+        "max_reported_residual": 6.077287897200982e-06,
+        "max_independent_residual": 6.077287897175809e-06
+      },
+      "strict": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.06844530899979873,
+        "min_seconds": 0.06748595400131308,
+        "max_seconds": 0.07052975599981437,
+        "rss_range_kib": [
+          5188,
+          5320
+        ],
+        "h_calls": [
+          2355
+        ],
+        "max_reported_residual": 9.643914236950227e-11,
+        "max_independent_residual": 9.643916316268732e-11
+      }
+    }
+  },
+  {
+    "profile": "bounds",
+    "alg": 1,
+    "threads": 2,
+    "modes": {
+      "legacy": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.004664811000111513,
+        "min_seconds": 0.004474704999665846,
+        "max_seconds": 0.007307189000130165,
+        "rss_range_kib": [
+          5252,
+          5352
+        ],
+        "h_calls": [
+          124
+        ],
+        "max_reported_residual": 5.645043866299531e-06,
+        "max_independent_residual": 5.645043866256746e-06
+      },
+      "loose": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.005410092999227345,
+        "min_seconds": 0.004604271000061999,
+        "max_seconds": 0.006441636998715694,
+        "rss_range_kib": [
+          5256,
+          5324
+        ],
+        "h_calls": [
+          124
+        ],
+        "max_reported_residual": 5.645043866299531e-06,
+        "max_independent_residual": 5.645043866256746e-06
+      },
+      "strict": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.07467754800018156,
+        "min_seconds": 0.06644567799958168,
+        "max_seconds": 0.08022611100022914,
+        "rss_range_kib": [
+          5280,
+          5348
+        ],
+        "h_calls": [
+          2294
+        ],
+        "max_reported_residual": 8.128115345204749e-11,
+        "max_independent_residual": 8.128117074688841e-11
+      }
+    }
+  },
+  {
+    "profile": "bounds",
+    "alg": 2,
+    "threads": 1,
+    "modes": {
+      "legacy": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.05911011500029417,
+        "min_seconds": 0.0565111039995827,
+        "max_seconds": 0.06223098400005256,
+        "rss_range_kib": [
+          6456,
+          6508
+        ],
+        "h_calls": [
+          1020
+        ],
+        "max_reported_residual": 1.244363754788939e-15,
+        "max_independent_residual": 1.197156760534097e-15
+      },
+      "loose": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.06271486200057552,
+        "min_seconds": 0.06218769799852453,
+        "max_seconds": 0.06938400999933947,
+        "rss_range_kib": [
+          6312,
+          6608
+        ],
+        "h_calls": [
+          1020
+        ],
+        "max_reported_residual": 1.244363754788939e-15,
+        "max_independent_residual": 1.197156760534097e-15
+      },
+      "strict": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.060254498001086176,
+        "min_seconds": 0.055365689000609564,
+        "max_seconds": 0.0737564619994373,
+        "rss_range_kib": [
+          6320,
+          6556
+        ],
+        "h_calls": [
+          1020
+        ],
+        "max_reported_residual": 1.244363754788939e-15,
+        "max_independent_residual": 1.197156760534097e-15
+      }
+    }
+  },
+  {
+    "profile": "bounds",
+    "alg": 2,
+    "threads": 2,
+    "modes": {
+      "legacy": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.06219471899930795,
+        "min_seconds": 0.05807870299940987,
+        "max_seconds": 0.06709032199978537,
+        "rss_range_kib": [
+          6416,
+          6652
+        ],
+        "h_calls": [
+          1020
+        ],
+        "max_reported_residual": 1.3676667652144057e-15,
+        "max_independent_residual": 1.3767979360306002e-15
+      },
+      "loose": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.0655637090003438,
+        "min_seconds": 0.05570364899904234,
+        "max_seconds": 0.07258369600094738,
+        "rss_range_kib": [
+          6496,
+          6672
+        ],
+        "h_calls": [
+          1020
+        ],
+        "max_reported_residual": 1.3676667652144057e-15,
+        "max_independent_residual": 1.3767979360306002e-15
+      },
+      "strict": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.06029251600011776,
+        "min_seconds": 0.05579109100108326,
+        "max_seconds": 0.07303473600040888,
+        "rss_range_kib": [
+          6412,
+          6724
+        ],
+        "h_calls": [
+          1020
+        ],
+        "max_reported_residual": 1.3676667652144057e-15,
+        "max_independent_residual": 1.3767979360306002e-15
+      }
+    }
+  },
+  {
+    "profile": "default",
+    "alg": 1,
+    "threads": 1,
+    "modes": {
+      "legacy": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.004448359000889468,
+        "min_seconds": 0.004300757998862537,
+        "max_seconds": 0.004658907000703039,
+        "rss_range_kib": [
+          5188,
+          5196
+        ],
+        "h_calls": [
+          122
+        ],
+        "max_reported_residual": 6.077287897167567e-06,
+        "max_independent_residual": 6.077287897165239e-06
+      },
+      "loose": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.0043872170008398825,
+        "min_seconds": 0.004258203000063077,
+        "max_seconds": 0.004689163000875851,
+        "rss_range_kib": [
+          5136,
+          5200
+        ],
+        "h_calls": [
+          122
+        ],
+        "max_reported_residual": 6.077287897167567e-06,
+        "max_independent_residual": 6.077287897165239e-06
+      },
+      "strict": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.06911048400070285,
+        "min_seconds": 0.06603053499929956,
+        "max_seconds": 0.07009019900033309,
+        "rss_range_kib": [
+          5164,
+          5312
+        ],
+        "h_calls": [
+          2355
+        ],
+        "max_reported_residual": 9.643918145670201e-11,
+        "max_independent_residual": 9.643918265105035e-11
+      }
+    }
+  },
+  {
+    "profile": "default",
+    "alg": 1,
+    "threads": 2,
+    "modes": {
+      "legacy": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.004979939998520422,
+        "min_seconds": 0.004663595000238274,
+        "max_seconds": 0.006160148999697412,
+        "rss_range_kib": [
+          5224,
+          5336
+        ],
+        "h_calls": [
+          124
+        ],
+        "max_reported_residual": 5.645043866297422e-06,
+        "max_independent_residual": 5.645043866286445e-06
+      },
+      "loose": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.00519695699949807,
+        "min_seconds": 0.004655800999898929,
+        "max_seconds": 0.007040775000859867,
+        "rss_range_kib": [
+          5236,
+          5364
+        ],
+        "h_calls": [
+          124
+        ],
+        "max_reported_residual": 5.645043866297422e-06,
+        "max_independent_residual": 5.645043866286445e-06
+      },
+      "strict": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.07207247400037886,
+        "min_seconds": 0.06809649699971487,
+        "max_seconds": 0.09850584999912826,
+        "rss_range_kib": [
+          5256,
+          5368
+        ],
+        "h_calls": [
+          2294
+        ],
+        "max_reported_residual": 8.128108175867074e-11,
+        "max_independent_residual": 8.128115937885399e-11
+      }
+    }
+  },
+  {
+    "profile": "default",
+    "alg": 2,
+    "threads": 1,
+    "modes": {
+      "legacy": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.06022339999981341,
+        "min_seconds": 0.05750185699980648,
+        "max_seconds": 0.07016310700055328,
+        "rss_range_kib": [
+          6288,
+          6460
+        ],
+        "h_calls": [
+          1020
+        ],
+        "max_reported_residual": 1.841654410368738e-15,
+        "max_independent_residual": 1.7458408591307396e-15
+      },
+      "loose": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.054059104000771185,
+        "min_seconds": 0.05227697600093961,
+        "max_seconds": 0.05656114799967327,
+        "rss_range_kib": [
+          6356,
+          6528
+        ],
+        "h_calls": [
+          1020
+        ],
+        "max_reported_residual": 1.841654410368738e-15,
+        "max_independent_residual": 1.7458408591307396e-15
+      },
+      "strict": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.05690676300037012,
+        "min_seconds": 0.05181745200025034,
+        "max_seconds": 0.062072409000393236,
+        "rss_range_kib": [
+          6432,
+          6532
+        ],
+        "h_calls": [
+          1020
+        ],
+        "max_reported_residual": 1.841654410368738e-15,
+        "max_independent_residual": 1.7458408591307396e-15
+      }
+    }
+  },
+  {
+    "profile": "default",
+    "alg": 2,
+    "threads": 2,
+    "modes": {
+      "legacy": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.06527640099920973,
+        "min_seconds": 0.0574299969994172,
+        "max_seconds": 0.13172409499929927,
+        "rss_range_kib": [
+          6388,
+          6624
+        ],
+        "h_calls": [
+          1088
+        ],
+        "max_reported_residual": 1.582303964430213e-15,
+        "max_independent_residual": 1.5043160819118382e-15
+      },
+      "loose": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.05714572800025053,
+        "min_seconds": 0.05539137600135291,
+        "max_seconds": 0.06138354399990931,
+        "rss_range_kib": [
+          6532,
+          6632
+        ],
+        "h_calls": [
+          1088
+        ],
+        "max_reported_residual": 1.582303964430213e-15,
+        "max_independent_residual": 1.5043160819118382e-15
+      },
+      "strict": {
+        "statuses": {
+          "0": 5
+        },
+        "median_seconds": 0.0653443379997043,
+        "min_seconds": 0.05868791200009582,
+        "max_seconds": 0.0696670390007057,
+        "rss_range_kib": [
+          6384,
+          6640
+        ],
+        "h_calls": [
+          1088
+        ],
+        "max_reported_residual": 1.582303964430213e-15,
+        "max_independent_residual": 1.5043160819118382e-15
+      }
+    }
+  }
+]

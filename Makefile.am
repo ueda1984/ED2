@@ -44,3 +44,8 @@ check-precision-contract:
 check-diagnostics:
 	$(AM_V_at)$(MAKE) -C source all
 	$(AM_V_at)$(MAKE) -C tests check-diagnostics DIAGNOSTICS_OUTPUT="$(DIAGNOSTICS_OUTPUT)"
+
+.PHONY: check-residual-policy
+check-residual-policy:
+	$(AM_V_at)$(MAKE) -C source all
+	$(AM_V_at)$(MAKE) -C tests check-residual-policy RESIDUAL_OUTPUT="$(RESIDUAL_OUTPUT)"

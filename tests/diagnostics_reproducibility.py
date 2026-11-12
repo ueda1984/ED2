@@ -68,7 +68,7 @@ def run(driver,root,name,item,threads,enabled=True,seed_option=False):
 def same(a,b):
     for key in ['status','reason','iterations','h_calls','exit_code']:
         assert a[key]==b[key],(key,a,b)
-    files=['status.dat','stdout.log','rng.dat','rng-after.dat','eigenpairs.dat','vectors.dat','last-estimates.dat','last-vectors.dat']
+    files=['status.dat','stdout.log','rng.dat','rng-after.dat','eigenpairs.dat','vectors.dat','last-estimates.dat','last-vectors.dat','float-mode.dat']
     for name in files:
         left=a['work']/name;right=b['work']/name
         assert left.exists()==right.exists(),name
@@ -86,7 +86,10 @@ def check_observation(result,item):
     assert (d['roundoff_risk']=='T')==(0<item['tol']<np.finfo(float).eps)
     assert 'estimate, not a spectral bound' in d['scale_provenance']
     scale=float(d['operator_scale']);eps=np.finfo(float).eps
-    np.testing.assert_allclose(float(d['breakdown_threshold']),64*eps*max(scale,np.finfo(float).tiny),atol=0,rtol=2e-15)
+    expected_breakdown=64*eps*max(scale,np.finfo(float).tiny)
+    gradual=(result['work']/'float-mode.dat').read_text().strip()=='T'
+    if not gradual and abs(expected_breakdown)<np.finfo(float).tiny:expected_breakdown=0.
+    np.testing.assert_allclose(float(d['breakdown_threshold']),expected_breakdown,atol=0,rtol=2e-15)
     q=None;values=None
     if result['status']==0:
         data=np.loadtxt(result['work']/'vectors.dat',ndmin=2)
@@ -99,6 +102,7 @@ def check_observation(result,item):
     for j,pair in enumerate(pairs):
         if not pair['available']:continue
         threshold=max(256*eps,np.sqrt(item['tol']))*max(scale,abs(pair['ritz']),np.finfo(float).tiny)
+        if not gradual and abs(threshold)<np.finfo(float).tiny:threshold=0.
         np.testing.assert_allclose(pair['threshold'],threshold,atol=0,rtol=3e-15)
         assert pair['certified']==(pair['residual']<=pair['threshold'])
         if q is not None:

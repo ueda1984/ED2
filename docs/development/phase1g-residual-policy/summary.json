@@ -1,0 +1,2313 @@
+{
+  "o2": {
+    "schema": 1,
+    "harness_sha256": "6e675e179c101182b6fcb08b128bb50c379f2a9c75c3a8d04be4303e3c5b22d1",
+    "driver_sha256": "9a6e81310a5d9c34999f6d24bed533dde334d325970aef533636e82b3df02fcf",
+    "before_driver_sha256": "c6305e20807be69e3883c8f2c903b9c7f4af9bbfaf779095a0a159a436e25857",
+    "executable_sha256": "9018f469448b000218221995b0cd028c63a65b4e006d02968a99c3686589488a",
+    "before_equivalence": 146,
+    "cli": {
+      "paired": [
+        {
+          "alg": 1,
+          "threads": 1,
+          "strict_exit": 0,
+          "strict_residuals": [
+            2.676721044732301e-16
+          ],
+          "failure_status": 1,
+          "failure_reason": "maximum iterations without requested residual convergence"
+        },
+        {
+          "alg": 1,
+          "threads": 2,
+          "strict_exit": 0,
+          "strict_residuals": [
+            2.6270037416296774e-16
+          ],
+          "failure_status": 1,
+          "failure_reason": "maximum iterations without requested residual convergence"
+        },
+        {
+          "alg": 2,
+          "threads": 1,
+          "strict_exit": 0,
+          "strict_residuals": [
+            1.58690034597295e-15,
+            2.6451671982107113e-15
+          ],
+          "failure_status": 1,
+          "failure_reason": "maximum restart iterations without requested residual convergence"
+        },
+        {
+          "alg": 2,
+          "threads": 2,
+          "strict_exit": 0,
+          "strict_residuals": [
+            1.1201479017103643e-15,
+            2.685943004079945e-15
+          ],
+          "failure_status": 1,
+          "failure_reason": "maximum restart iterations without requested residual convergence"
+        }
+      ],
+      "invalid_rejections": 12,
+      "relative_cli": 2,
+      "combined_cli": 2
+    },
+    "invalid_kernel": [
+      {
+        "alg": 1,
+        "index": 0,
+        "reason": "at least one positive residual tolerance is required"
+      },
+      {
+        "alg": 1,
+        "index": 1,
+        "reason": "negative residual tolerance or operator scale"
+      },
+      {
+        "alg": 1,
+        "index": 2,
+        "reason": "nonfinite residual policy parameter"
+      },
+      {
+        "alg": 1,
+        "index": 3,
+        "reason": "relative residual tolerance requires an explicit H-origin*I scale"
+      },
+      {
+        "alg": 1,
+        "index": 4,
+        "reason": "negative residual tolerance or operator scale"
+      },
+      {
+        "alg": 1,
+        "index": 5,
+        "reason": "residual threshold overflows for the supplied scale"
+      },
+      {
+        "alg": 2,
+        "index": 0,
+        "reason": "at least one positive residual tolerance is required"
+      },
+      {
+        "alg": 2,
+        "index": 1,
+        "reason": "negative residual tolerance or operator scale"
+      },
+      {
+        "alg": 2,
+        "index": 2,
+        "reason": "nonfinite residual policy parameter"
+      },
+      {
+        "alg": 2,
+        "index": 3,
+        "reason": "relative residual tolerance requires an explicit H-origin*I scale"
+      },
+      {
+        "alg": 2,
+        "index": 4,
+        "reason": "negative residual tolerance or operator scale"
+      },
+      {
+        "alg": 2,
+        "index": 5,
+        "reason": "residual threshold overflows for the supplied scale"
+      }
+    ],
+    "overflow_guards": 2,
+    "summary": {
+      "legacy": {
+        "0": 116,
+        "1": 30
+      },
+      "policies": {
+        "atol-1e-10": {
+          "0": 102,
+          "1": 44
+        },
+        "rtol-1e-10-centered": {
+          "0": 107,
+          "1": 37,
+          "2": 2
+        },
+        "atol-1e-300": {
+          "1": 130,
+          "0": 11,
+          "2": 5
+        }
+      }
+    },
+    "raw_report_sha256": "602228883555f1f52b6a76687b5d4cd706083468fbeb034f78c927541c875694",
+    "transitions": {
+      "atol-1e-10": {
+        "0->0": 102,
+        "1->1": 30,
+        "0->1": 14
+      },
+      "rtol-1e-10-centered": {
+        "0->0": 107,
+        "1->1": 30,
+        "0->1": 7,
+        "0->2": 2
+      },
+      "atol-1e-300": {
+        "0->1": 100,
+        "1->1": 30,
+        "0->0": 11,
+        "0->2": 5
+      }
+    },
+    "relative_cli_scale_checks": 3,
+    "final_diagnostics": {
+      "schema": 1,
+      "driver_sha256": "85d780e2f5ba994c3a68f368ac4a536a70726b204502719d31f8cc369a8c49dc",
+      "before_driver_sha256": "bfbbdffa820c1e356a139a935d1fcc54cbb984ceda8ec3d01f01d6ee40aa09b3",
+      "executable_sha256": "9018f469448b000218221995b0cd028c63a65b4e006d02968a99c3686589488a",
+      "harness_sha256": "9d0aabafe80e35e33ecda5f0615b831d788089f7c30746171d740039ad420e09",
+      "comparison_cases": 136,
+      "before_comparisons": 136,
+      "diagnostic_solver_statuses": {
+        "0": 106,
+        "1": 30
+      },
+      "seeded_replays": [
+        {
+          "id": "0000-t1",
+          "status": 0,
+          "h_calls": 62,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0000-t2",
+          "status": 0,
+          "h_calls": 64,
+          "seed": 19,
+          "threads": 2
+        },
+        {
+          "id": "0004-t1",
+          "status": 0,
+          "h_calls": 1020,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0004-t2",
+          "status": 0,
+          "h_calls": 1000,
+          "seed": 19,
+          "threads": 2
+        },
+        {
+          "id": "0016-t1",
+          "status": 0,
+          "h_calls": 36,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0016-t2",
+          "status": 0,
+          "h_calls": 38,
+          "seed": 19,
+          "threads": 2
+        },
+        {
+          "id": "0020-t1",
+          "status": 0,
+          "h_calls": 1000,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0020-t2",
+          "status": 0,
+          "h_calls": 920,
+          "seed": 19,
+          "threads": 2
+        },
+        {
+          "id": "0032-t1",
+          "status": 0,
+          "h_calls": 2,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0032-t2",
+          "status": 0,
+          "h_calls": 2,
+          "seed": 19,
+          "threads": 2
+        },
+        {
+          "id": "0034-t1",
+          "status": 0,
+          "h_calls": 2,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0034-t2",
+          "status": 0,
+          "h_calls": 2,
+          "seed": 19,
+          "threads": 2
+        },
+        {
+          "id": "0042-t1",
+          "status": 0,
+          "h_calls": 2,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0042-t2",
+          "status": 0,
+          "h_calls": 2,
+          "seed": 19,
+          "threads": 2
+        },
+        {
+          "id": "0043-t1",
+          "status": 0,
+          "h_calls": 2,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0043-t2",
+          "status": 0,
+          "h_calls": 2,
+          "seed": 19,
+          "threads": 2
+        },
+        {
+          "id": "0044-t1",
+          "status": 0,
+          "h_calls": 32,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0044-t2",
+          "status": 0,
+          "h_calls": 32,
+          "seed": 19,
+          "threads": 2
+        },
+        {
+          "id": "0047-t1",
+          "status": 0,
+          "h_calls": 32,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0047-t2",
+          "status": 0,
+          "h_calls": 32,
+          "seed": 19,
+          "threads": 2
+        },
+        {
+          "id": "0050-t1",
+          "status": 0,
+          "h_calls": 520,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0050-t2",
+          "status": 0,
+          "h_calls": 550,
+          "seed": 19,
+          "threads": 2
+        },
+        {
+          "id": "0053-t1",
+          "status": 1,
+          "h_calls": 10000,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0053-t2",
+          "status": 1,
+          "h_calls": 10000,
+          "seed": 19,
+          "threads": 2
+        }
+      ],
+      "error_paths": [
+        {
+          "name": "zero-budget",
+          "status": -1,
+          "termination": "invalid_input"
+        },
+        {
+          "name": "zero-tolerance",
+          "status": -1,
+          "termination": "invalid_input"
+        },
+        {
+          "name": "nan-tolerance",
+          "status": -1,
+          "termination": "invalid_input"
+        },
+        {
+          "name": "zero-initial",
+          "status": -1,
+          "termination": "invalid_input"
+        },
+        {
+          "name": "invalid-capacity",
+          "status": -1,
+          "termination": "invalid_input"
+        },
+        {
+          "name": "nonfinite-action",
+          "status": 2,
+          "termination": "numerical_failure"
+        }
+      ],
+      "cli_checks": [
+        {
+          "name": "cli-a1-t1-s19",
+          "status": "passed",
+          "sidecar_sha256": "5d15e3f173815c03d8a335a2d387b6592513977e853ba17d5034310aa9566bb9",
+          "eigenvalues_sha256": "3d0e0e43de2c4d70151deaa11751d450f8d95a6bef4f9434961b7dc78b99da07",
+          "h_applications": 32
+        },
+        {
+          "name": "cli-a1-t1-s73",
+          "status": "passed",
+          "sidecar_sha256": "ee7f46fa5faaf5d5a32ba09d0e61503174c32058058e15aac85c1aa146aac2d2",
+          "eigenvalues_sha256": "3d0e0e43de2c4d70151deaa11751d450f8d95a6bef4f9434961b7dc78b99da07",
+          "h_applications": 32
+        },
+        {
+          "name": "cli-a1-t2-s19",
+          "status": "passed",
+          "sidecar_sha256": "3a3f4380d25352dbf1d70918300eb844eb448d98b58651351314448ef8a1b28e",
+          "eigenvalues_sha256": "3d0e0e43de2c4d70151deaa11751d450f8d95a6bef4f9434961b7dc78b99da07",
+          "h_applications": 32
+        },
+        {
+          "name": "cli-a1-t2-s73",
+          "status": "passed",
+          "sidecar_sha256": "d8e40814f6c0c19b8a5b6ef73c709a7880d31456e3772d5cf0b10e08b4063e6a",
+          "eigenvalues_sha256": "3d0e0e43de2c4d70151deaa11751d450f8d95a6bef4f9434961b7dc78b99da07",
+          "h_applications": 32
+        },
+        {
+          "name": "cli-a2-t1-s19",
+          "status": "passed",
+          "sidecar_sha256": "08b093c84b0d386aec048123b1b21467d91ffa5187993142c413abb3e7d0e8ed",
+          "eigenvalues_sha256": "c7f6e301b41acc3fbfd2e67d1dafa3260b8ccd392997f537998c1377326daf3c",
+          "h_applications": 500
+        },
+        {
+          "name": "cli-a2-t1-s73",
+          "status": "passed",
+          "sidecar_sha256": "77cc40298a5994de8d0edcc122f216fc428316c9afabb7782ce8e9454bdabfd7",
+          "eigenvalues_sha256": "f1cb2cfd0504b183b878ad283c2e51c96801e3899eb910994d1b24e2d1231f92",
+          "h_applications": 500
+        },
+        {
+          "name": "cli-a2-t2-s19",
+          "status": "passed",
+          "sidecar_sha256": "62a80d7d2570686e3cc7a3fde409c8b383f708cb56fee35a20bfe748471a76f1",
+          "eigenvalues_sha256": "c7f6e301b41acc3fbfd2e67d1dafa3260b8ccd392997f537998c1377326daf3c",
+          "h_applications": 500
+        },
+        {
+          "name": "cli-a2-t2-s73",
+          "status": "passed",
+          "sidecar_sha256": "0df0504f07024619e9a332ddda98ea0e878ef7dfae96a4273b089fad9e19bc83",
+          "eigenvalues_sha256": "c7f6e301b41acc3fbfd2e67d1dafa3260b8ccd392997f537998c1377326daf3c",
+          "h_applications": 550
+        },
+        {
+          "name": "explicit-initial-a1",
+          "status": "passed"
+        },
+        {
+          "name": "explicit-initial-a2",
+          "status": "passed"
+        },
+        {
+          "name": "seed-zero",
+          "status": "passed"
+        },
+        {
+          "name": "seed-max",
+          "status": "passed"
+        },
+        {
+          "name": "seed-min",
+          "status": "passed"
+        },
+        {
+          "name": "bad-seed",
+          "status": "passed",
+          "observed_exit": 1
+        },
+        {
+          "name": "overflow-seed",
+          "status": "passed",
+          "observed_exit": 1
+        },
+        {
+          "name": "short-vector",
+          "status": "passed",
+          "observed_exit": 1
+        },
+        {
+          "name": "zero-vector",
+          "status": "passed",
+          "observed_exit": 1
+        },
+        {
+          "name": "nonfinite-vector",
+          "status": "passed",
+          "observed_exit": 1
+        },
+        {
+          "name": "extra-vector",
+          "status": "passed",
+          "observed_exit": 1
+        },
+        {
+          "name": "existing-sidecar",
+          "status": "passed",
+          "observed_exit": 1
+        },
+        {
+          "name": "budget-a1",
+          "status": "passed",
+          "observed_exit": 1
+        },
+        {
+          "name": "budget-a2",
+          "status": "passed",
+          "observed_exit": 1
+        }
+      ],
+      "report_sha256": "99b13e987ff34c2c9ed7e8ce55fe3a7f0cf6874c849660af65ca5bde29ac6572"
+    },
+    "initial_diagnostics_log_sha256": "c32e800c87784501f53aa5aacb3f75b7f3704bc8ceb45ab1ee70649660f03f00",
+    "gradual_underflow": true,
+    "suites": {
+      "independent": {
+        "passed": 21,
+        "failed": 0,
+        "report_sha256": "fc5384ac2e6e889880bc4bb967a91d72327b12fb4de626c0d6633428df598dac"
+      },
+      "fields": {
+        "cli_counts": {
+          "passed": 70,
+          "failed": 0
+        },
+        "operator_counts": {
+          "passed": 10,
+          "failed": 0
+        },
+        "permutation_counts": {
+          "passed": 28,
+          "failed": 0
+        },
+        "report_sha256": "96bfc41af790aec24df6948d74c02581d8bb8bd21ee6f80d440cc07f2f1586b8"
+      },
+      "stability": {
+        "passed": 82,
+        "failed": 0,
+        "report_sha256": "529fe898885bfe3843d362bf9555ff2c95475b4ac1ab8ea0a73b3acfa5f0038a"
+      },
+      "stability-cli": {
+        "passed": 26,
+        "failed": 0,
+        "report_sha256": "243550b17abd8d2e6ad585c548681433a327523d864fdaf02b014295f8a197d0"
+      },
+      "stress": {
+        "counts": {
+          "accepted_accuracy_or_inclusion_warning": 135,
+          "accepted_strict": 164,
+          "nonconvergence": 119
+        },
+        "report_sha256": "97edb8f302a679d7b973f1272bc091aec113ab4b551d40f9cfa469a50e420165"
+      },
+      "precision": {
+        "counts": {
+          "accepted_reference_targets": 92,
+          "nonconvergence": 30,
+          "accepted_accuracy_or_inclusion_warning": 14
+        },
+        "report_sha256": "4144a04968337d4db43255d7720beac361d7956bbb732d389e4590485b972742"
+      },
+      "standard": {
+        "passed": 1,
+        "failed": 0,
+        "log_sha256": "8fb404cc78fb9bcc87cf7bb45a34af07239207f8e7120ae6acfeedc2500490bf"
+      },
+      "lapack": {
+        "passed": 11,
+        "failed": 0,
+        "log_sha256": "359191cccf893888aebfaea65c5169e1b14412d54438a5fcb5ce9dbee0ddc44d"
+      },
+      "extended": {
+        "passed": 9,
+        "failed": 0,
+        "log_sha256": "c0749dfd4d80d306269f03ce1085e724ec3f52d05e9cef52db06c65db7309676"
+      },
+      "historical": {
+        "passed": 27,
+        "failed": 0,
+        "report_sha256": "92e0cdaf3bd81b7dc0e08c781b1bbc4b26b0dfdfb349c8dd84d7c48b525e6d58"
+      },
+      "acceptance": {
+        "counts": {
+          "observable_agreement": 768,
+          "solver_failure": 256
+        },
+        "report_sha256": "baeb2c5b99205b7940b2c80fecf4acce3644c9d8b1106f3a95fc6c9897507e46",
+        "failure_eigenvalue_files": 0
+      }
+    }
+  },
+  "gnu13": {
+    "schema": 1,
+    "harness_sha256": "6e675e179c101182b6fcb08b128bb50c379f2a9c75c3a8d04be4303e3c5b22d1",
+    "driver_sha256": "11e1000a5a5f1a7f4e5399873a0ac07aef047af2a8fb7cb4e299fdb001b7369d",
+    "before_driver_sha256": "9fd35699216f36bde199b5425b422090fbf12b4d139c0c6ff519114f3a5715a3",
+    "executable_sha256": "8266506447b46d9def9184ac20451bf45031c29102dce17b6cda8e02c058b46c",
+    "before_equivalence": 146,
+    "cli": {
+      "paired": [
+        {
+          "alg": 1,
+          "threads": 1,
+          "strict_exit": 0,
+          "strict_residuals": [
+            2.676721044732301e-16
+          ],
+          "failure_status": 1,
+          "failure_reason": "maximum iterations without requested residual convergence"
+        },
+        {
+          "alg": 1,
+          "threads": 2,
+          "strict_exit": 0,
+          "strict_residuals": [
+            2.6270037416296774e-16
+          ],
+          "failure_status": 1,
+          "failure_reason": "maximum iterations without requested residual convergence"
+        },
+        {
+          "alg": 2,
+          "threads": 1,
+          "strict_exit": 0,
+          "strict_residuals": [
+            1.58690034597295e-15,
+            2.6451671982107113e-15
+          ],
+          "failure_status": 1,
+          "failure_reason": "maximum restart iterations without requested residual convergence"
+        },
+        {
+          "alg": 2,
+          "threads": 2,
+          "strict_exit": 0,
+          "strict_residuals": [
+            1.1201479017103643e-15,
+            2.685943004079945e-15
+          ],
+          "failure_status": 1,
+          "failure_reason": "maximum restart iterations without requested residual convergence"
+        }
+      ],
+      "invalid_rejections": 12,
+      "relative_cli": 2,
+      "combined_cli": 2
+    },
+    "invalid_kernel": [
+      {
+        "alg": 1,
+        "index": 0,
+        "reason": "at least one positive residual tolerance is required"
+      },
+      {
+        "alg": 1,
+        "index": 1,
+        "reason": "negative residual tolerance or operator scale"
+      },
+      {
+        "alg": 1,
+        "index": 2,
+        "reason": "nonfinite residual policy parameter"
+      },
+      {
+        "alg": 1,
+        "index": 3,
+        "reason": "relative residual tolerance requires an explicit H-origin*I scale"
+      },
+      {
+        "alg": 1,
+        "index": 4,
+        "reason": "negative residual tolerance or operator scale"
+      },
+      {
+        "alg": 1,
+        "index": 5,
+        "reason": "residual threshold overflows for the supplied scale"
+      },
+      {
+        "alg": 2,
+        "index": 0,
+        "reason": "at least one positive residual tolerance is required"
+      },
+      {
+        "alg": 2,
+        "index": 1,
+        "reason": "negative residual tolerance or operator scale"
+      },
+      {
+        "alg": 2,
+        "index": 2,
+        "reason": "nonfinite residual policy parameter"
+      },
+      {
+        "alg": 2,
+        "index": 3,
+        "reason": "relative residual tolerance requires an explicit H-origin*I scale"
+      },
+      {
+        "alg": 2,
+        "index": 4,
+        "reason": "negative residual tolerance or operator scale"
+      },
+      {
+        "alg": 2,
+        "index": 5,
+        "reason": "residual threshold overflows for the supplied scale"
+      }
+    ],
+    "overflow_guards": 2,
+    "summary": {
+      "legacy": {
+        "0": 116,
+        "1": 30
+      },
+      "policies": {
+        "atol-1e-10": {
+          "0": 102,
+          "1": 44
+        },
+        "rtol-1e-10-centered": {
+          "0": 107,
+          "1": 37,
+          "2": 2
+        },
+        "atol-1e-300": {
+          "1": 130,
+          "0": 11,
+          "2": 5
+        }
+      }
+    },
+    "raw_report_sha256": "c78dea2956aa83e5c7403d98386fecd8eab51f301a7704106244bd51eab0cb58",
+    "transitions": {
+      "atol-1e-10": {
+        "0->0": 102,
+        "1->1": 30,
+        "0->1": 14
+      },
+      "rtol-1e-10-centered": {
+        "0->0": 107,
+        "1->1": 30,
+        "0->1": 7,
+        "0->2": 2
+      },
+      "atol-1e-300": {
+        "0->1": 100,
+        "1->1": 30,
+        "0->0": 11,
+        "0->2": 5
+      }
+    },
+    "relative_cli_scale_checks": 3,
+    "final_diagnostics": {
+      "schema": 1,
+      "driver_sha256": "472a6597cfbe6cc01aaf5d553c5c8e344bceb70bd8268cd100fb18465035e8c6",
+      "before_driver_sha256": "0dccce692549e6dcc1bb702847d128c4c452749c01129eeb04866318cb4990aa",
+      "executable_sha256": "8266506447b46d9def9184ac20451bf45031c29102dce17b6cda8e02c058b46c",
+      "harness_sha256": "9d0aabafe80e35e33ecda5f0615b831d788089f7c30746171d740039ad420e09",
+      "comparison_cases": 136,
+      "before_comparisons": 136,
+      "diagnostic_solver_statuses": {
+        "0": 106,
+        "1": 30
+      },
+      "seeded_replays": [
+        {
+          "id": "0000-t1",
+          "status": 0,
+          "h_calls": 62,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0000-t2",
+          "status": 0,
+          "h_calls": 64,
+          "seed": 19,
+          "threads": 2
+        },
+        {
+          "id": "0004-t1",
+          "status": 0,
+          "h_calls": 1020,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0004-t2",
+          "status": 0,
+          "h_calls": 1000,
+          "seed": 19,
+          "threads": 2
+        },
+        {
+          "id": "0016-t1",
+          "status": 0,
+          "h_calls": 36,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0016-t2",
+          "status": 0,
+          "h_calls": 38,
+          "seed": 19,
+          "threads": 2
+        },
+        {
+          "id": "0020-t1",
+          "status": 0,
+          "h_calls": 1000,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0020-t2",
+          "status": 0,
+          "h_calls": 920,
+          "seed": 19,
+          "threads": 2
+        },
+        {
+          "id": "0032-t1",
+          "status": 0,
+          "h_calls": 2,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0032-t2",
+          "status": 0,
+          "h_calls": 2,
+          "seed": 19,
+          "threads": 2
+        },
+        {
+          "id": "0034-t1",
+          "status": 0,
+          "h_calls": 2,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0034-t2",
+          "status": 0,
+          "h_calls": 2,
+          "seed": 19,
+          "threads": 2
+        },
+        {
+          "id": "0042-t1",
+          "status": 0,
+          "h_calls": 2,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0042-t2",
+          "status": 0,
+          "h_calls": 2,
+          "seed": 19,
+          "threads": 2
+        },
+        {
+          "id": "0043-t1",
+          "status": 0,
+          "h_calls": 2,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0043-t2",
+          "status": 0,
+          "h_calls": 2,
+          "seed": 19,
+          "threads": 2
+        },
+        {
+          "id": "0044-t1",
+          "status": 0,
+          "h_calls": 32,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0044-t2",
+          "status": 0,
+          "h_calls": 32,
+          "seed": 19,
+          "threads": 2
+        },
+        {
+          "id": "0047-t1",
+          "status": 0,
+          "h_calls": 32,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0047-t2",
+          "status": 0,
+          "h_calls": 32,
+          "seed": 19,
+          "threads": 2
+        },
+        {
+          "id": "0050-t1",
+          "status": 0,
+          "h_calls": 520,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0050-t2",
+          "status": 0,
+          "h_calls": 550,
+          "seed": 19,
+          "threads": 2
+        },
+        {
+          "id": "0053-t1",
+          "status": 1,
+          "h_calls": 10000,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0053-t2",
+          "status": 1,
+          "h_calls": 10000,
+          "seed": 19,
+          "threads": 2
+        }
+      ],
+      "error_paths": [
+        {
+          "name": "zero-budget",
+          "status": -1,
+          "termination": "invalid_input"
+        },
+        {
+          "name": "zero-tolerance",
+          "status": -1,
+          "termination": "invalid_input"
+        },
+        {
+          "name": "nan-tolerance",
+          "status": -1,
+          "termination": "invalid_input"
+        },
+        {
+          "name": "zero-initial",
+          "status": -1,
+          "termination": "invalid_input"
+        },
+        {
+          "name": "invalid-capacity",
+          "status": -1,
+          "termination": "invalid_input"
+        },
+        {
+          "name": "nonfinite-action",
+          "status": 2,
+          "termination": "numerical_failure"
+        }
+      ],
+      "cli_checks": [
+        {
+          "name": "cli-a1-t1-s19",
+          "status": "passed",
+          "sidecar_sha256": "236a6abb6a77f8fdaa0b03a1d0d68633530afbe7106efc1e414d26a0172bc071",
+          "eigenvalues_sha256": "3d0e0e43de2c4d70151deaa11751d450f8d95a6bef4f9434961b7dc78b99da07",
+          "h_applications": 32
+        },
+        {
+          "name": "cli-a1-t1-s73",
+          "status": "passed",
+          "sidecar_sha256": "64b02bf8927ebda29967aff8e9767eb0687676a5682b51867bb99f970b8e9d49",
+          "eigenvalues_sha256": "3d0e0e43de2c4d70151deaa11751d450f8d95a6bef4f9434961b7dc78b99da07",
+          "h_applications": 32
+        },
+        {
+          "name": "cli-a1-t2-s19",
+          "status": "passed",
+          "sidecar_sha256": "79af248984b9d27bdb56e90e4f9353ea946f74926427c78982e0d82e4c47286a",
+          "eigenvalues_sha256": "3d0e0e43de2c4d70151deaa11751d450f8d95a6bef4f9434961b7dc78b99da07",
+          "h_applications": 32
+        },
+        {
+          "name": "cli-a1-t2-s73",
+          "status": "passed",
+          "sidecar_sha256": "d316bb036580b7a4f5f83cc828051427020f98debd171d8513e4df41bcddcf4f",
+          "eigenvalues_sha256": "3d0e0e43de2c4d70151deaa11751d450f8d95a6bef4f9434961b7dc78b99da07",
+          "h_applications": 32
+        },
+        {
+          "name": "cli-a2-t1-s19",
+          "status": "passed",
+          "sidecar_sha256": "a9a3ebd12d492d05bbb6dbdff7a4963514274cc81dd8cf74b3c467fafbf6e5dc",
+          "eigenvalues_sha256": "c7f6e301b41acc3fbfd2e67d1dafa3260b8ccd392997f537998c1377326daf3c",
+          "h_applications": 500
+        },
+        {
+          "name": "cli-a2-t1-s73",
+          "status": "passed",
+          "sidecar_sha256": "e0d478261823c069ed821bd11e5adb11d0d7e9a256753bde2a03f2042f1442ac",
+          "eigenvalues_sha256": "f1cb2cfd0504b183b878ad283c2e51c96801e3899eb910994d1b24e2d1231f92",
+          "h_applications": 500
+        },
+        {
+          "name": "cli-a2-t2-s19",
+          "status": "passed",
+          "sidecar_sha256": "7c017f49b9d35a6f74f252c6c2689bdd66d6b3f6eca94e5f6d0b737dc052bbbf",
+          "eigenvalues_sha256": "c7f6e301b41acc3fbfd2e67d1dafa3260b8ccd392997f537998c1377326daf3c",
+          "h_applications": 500
+        },
+        {
+          "name": "cli-a2-t2-s73",
+          "status": "passed",
+          "sidecar_sha256": "6105ce4f48e545485b39baa036273bf8bcf0c0f5d278a0b738a310f5a593348f",
+          "eigenvalues_sha256": "c7f6e301b41acc3fbfd2e67d1dafa3260b8ccd392997f537998c1377326daf3c",
+          "h_applications": 550
+        },
+        {
+          "name": "explicit-initial-a1",
+          "status": "passed"
+        },
+        {
+          "name": "explicit-initial-a2",
+          "status": "passed"
+        },
+        {
+          "name": "seed-zero",
+          "status": "passed"
+        },
+        {
+          "name": "seed-max",
+          "status": "passed"
+        },
+        {
+          "name": "seed-min",
+          "status": "passed"
+        },
+        {
+          "name": "bad-seed",
+          "status": "passed",
+          "observed_exit": 1
+        },
+        {
+          "name": "overflow-seed",
+          "status": "passed",
+          "observed_exit": 1
+        },
+        {
+          "name": "short-vector",
+          "status": "passed",
+          "observed_exit": 1
+        },
+        {
+          "name": "zero-vector",
+          "status": "passed",
+          "observed_exit": 1
+        },
+        {
+          "name": "nonfinite-vector",
+          "status": "passed",
+          "observed_exit": 1
+        },
+        {
+          "name": "extra-vector",
+          "status": "passed",
+          "observed_exit": 1
+        },
+        {
+          "name": "existing-sidecar",
+          "status": "passed",
+          "observed_exit": 1
+        },
+        {
+          "name": "budget-a1",
+          "status": "passed",
+          "observed_exit": 1
+        },
+        {
+          "name": "budget-a2",
+          "status": "passed",
+          "observed_exit": 1
+        }
+      ],
+      "report_sha256": "f13aa2b1d2b6824aead0cc603890a4ff05475b8a03f72c84b389746c72e17951"
+    },
+    "initial_diagnostics_log_sha256": "c32e800c87784501f53aa5aacb3f75b7f3704bc8ceb45ab1ee70649660f03f00",
+    "gradual_underflow": true,
+    "suites": {
+      "independent": {
+        "passed": 21,
+        "failed": 0,
+        "report_sha256": "8ec8c1713440c85bb4dbfe79b460d0c7f23f0691b556e0e35e4af1c579ac8b47"
+      },
+      "fields": {
+        "cli_counts": {
+          "passed": 70,
+          "failed": 0
+        },
+        "operator_counts": {
+          "passed": 10,
+          "failed": 0
+        },
+        "permutation_counts": {
+          "passed": 28,
+          "failed": 0
+        },
+        "report_sha256": "f40ffdae3c24f760c3a1c3e62f361788a585b4ec735cbf8f8845a772164e5889"
+      },
+      "stability": {
+        "passed": 82,
+        "failed": 0,
+        "report_sha256": "3279d6b24f25dabdffd275de4d5b0a9213814ea315950c4b0bd6e0ad81f130eb"
+      },
+      "stability-cli": {
+        "passed": 26,
+        "failed": 0,
+        "report_sha256": "0fef0017349b0250add112beb3423efd8e99df8305219316c4ef4fe3a924619e"
+      },
+      "stress": {
+        "counts": {
+          "accepted_accuracy_or_inclusion_warning": 135,
+          "accepted_strict": 164,
+          "nonconvergence": 119
+        },
+        "report_sha256": "dfba6643a282d2f27eec3f833cdca441dd91096965fbe81eb93bb029d0df298d"
+      },
+      "precision": {
+        "counts": {
+          "accepted_reference_targets": 92,
+          "nonconvergence": 30,
+          "accepted_accuracy_or_inclusion_warning": 14
+        },
+        "report_sha256": "87c1e933f64b3153e98e00a9828fd93a38f1da9659f90b8b47555e2dba8e06a1"
+      },
+      "standard": {
+        "passed": 1,
+        "failed": 0,
+        "log_sha256": "253a8a77dfc146f495b306653110d238a14b60c688b8b373e115e4ff7514ceea"
+      },
+      "lapack": {
+        "passed": 11,
+        "failed": 0,
+        "log_sha256": "7918cae1a23f747b1ae48f86a4c575e88403bfa897e3938b8d14e61fb526b7e1"
+      },
+      "extended": {
+        "passed": 9,
+        "failed": 0,
+        "log_sha256": "aee0142add27a3d23c0227e18193dd4b769312209bbd7a6174ef27836628e038"
+      },
+      "historical": {
+        "passed": 27,
+        "failed": 0,
+        "report_sha256": "103f9d619ffdb4e3c93c24922263fcbbdcfb65dcb94648b93ca6bba45410d73f"
+      },
+      "acceptance": {
+        "counts": {
+          "observable_agreement": 768,
+          "solver_failure": 256
+        },
+        "report_sha256": "2209b77b71a542975e17a91bfeafa586ffe3b4d433cad7ea280497313688eaf1",
+        "failure_eigenvalue_files": 0
+      }
+    }
+  },
+  "bounds": {
+    "schema": 1,
+    "harness_sha256": "6e675e179c101182b6fcb08b128bb50c379f2a9c75c3a8d04be4303e3c5b22d1",
+    "driver_sha256": "fa15727f56fdca21608b9abccdd1aa71b7bf9729b6cffea57a97a61a08471ec1",
+    "before_driver_sha256": "804504141c424b105bebfddd124741aed8705415aa3e6e6600fa9725f08e9888",
+    "executable_sha256": "e742fb4524084d4ee97cb0bcdb8cd1c1c371afc0bccc6f0f6b1fb09b53461e1b",
+    "before_equivalence": 146,
+    "cli": {
+      "paired": [
+        {
+          "alg": 1,
+          "threads": 1,
+          "strict_exit": 0,
+          "strict_residuals": [
+            2.676721044732301e-16
+          ],
+          "failure_status": 1,
+          "failure_reason": "maximum iterations without requested residual convergence"
+        },
+        {
+          "alg": 1,
+          "threads": 2,
+          "strict_exit": 0,
+          "strict_residuals": [
+            2.6270037416296774e-16
+          ],
+          "failure_status": 1,
+          "failure_reason": "maximum iterations without requested residual convergence"
+        },
+        {
+          "alg": 2,
+          "threads": 1,
+          "strict_exit": 0,
+          "strict_residuals": [
+            1.58690034597295e-15,
+            2.6451671982107113e-15
+          ],
+          "failure_status": 1,
+          "failure_reason": "maximum restart iterations without requested residual convergence"
+        },
+        {
+          "alg": 2,
+          "threads": 2,
+          "strict_exit": 0,
+          "strict_residuals": [
+            1.1201479017103643e-15,
+            2.685943004079945e-15
+          ],
+          "failure_status": 1,
+          "failure_reason": "maximum restart iterations without requested residual convergence"
+        }
+      ],
+      "invalid_rejections": 12,
+      "relative_cli": 2,
+      "combined_cli": 2
+    },
+    "invalid_kernel": [
+      {
+        "alg": 1,
+        "index": 0,
+        "reason": "at least one positive residual tolerance is required"
+      },
+      {
+        "alg": 1,
+        "index": 1,
+        "reason": "negative residual tolerance or operator scale"
+      },
+      {
+        "alg": 1,
+        "index": 2,
+        "reason": "nonfinite residual policy parameter"
+      },
+      {
+        "alg": 1,
+        "index": 3,
+        "reason": "relative residual tolerance requires an explicit H-origin*I scale"
+      },
+      {
+        "alg": 1,
+        "index": 4,
+        "reason": "negative residual tolerance or operator scale"
+      },
+      {
+        "alg": 1,
+        "index": 5,
+        "reason": "residual threshold overflows for the supplied scale"
+      },
+      {
+        "alg": 2,
+        "index": 0,
+        "reason": "at least one positive residual tolerance is required"
+      },
+      {
+        "alg": 2,
+        "index": 1,
+        "reason": "negative residual tolerance or operator scale"
+      },
+      {
+        "alg": 2,
+        "index": 2,
+        "reason": "nonfinite residual policy parameter"
+      },
+      {
+        "alg": 2,
+        "index": 3,
+        "reason": "relative residual tolerance requires an explicit H-origin*I scale"
+      },
+      {
+        "alg": 2,
+        "index": 4,
+        "reason": "negative residual tolerance or operator scale"
+      },
+      {
+        "alg": 2,
+        "index": 5,
+        "reason": "residual threshold overflows for the supplied scale"
+      }
+    ],
+    "overflow_guards": 2,
+    "summary": {
+      "legacy": {
+        "0": 116,
+        "1": 30
+      },
+      "policies": {
+        "atol-1e-10": {
+          "0": 102,
+          "1": 44
+        },
+        "rtol-1e-10-centered": {
+          "0": 107,
+          "1": 37,
+          "2": 2
+        },
+        "atol-1e-300": {
+          "1": 130,
+          "0": 11,
+          "2": 5
+        }
+      }
+    },
+    "raw_report_sha256": "ab80e22947d3e2df75b085da26e5acea303433dc78eab3beea460a7d566d1e94",
+    "transitions": {
+      "atol-1e-10": {
+        "0->0": 102,
+        "1->1": 30,
+        "0->1": 14
+      },
+      "rtol-1e-10-centered": {
+        "0->0": 107,
+        "1->1": 30,
+        "0->1": 7,
+        "0->2": 2
+      },
+      "atol-1e-300": {
+        "0->1": 100,
+        "1->1": 30,
+        "0->0": 11,
+        "0->2": 5
+      }
+    },
+    "relative_cli_scale_checks": 3,
+    "final_diagnostics": {
+      "schema": 1,
+      "driver_sha256": "22b49e0ca56b45b4ce32738d38aa78519a82952c7e8bee1ccb261c4dda3d754b",
+      "before_driver_sha256": "4d42480547321919d71884b5174fe23d58ffc5e465f864df69debf249c14ff64",
+      "executable_sha256": "e742fb4524084d4ee97cb0bcdb8cd1c1c371afc0bccc6f0f6b1fb09b53461e1b",
+      "harness_sha256": "9d0aabafe80e35e33ecda5f0615b831d788089f7c30746171d740039ad420e09",
+      "comparison_cases": 136,
+      "before_comparisons": 136,
+      "diagnostic_solver_statuses": {
+        "0": 106,
+        "1": 30
+      },
+      "seeded_replays": [
+        {
+          "id": "0000-t1",
+          "status": 0,
+          "h_calls": 62,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0000-t2",
+          "status": 0,
+          "h_calls": 64,
+          "seed": 19,
+          "threads": 2
+        },
+        {
+          "id": "0004-t1",
+          "status": 0,
+          "h_calls": 1020,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0004-t2",
+          "status": 0,
+          "h_calls": 1000,
+          "seed": 19,
+          "threads": 2
+        },
+        {
+          "id": "0016-t1",
+          "status": 0,
+          "h_calls": 36,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0016-t2",
+          "status": 0,
+          "h_calls": 38,
+          "seed": 19,
+          "threads": 2
+        },
+        {
+          "id": "0020-t1",
+          "status": 0,
+          "h_calls": 1000,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0020-t2",
+          "status": 0,
+          "h_calls": 920,
+          "seed": 19,
+          "threads": 2
+        },
+        {
+          "id": "0032-t1",
+          "status": 0,
+          "h_calls": 2,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0032-t2",
+          "status": 0,
+          "h_calls": 2,
+          "seed": 19,
+          "threads": 2
+        },
+        {
+          "id": "0034-t1",
+          "status": 0,
+          "h_calls": 2,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0034-t2",
+          "status": 0,
+          "h_calls": 2,
+          "seed": 19,
+          "threads": 2
+        },
+        {
+          "id": "0042-t1",
+          "status": 0,
+          "h_calls": 2,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0042-t2",
+          "status": 0,
+          "h_calls": 2,
+          "seed": 19,
+          "threads": 2
+        },
+        {
+          "id": "0043-t1",
+          "status": 0,
+          "h_calls": 2,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0043-t2",
+          "status": 0,
+          "h_calls": 2,
+          "seed": 19,
+          "threads": 2
+        },
+        {
+          "id": "0044-t1",
+          "status": 0,
+          "h_calls": 32,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0044-t2",
+          "status": 0,
+          "h_calls": 32,
+          "seed": 19,
+          "threads": 2
+        },
+        {
+          "id": "0047-t1",
+          "status": 0,
+          "h_calls": 32,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0047-t2",
+          "status": 0,
+          "h_calls": 32,
+          "seed": 19,
+          "threads": 2
+        },
+        {
+          "id": "0050-t1",
+          "status": 0,
+          "h_calls": 520,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0050-t2",
+          "status": 0,
+          "h_calls": 550,
+          "seed": 19,
+          "threads": 2
+        },
+        {
+          "id": "0053-t1",
+          "status": 1,
+          "h_calls": 10000,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0053-t2",
+          "status": 1,
+          "h_calls": 10000,
+          "seed": 19,
+          "threads": 2
+        }
+      ],
+      "error_paths": [
+        {
+          "name": "zero-budget",
+          "status": -1,
+          "termination": "invalid_input"
+        },
+        {
+          "name": "zero-tolerance",
+          "status": -1,
+          "termination": "invalid_input"
+        },
+        {
+          "name": "nan-tolerance",
+          "status": -1,
+          "termination": "invalid_input"
+        },
+        {
+          "name": "zero-initial",
+          "status": -1,
+          "termination": "invalid_input"
+        },
+        {
+          "name": "invalid-capacity",
+          "status": -1,
+          "termination": "invalid_input"
+        },
+        {
+          "name": "nonfinite-action",
+          "status": 2,
+          "termination": "numerical_failure"
+        }
+      ],
+      "cli_checks": [
+        {
+          "name": "cli-a1-t1-s19",
+          "status": "passed",
+          "sidecar_sha256": "5d15e3f173815c03d8a335a2d387b6592513977e853ba17d5034310aa9566bb9",
+          "eigenvalues_sha256": "3d0e0e43de2c4d70151deaa11751d450f8d95a6bef4f9434961b7dc78b99da07",
+          "h_applications": 32
+        },
+        {
+          "name": "cli-a1-t1-s73",
+          "status": "passed",
+          "sidecar_sha256": "ee7f46fa5faaf5d5a32ba09d0e61503174c32058058e15aac85c1aa146aac2d2",
+          "eigenvalues_sha256": "3d0e0e43de2c4d70151deaa11751d450f8d95a6bef4f9434961b7dc78b99da07",
+          "h_applications": 32
+        },
+        {
+          "name": "cli-a1-t2-s19",
+          "status": "passed",
+          "sidecar_sha256": "3a3f4380d25352dbf1d70918300eb844eb448d98b58651351314448ef8a1b28e",
+          "eigenvalues_sha256": "3d0e0e43de2c4d70151deaa11751d450f8d95a6bef4f9434961b7dc78b99da07",
+          "h_applications": 32
+        },
+        {
+          "name": "cli-a1-t2-s73",
+          "status": "passed",
+          "sidecar_sha256": "d8e40814f6c0c19b8a5b6ef73c709a7880d31456e3772d5cf0b10e08b4063e6a",
+          "eigenvalues_sha256": "3d0e0e43de2c4d70151deaa11751d450f8d95a6bef4f9434961b7dc78b99da07",
+          "h_applications": 32
+        },
+        {
+          "name": "cli-a2-t1-s19",
+          "status": "passed",
+          "sidecar_sha256": "08b093c84b0d386aec048123b1b21467d91ffa5187993142c413abb3e7d0e8ed",
+          "eigenvalues_sha256": "c7f6e301b41acc3fbfd2e67d1dafa3260b8ccd392997f537998c1377326daf3c",
+          "h_applications": 500
+        },
+        {
+          "name": "cli-a2-t1-s73",
+          "status": "passed",
+          "sidecar_sha256": "77cc40298a5994de8d0edcc122f216fc428316c9afabb7782ce8e9454bdabfd7",
+          "eigenvalues_sha256": "f1cb2cfd0504b183b878ad283c2e51c96801e3899eb910994d1b24e2d1231f92",
+          "h_applications": 500
+        },
+        {
+          "name": "cli-a2-t2-s19",
+          "status": "passed",
+          "sidecar_sha256": "62a80d7d2570686e3cc7a3fde409c8b383f708cb56fee35a20bfe748471a76f1",
+          "eigenvalues_sha256": "c7f6e301b41acc3fbfd2e67d1dafa3260b8ccd392997f537998c1377326daf3c",
+          "h_applications": 500
+        },
+        {
+          "name": "cli-a2-t2-s73",
+          "status": "passed",
+          "sidecar_sha256": "0df0504f07024619e9a332ddda98ea0e878ef7dfae96a4273b089fad9e19bc83",
+          "eigenvalues_sha256": "c7f6e301b41acc3fbfd2e67d1dafa3260b8ccd392997f537998c1377326daf3c",
+          "h_applications": 550
+        },
+        {
+          "name": "explicit-initial-a1",
+          "status": "passed"
+        },
+        {
+          "name": "explicit-initial-a2",
+          "status": "passed"
+        },
+        {
+          "name": "seed-zero",
+          "status": "passed"
+        },
+        {
+          "name": "seed-max",
+          "status": "passed"
+        },
+        {
+          "name": "seed-min",
+          "status": "passed"
+        },
+        {
+          "name": "bad-seed",
+          "status": "passed",
+          "observed_exit": 1
+        },
+        {
+          "name": "overflow-seed",
+          "status": "passed",
+          "observed_exit": 1
+        },
+        {
+          "name": "short-vector",
+          "status": "passed",
+          "observed_exit": 1
+        },
+        {
+          "name": "zero-vector",
+          "status": "passed",
+          "observed_exit": 1
+        },
+        {
+          "name": "nonfinite-vector",
+          "status": "passed",
+          "observed_exit": 1
+        },
+        {
+          "name": "extra-vector",
+          "status": "passed",
+          "observed_exit": 1
+        },
+        {
+          "name": "existing-sidecar",
+          "status": "passed",
+          "observed_exit": 1
+        },
+        {
+          "name": "budget-a1",
+          "status": "passed",
+          "observed_exit": 1
+        },
+        {
+          "name": "budget-a2",
+          "status": "passed",
+          "observed_exit": 1
+        }
+      ],
+      "report_sha256": "6dd37fff8fa0a9e23b218bec7881052a7168d696b5d623a1911af80a55efc3d5"
+    },
+    "initial_diagnostics_log_sha256": "c32e800c87784501f53aa5aacb3f75b7f3704bc8ceb45ab1ee70649660f03f00",
+    "gradual_underflow": true,
+    "suites": {
+      "independent": {
+        "passed": 21,
+        "failed": 0,
+        "report_sha256": "5140865e8a7f80bc94da6a2e1e19eee7cc49bc5737131b85d8dbf427e0f15dfb"
+      },
+      "fields": {
+        "cli_counts": {
+          "passed": 70,
+          "failed": 0
+        },
+        "operator_counts": {
+          "passed": 10,
+          "failed": 0
+        },
+        "permutation_counts": {
+          "passed": 28,
+          "failed": 0
+        },
+        "report_sha256": "6d1dec3880337dcf82eca532b4d802b0bfa39aeaf66e47a8fb3a4d00b831b285"
+      },
+      "stability": {
+        "passed": 82,
+        "failed": 0,
+        "report_sha256": "1d16db439974127fe157b90f09fc6e98f432575bd2ea627b117c7bb2103b24c2"
+      },
+      "stability-cli": {
+        "passed": 26,
+        "failed": 0,
+        "report_sha256": "4fe0826ba59356afc52e87f463b6eb9a65d8b5cdce79445b15972be6865b6b73"
+      },
+      "stress": {
+        "counts": {
+          "accepted_accuracy_or_inclusion_warning": 135,
+          "accepted_strict": 164,
+          "nonconvergence": 119
+        },
+        "report_sha256": "786206688afc2193d9ca7874d745ff6c9f8bb7cb4186f4e42317c6533fc37072"
+      },
+      "precision": {
+        "counts": {
+          "accepted_reference_targets": 92,
+          "nonconvergence": 30,
+          "accepted_accuracy_or_inclusion_warning": 14
+        },
+        "report_sha256": "7f745cbffb816771d38649ced54977b29236f1df45496717fdbf46146a236491"
+      },
+      "standard": {
+        "passed": 1,
+        "failed": 0,
+        "log_sha256": "5327623a93095692b20eb9871191ae5db11e9503905ce34445938ce72cfe09ca"
+      },
+      "lapack": {
+        "passed": 11,
+        "failed": 0,
+        "log_sha256": "6a3881b5c03ca7acfad5703c0434dc845fdf6f794524dde2555f95082dac17b9"
+      },
+      "extended": {
+        "passed": 9,
+        "failed": 0,
+        "log_sha256": "6200bf1dd08733f9f543dbada7da676bc335740f7d1a56b2143ebb0ac4c234fe"
+      },
+      "historical": {
+        "passed": 27,
+        "failed": 0,
+        "report_sha256": "5ce4e27585febcaef21a56dac90bfd8f90d3e92d941eaff2c49f7be8b6711f16"
+      },
+      "acceptance": {
+        "counts": {
+          "observable_agreement": 768,
+          "solver_failure": 256
+        },
+        "report_sha256": "f43c9979aed9eceb153ad9023b3e85542db4cbc15937c5d8998ea97f3fd8e692",
+        "failure_eigenvalue_files": 0
+      }
+    }
+  },
+  "default": {
+    "schema": 1,
+    "harness_sha256": "6e675e179c101182b6fcb08b128bb50c379f2a9c75c3a8d04be4303e3c5b22d1",
+    "driver_sha256": "a9d564b161e1ace1e400995ea5a06d785e536d4d3e3a433b03abd182d18965a9",
+    "before_driver_sha256": "4a48161899e91bbec32151755bfe0a319487302b1557d687d72acb4548a68639",
+    "executable_sha256": "6375f4eb8da23a864f62c3df31a935c0d0257c0fcbb231e268ca9f250750dced",
+    "before_equivalence": 146,
+    "cli": {
+      "paired": [
+        {
+          "alg": 1,
+          "threads": 1,
+          "strict_exit": 0,
+          "strict_residuals": [
+            2.981911571442459e-16
+          ],
+          "failure_status": 1,
+          "failure_reason": "maximum iterations without requested residual convergence"
+        },
+        {
+          "alg": 1,
+          "threads": 2,
+          "strict_exit": 0,
+          "strict_residuals": [
+            3.0437477091980992e-16
+          ],
+          "failure_status": 1,
+          "failure_reason": "maximum iterations without requested residual convergence"
+        },
+        {
+          "alg": 2,
+          "threads": 1,
+          "strict_exit": 0,
+          "strict_residuals": [
+            2.237125951046781e-15,
+            3.248174054381453e-15
+          ],
+          "failure_status": 1,
+          "failure_reason": "maximum restart iterations without requested residual convergence"
+        },
+        {
+          "alg": 2,
+          "threads": 2,
+          "strict_exit": 0,
+          "strict_residuals": [
+            1.968050855405482e-15,
+            2.7216653950107044e-15
+          ],
+          "failure_status": 1,
+          "failure_reason": "maximum restart iterations without requested residual convergence"
+        }
+      ],
+      "invalid_rejections": 12,
+      "relative_cli": 2,
+      "combined_cli": 2
+    },
+    "invalid_kernel": [
+      {
+        "alg": 1,
+        "index": 0,
+        "reason": "at least one positive residual tolerance is required"
+      },
+      {
+        "alg": 1,
+        "index": 1,
+        "reason": "negative residual tolerance or operator scale"
+      },
+      {
+        "alg": 1,
+        "index": 2,
+        "reason": "nonfinite residual policy parameter"
+      },
+      {
+        "alg": 1,
+        "index": 3,
+        "reason": "relative residual tolerance requires an explicit H-origin*I scale"
+      },
+      {
+        "alg": 1,
+        "index": 4,
+        "reason": "negative residual tolerance or operator scale"
+      },
+      {
+        "alg": 1,
+        "index": 5,
+        "reason": "residual threshold overflows for the supplied scale"
+      },
+      {
+        "alg": 2,
+        "index": 0,
+        "reason": "at least one positive residual tolerance is required"
+      },
+      {
+        "alg": 2,
+        "index": 1,
+        "reason": "negative residual tolerance or operator scale"
+      },
+      {
+        "alg": 2,
+        "index": 2,
+        "reason": "nonfinite residual policy parameter"
+      },
+      {
+        "alg": 2,
+        "index": 3,
+        "reason": "relative residual tolerance requires an explicit H-origin*I scale"
+      },
+      {
+        "alg": 2,
+        "index": 4,
+        "reason": "negative residual tolerance or operator scale"
+      },
+      {
+        "alg": 2,
+        "index": 5,
+        "reason": "residual threshold overflows for the supplied scale"
+      }
+    ],
+    "overflow_guards": 2,
+    "summary": {
+      "legacy": {
+        "0": 115,
+        "1": 31
+      },
+      "policies": {
+        "atol-1e-10": {
+          "0": 102,
+          "1": 44
+        },
+        "rtol-1e-10-centered": {
+          "0": 106,
+          "1": 38,
+          "2": 2
+        },
+        "atol-1e-300": {
+          "1": 130,
+          "0": 11,
+          "2": 5
+        }
+      }
+    },
+    "raw_report_sha256": "c0eee0fee5952a71fe1141f838a4a6f57522b2f0065b60436252d2723a8c86f8",
+    "transitions": {
+      "atol-1e-10": {
+        "0->0": 102,
+        "1->1": 31,
+        "0->1": 13
+      },
+      "rtol-1e-10-centered": {
+        "0->0": 106,
+        "1->1": 31,
+        "0->1": 7,
+        "0->2": 2
+      },
+      "atol-1e-300": {
+        "0->1": 99,
+        "1->1": 31,
+        "0->0": 11,
+        "0->2": 5
+      }
+    },
+    "relative_cli_scale_checks": 3,
+    "final_diagnostics": {
+      "schema": 1,
+      "driver_sha256": "b1a1fb1034d136bc1b529e6e3ae334269ab240867ae692f7d4b7e8785c29d563",
+      "before_driver_sha256": "4dd58657f28966bbfcdbb82fc2f4199ec8d521f4ae457263a035711bd558d0dd",
+      "executable_sha256": "6375f4eb8da23a864f62c3df31a935c0d0257c0fcbb231e268ca9f250750dced",
+      "harness_sha256": "9d0aabafe80e35e33ecda5f0615b831d788089f7c30746171d740039ad420e09",
+      "comparison_cases": 136,
+      "before_comparisons": 136,
+      "diagnostic_solver_statuses": {
+        "0": 105,
+        "1": 31
+      },
+      "seeded_replays": [
+        {
+          "id": "0000-t1",
+          "status": 0,
+          "h_calls": 62,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0000-t2",
+          "status": 0,
+          "h_calls": 64,
+          "seed": 19,
+          "threads": 2
+        },
+        {
+          "id": "0004-t1",
+          "status": 0,
+          "h_calls": 1020,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0004-t2",
+          "status": 0,
+          "h_calls": 1020,
+          "seed": 19,
+          "threads": 2
+        },
+        {
+          "id": "0016-t1",
+          "status": 0,
+          "h_calls": 36,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0016-t2",
+          "status": 0,
+          "h_calls": 38,
+          "seed": 19,
+          "threads": 2
+        },
+        {
+          "id": "0020-t1",
+          "status": 0,
+          "h_calls": 980,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0020-t2",
+          "status": 0,
+          "h_calls": 940,
+          "seed": 19,
+          "threads": 2
+        },
+        {
+          "id": "0032-t1",
+          "status": 0,
+          "h_calls": 2,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0032-t2",
+          "status": 0,
+          "h_calls": 2,
+          "seed": 19,
+          "threads": 2
+        },
+        {
+          "id": "0034-t1",
+          "status": 0,
+          "h_calls": 2,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0034-t2",
+          "status": 0,
+          "h_calls": 2,
+          "seed": 19,
+          "threads": 2
+        },
+        {
+          "id": "0042-t1",
+          "status": 0,
+          "h_calls": 2,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0042-t2",
+          "status": 0,
+          "h_calls": 2,
+          "seed": 19,
+          "threads": 2
+        },
+        {
+          "id": "0043-t1",
+          "status": 0,
+          "h_calls": 2,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0043-t2",
+          "status": 0,
+          "h_calls": 2,
+          "seed": 19,
+          "threads": 2
+        },
+        {
+          "id": "0044-t1",
+          "status": 0,
+          "h_calls": 32,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0044-t2",
+          "status": 0,
+          "h_calls": 32,
+          "seed": 19,
+          "threads": 2
+        },
+        {
+          "id": "0047-t1",
+          "status": 0,
+          "h_calls": 32,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0047-t2",
+          "status": 0,
+          "h_calls": 32,
+          "seed": 19,
+          "threads": 2
+        },
+        {
+          "id": "0050-t1",
+          "status": 0,
+          "h_calls": 520,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0050-t2",
+          "status": 0,
+          "h_calls": 520,
+          "seed": 19,
+          "threads": 2
+        },
+        {
+          "id": "0053-t1",
+          "status": 1,
+          "h_calls": 10000,
+          "seed": 19,
+          "threads": 1
+        },
+        {
+          "id": "0053-t2",
+          "status": 1,
+          "h_calls": 10000,
+          "seed": 19,
+          "threads": 2
+        }
+      ],
+      "error_paths": [
+        {
+          "name": "zero-budget",
+          "status": -1,
+          "termination": "invalid_input"
+        },
+        {
+          "name": "zero-tolerance",
+          "status": -1,
+          "termination": "invalid_input"
+        },
+        {
+          "name": "nan-tolerance",
+          "status": -1,
+          "termination": "invalid_input"
+        },
+        {
+          "name": "zero-initial",
+          "status": -1,
+          "termination": "invalid_input"
+        },
+        {
+          "name": "invalid-capacity",
+          "status": -1,
+          "termination": "invalid_input"
+        },
+        {
+          "name": "nonfinite-action",
+          "status": 2,
+          "termination": "numerical_failure"
+        }
+      ],
+      "cli_checks": [
+        {
+          "name": "cli-a1-t1-s19",
+          "status": "passed",
+          "sidecar_sha256": "d411af7b0852fc1767e3c54d690aac6382a24a76c96cfb7e6dcccef3243c3400",
+          "eigenvalues_sha256": "3d0e0e43de2c4d70151deaa11751d450f8d95a6bef4f9434961b7dc78b99da07",
+          "h_applications": 32
+        },
+        {
+          "name": "cli-a1-t1-s73",
+          "status": "passed",
+          "sidecar_sha256": "5fef3d608e5dcad103c325f32d54a8f82283f961388ef9d86eda75e2f8d576ce",
+          "eigenvalues_sha256": "3d0e0e43de2c4d70151deaa11751d450f8d95a6bef4f9434961b7dc78b99da07",
+          "h_applications": 32
+        },
+        {
+          "name": "cli-a1-t2-s19",
+          "status": "passed",
+          "sidecar_sha256": "fdfbc268c8aaaf37ed29fc91740beca9cd2777a0d553b01c69cd377153f49a74",
+          "eigenvalues_sha256": "3d0e0e43de2c4d70151deaa11751d450f8d95a6bef4f9434961b7dc78b99da07",
+          "h_applications": 32
+        },
+        {
+          "name": "cli-a1-t2-s73",
+          "status": "passed",
+          "sidecar_sha256": "7006e9c161f636bef73fc477e46004c05d70cabf717990dfe4519dd5061d19d7",
+          "eigenvalues_sha256": "a6e8de0bf07d55bf12f5133607d20751b84953897a0ed74998470f5b36c8324c",
+          "h_applications": 32
+        },
+        {
+          "name": "cli-a2-t1-s19",
+          "status": "passed",
+          "sidecar_sha256": "9a818e3fc4f36da3f307702c213609f4d0bbe2d315d1340830d66345de064a84",
+          "eigenvalues_sha256": "06a43b38449c8358178b1c1667496c3f16b7c628f07a977db2409ec32ab1d981",
+          "h_applications": 470
+        },
+        {
+          "name": "cli-a2-t1-s73",
+          "status": "passed",
+          "sidecar_sha256": "4db7a2826db92880fda52b68a93ae7ba098fb9162ddbb3037add183438951d7e",
+          "eigenvalues_sha256": "06a43b38449c8358178b1c1667496c3f16b7c628f07a977db2409ec32ab1d981",
+          "h_applications": 500
+        },
+        {
+          "name": "cli-a2-t2-s19",
+          "status": "passed",
+          "sidecar_sha256": "a6d8a1dd4476a0b9103b889c8ba4540fa913cd29015df29f18e5b78dfc2cb833",
+          "eigenvalues_sha256": "c7f6e301b41acc3fbfd2e67d1dafa3260b8ccd392997f537998c1377326daf3c",
+          "h_applications": 550
+        },
+        {
+          "name": "cli-a2-t2-s73",
+          "status": "passed",
+          "sidecar_sha256": "e1d66351af8ba4002f3a1dfdbaa30458ef6d11c0cb1bb33d24e07b8be03c7268",
+          "eigenvalues_sha256": "f34dabc70149e8e280400bc0f3516dc0401d2f01583e09bbde35b18ad1509fc5",
+          "h_applications": 520
+        },
+        {
+          "name": "explicit-initial-a1",
+          "status": "passed"
+        },
+        {
+          "name": "explicit-initial-a2",
+          "status": "passed"
+        },
+        {
+          "name": "seed-zero",
+          "status": "passed"
+        },
+        {
+          "name": "seed-max",
+          "status": "passed"
+        },
+        {
+          "name": "seed-min",
+          "status": "passed"
+        },
+        {
+          "name": "bad-seed",
+          "status": "passed",
+          "observed_exit": 1
+        },
+        {
+          "name": "overflow-seed",
+          "status": "passed",
+          "observed_exit": 1
+        },
+        {
+          "name": "short-vector",
+          "status": "passed",
+          "observed_exit": 1
+        },
+        {
+          "name": "zero-vector",
+          "status": "passed",
+          "observed_exit": 1
+        },
+        {
+          "name": "nonfinite-vector",
+          "status": "passed",
+          "observed_exit": 1
+        },
+        {
+          "name": "extra-vector",
+          "status": "passed",
+          "observed_exit": 1
+        },
+        {
+          "name": "existing-sidecar",
+          "status": "passed",
+          "observed_exit": 1
+        },
+        {
+          "name": "budget-a1",
+          "status": "passed",
+          "observed_exit": 1
+        },
+        {
+          "name": "budget-a2",
+          "status": "passed",
+          "observed_exit": 1
+        }
+      ],
+      "report_sha256": "1e11947961c22b99be0dfbc893da73db4e185a67a305dadc98745ac7cfe0154f"
+    },
+    "initial_diagnostics_log_sha256": "1df0740c48a1c81b4e27e08f85517f0cce6108976fe20d3bf837a39aab551661",
+    "gradual_underflow": false,
+    "suites": {
+      "independent": {
+        "passed": 21,
+        "failed": 0,
+        "report_sha256": "bb11f02ec5b4f22976f6246ea46a137bf54bc217e0cca1ca0305c58300172630"
+      },
+      "fields": {
+        "cli_counts": {
+          "passed": 70,
+          "failed": 0
+        },
+        "operator_counts": {
+          "passed": 10,
+          "failed": 0
+        },
+        "permutation_counts": {
+          "passed": 28,
+          "failed": 0
+        },
+        "report_sha256": "f254c705a12cb87bbc0779d39b6ab44b15e1f867c1716c1ccecd70de6b84c39c"
+      },
+      "stability": {
+        "passed": 82,
+        "failed": 0,
+        "report_sha256": "7a7e86cfa3e238b620e457da1042659285b935a3c5ad4f88026cf1438037809a"
+      },
+      "stability-cli": {
+        "passed": 26,
+        "failed": 0,
+        "report_sha256": "beb010e0834771d5a7a92e7a68a5c6909b8af448a5657ab4fd44cab16e903b92"
+      },
+      "stress": {
+        "counts": {
+          "accepted_accuracy_or_inclusion_warning": 134,
+          "accepted_strict": 163,
+          "nonconvergence": 121
+        },
+        "report_sha256": "4e15e2c2b7ee4ade418ba97265da870134de568eee7fbcb6a6be9075af390339"
+      },
+      "precision": {
+        "counts": {
+          "accepted_reference_targets": 92,
+          "nonconvergence": 31,
+          "accepted_accuracy_or_inclusion_warning": 13
+        },
+        "report_sha256": "a4c2f579d5823ee341c4ffc8bf93729ac3c640d75c1d265f23e7facd449f6d86"
+      },
+      "standard": {
+        "passed": 1,
+        "failed": 0,
+        "log_sha256": "5691a06ac8ba05dd8d30e92c42eeaba387ac35e15d7a17e0a43b19efa14dbf5e"
+      },
+      "lapack": {
+        "passed": 11,
+        "failed": 0,
+        "log_sha256": "76af770ae0fb6de09daafd7b6ad1b6ad92c23c891c835a791497b3bb78acb12d"
+      },
+      "extended": {
+        "status": "unrun in supplemental quick profile"
+      },
+      "historical": {
+        "status": "unrun in supplemental quick profile"
+      },
+      "acceptance": {
+        "status": "unrun in supplemental quick profile"
+      }
+    }
+  }
+}

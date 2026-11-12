@@ -56,6 +56,7 @@ def build(repo,output,fc,flags,source_archives=None):
         if label=='phase1c':names.insert(0,'krylov_solvers')
         names.insert(0,'blas_lapack_interfaces')
         if (src/'krylov_observations.f90').exists():names.insert(1,'krylov_observations')
+        if (src/'krylov_residual_policy.f90').exists():names.insert(1,'krylov_residual_policy')
         with (output/f'{label}-build.log').open('w') as log:
             subprocess.run([fc,*flags.split(),'-c',str(probe)],cwd=src,stdout=log,stderr=subprocess.STDOUT,check=True)
             for name in names:subprocess.run([fc,*flags.split(),'-c',name+'.f90'],cwd=src,stdout=log,stderr=subprocess.STDOUT,check=True)

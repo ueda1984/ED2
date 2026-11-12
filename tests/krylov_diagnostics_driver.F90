@@ -16,6 +16,7 @@ end module diagnostic_operator
 ! Python independently; no production Hamiltonian/symmetry code is replaced.
 program krylov_diagnostics_driver
   use iso_fortran_env, only: int64
+  use, intrinsic :: ieee_arithmetic, only: ieee_get_underflow_mode
   use diagnostic_operator, only: h,apply,h_calls
   use omp_lib, only: omp_get_thread_num,omp_get_max_threads,omp_get_wtime
   use krylov_solvers, only: lanczos_ground, restarted_hermitian
@@ -27,7 +28,7 @@ program krylov_diagnostics_driver
   type(krylov_diagnostics), allocatable :: observation
   integer, allocatable :: seed_option
 #endif
-  logical :: enable_diagnostics=.true.,use_seed_option=.false.
+  logical :: enable_diagnostics=.true.,use_seed_option=.false.,gradual_underflow
   integer :: seed,seed_size,tid,k,ios,peak_rss
   character(256) :: line
   integer, allocatable :: seed_state(:),seed_records(:,:)
@@ -107,6 +108,11 @@ program krylov_diagnostics_driver
     end if
   end if
   elapsed=omp_get_wtime()-started
+  ! Query only: do not modify the caller's arithmetic mode or convergence rules.
+  call ieee_get_underflow_mode(gradual_underflow)
+  open(78,file='float-mode.dat',status='new')
+  write(78,'(l1)')gradual_underflow
+  close(78)
 #ifdef PHASE1F
   if(allocated(observation))call write_krylov_diagnostics('diagnostics.dat',observation)
 #endif
