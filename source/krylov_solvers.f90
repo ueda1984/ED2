@@ -3,9 +3,11 @@ module krylov_solvers
   use iso_fortran_env, only: int64
   use blas_lapack_interfaces, only: dznrm2, zdotc, dstevx, zheevr, zgemm, dlamch, &
     check_lapack_info, zheevr_workspace_lengths
+  use krylov_observations, only: krylov_diagnostics,begin_observation,finish_observation,observe_pair,observe_gram
+  !$ use omp_lib, only: omp_get_thread_num,omp_get_num_threads
   implicit none
   private
-  public :: lanczos_ground, restarted_hermitian, energy_change, residual_limit
+  public :: lanczos_ground, restarted_hermitian, energy_change, residual_limit, krylov_diagnostics
   public :: finite_real, normalize_vector
   abstract interface
     subroutine operator_action(n,x,y)
@@ -59,18 +61,64 @@ contains
     limit=64d0*epsilon(1d0)*max(scale,tiny(1d0))
   end function near_limit
 
-  subroutine random_start(x)
+  subroutine random_start(x,seed,draw_index,diagnostics)
     complex(8), intent(out) :: x(:)
-    integer :: i
+    integer, intent(in), optional :: seed
+    integer, intent(inout) :: draw_index
+    type(krylov_diagnostics), intent(inout), optional :: diagnostics
+    integer :: i,k,tid,nseed
+    integer, allocatable :: saved(:),state(:)
     real(8) :: v(2)
+    if(present(seed))then
+      call random_seed(size=nseed)
+      if(present(diagnostics))then
+        if(.not.allocated(diagnostics%rng_initial_state))then
+          allocate(diagnostics%rng_initial_state(nseed,diagnostics%max_threads))
+          diagnostics%rng_initial_state=0
+        end if
+      end if
+      ! An explicitly seeded draw preserves each participating thread's ambient
+      ! intrinsic RNG state. The default branch below is the original loop.
+      !$omp parallel private(saved,state,tid,k,i,v)
+      allocate(saved(nseed),state(nseed))
+      tid=0
+      !$ tid=omp_get_thread_num()
+      call random_seed(get=saved)
+      do k=1,nseed
+        state(k)=int(modulo(int(seed,int64)+104729_int64*tid+37_int64*k+ &
+                           1000003_int64*draw_index,int(huge(1)-1,int64)))
+      end do
+      if(present(diagnostics))then
+        !$omp single
+        diagnostics%rng_active_threads=1
+        !$ diagnostics%rng_active_threads=omp_get_num_threads()
+        !$omp end single
+        if(draw_index==0)diagnostics%rng_initial_state(:,tid+1)=state
+      end if
+      call random_seed(put=state)
+      !$omp do schedule(static)
+      do i=1,size(x)
+        call random_number(v)
+        x(i)=cmplx(v(1)-0.5d0,v(2)-0.5d0,8)
+      end do
+      !$omp end do
+      call random_seed(put=saved)
+      deallocate(saved,state)
+      !$omp end parallel
+      draw_index=draw_index+1
+      return
+    end if
     !$omp parallel do private(i,v)
     do i=1,size(x)
       call random_number(v)
       x(i)=cmplx(v(1)-0.5d0,v(2)-0.5d0,8)
     end do
+    draw_index=draw_index+1
   end subroutine random_start
 
-  subroutine lanczos_ground(apply,n,tol,maxiter,miniter,interval,value,vector,iterations,status,reason,residual,initial)
+  ! Optional trailing arguments preserve every existing call site.
+  subroutine lanczos_ground(apply,n,tol,maxiter,miniter,interval,value,vector, &
+                            iterations,status,reason,residual,initial,diagnostics,rng_seed)
     procedure(operator_action) :: apply
     integer, intent(in) :: n,maxiter,miniter,interval
     real(8), intent(in) :: tol
@@ -79,12 +127,55 @@ contains
     integer, intent(out) :: iterations,status
     character(*), intent(out) :: reason
     complex(8), intent(in), optional :: initial(n)
+    type(krylov_diagnostics), intent(out), optional :: diagnostics
+    integer, intent(in), optional :: rng_seed
+    if(present(diagnostics))call begin_observation(diagnostics,1,n,1,maxiter,tol,present(initial),rng_seed)
+    call lanczos_ground_core(apply,n,tol,maxiter,miniter,interval,value,vector, &
+                             iterations,status,reason,residual,initial,diagnostics,rng_seed)
+    if(present(diagnostics))call finish_observation(diagnostics,status,reason,iterations)
+  end subroutine
+
+  subroutine restarted_hermitian(apply,n,wanted,keep,capacity,tol,maxcycles,values,vectors,iterations, &
+                                status,reason,residuals,initial,diagnostics,rng_seed)
+    procedure(operator_action) :: apply
+    integer, intent(in) :: n,wanted,keep,capacity,maxcycles
+    real(8), intent(in) :: tol
+    real(8), intent(out) :: values(:),residuals(wanted)
+    complex(8), intent(out) :: vectors(n,wanted)
+    integer, intent(out) :: iterations,status
+    character(*), intent(out) :: reason
+    complex(8), intent(in), optional :: initial(n)
+    type(krylov_diagnostics), intent(out), optional :: diagnostics
+    integer, intent(in), optional :: rng_seed
+    if(present(diagnostics))call begin_observation(diagnostics,2,n,wanted,maxcycles,tol,present(initial),rng_seed)
+    call restarted_hermitian_core(apply,n,wanted,keep,capacity,tol,maxcycles,values,vectors,iterations, &
+                                  status,reason,residuals,initial,diagnostics,rng_seed)
+    if(present(diagnostics))then
+      call observe_gram(diagnostics,vectors)
+      call finish_observation(diagnostics,status,reason,iterations)
+    end if
+  end subroutine
+
+  subroutine lanczos_ground_core(apply,n,tol,maxiter,miniter,interval,value,vector, &
+                                 iterations,status,reason,residual,initial,diagnostics,rng_seed)
+    procedure(operator_action) :: apply
+    integer, intent(in) :: n,maxiter,miniter,interval
+    real(8), intent(in) :: tol
+    real(8), intent(out) :: value,residual
+    complex(8), intent(out) :: vector(n)
+    integer, intent(out) :: iterations,status
+    character(*), intent(out) :: reason
+    complex(8), intent(in), optional :: initial(n)
+    type(krylov_diagnostics), intent(inout), optional :: diagnostics
+    integer, intent(in), optional :: rng_seed
+    integer :: draw_index
     complex(8), allocatable :: q(:,:),start(:),r(:),candidate(:),action(:)
     real(8), allocatable :: alpha(:),beta(:),d(:),e(:),w(:),z(:,:),work(:)
     integer, allocatable :: iwork(:),ifail(:)
     integer :: k,limit,info,m
     real(8) :: scale,hnorm,previous,change,bnorm
     logical :: breakdown,have_previous,energy_ok,qualified
+    draw_index=0
     status=1;reason='maximum iterations without convergence';iterations=0
     value=0d0;residual=huge(1d0);vector=(0d0,0d0)
     if(n<1 .or. maxiter<1 .or. miniter<0 .or. interval<1 .or. .not.finite_real(tol))then
@@ -94,11 +185,15 @@ contains
       status=-1;reason='invalid Lanczos tolerance';return
     end if
     limit=min(n,maxiter)
+    if(present(diagnostics))then
+      diagnostics%effective_budget=limit;diagnostics%miniter=miniter;diagnostics%interval=interval
+      diagnostics%scale_provenance='max observed ||Hq|| and |alpha| in first recurrence; estimate, not a spectral bound'
+    end if
     allocate(q(n,3),start(n),r(n),candidate(n),action(n),alpha(limit),beta(0:limit))
     if(present(initial))then
       start=initial
     else
-      call random_start(start)
+      call random_start(start,rng_seed,draw_index,diagnostics)
     end if
     if(.not.normalize_vector(start))then
       status=-1;reason='invalid initial vector';return
@@ -106,6 +201,7 @@ contains
     q=(0d0,0d0);q(:,1)=start;beta=0d0;scale=0d0;have_previous=.false.;previous=0d0
     do k=1,limit
       iterations=k
+      if(present(diagnostics)) diagnostics%h_applications=diagnostics%h_applications+1_int64
       call apply(n,q(:,1),action)
       hnorm=dznrm2(n,action,1)
       alpha(k)=real(zdotc(n,q(:,1),1,action,1),8)
@@ -113,6 +209,11 @@ contains
         status=2;reason='nonfinite operator action';return
       end if
       scale=max(scale,hnorm,abs(alpha(k)))
+      if(present(diagnostics))then
+        diagnostics%operator_scale=scale;diagnostics%breakdown_threshold=near_limit(scale)
+        diagnostics%scale_available=.true.
+        diagnostics%random_vectors=draw_index
+      end if
       r=action-alpha(k)*q(:,1)
       if(k>1) r=r-beta(k-1)*q(:,3)
       bnorm=dznrm2(n,r,1);beta(k)=bnorm
@@ -120,6 +221,11 @@ contains
         status=2;reason='nonfinite Lanczos beta';return
       end if
       breakdown=bnorm<=near_limit(scale)
+      if(present(diagnostics))then
+        diagnostics%last_beta=bnorm
+        if(breakdown .and. bnorm==0d0) diagnostics%exact_closures=diagnostics%exact_closures+1
+        if(breakdown .and. bnorm>0d0) diagnostics%near_closures=diagnostics%near_closures+1
+      end if
       if(breakdown .or. k==limit .or. (k>=miniter .and. mod(k,interval)==0))then
         allocate(d(k),e(max(1,k-1)),w(k),z(k,1),work(5*k),iwork(5*k),ifail(k))
         if(k==1)then
@@ -132,15 +238,24 @@ contains
         value=w(1);change=1d0
         if(have_previous) change=energy_change(previous,value,scale)
         energy_ok=have_previous .and. change<tol
+        if(present(diagnostics))then
+          diagnostics%energy_change=change;diagnostics%energy_change_available=have_previous
+          diagnostics%energy_gate_satisfied=energy_ok
+        end if
         write(*,'("itr, ene, conv: ",i5,es25.15,es11.1)') k,value,change
         if(breakdown .or. k==limit .or. energy_ok)then
           call reconstruct(k,z(:,1),candidate)
           if(.not.normalize_vector(candidate))then
             status=2;reason='invalid reconstructed eigenvector';return
           end if
+          if(present(diagnostics)) diagnostics%h_applications=diagnostics%h_applications+1_int64
           call apply(n,candidate,action)
           residual=dznrm2(n,action-value*candidate,1)
           qualified=finite_real(residual)
+          if(qualified)then
+            if(present(diagnostics)) call observe_pair(diagnostics,1,1,value,candidate,action, &
+                                                       residual,residual_limit(tol,scale,value))
+          end if
           if(qualified) qualified=residual<=residual_limit(tol,scale,value)
           if(qualified .and. (energy_ok .or. breakdown .or. k==n))then
             vector=candidate;status=0
@@ -181,6 +296,7 @@ contains
       allocate(basis(n,3),hv(n))
       basis=(0d0,0d0);basis(:,1)=start;out=coeff(1)*start
       do step=1,count-1
+        if(present(diagnostics)) diagnostics%h_applications=diagnostics%h_applications+1_int64
         call apply(n,basis(:,1),hv)
         hv=hv-alpha(step)*basis(:,1)
         if(step>1) hv=hv-beta(step-1)*basis(:,3)
@@ -190,7 +306,7 @@ contains
         out=out+coeff(step+1)*basis(:,1)
       end do
     end subroutine reconstruct
-  end subroutine lanczos_ground
+  end subroutine lanczos_ground_core
 
   subroutine orthogonalize(x,q,m)
     complex(8), intent(inout) :: x(:)
@@ -226,8 +342,8 @@ contains
     end do
   end function complement
 
-  subroutine restarted_hermitian(apply,n,wanted,keep,capacity,tol,maxcycles,values,vectors,iterations, &
-                                  status,reason,residuals,initial)
+  subroutine restarted_hermitian_core(apply,n,wanted,keep,capacity,tol,maxcycles,values,vectors,iterations, &
+                                       status,reason,residuals,initial,diagnostics,rng_seed)
     procedure(operator_action) :: apply
     integer, intent(in) :: n,wanted,keep,capacity,maxcycles
     real(8), intent(in) :: tol
@@ -236,6 +352,9 @@ contains
     integer, intent(out) :: iterations,status
     character(*), intent(out) :: reason
     complex(8), intent(in), optional :: initial(n)
+    type(krylov_diagnostics), intent(inout), optional :: diagnostics
+    integer, intent(in), optional :: rng_seed
+    integer :: draw_index
     complex(8), allocatable :: q(:,:),hq(:,:),t(:,:),z(:,:),ritz(:,:),x(:),work(:)
     real(8), allocatable :: eig(:),rwork(:),previous(:)
     integer, allocatable :: support(:),iwork(:)
@@ -243,6 +362,7 @@ contains
     real(8) :: rquery(1),scale,bnorm,change,closure,hnorm
     integer :: iquery(1),info,lw,lrw,liw,count,cap,retained,m,cursor,cycle,j,flag,seeds
     logical :: found,certified,have_previous
+    draw_index=0
     status=1;reason='maximum restart iterations without convergence';iterations=0
     values=0d0;vectors=(0d0,0d0);residuals=huge(1d0)
     if(n<1 .or. wanted<1 .or. wanted>n .or. keep<wanted .or. capacity<keep .or. maxcycles<1)then
@@ -252,6 +372,9 @@ contains
       status=-1;reason='invalid thick-restart tolerance';return
     end if
     cap=min(capacity,n);retained=min(keep,cap)
+    if(present(diagnostics))then
+      diagnostics%effective_budget=maxcycles;diagnostics%keep=retained;diagnostics%capacity=cap
+    end if
     if(size(values)<cap .or. (retained==cap .and. cap<n))then
       status=-1;reason='no expansion space for thick restart';return
     end if
@@ -268,7 +391,7 @@ contains
       if(j==1 .and. present(initial))then
         x=initial
       else
-        call random_start(x)
+        call random_start(x,rng_seed,draw_index,diagnostics)
       end if
       if(j==1)then
         if(.not.normalize_vector(x))then
@@ -286,14 +409,25 @@ contains
         status=2;reason='cannot initialize orthogonal restart block';return
       end if
       m=m+1;q(:,m)=x
+      if(present(diagnostics)) diagnostics%h_applications=diagnostics%h_applications+1_int64
       call apply(n,x,hq(:,m));iterations=iterations+1
       hnorm=dznrm2(n,hq(:,m),1)
       if(.not.finite_real(hnorm))then
         status=2;reason='nonfinite operator action';return
       end if
       scale=max(scale,hnorm)
+      if(present(diagnostics))then
+        diagnostics%operator_scale=scale;diagnostics%breakdown_threshold=near_limit(scale)
+        diagnostics%scale_available=.true.
+        diagnostics%random_vectors=draw_index
+      end if
     end do
     do cycle=1,maxcycles
+      if(present(diagnostics))then
+        diagnostics%cycles=cycle
+        if(allocated(diagnostics%pair_available))diagnostics%pair_available=.false.
+        diagnostics%orthogonality_available=.false.
+      end if
       cursor=1
       do while(m<cap)
         found=.false.
@@ -304,8 +438,13 @@ contains
           if(.not.finite_real(bnorm))then
             status=2;reason='nonfinite restart beta';return
           end if
+          if(present(diagnostics))diagnostics%last_beta=bnorm
           if(bnorm>near_limit(scale))then
             found=normalize_vector(x);exit
+          end if
+          if(present(diagnostics))then
+            if(bnorm==0d0)diagnostics%exact_closures=diagnostics%exact_closures+1
+            if(bnorm>0d0)diagnostics%near_closures=diagnostics%near_closures+1
           end if
           if(bnorm==0d0)then
             write(*,'(a,i0)') 'Exact Krylov block closure; orthogonal continuation after column ',cursor-1
@@ -316,12 +455,18 @@ contains
         if(.not.found) found=complement(q,m,x)
         if(.not.found) exit
         m=m+1;q(:,m)=x
+        if(present(diagnostics)) diagnostics%h_applications=diagnostics%h_applications+1_int64
         call apply(n,x,hq(:,m));iterations=iterations+1
         hnorm=dznrm2(n,hq(:,m),1)
         if(.not.finite_real(hnorm))then
           status=2;reason='nonfinite operator action';return
         end if
         scale=max(scale,hnorm)
+        if(present(diagnostics))then
+          diagnostics%operator_scale=scale;diagnostics%breakdown_threshold=near_limit(scale)
+        diagnostics%scale_available=.true.
+          diagnostics%random_vectors=draw_index
+        end if
       end do
       ! Compute the Hermitian Rayleigh-Ritz projection from actual H actions.
       ! This also handles closed blocks and complex restart couplings correctly.
@@ -354,11 +499,14 @@ contains
         if(.not.normalize_vector(vectors(:,j)))then
           status=2;reason='invalid Ritz vector';return
         end if
+        if(present(diagnostics)) diagnostics%h_applications=diagnostics%h_applications+1_int64
         call apply(n,vectors(:,j),x);iterations=iterations+1
         residuals(j)=dznrm2(n,x-eig(j)*vectors(:,j),1)
         if(.not.finite_real(residuals(j)))then
           status=2;reason='nonfinite Ritz residual';return
         end if
+        if(present(diagnostics))call observe_pair(diagnostics,j,wanted,eig(j),vectors(:,j),x, &
+                                                 residuals(j),residual_limit(tol,scale,eig(j)))
         certified=certified .and. residuals(j)<=residual_limit(tol,scale,eig(j))
       end do
       change=1d0
@@ -368,10 +516,16 @@ contains
           change=max(change,energy_change(previous(j),eig(j),scale))
         end do
       end if
+      if(present(diagnostics))then
+        diagnostics%energy_change=change;diagnostics%energy_change_available=have_previous
+      end if
       if(have_previous .and. change<tol)then
         flag=flag+1
       else
         flag=0
+      end if
+      if(present(diagnostics))then
+        diagnostics%energy_consecutive_checks=flag;diagnostics%energy_gate_satisfied=flag>=2
       end if
       write(*,'("tritr, ene(NOK), max_conv, flag: ",i5,es25.15,es11.1,i5)') cycle,eig(min(retained,m)),change,flag
       ! Check closure of the entire computed subspace, not just one beta.
@@ -381,6 +535,7 @@ contains
         call orthogonalize(x,q,m)
         closure=max(closure,dznrm2(n,x,1))
       end do
+      if(present(diagnostics)) diagnostics%closure=closure
       if(certified .and. (flag>=2 .or. m==n .or. closure<=near_limit(scale)))then
         status=0
         if(m==n)then
@@ -404,8 +559,9 @@ contains
           status=2;reason='loss of retained-subspace independence';return
         end if
         q(:,j)=x
+        if(present(diagnostics)) diagnostics%h_applications=diagnostics%h_applications+1_int64
         call apply(n,x,hq(:,j));iterations=iterations+1
       end do
     end do
-  end subroutine restarted_hermitian
+  end subroutine restarted_hermitian_core
 end module krylov_solvers

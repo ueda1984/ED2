@@ -1,0 +1,44 @@
+{
+  "initial_failures": [
+    {
+      "profile": "o2",
+      "suite": "stability",
+      "original_failures": [
+        {
+          "name": "zero-energy-alg2-omp2",
+          "alg": 2,
+          "threads": 2,
+          "expected_status": 0,
+          "input_sha256": "79bc1f34a120460b78988e6692519ba155ebe65f88c5dc0bae5f632c57024eaa",
+          "exit_code": 0,
+          "solver_status": 0,
+          "reason": "full invariant space (residuals certified)",
+          "iterations": 6,
+          "status": "failed",
+          "error": "could not convert string '-3.420637783583041-308' to float64 at row 0, column 2."
+        }
+      ]
+    },
+    {
+      "profile": "gnu13",
+      "suite": "stability",
+      "original_failures": [
+        {
+          "name": "zero-energy-alg1-omp1",
+          "alg": 1,
+          "threads": 1,
+          "expected_status": 0,
+          "input_sha256": "bf0f28839189fdc646fb0f893c9e894a2ea51a5a6311e7b34b953c5af2d2086f",
+          "exit_code": 0,
+          "solver_status": 0,
+          "reason": "numerical near-breakdown (residual certified)",
+          "iterations": 4,
+          "status": "failed",
+          "error": "could not convert string '-8.914189635110894-309' to float64 at row 0, column 2."
+        }
+      ]
+    }
+  ],
+  "change": "test-only ES25.15 to ES26.15E3; scientific assertions unchanged",
+  "corrected_source_sha256": "22b7cbe2b8169d524713bf06f3544212847fb094dd919b9e1277a037679221be"
+}

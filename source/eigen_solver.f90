@@ -1,6 +1,7 @@
 module eigen_solver
   use blas_lapack_interfaces, only: zheevr, dlamch, zcopy, check_lapack_info, zheevr_workspace_lengths
   use ham2vec
+  use krylov_observations, only: krylov_diagnostics,read_krylov_controls,write_krylov_diagnostics
   implicit none
   private :: apply_hamiltonian
   integer :: NOE,NOK, NOM, maxitr, ite_lancz, i_vec_min, i_vec_max
@@ -88,8 +89,15 @@ contains
     integer :: status
     real(8) :: residuals(NOE)
     character(120) :: reason
+    type(krylov_diagnostics), allocatable :: observation
+    complex(8), allocatable :: initial(:)
+    integer, allocatable :: seed
+    character(:), allocatable :: diagnostic_path
+    call read_krylov_controls(dim,initial,seed,diagnostic_path)
+    if(len(diagnostic_path)>0)allocate(observation)
     call restarted_hermitian(apply_hamiltonian,dim,NOE,NOK,NOM,lnc_ene_conv,maxitr,ene,psi(:,1:NOE), &
-                              ite_lancz,status,reason,residuals)
+                              ite_lancz,status,reason,residuals,initial,observation,seed)
+    if(allocated(observation))call write_krylov_diagnostics(diagnostic_path,observation)
     write(*,'(a,a)') 'TRLan status: ',trim(reason)
     write(*,'(a,100es25.15)') 'Eigenpair residual norms: ',residuals
     if(status/=0) error stop 'TRLan did not converge'

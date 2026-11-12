@@ -26,11 +26,12 @@ REVISIONS={'phase1b':'2050208999940044c155cce7fb60d42b7228481d',
 def sha(path):return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def build(repo,output,fc,flags):
+def build(repo,output,fc,flags,source_archives=None):
     bins={}
     for label,rev in REVISIONS.items():
         stage=output/label;stage.mkdir()
-        archive=subprocess.check_output(['git','archive',rev],cwd=repo)
+        archive=(source_archives[label].read_bytes() if source_archives is not None else
+                 subprocess.check_output(['git','archive',rev],cwd=repo))
         with tarfile.open(fileobj=io.BytesIO(archive)) as t:t.extractall(stage,filter='data')
         originals={f:(stage/'source'/f).read_text() for f in ['ham2vec.f90','main.f90']}
         s=originals['ham2vec.f90'];s=s.replace('module ham2vec\n','module ham2vec\n  use phase1d_probe, only: probe_h_calls\n',1)
@@ -54,6 +55,7 @@ def build(repo,output,fc,flags):
         names=['input_param','state_lists','ham2vec','lanczos','eigen_solver','get_expectation_values','main']
         if label=='phase1c':names.insert(0,'krylov_solvers')
         names.insert(0,'blas_lapack_interfaces')
+        if (src/'krylov_observations.f90').exists():names.insert(1,'krylov_observations')
         with (output/f'{label}-build.log').open('w') as log:
             subprocess.run([fc,*flags.split(),'-c',str(probe)],cwd=src,stdout=log,stderr=subprocess.STDOUT,check=True)
             for name in names:subprocess.run([fc,*flags.split(),'-c',name+'.f90'],cwd=src,stdout=log,stderr=subprocess.STDOUT,check=True)

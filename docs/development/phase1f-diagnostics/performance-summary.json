@@ -1,0 +1,416 @@
+[
+  {
+    "profile": "o2",
+    "alg": 1,
+    "workload": "original-cap12",
+    "before": {
+      "solver_statuses": [
+        0
+      ],
+      "median_seconds": 0.0043832820001625805,
+      "min_seconds": 0.004269982000096206,
+      "max_seconds": 0.004675322999901255,
+      "min_rss_kib": 5080,
+      "max_rss_kib": 5156,
+      "h_calls": [
+        122
+      ]
+    },
+    "off": {
+      "solver_statuses": [
+        0
+      ],
+      "median_seconds": 0.004473867999877257,
+      "min_seconds": 0.00430214000016349,
+      "max_seconds": 0.005105080000248563,
+      "min_rss_kib": 5116,
+      "max_rss_kib": 5256,
+      "h_calls": [
+        122
+      ]
+    },
+    "on": {
+      "solver_statuses": [
+        0
+      ],
+      "median_seconds": 0.0045946109999022156,
+      "min_seconds": 0.004349501999968197,
+      "max_seconds": 0.004895593999663106,
+      "min_rss_kib": 5120,
+      "max_rss_kib": 5260,
+      "h_calls": [
+        122
+      ]
+    },
+    "on_over_off": 1.026988503019819,
+    "off_over_before": 1.020666249561702
+  },
+  {
+    "profile": "o2",
+    "alg": 2,
+    "workload": "original-cap12",
+    "before": {
+      "solver_statuses": [
+        1
+      ],
+      "median_seconds": 0.06556993499998498,
+      "min_seconds": 0.06343528900015372,
+      "max_seconds": 0.06710751999980857,
+      "min_rss_kib": 6112,
+      "max_rss_kib": 6260,
+      "h_calls": [
+        1680
+      ]
+    },
+    "off": {
+      "solver_statuses": [
+        1
+      ],
+      "median_seconds": 0.06554418599989731,
+      "min_seconds": 0.06329267399996752,
+      "max_seconds": 0.06985445700001947,
+      "min_rss_kib": 6140,
+      "max_rss_kib": 6256,
+      "h_calls": [
+        1680
+      ]
+    },
+    "on": {
+      "solver_statuses": [
+        1
+      ],
+      "median_seconds": 0.06697614299991983,
+      "min_seconds": 0.06301492600005076,
+      "max_seconds": 0.07213897800011182,
+      "min_rss_kib": 6016,
+      "max_rss_kib": 6280,
+      "h_calls": [
+        1680
+      ]
+    },
+    "on_over_off": 1.0218472009100055,
+    "off_over_before": 0.9996073047794286
+  },
+  {
+    "profile": "gnu13",
+    "alg": 1,
+    "workload": "original-cap12",
+    "before": {
+      "solver_statuses": [
+        0
+      ],
+      "median_seconds": 0.004468618999908358,
+      "min_seconds": 0.004308640000090236,
+      "max_seconds": 0.005173251000087475,
+      "min_rss_kib": 5080,
+      "max_rss_kib": 5156,
+      "h_calls": [
+        122
+      ]
+    },
+    "off": {
+      "solver_statuses": [
+        0
+      ],
+      "median_seconds": 0.004497343999901204,
+      "min_seconds": 0.004281257999991794,
+      "max_seconds": 0.00784757500014166,
+      "min_rss_kib": 5116,
+      "max_rss_kib": 5252,
+      "h_calls": [
+        122
+      ]
+    },
+    "on": {
+      "solver_statuses": [
+        0
+      ],
+      "median_seconds": 0.004551754999738478,
+      "min_seconds": 0.0043377130000408215,
+      "max_seconds": 0.00649342999986402,
+      "min_rss_kib": 5120,
+      "max_rss_kib": 5188,
+      "h_calls": [
+        122
+      ]
+    },
+    "on_over_off": 1.0120984740856978,
+    "off_over_before": 1.0064281604660041
+  },
+  {
+    "profile": "gnu13",
+    "alg": 2,
+    "workload": "original-cap12",
+    "before": {
+      "solver_statuses": [
+        1
+      ],
+      "median_seconds": 0.06799855600002047,
+      "min_seconds": 0.06635499599997274,
+      "max_seconds": 0.07940193000013096,
+      "min_rss_kib": 5980,
+      "max_rss_kib": 6220,
+      "h_calls": [
+        1680
+      ]
+    },
+    "off": {
+      "solver_statuses": [
+        1
+      ],
+      "median_seconds": 0.06776722699987658,
+      "min_seconds": 0.06578767600012725,
+      "max_seconds": 0.07084042599990426,
+      "min_rss_kib": 6128,
+      "max_rss_kib": 6220,
+      "h_calls": [
+        1680
+      ]
+    },
+    "on": {
+      "solver_statuses": [
+        1
+      ],
+      "median_seconds": 0.06795429900012095,
+      "min_seconds": 0.0653107779999118,
+      "max_seconds": 0.06986863800011633,
+      "min_rss_kib": 6144,
+      "max_rss_kib": 6300,
+      "h_calls": [
+        1680
+      ]
+    },
+    "on_over_off": 1.0027605084127864,
+    "off_over_before": 0.9965980306972427
+  },
+  {
+    "profile": "bounds",
+    "alg": 1,
+    "workload": "original-cap12",
+    "before": {
+      "solver_statuses": [
+        0
+      ],
+      "median_seconds": 0.004502250999394164,
+      "min_seconds": 0.004344833999311959,
+      "max_seconds": 0.004757366000376351,
+      "min_rss_kib": 5092,
+      "max_rss_kib": 5172,
+      "h_calls": [
+        122
+      ]
+    },
+    "off": {
+      "solver_statuses": [
+        0
+      ],
+      "median_seconds": 0.004498266000155127,
+      "min_seconds": 0.004402400999424572,
+      "max_seconds": 0.00468328399983875,
+      "min_rss_kib": 5140,
+      "max_rss_kib": 5212,
+      "h_calls": [
+        122
+      ]
+    },
+    "on": {
+      "solver_statuses": [
+        0
+      ],
+      "median_seconds": 0.004706550000264542,
+      "min_seconds": 0.004296181999961846,
+      "max_seconds": 0.00538959799996519,
+      "min_rss_kib": 5140,
+      "max_rss_kib": 5220,
+      "h_calls": [
+        122
+      ]
+    },
+    "on_over_off": 1.046303175513016,
+    "off_over_before": 0.9991148873664366
+  },
+  {
+    "profile": "bounds",
+    "alg": 2,
+    "workload": "original-cap12",
+    "before": {
+      "solver_statuses": [
+        1
+      ],
+      "median_seconds": 0.06928457100002561,
+      "min_seconds": 0.06741926099948614,
+      "max_seconds": 0.07578888699936215,
+      "min_rss_kib": 5984,
+      "max_rss_kib": 6176,
+      "h_calls": [
+        1680
+      ]
+    },
+    "off": {
+      "solver_statuses": [
+        1
+      ],
+      "median_seconds": 0.07186143299986725,
+      "min_seconds": 0.06460199799948896,
+      "max_seconds": 0.07439143400006287,
+      "min_rss_kib": 6028,
+      "max_rss_kib": 6276,
+      "h_calls": [
+        1680
+      ]
+    },
+    "on": {
+      "solver_statuses": [
+        1
+      ],
+      "median_seconds": 0.0653480410001066,
+      "min_seconds": 0.06380402600007073,
+      "max_seconds": 0.06971429900022486,
+      "min_rss_kib": 6032,
+      "max_rss_kib": 6244,
+      "h_calls": [
+        1680
+      ]
+    },
+    "on_over_off": 0.9093617852044131,
+    "off_over_before": 1.0371924363916563
+  },
+  {
+    "profile": "o2",
+    "alg": 2,
+    "workload": "converged-cap32",
+    "before": {
+      "solver_statuses": [
+        0
+      ],
+      "median_seconds": 0.05808719500055304,
+      "min_seconds": 0.05630244700023468,
+      "max_seconds": 0.06325105599989911,
+      "min_rss_kib": 6380,
+      "max_rss_kib": 6544,
+      "h_calls": [
+        1020
+      ]
+    },
+    "off": {
+      "solver_statuses": [
+        0
+      ],
+      "median_seconds": 0.05916790499941271,
+      "min_seconds": 0.057192467999811925,
+      "max_seconds": 0.06025478299943643,
+      "min_rss_kib": 6296,
+      "max_rss_kib": 6504,
+      "h_calls": [
+        1020
+      ]
+    },
+    "on": {
+      "solver_statuses": [
+        0
+      ],
+      "median_seconds": 0.059605022999676294,
+      "min_seconds": 0.05692205000013928,
+      "max_seconds": 0.06386340999961249,
+      "min_rss_kib": 6288,
+      "max_rss_kib": 6500,
+      "h_calls": [
+        1020
+      ]
+    },
+    "on_over_off": 1.0073877552410875,
+    "off_over_before": 1.0186049610219496
+  },
+  {
+    "profile": "gnu13",
+    "alg": 2,
+    "workload": "converged-cap32",
+    "before": {
+      "solver_statuses": [
+        0
+      ],
+      "median_seconds": 0.05775473300036538,
+      "min_seconds": 0.05540111800019076,
+      "max_seconds": 0.060426250000091386,
+      "min_rss_kib": 6260,
+      "max_rss_kib": 6548,
+      "h_calls": [
+        1020
+      ]
+    },
+    "off": {
+      "solver_statuses": [
+        0
+      ],
+      "median_seconds": 0.05909221799993247,
+      "min_seconds": 0.05544439200002671,
+      "max_seconds": 0.062139581000337785,
+      "min_rss_kib": 6292,
+      "max_rss_kib": 6508,
+      "h_calls": [
+        1020
+      ]
+    },
+    "on": {
+      "solver_statuses": [
+        0
+      ],
+      "median_seconds": 0.058733849999953236,
+      "min_seconds": 0.05616102200019668,
+      "max_seconds": 0.06449032199998328,
+      "min_rss_kib": 6288,
+      "max_rss_kib": 6588,
+      "h_calls": [
+        1020
+      ]
+    },
+    "on_over_off": 0.9939354451041312,
+    "off_over_before": 1.0231580154575146
+  },
+  {
+    "profile": "bounds",
+    "alg": 2,
+    "workload": "converged-cap32",
+    "before": {
+      "solver_statuses": [
+        0
+      ],
+      "median_seconds": 0.058619978000024275,
+      "min_seconds": 0.05599919799988129,
+      "max_seconds": 0.062013761999878625,
+      "min_rss_kib": 6280,
+      "max_rss_kib": 6560,
+      "h_calls": [
+        1020
+      ]
+    },
+    "off": {
+      "solver_statuses": [
+        0
+      ],
+      "median_seconds": 0.05839404700054729,
+      "min_seconds": 0.05545115299992176,
+      "max_seconds": 0.06099089999952412,
+      "min_rss_kib": 6312,
+      "max_rss_kib": 6568,
+      "h_calls": [
+        1020
+      ]
+    },
+    "on": {
+      "solver_statuses": [
+        0
+      ],
+      "median_seconds": 0.05728172999988601,
+      "min_seconds": 0.05601648399988335,
+      "max_seconds": 0.05835889399986627,
+      "min_rss_kib": 6304,
+      "max_rss_kib": 6484,
+      "h_calls": [
+        1020
+      ]
+    },
+    "on_over_off": 0.9809515343122073,
+    "off_over_before": 0.9961458361605511
+  }
+]

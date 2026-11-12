@@ -1,0 +1,71 @@
+{
+  "base": "b756b0009f08027e8a2ae8a1e349d78d8e81d9c5",
+  "machine": {
+    "observed_after_validation": true,
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+    "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+    "numpy": "2.3.5",
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "affinity": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "cpu_max": "400000 100000",
+    "thread_environment": {
+      "OMP_NUM_THREADS": [
+        1,
+        2
+      ],
+      "OMP_DYNAMIC": "FALSE",
+      "OPENBLAS_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1"
+    }
+  },
+  "linked_library_sha256": {
+    "/workspace/ed2-env/tools/usr/lib/x86_64-linux-gnu/openblas-pthread/liblapack.so.3": "336a9b0a527ae2d558b4ff59844e787e49e38d5a1c39d5ae36651252badf28cd",
+    "/workspace/ed2-env/tools/usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.29.so": "10d1c640ecccd21063a7d80f90e949b1d48202830b6ec0b52b2796c5d0fbce63",
+    "/workspace/ed2-env/tools/usr/lib/x86_64-linux-gnu/libgfortran.so.5.0.0": "d1c716d10039872bb5481b921d2142577c7873cad4d8d9f09028231aa7e42127",
+    "/usr/lib/x86_64-linux-gnu/libm.so.6": "6d567d53e895273ca14a1f9dc164fc6c8d39aed2f60aa46a733c2784228915f3",
+    "/usr/lib/x86_64-linux-gnu/libgomp.so.1.0.0": "6456b504ac347bd50c419667440b691f6966ad8aff5309d2f06c977fe2f9debe",
+    "/usr/lib/x86_64-linux-gnu/libc.so.6": "9792e3cbb541c8f44c7acf5f14f4022ea62998ecc787d326bed4d8b6547dfd92",
+    "/usr/lib/x86_64-linux-gnu/libgcc_s.so.1": "30c61ab012a4241bed033725a09b61f5fdd3bb7df95ee852d0b096520524c7af"
+  },
+  "protected_source_sha256": {
+    "ham2vec": "148ee9d28fbef2053ad86dcb702e4e3a3bbcd518c137e33581f3261a1bdeeaf2",
+    "state_lists": "977c6f513a351ab087da648795ff15cae83248f22b9476fb1135ae12b76b5f1a",
+    "input_param": "96f83ae7b6af3188de463e285a349e4f055ffc92bff49a53aed2b0acb19e82f4",
+    "blas_lapack_interfaces": "d32e3dd65a61961867c3d156d9d27b545406f6616e788d1f7c75df6997402abc",
+    "main": "fffca6f3035492f347e30e1897f2bfcb4c29921dfa9006844dc149dae9e2cbf3",
+    "get_expectation_values": "766439b901c3c3a985f6983542451d8d02a39eef4837fe7254da1506c6bbc34b"
+  },
+  "unchanged_numerical_helpers": [
+    "finite_real",
+    "normalize_vector",
+    "energy_change",
+    "residual_limit",
+    "near_limit",
+    "orthogonalize",
+    "complement"
+  ],
+  "production_stdout_and_namelists_unchanged": true,
+  "maintained_source_sha256": {
+    "source/blas_lapack_interfaces.f90": "d32e3dd65a61961867c3d156d9d27b545406f6616e788d1f7c75df6997402abc",
+    "source/eigen_solver.f90": "63d6c661d698e685a757db31c72a165eb149a65bb291fb63cd027ba2ca449cf3",
+    "source/get_expectation_values.f90": "766439b901c3c3a985f6983542451d8d02a39eef4837fe7254da1506c6bbc34b",
+    "source/ham2vec.f90": "148ee9d28fbef2053ad86dcb702e4e3a3bbcd518c137e33581f3261a1bdeeaf2",
+    "source/input_param.f90": "96f83ae7b6af3188de463e285a349e4f055ffc92bff49a53aed2b0acb19e82f4",
+    "source/krylov_observations.f90": "a93c3df3d86a176eebdbd5a07eb7b8ab90b8201d82cc279ece6b888f5f200160",
+    "source/krylov_solvers.f90": "a4bc3d5a0eca1e4c21fa295365c7a854fc1745db81a8f27ef19bc4af72b625be",
+    "source/lanczos.f90": "3387a45149558ec77e7eca2cb71f463eb3586c26266f8f6fe384c492fc326cb0",
+    "source/main.f90": "fffca6f3035492f347e30e1897f2bfcb4c29921dfa9006844dc149dae9e2cbf3",
+    "source/state_lists.f90": "977c6f513a351ab087da648795ff15cae83248f22b9476fb1135ae12b76b5f1a",
+    "tests/krylov_diagnostics_driver.F90": "151735c36f0bfa2bff171a493b8c9d6f2ab12e84f88c9f3b5fc5f66d6f6360e2",
+    "tests/diagnostics_reproducibility.py": "ec6c6b01c989c4e8d1f4e15d61558d081fc84575e43491b29fa8e0ea4a03dbe7",
+    "tools/phase1f_validation.py": "e6a9f39cf8a7174e48a3a656218725247c86f6eb624301cc8387ea75531eb09e",
+    "tools/phase1f_success_timing.py": "de20560c0ad37f2d4517bb656ef48bcf285250c09cb4009a684572f4986a1f1c",
+    "tools/summarize_phase1f.py": "b1ee0f8b79c014ab1c6d4071fe90098a93f5e9f16789f714facc170d5a57d37e"
+  }
+}

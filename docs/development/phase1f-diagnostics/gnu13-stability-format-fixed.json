@@ -1,0 +1,1830 @@
+{
+  "driver_sha256": "000586b222da5eac90f6079b78e569747967f5234ae744ca18ead8674f3446a5",
+  "numpy": "2.3.5",
+  "cases": [
+    {
+      "name": "zero-alg1-omp1",
+      "alg": 1,
+      "threads": 1,
+      "expected_status": 0,
+      "input_sha256": "27b9053716d0b6ed3d66b9c7ebbdc7bc0a20e07d5e7fb507c022bdc327a5524f",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "happy breakdown (exact zero beta; residual certified)",
+      "iterations": 1,
+      "eigenvalues": [
+        0.0
+      ],
+      "residuals": [
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0
+      ],
+      "orthogonality_error": 0.0,
+      "eigenspace_leakage": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "zero-alg1-omp2",
+      "alg": 1,
+      "threads": 2,
+      "expected_status": 0,
+      "input_sha256": "27b9053716d0b6ed3d66b9c7ebbdc7bc0a20e07d5e7fb507c022bdc327a5524f",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "happy breakdown (exact zero beta; residual certified)",
+      "iterations": 1,
+      "eigenvalues": [
+        0.0
+      ],
+      "residuals": [
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0
+      ],
+      "orthogonality_error": 0.0,
+      "eigenspace_leakage": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "scalar-alg1-omp1",
+      "alg": 1,
+      "threads": 1,
+      "expected_status": 0,
+      "input_sha256": "26eef9148c8844255a652e8c0583915e61732d2736dd0090e35086ee79fff776",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "happy breakdown (exact zero beta; residual certified)",
+      "iterations": 1,
+      "eigenvalues": [
+        3.25
+      ],
+      "residuals": [
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0
+      ],
+      "orthogonality_error": 0.0,
+      "eigenspace_leakage": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "scalar-alg1-omp2",
+      "alg": 1,
+      "threads": 2,
+      "expected_status": 0,
+      "input_sha256": "26eef9148c8844255a652e8c0583915e61732d2736dd0090e35086ee79fff776",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "happy breakdown (exact zero beta; residual certified)",
+      "iterations": 1,
+      "eigenvalues": [
+        3.25
+      ],
+      "residuals": [
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0
+      ],
+      "orthogonality_error": 0.0,
+      "eigenspace_leakage": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "one-dimensional-0.0-alg1-omp1",
+      "alg": 1,
+      "threads": 1,
+      "expected_status": 0,
+      "input_sha256": "d448a6223c3b963023cf68bbca50761aa49e429868ea4a52820c7089411d390d",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "happy breakdown (exact zero beta; residual certified)",
+      "iterations": 1,
+      "eigenvalues": [
+        0.0
+      ],
+      "residuals": [
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0
+      ],
+      "orthogonality_error": 2.220446049250313e-16,
+      "eigenspace_leakage": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "one-dimensional-0.0-alg1-omp2",
+      "alg": 1,
+      "threads": 2,
+      "expected_status": 0,
+      "input_sha256": "d448a6223c3b963023cf68bbca50761aa49e429868ea4a52820c7089411d390d",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "happy breakdown (exact zero beta; residual certified)",
+      "iterations": 1,
+      "eigenvalues": [
+        0.0
+      ],
+      "residuals": [
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0
+      ],
+      "orthogonality_error": 1.1102230246251565e-16,
+      "eigenspace_leakage": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "one-dimensional-2.5-alg1-omp1",
+      "alg": 1,
+      "threads": 1,
+      "expected_status": 0,
+      "input_sha256": "ba702958cc6018ab04d0271cb34a0f6001c1eccd1ed3dd209f38b59877fb4c54",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "happy breakdown (exact zero beta; residual certified)",
+      "iterations": 1,
+      "eigenvalues": [
+        2.5
+      ],
+      "residuals": [
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0
+      ],
+      "orthogonality_error": 1.1102230246251565e-16,
+      "eigenspace_leakage": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "one-dimensional-2.5-alg1-omp2",
+      "alg": 1,
+      "threads": 2,
+      "expected_status": 0,
+      "input_sha256": "ba702958cc6018ab04d0271cb34a0f6001c1eccd1ed3dd209f38b59877fb4c54",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "numerical near-breakdown (residual certified)",
+      "iterations": 1,
+      "eigenvalues": [
+        2.5
+      ],
+      "residuals": [
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0
+      ],
+      "orthogonality_error": 2.220446049250313e-16,
+      "eigenspace_leakage": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "zero-energy-alg1-omp1",
+      "alg": 1,
+      "threads": 1,
+      "expected_status": 0,
+      "input_sha256": "bf0f28839189fdc646fb0f893c9e894a2ea51a5a6311e7b34b953c5af2d2086f",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "numerical near-breakdown (residual certified)",
+      "iterations": 4,
+      "eigenvalues": [
+        8.326672684688674e-17
+      ],
+      "residuals": [
+        2.888819292573201e-16
+      ],
+      "normalized_residuals": [
+        1.4444096462866006e-16
+      ],
+      "orthogonality_error": 2.220446049250313e-16,
+      "eigenspace_leakage": 3.4784558176887644e-16,
+      "status": "passed"
+    },
+    {
+      "name": "zero-energy-alg1-omp2",
+      "alg": 1,
+      "threads": 2,
+      "expected_status": 0,
+      "input_sha256": "bf0f28839189fdc646fb0f893c9e894a2ea51a5a6311e7b34b953c5af2d2086f",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "numerical near-breakdown (residual certified)",
+      "iterations": 4,
+      "eigenvalues": [
+        1.665334536937735e-16
+      ],
+      "residuals": [
+        3.286178401394692e-16
+      ],
+      "normalized_residuals": [
+        1.643089200697346e-16
+      ],
+      "orthogonality_error": 2.220446049250313e-16,
+      "eigenspace_leakage": 4.0275482562722316e-16,
+      "status": "passed"
+    },
+    {
+      "name": "exact-ground-start-alg1-omp1",
+      "alg": 1,
+      "threads": 1,
+      "expected_status": 0,
+      "input_sha256": "437fe3618aba542dc720bfd055815b167fdf7d77c8f66b9b51f3ecf9b0fc3fb9",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "happy breakdown (exact zero beta; residual certified)",
+      "iterations": 1,
+      "eigenvalues": [
+        -2.0
+      ],
+      "residuals": [
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0
+      ],
+      "orthogonality_error": 0.0,
+      "eigenspace_leakage": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "exact-ground-start-alg1-omp2",
+      "alg": 1,
+      "threads": 2,
+      "expected_status": 0,
+      "input_sha256": "437fe3618aba542dc720bfd055815b167fdf7d77c8f66b9b51f3ecf9b0fc3fb9",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "happy breakdown (exact zero beta; residual certified)",
+      "iterations": 1,
+      "eigenvalues": [
+        -2.0
+      ],
+      "residuals": [
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0
+      ],
+      "orthogonality_error": 0.0,
+      "eigenspace_leakage": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "zero-start-alg1-omp1",
+      "alg": 1,
+      "threads": 1,
+      "expected_status": -1,
+      "input_sha256": "7780d26f5756cdb19e212d758e6207ddf5a84f434978f13a570b9b8ab6d76431",
+      "exit_code": 1,
+      "solver_status": -1,
+      "reason": "invalid initial vector",
+      "iterations": 0,
+      "status": "passed"
+    },
+    {
+      "name": "zero-start-alg1-omp2",
+      "alg": 1,
+      "threads": 2,
+      "expected_status": -1,
+      "input_sha256": "7780d26f5756cdb19e212d758e6207ddf5a84f434978f13a570b9b8ab6d76431",
+      "exit_code": 1,
+      "solver_status": -1,
+      "reason": "invalid initial vector",
+      "iterations": 0,
+      "status": "passed"
+    },
+    {
+      "name": "nonfinite-start-alg1-omp1",
+      "alg": 1,
+      "threads": 1,
+      "expected_status": -1,
+      "input_sha256": "423f9494a15cf311a7ba3464a1d56aac1610ecbb298b6b068a059931be016686",
+      "exit_code": 1,
+      "solver_status": -1,
+      "reason": "invalid initial vector",
+      "iterations": 0,
+      "status": "passed"
+    },
+    {
+      "name": "nonfinite-start-alg1-omp2",
+      "alg": 1,
+      "threads": 2,
+      "expected_status": -1,
+      "input_sha256": "423f9494a15cf311a7ba3464a1d56aac1610ecbb298b6b068a059931be016686",
+      "exit_code": 1,
+      "solver_status": -1,
+      "reason": "invalid initial vector",
+      "iterations": 0,
+      "status": "passed"
+    },
+    {
+      "name": "invalid-budget-alg1-omp1",
+      "alg": 1,
+      "threads": 1,
+      "expected_status": -1,
+      "input_sha256": "bdb33639eb8bf21a691027d1ea2e1128426464f8b6f7f4984cd529e683b2ec78",
+      "exit_code": 1,
+      "solver_status": -1,
+      "reason": "invalid Lanczos parameters",
+      "iterations": 0,
+      "status": "passed"
+    },
+    {
+      "name": "invalid-budget-alg1-omp2",
+      "alg": 1,
+      "threads": 2,
+      "expected_status": -1,
+      "input_sha256": "bdb33639eb8bf21a691027d1ea2e1128426464f8b6f7f4984cd529e683b2ec78",
+      "exit_code": 1,
+      "solver_status": -1,
+      "reason": "invalid Lanczos parameters",
+      "iterations": 0,
+      "status": "passed"
+    },
+    {
+      "name": "zero-closed-block-alg1-omp1",
+      "alg": 1,
+      "threads": 1,
+      "expected_status": 0,
+      "input_sha256": "d1b90435a1e0d4973a0abbf03c5930f8b837b375c735051a611dd497903637bf",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "happy breakdown (exact zero beta; residual certified)",
+      "iterations": 1,
+      "eigenvalues": [
+        0.0
+      ],
+      "residuals": [
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0
+      ],
+      "orthogonality_error": 0.0,
+      "eigenspace_leakage": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "zero-closed-block-alg1-omp2",
+      "alg": 1,
+      "threads": 2,
+      "expected_status": 0,
+      "input_sha256": "d1b90435a1e0d4973a0abbf03c5930f8b837b375c735051a611dd497903637bf",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "happy breakdown (exact zero beta; residual certified)",
+      "iterations": 1,
+      "eigenvalues": [
+        0.0
+      ],
+      "residuals": [
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0
+      ],
+      "orthogonality_error": 0.0,
+      "eigenspace_leakage": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "scalar-closed-block-alg1-omp1",
+      "alg": 1,
+      "threads": 1,
+      "expected_status": 0,
+      "input_sha256": "7a66bce73a18bcef9db6436e44cb4e5ad875d22c1d991a3892658d447fc6fc7c",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "numerical near-breakdown (residual certified)",
+      "iterations": 1,
+      "eigenvalues": [
+        3.25
+      ],
+      "residuals": [
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0
+      ],
+      "orthogonality_error": 0.0,
+      "eigenspace_leakage": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "scalar-closed-block-alg1-omp2",
+      "alg": 1,
+      "threads": 2,
+      "expected_status": 0,
+      "input_sha256": "7a66bce73a18bcef9db6436e44cb4e5ad875d22c1d991a3892658d447fc6fc7c",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "happy breakdown (exact zero beta; residual certified)",
+      "iterations": 1,
+      "eigenvalues": [
+        3.25
+      ],
+      "residuals": [
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0
+      ],
+      "orthogonality_error": 0.0,
+      "eigenspace_leakage": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "minimal-budget-closed-block-alg1-omp1",
+      "alg": 1,
+      "threads": 1,
+      "expected_status": 0,
+      "input_sha256": "74241808ad00663d17d502f041cbaa5df95c240f4ee90d4c452eee1ef21e5624",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "happy breakdown (exact zero beta; residual certified)",
+      "iterations": 1,
+      "eigenvalues": [
+        0.0
+      ],
+      "residuals": [
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0
+      ],
+      "orthogonality_error": 0.0,
+      "eigenspace_leakage": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "minimal-budget-closed-block-alg1-omp2",
+      "alg": 1,
+      "threads": 2,
+      "expected_status": 0,
+      "input_sha256": "74241808ad00663d17d502f041cbaa5df95c240f4ee90d4c452eee1ef21e5624",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "happy breakdown (exact zero beta; residual certified)",
+      "iterations": 1,
+      "eigenvalues": [
+        0.0
+      ],
+      "residuals": [
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0
+      ],
+      "orthogonality_error": 0.0,
+      "eigenspace_leakage": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "insufficient-iterations-alg1-omp1",
+      "alg": 1,
+      "threads": 1,
+      "expected_status": 1,
+      "input_sha256": "8752c2157ac2b1fa6dc79676771a48dc2644edf807a0b9f1612133c8ed6f3414",
+      "exit_code": 1,
+      "solver_status": 1,
+      "reason": "maximum iterations without convergence",
+      "iterations": 1,
+      "status": "passed"
+    },
+    {
+      "name": "insufficient-iterations-alg1-omp2",
+      "alg": 1,
+      "threads": 2,
+      "expected_status": 1,
+      "input_sha256": "8752c2157ac2b1fa6dc79676771a48dc2644edf807a0b9f1612133c8ed6f3414",
+      "exit_code": 1,
+      "solver_status": 1,
+      "reason": "maximum iterations without convergence",
+      "iterations": 1,
+      "status": "passed"
+    },
+    {
+      "name": "scaled-1e-09-alg1-omp1",
+      "alg": 1,
+      "threads": 1,
+      "expected_status": 0,
+      "input_sha256": "586d7045131f3b53c166b86dbbc8554eafa25da179af9ebd39ea995108f8690b",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "full Krylov dimension (residual certified)",
+      "iterations": 8,
+      "eigenvalues": [
+        -2.000000000000001e-09
+      ],
+      "residuals": [
+        3.830032043761436e-25
+      ],
+      "normalized_residuals": [
+        1.2766773479204786e-16
+      ],
+      "orthogonality_error": 0.0,
+      "eigenspace_leakage": 8.145593532491709e-16,
+      "status": "passed"
+    },
+    {
+      "name": "scaled-1e-09-alg1-omp2",
+      "alg": 1,
+      "threads": 2,
+      "expected_status": 0,
+      "input_sha256": "586d7045131f3b53c166b86dbbc8554eafa25da179af9ebd39ea995108f8690b",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "numerical near-breakdown (residual certified)",
+      "iterations": 8,
+      "eigenvalues": [
+        -2.000000000000001e-09
+      ],
+      "residuals": [
+        5.288278441683017e-25
+      ],
+      "normalized_residuals": [
+        1.7627594805610054e-16
+      ],
+      "orthogonality_error": 0.0,
+      "eigenspace_leakage": 8.301843576345707e-16,
+      "status": "passed"
+    },
+    {
+      "name": "scaled-1000000000.0-alg1-omp1",
+      "alg": 1,
+      "threads": 1,
+      "expected_status": 0,
+      "input_sha256": "9978827b0a3c720171fb01c4e31b9330ef9251a2322d8162e235523295390793",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "numerical near-breakdown (residual certified)",
+      "iterations": 8,
+      "eigenvalues": [
+        -2000000000.000001
+      ],
+      "residuals": [
+        6.829612979576737e-07
+      ],
+      "normalized_residuals": [
+        2.2765376598589127e-16
+      ],
+      "orthogonality_error": 2.220446049250313e-16,
+      "eigenspace_leakage": 1.3881132846006616e-15,
+      "status": "passed"
+    },
+    {
+      "name": "scaled-1000000000.0-alg1-omp2",
+      "alg": 1,
+      "threads": 2,
+      "expected_status": 0,
+      "input_sha256": "9978827b0a3c720171fb01c4e31b9330ef9251a2322d8162e235523295390793",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "numerical near-breakdown (residual certified)",
+      "iterations": 8,
+      "eigenvalues": [
+        -2000000000.000001
+      ],
+      "residuals": [
+        7.509301911595543e-07
+      ],
+      "normalized_residuals": [
+        2.5031006371985147e-16
+      ],
+      "orthogonality_error": 0.0,
+      "eigenspace_leakage": 1.3059006651657336e-15,
+      "status": "passed"
+    },
+    {
+      "name": "zero-alg2-omp1",
+      "alg": 2,
+      "threads": 1,
+      "expected_status": 0,
+      "input_sha256": "6fde836512fa3b0f557d60fc0fcd4f7a53ed7d035a2eecde67798b994a0a0158",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "full invariant space (residuals certified)",
+      "iterations": 8,
+      "eigenvalues": [
+        0.0,
+        0.0
+      ],
+      "residuals": [
+        0.0,
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0,
+        0.0
+      ],
+      "orthogonality_error": 9.575941604509741e-17,
+      "eigenspace_leakage": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "zero-alg2-omp2",
+      "alg": 2,
+      "threads": 2,
+      "expected_status": 0,
+      "input_sha256": "6fde836512fa3b0f557d60fc0fcd4f7a53ed7d035a2eecde67798b994a0a0158",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "full invariant space (residuals certified)",
+      "iterations": 8,
+      "eigenvalues": [
+        0.0,
+        0.0
+      ],
+      "residuals": [
+        0.0,
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0,
+        0.0
+      ],
+      "orthogonality_error": 2.346213242419664e-16,
+      "eigenspace_leakage": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "scalar-alg2-omp1",
+      "alg": 2,
+      "threads": 1,
+      "expected_status": 0,
+      "input_sha256": "cbc0f934cf2b850d72be1baa20ea6a3ec968fe584be79ee554606a64149081e1",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "full invariant space (residuals certified)",
+      "iterations": 8,
+      "eigenvalues": [
+        3.249999999999996,
+        3.249999999999999
+      ],
+      "residuals": [
+        3.828213613040532e-15,
+        9.691625425477684e-16
+      ],
+      "normalized_residuals": [
+        1.1779118809355483e-15,
+        2.982038592454672e-16
+      ],
+      "orthogonality_error": 2.673128903135819e-16,
+      "eigenspace_leakage": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "scalar-alg2-omp2",
+      "alg": 2,
+      "threads": 2,
+      "expected_status": 0,
+      "input_sha256": "cbc0f934cf2b850d72be1baa20ea6a3ec968fe584be79ee554606a64149081e1",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "full invariant space (residuals certified)",
+      "iterations": 8,
+      "eigenvalues": [
+        3.25,
+        3.25
+      ],
+      "residuals": [
+        0.0,
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0,
+        0.0
+      ],
+      "orthogonality_error": 1.7484458621524696e-16,
+      "eigenspace_leakage": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "one-dimensional-0.0-alg2-omp1",
+      "alg": 2,
+      "threads": 1,
+      "expected_status": 0,
+      "input_sha256": "5ec90f325fdd500bfeb4a43bbd1cdeb74c93f962f93b41265af7a0b061f243ce",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "full invariant space (residuals certified)",
+      "iterations": 2,
+      "eigenvalues": [
+        0.0
+      ],
+      "residuals": [
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0
+      ],
+      "orthogonality_error": 2.220446049250313e-16,
+      "eigenspace_leakage": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "one-dimensional-0.0-alg2-omp2",
+      "alg": 2,
+      "threads": 2,
+      "expected_status": 0,
+      "input_sha256": "5ec90f325fdd500bfeb4a43bbd1cdeb74c93f962f93b41265af7a0b061f243ce",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "full invariant space (residuals certified)",
+      "iterations": 2,
+      "eigenvalues": [
+        0.0
+      ],
+      "residuals": [
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0
+      ],
+      "orthogonality_error": 2.220446049250313e-16,
+      "eigenspace_leakage": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "one-dimensional-2.5-alg2-omp1",
+      "alg": 2,
+      "threads": 1,
+      "expected_status": 0,
+      "input_sha256": "13037a027f17b726f73309eecac63d374f8991613696507b0e6a6f7125a65934",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "full invariant space (residuals certified)",
+      "iterations": 2,
+      "eigenvalues": [
+        2.5
+      ],
+      "residuals": [
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0
+      ],
+      "orthogonality_error": 0.0,
+      "eigenspace_leakage": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "one-dimensional-2.5-alg2-omp2",
+      "alg": 2,
+      "threads": 2,
+      "expected_status": 0,
+      "input_sha256": "13037a027f17b726f73309eecac63d374f8991613696507b0e6a6f7125a65934",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "full invariant space (residuals certified)",
+      "iterations": 2,
+      "eigenvalues": [
+        2.5
+      ],
+      "residuals": [
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0
+      ],
+      "orthogonality_error": 0.0,
+      "eigenspace_leakage": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "zero-energy-alg2-omp1",
+      "alg": 2,
+      "threads": 1,
+      "expected_status": 0,
+      "input_sha256": "79bc1f34a120460b78988e6692519ba155ebe65f88c5dc0bae5f632c57024eaa",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "full invariant space (residuals certified)",
+      "iterations": 6,
+      "eigenvalues": [
+        -2.468395935714214e-16,
+        0.4999999999999984
+      ],
+      "residuals": [
+        6.373751016263799e-16,
+        2.3856074668025923e-15
+      ],
+      "normalized_residuals": [
+        3.1868755081318997e-16,
+        1.1928037334012962e-15
+      ],
+      "orthogonality_error": 3.250207424282755e-16,
+      "eigenspace_leakage": 6.071433038053841e-16,
+      "status": "passed"
+    },
+    {
+      "name": "zero-energy-alg2-omp2",
+      "alg": 2,
+      "threads": 2,
+      "expected_status": 0,
+      "input_sha256": "79bc1f34a120460b78988e6692519ba155ebe65f88c5dc0bae5f632c57024eaa",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "full invariant space (residuals certified)",
+      "iterations": 6,
+      "eigenvalues": [
+        8.036586041849731e-17,
+        0.4999999999999998
+      ],
+      "residuals": [
+        4.132049681064074e-16,
+        6.121976536852751e-16
+      ],
+      "normalized_residuals": [
+        2.066024840532037e-16,
+        3.0609882684263757e-16
+      ],
+      "orthogonality_error": 3.787039795827577e-16,
+      "eigenspace_leakage": 7.25122713023127e-16,
+      "status": "passed"
+    },
+    {
+      "name": "exact-ground-start-alg2-omp1",
+      "alg": 2,
+      "threads": 1,
+      "expected_status": 0,
+      "input_sha256": "1a0a82b514b65cbfc1e9cdab567bfc0ed811da13750416c9c262754dc4550f05",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "full invariant space (residuals certified)",
+      "iterations": 6,
+      "eigenvalues": [
+        -2.0,
+        -0.4999999999999973
+      ],
+      "residuals": [
+        0.0,
+        3.407477366612422e-15
+      ],
+      "normalized_residuals": [
+        0.0,
+        1.1358257888708073e-15
+      ],
+      "orthogonality_error": 2.919206004844699e-18,
+      "eigenspace_leakage": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "exact-ground-start-alg2-omp2",
+      "alg": 2,
+      "threads": 2,
+      "expected_status": 0,
+      "input_sha256": "1a0a82b514b65cbfc1e9cdab567bfc0ed811da13750416c9c262754dc4550f05",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "full invariant space (residuals certified)",
+      "iterations": 6,
+      "eigenvalues": [
+        -2.0,
+        -0.4999999999999978
+      ],
+      "residuals": [
+        0.0,
+        3.020109231778234e-15
+      ],
+      "normalized_residuals": [
+        0.0,
+        1.0067030772594112e-15
+      ],
+      "orthogonality_error": 1.4899292477504384e-19,
+      "eigenspace_leakage": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "zero-start-alg2-omp1",
+      "alg": 2,
+      "threads": 1,
+      "expected_status": -1,
+      "input_sha256": "10fcb12d13e4bc028df5a8ac2d9a0fe51dd607168945966921a611636950da66",
+      "exit_code": 1,
+      "solver_status": -1,
+      "reason": "invalid initial vector",
+      "iterations": 0,
+      "status": "passed"
+    },
+    {
+      "name": "zero-start-alg2-omp2",
+      "alg": 2,
+      "threads": 2,
+      "expected_status": -1,
+      "input_sha256": "10fcb12d13e4bc028df5a8ac2d9a0fe51dd607168945966921a611636950da66",
+      "exit_code": 1,
+      "solver_status": -1,
+      "reason": "invalid initial vector",
+      "iterations": 0,
+      "status": "passed"
+    },
+    {
+      "name": "nonfinite-start-alg2-omp1",
+      "alg": 2,
+      "threads": 1,
+      "expected_status": -1,
+      "input_sha256": "c6974bbbb64fb62662671ca5df0a53441705281d42fa81b6ba2ccbb4990048e9",
+      "exit_code": 1,
+      "solver_status": -1,
+      "reason": "invalid initial vector",
+      "iterations": 0,
+      "status": "passed"
+    },
+    {
+      "name": "nonfinite-start-alg2-omp2",
+      "alg": 2,
+      "threads": 2,
+      "expected_status": -1,
+      "input_sha256": "c6974bbbb64fb62662671ca5df0a53441705281d42fa81b6ba2ccbb4990048e9",
+      "exit_code": 1,
+      "solver_status": -1,
+      "reason": "invalid initial vector",
+      "iterations": 0,
+      "status": "passed"
+    },
+    {
+      "name": "invalid-budget-alg2-omp1",
+      "alg": 2,
+      "threads": 1,
+      "expected_status": -1,
+      "input_sha256": "b6fb25ad008b911fdbe34a1ac1968790033dbcbeda8dfd023d8ebb59eceb171a",
+      "exit_code": 1,
+      "solver_status": -1,
+      "reason": "invalid thick-restart dimensions or iteration budget",
+      "iterations": 0,
+      "status": "passed"
+    },
+    {
+      "name": "invalid-budget-alg2-omp2",
+      "alg": 2,
+      "threads": 2,
+      "expected_status": -1,
+      "input_sha256": "b6fb25ad008b911fdbe34a1ac1968790033dbcbeda8dfd023d8ebb59eceb171a",
+      "exit_code": 1,
+      "solver_status": -1,
+      "reason": "invalid thick-restart dimensions or iteration budget",
+      "iterations": 0,
+      "status": "passed"
+    },
+    {
+      "name": "zero-closed-block-alg2-omp1",
+      "alg": 2,
+      "threads": 1,
+      "expected_status": 0,
+      "input_sha256": "3bdfb33da574473ca28e74648799bd269f8649ab281f0f62d9df3e985857b42e",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "happy breakdown (closed invariant subspace; residuals certified)",
+      "iterations": 10,
+      "eigenvalues": [
+        0.0,
+        0.0
+      ],
+      "residuals": [
+        0.0,
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0,
+        0.0
+      ],
+      "orthogonality_error": 2.3797159759084474e-16,
+      "eigenspace_leakage": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "zero-closed-block-alg2-omp2",
+      "alg": 2,
+      "threads": 2,
+      "expected_status": 0,
+      "input_sha256": "3bdfb33da574473ca28e74648799bd269f8649ab281f0f62d9df3e985857b42e",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "happy breakdown (closed invariant subspace; residuals certified)",
+      "iterations": 10,
+      "eigenvalues": [
+        0.0,
+        0.0
+      ],
+      "residuals": [
+        0.0,
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0,
+        0.0
+      ],
+      "orthogonality_error": 2.310004714166588e-16,
+      "eigenspace_leakage": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "scalar-closed-block-alg2-omp1",
+      "alg": 2,
+      "threads": 1,
+      "expected_status": 0,
+      "input_sha256": "d1135e3600b589dc2996dda518ba4068404fed1b5c857d1814c73b07c82f19ce",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "numerical near-breakdown (residuals certified)",
+      "iterations": 10,
+      "eigenvalues": [
+        3.249999999999995,
+        3.249999999999997
+      ],
+      "residuals": [
+        4.748347573935184e-15,
+        3.1291935292828375e-15
+      ],
+      "normalized_residuals": [
+        1.4610300227492873e-15,
+        9.62828778240873e-16
+      ],
+      "orthogonality_error": 8.277789336818819e-17,
+      "eigenspace_leakage": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "scalar-closed-block-alg2-omp2",
+      "alg": 2,
+      "threads": 2,
+      "expected_status": 0,
+      "input_sha256": "d1135e3600b589dc2996dda518ba4068404fed1b5c857d1814c73b07c82f19ce",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "numerical near-breakdown (residuals certified)",
+      "iterations": 10,
+      "eigenvalues": [
+        3.249999999999996,
+        3.249999999999997
+      ],
+      "residuals": [
+        3.933676646958429e-15,
+        3.0793369547989637e-15
+      ],
+      "normalized_residuals": [
+        1.210362045217978e-15,
+        9.474882937842966e-16
+      ],
+      "orthogonality_error": 3.4780770540464886e-16,
+      "eigenspace_leakage": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "minimal-budget-closed-block-alg2-omp1",
+      "alg": 2,
+      "threads": 1,
+      "expected_status": 0,
+      "input_sha256": "2b61aa5cdd359430a242d3d005ee9babba36ffc6d6749a75c8f16628db393ca3",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "happy breakdown (closed invariant subspace; residuals certified)",
+      "iterations": 10,
+      "eigenvalues": [
+        0.0,
+        0.0
+      ],
+      "residuals": [
+        0.0,
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0,
+        0.0
+      ],
+      "orthogonality_error": 3.862270012105785e-16,
+      "eigenspace_leakage": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "minimal-budget-closed-block-alg2-omp2",
+      "alg": 2,
+      "threads": 2,
+      "expected_status": 0,
+      "input_sha256": "2b61aa5cdd359430a242d3d005ee9babba36ffc6d6749a75c8f16628db393ca3",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "happy breakdown (closed invariant subspace; residuals certified)",
+      "iterations": 10,
+      "eigenvalues": [
+        0.0,
+        0.0
+      ],
+      "residuals": [
+        0.0,
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0,
+        0.0
+      ],
+      "orthogonality_error": 3.374764182231829e-16,
+      "eigenspace_leakage": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "insufficient-iterations-alg2-omp1",
+      "alg": 2,
+      "threads": 1,
+      "expected_status": 1,
+      "input_sha256": "48055b6af9fc6058821fb7261c529163612ad750314ac5d7827b8ac57ad90b37",
+      "exit_code": 1,
+      "solver_status": 1,
+      "reason": "maximum restart iterations without convergence",
+      "iterations": 10,
+      "status": "passed"
+    },
+    {
+      "name": "insufficient-iterations-alg2-omp2",
+      "alg": 2,
+      "threads": 2,
+      "expected_status": 1,
+      "input_sha256": "48055b6af9fc6058821fb7261c529163612ad750314ac5d7827b8ac57ad90b37",
+      "exit_code": 1,
+      "solver_status": 1,
+      "reason": "maximum restart iterations without convergence",
+      "iterations": 10,
+      "status": "passed"
+    },
+    {
+      "name": "scaled-1e-09-alg2-omp1",
+      "alg": 2,
+      "threads": 1,
+      "expected_status": 0,
+      "input_sha256": "6f6ed10193e314de36c7186ed0c840eb96394f66025f34d0c16f8b3f34bfa1d9",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "full invariant space (residuals certified)",
+      "iterations": 10,
+      "eigenvalues": [
+        -1.999999999999996e-09,
+        -1.285714285714279e-09
+      ],
+      "residuals": [
+        6.770821402390053e-24,
+        7.773907144300288e-24
+      ],
+      "normalized_residuals": [
+        2.2569404674633506e-15,
+        2.591302381433429e-15
+      ],
+      "orthogonality_error": 1.0840379201593337e-15,
+      "eigenspace_leakage": 2.0842751291991903e-15,
+      "status": "passed"
+    },
+    {
+      "name": "scaled-1e-09-alg2-omp2",
+      "alg": 2,
+      "threads": 2,
+      "expected_status": 0,
+      "input_sha256": "6f6ed10193e314de36c7186ed0c840eb96394f66025f34d0c16f8b3f34bfa1d9",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "full invariant space (residuals certified)",
+      "iterations": 10,
+      "eigenvalues": [
+        -1.999999999999998e-09,
+        -1.285714285714282e-09
+      ],
+      "residuals": [
+        5.434093549827432e-24,
+        9.255581376664192e-24
+      ],
+      "normalized_residuals": [
+        1.8113645166091436e-15,
+        3.0851937922213973e-15
+      ],
+      "orthogonality_error": 7.213474763199781e-16,
+      "eigenspace_leakage": 2.456814333254044e-15,
+      "status": "passed"
+    },
+    {
+      "name": "scaled-1000000000.0-alg2-omp1",
+      "alg": 2,
+      "threads": 1,
+      "expected_status": 0,
+      "input_sha256": "1e15f0f4f58cfc8fc5b1b3b2d4133cfb895a9736494a870836a0d17565a57cc1",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "full invariant space (residuals certified)",
+      "iterations": 10,
+      "eigenvalues": [
+        -1999999999.999994,
+        -1285714285.714277
+      ],
+      "residuals": [
+        7.421963839494758e-06,
+        8.605510899040985e-06
+      ],
+      "normalized_residuals": [
+        2.4739879464982525e-15,
+        2.8685036330136618e-15
+      ],
+      "orthogonality_error": 1.8415687077497135e-16,
+      "eigenspace_leakage": 1.7985661185626207e-15,
+      "status": "passed"
+    },
+    {
+      "name": "scaled-1000000000.0-alg2-omp2",
+      "alg": 2,
+      "threads": 2,
+      "expected_status": 0,
+      "input_sha256": "1e15f0f4f58cfc8fc5b1b3b2d4133cfb895a9736494a870836a0d17565a57cc1",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "full invariant space (residuals certified)",
+      "iterations": 10,
+      "eigenvalues": [
+        -1999999999.999991,
+        -1285714285.714282
+      ],
+      "residuals": [
+        1.1552190086575638e-05,
+        7.197808445758366e-06
+      ],
+      "normalized_residuals": [
+        3.850730028858546e-15,
+        2.3992694819194553e-15
+      ],
+      "orthogonality_error": 1.3219040876157394e-15,
+      "eigenspace_leakage": 6.232734711210232e-15,
+      "status": "passed"
+    },
+    {
+      "name": "early-check-alg1-omp1",
+      "alg": 1,
+      "threads": 1,
+      "expected_status": 0,
+      "input_sha256": "00a44e14022025632e8393dd397b04e0ca4ae14b3957a0a2f1e355ab6938f50e",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "numerical near-breakdown (residual certified)",
+      "iterations": 4,
+      "eigenvalues": [
+        -2.0
+      ],
+      "residuals": [
+        7.201756272073379e-16
+      ],
+      "normalized_residuals": [
+        2.40058542402446e-16
+      ],
+      "orthogonality_error": 2.220446049250313e-16,
+      "eigenspace_leakage": 4.890812806608884e-16,
+      "status": "passed"
+    },
+    {
+      "name": "early-check-alg1-omp2",
+      "alg": 1,
+      "threads": 2,
+      "expected_status": 0,
+      "input_sha256": "00a44e14022025632e8393dd397b04e0ca4ae14b3957a0a2f1e355ab6938f50e",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "numerical near-breakdown (residual certified)",
+      "iterations": 4,
+      "eigenvalues": [
+        -2.0
+      ],
+      "residuals": [
+        6.48703085277549e-16
+      ],
+      "normalized_residuals": [
+        2.1623436175918299e-16
+      ],
+      "orthogonality_error": 0.0,
+      "eigenspace_leakage": 4.424055047107267e-16,
+      "status": "passed"
+    },
+    {
+      "name": "near-breakdown-alg1-omp1",
+      "alg": 1,
+      "threads": 1,
+      "expected_status": 0,
+      "input_sha256": "fd5d96b1e73b351ce5a3ccf2567d30d2fab6d8dc904534a78d3f2ae396a187f2",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "numerical near-breakdown (residual certified)",
+      "iterations": 1,
+      "eigenvalues": [
+        1.0
+      ],
+      "residuals": [
+        1e-15
+      ],
+      "normalized_residuals": [
+        5e-16
+      ],
+      "orthogonality_error": 0.0,
+      "eigenspace_leakage": 1e-15,
+      "status": "passed"
+    },
+    {
+      "name": "near-breakdown-alg1-omp2",
+      "alg": 1,
+      "threads": 2,
+      "expected_status": 0,
+      "input_sha256": "fd5d96b1e73b351ce5a3ccf2567d30d2fab6d8dc904534a78d3f2ae396a187f2",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "numerical near-breakdown (residual certified)",
+      "iterations": 1,
+      "eigenvalues": [
+        1.0
+      ],
+      "residuals": [
+        1e-15
+      ],
+      "normalized_residuals": [
+        5e-16
+      ],
+      "orthogonality_error": 0.0,
+      "eigenspace_leakage": 1e-15,
+      "status": "passed"
+    },
+    {
+      "name": "exact-excited-start-alg1-omp1",
+      "alg": 1,
+      "threads": 1,
+      "expected_status": 0,
+      "input_sha256": "b4b9ec8c26429c336b418c7126af69809daef44c37f3263b1a34ace7b145d0ec",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "happy breakdown (exact zero beta; residual certified)",
+      "iterations": 1,
+      "eigenvalues": [
+        3.0
+      ],
+      "residuals": [
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0
+      ],
+      "orthogonality_error": 0.0,
+      "eigenspace_leakage": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "exact-excited-start-alg1-omp2",
+      "alg": 1,
+      "threads": 2,
+      "expected_status": 0,
+      "input_sha256": "b4b9ec8c26429c336b418c7126af69809daef44c37f3263b1a34ace7b145d0ec",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "happy breakdown (exact zero beta; residual certified)",
+      "iterations": 1,
+      "eigenvalues": [
+        3.0
+      ],
+      "residuals": [
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0
+      ],
+      "orthogonality_error": 0.0,
+      "eigenspace_leakage": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "excited-start-restart-alg2-omp1",
+      "alg": 2,
+      "threads": 1,
+      "expected_status": 0,
+      "input_sha256": "a1356d13069c99cb1bb43b50f709a001bd9b837ae200052d8c535bf98ba17567",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "full invariant space (residuals certified)",
+      "iterations": 6,
+      "eigenvalues": [
+        -1.999999999999996,
+        -0.4999999999999991
+      ],
+      "residuals": [
+        4.296404030004814e-15,
+        1.6258681318701264e-15
+      ],
+      "normalized_residuals": [
+        1.4321346766682712e-15,
+        5.419560439567088e-16
+      ],
+      "orthogonality_error": 2.8587104722067536e-16,
+      "eigenspace_leakage": 1.0734672952519296e-15,
+      "status": "passed"
+    },
+    {
+      "name": "excited-start-restart-alg2-omp2",
+      "alg": 2,
+      "threads": 2,
+      "expected_status": 0,
+      "input_sha256": "a1356d13069c99cb1bb43b50f709a001bd9b837ae200052d8c535bf98ba17567",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "full invariant space (residuals certified)",
+      "iterations": 6,
+      "eigenvalues": [
+        -1.999999999999999,
+        -0.4999999999999976
+      ],
+      "residuals": [
+        1.549720826681658e-15,
+        2.5519380208382043e-15
+      ],
+      "normalized_residuals": [
+        5.16573608893886e-16,
+        8.506460069460681e-16
+      ],
+      "orthogonality_error": 4.000540971038478e-16,
+      "eigenspace_leakage": 7.033998881952434e-16,
+      "status": "passed"
+    },
+    {
+      "name": "degenerate-full-space-alg2-omp1",
+      "alg": 2,
+      "threads": 1,
+      "expected_status": 0,
+      "input_sha256": "008dd3e24eca5a33724f8dd0ccc1ed9fdc846d5f2389e4a7a1765b6cfadaefd4",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "full invariant space (residuals certified)",
+      "iterations": 8,
+      "eigenvalues": [
+        -2.0,
+        -1.999999999999999
+      ],
+      "residuals": [
+        1.781016186189202e-15,
+        1.6426759674063837e-15
+      ],
+      "normalized_residuals": [
+        5.936720620630672e-16,
+        5.475586558021278e-16
+      ],
+      "orthogonality_error": 8.346673214499328e-16,
+      "eigenspace_leakage": 6.806573919267329e-16,
+      "projector_error": 1.3716093552532389e-15,
+      "status": "passed"
+    },
+    {
+      "name": "degenerate-full-space-alg2-omp2",
+      "alg": 2,
+      "threads": 2,
+      "expected_status": 0,
+      "input_sha256": "008dd3e24eca5a33724f8dd0ccc1ed9fdc846d5f2389e4a7a1765b6cfadaefd4",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "full invariant space (residuals certified)",
+      "iterations": 8,
+      "eigenvalues": [
+        -2.0,
+        -1.999999999999997
+      ],
+      "residuals": [
+        2.23413863957078e-15,
+        2.7648838560388164e-15
+      ],
+      "normalized_residuals": [
+        7.447128798569264e-16,
+        9.216279520129385e-16
+      ],
+      "orthogonality_error": 3.695051788885622e-16,
+      "eigenspace_leakage": 8.299523369882437e-16,
+      "projector_error": 1.0109750389755071e-15,
+      "status": "passed"
+    },
+    {
+      "name": "degenerate-restarts-alg2-omp1",
+      "alg": 2,
+      "threads": 1,
+      "expected_status": 0,
+      "input_sha256": "0603bd1b96980313fac595e61502d10f967b7d05ca5fc9902341dccc4779b503",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "two energy-converged restarts (residuals certified)",
+      "iterations": 600,
+      "eigenvalues": [
+        -2.0,
+        -1.999999999999998
+      ],
+      "residuals": [
+        1.9629498028602476e-15,
+        2.1991782401603875e-15
+      ],
+      "normalized_residuals": [
+        6.54316600953416e-16,
+        7.330594133867959e-16
+      ],
+      "orthogonality_error": 2.5518384328212984e-16,
+      "eigenspace_leakage": 1.6433334982744245e-15,
+      "projector_error": 2.109014443941905e-15,
+      "status": "passed"
+    },
+    {
+      "name": "degenerate-restarts-alg2-omp2",
+      "alg": 2,
+      "threads": 2,
+      "expected_status": 0,
+      "input_sha256": "0603bd1b96980313fac595e61502d10f967b7d05ca5fc9902341dccc4779b503",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "two energy-converged restarts (residuals certified)",
+      "iterations": 640,
+      "eigenvalues": [
+        -2.0,
+        -1.999999999999998
+      ],
+      "residuals": [
+        1.5664043897050295e-15,
+        2.8937371501252156e-15
+      ],
+      "normalized_residuals": [
+        5.221347965683432e-16,
+        9.645790500417386e-16
+      ],
+      "orthogonality_error": 8.807219213556604e-17,
+      "eigenspace_leakage": 1.2597317748066645e-15,
+      "projector_error": 2.289620570058367e-15,
+      "status": "passed"
+    },
+    {
+      "name": "excited-start-degenerate-restarts-alg2-omp1",
+      "alg": 2,
+      "threads": 1,
+      "expected_status": 0,
+      "input_sha256": "5e8d629b96d91dc9aff25632ef7b3611e736288ca530688a2089e433723531af",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "two energy-converged restarts (residuals certified)",
+      "iterations": 620,
+      "eigenvalues": [
+        -1.999999999999999,
+        -1.999999999999999
+      ],
+      "residuals": [
+        1.4858521763040187e-15,
+        2.094000861243007e-15
+      ],
+      "normalized_residuals": [
+        4.952840587680063e-16,
+        6.980002870810024e-16
+      ],
+      "orthogonality_error": 3.8606761877467386e-16,
+      "eigenspace_leakage": 1.6540861239479632e-15,
+      "projector_error": 2.1040375460445633e-15,
+      "status": "passed"
+    },
+    {
+      "name": "excited-start-degenerate-restarts-alg2-omp2",
+      "alg": 2,
+      "threads": 2,
+      "expected_status": 0,
+      "input_sha256": "5e8d629b96d91dc9aff25632ef7b3611e736288ca530688a2089e433723531af",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "two energy-converged restarts (residuals certified)",
+      "iterations": 620,
+      "eigenvalues": [
+        -2.0,
+        -1.999999999999998
+      ],
+      "residuals": [
+        1.889735014052184e-15,
+        2.5302249075914955e-15
+      ],
+      "normalized_residuals": [
+        6.299116713507281e-16,
+        8.434083025304986e-16
+      ],
+      "orthogonality_error": 1.543364120412207e-16,
+      "eigenspace_leakage": 1.326689817381111e-15,
+      "projector_error": 2.5709804419320633e-15,
+      "status": "passed"
+    },
+    {
+      "name": "diagonal-excited-degenerate-restarts-alg2-omp1",
+      "alg": 2,
+      "threads": 1,
+      "expected_status": 0,
+      "input_sha256": "dca651ef0490fee5d8a285dd772787e3e6cdc45b3c8878c3058bcfada05a27b9",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "two energy-converged restarts (residuals certified)",
+      "iterations": 480,
+      "eigenvalues": [
+        -2.0,
+        -2.0
+      ],
+      "residuals": [
+        1.6316930426034183e-16,
+        4.179717744290101e-17
+      ],
+      "normalized_residuals": [
+        5.438976808678061e-17,
+        1.3932392480967002e-17
+      ],
+      "orthogonality_error": 2.427904381545214e-16,
+      "eigenspace_leakage": 8.117788439404427e-17,
+      "projector_error": 2.1839182492317577e-16,
+      "status": "passed"
+    },
+    {
+      "name": "diagonal-excited-degenerate-restarts-alg2-omp2",
+      "alg": 2,
+      "threads": 2,
+      "expected_status": 0,
+      "input_sha256": "dca651ef0490fee5d8a285dd772787e3e6cdc45b3c8878c3058bcfada05a27b9",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "two energy-converged restarts (residuals certified)",
+      "iterations": 430,
+      "eigenvalues": [
+        -2.0,
+        -1.999999999999999
+      ],
+      "residuals": [
+        1.280271004246969e-15,
+        1.1745184771180697e-15
+      ],
+      "normalized_residuals": [
+        4.267570014156563e-16,
+        3.9150615903935657e-16
+      ],
+      "orthogonality_error": 2.5758730259081377e-16,
+      "eigenspace_leakage": 5.376566861183506e-16,
+      "projector_error": 5.83087740672936e-16,
+      "status": "passed"
+    },
+    {
+      "name": "zero-energy-restarts-alg2-omp1",
+      "alg": 2,
+      "threads": 1,
+      "expected_status": 0,
+      "input_sha256": "a4e50f409446419a3f6e1394691eb62402e76011d88f207af401b169a0c6932e",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "two energy-converged restarts (residuals certified)",
+      "iterations": 620,
+      "eigenvalues": [
+        -9.973800749380331e-17,
+        -6.201636426617088e-17
+      ],
+      "residuals": [
+        1.596399280372265e-15,
+        1.14102418909274e-15
+      ],
+      "normalized_residuals": [
+        3.9909982009306646e-16,
+        2.8525604727318513e-16
+      ],
+      "orthogonality_error": 4.868115430763639e-16,
+      "eigenspace_leakage": 1.7029715622855352e-15,
+      "projector_error": 2.110965506398429e-15,
+      "status": "passed"
+    },
+    {
+      "name": "zero-energy-restarts-alg2-omp2",
+      "alg": 2,
+      "threads": 2,
+      "expected_status": 0,
+      "input_sha256": "a4e50f409446419a3f6e1394691eb62402e76011d88f207af401b169a0c6932e",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "two energy-converged restarts (residuals certified)",
+      "iterations": 610,
+      "eigenvalues": [
+        -1.218643241873706e-16,
+        3.198214906543375e-17
+      ],
+      "residuals": [
+        1.6024343388881856e-15,
+        1.4235743947398944e-15
+      ],
+      "normalized_residuals": [
+        4.006085847220466e-16,
+        3.5589359868497375e-16
+      ],
+      "orthogonality_error": 3.2793231562036733e-16,
+      "eigenspace_leakage": 1.35723488765981e-15,
+      "projector_error": 1.4734321932829012e-15,
+      "status": "passed"
+    },
+    {
+      "name": "general-restarts-alg2-omp1",
+      "alg": 2,
+      "threads": 1,
+      "expected_status": 0,
+      "input_sha256": "1f8e2693a74ebc1c84689e8f377a3ee595d41255de71f06ac69e8ff5a24d3c72",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "two energy-converged restarts (residuals certified)",
+      "iterations": 780,
+      "eigenvalues": [
+        -3.0,
+        -2.695652173913041
+      ],
+      "residuals": [
+        1.9819137897058937e-15,
+        2.9704261265164257e-15
+      ],
+      "normalized_residuals": [
+        4.954784474264736e-16,
+        7.426065316291067e-16
+      ],
+      "orthogonality_error": 3.359032275536539e-16,
+      "eigenspace_leakage": 5.263969724474307e-15,
+      "status": "passed"
+    },
+    {
+      "name": "general-restarts-alg2-omp2",
+      "alg": 2,
+      "threads": 2,
+      "expected_status": 0,
+      "input_sha256": "1f8e2693a74ebc1c84689e8f377a3ee595d41255de71f06ac69e8ff5a24d3c72",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "two energy-converged restarts (residuals certified)",
+      "iterations": 800,
+      "eigenvalues": [
+        -3.000000000000001,
+        -2.695652173913045
+      ],
+      "residuals": [
+        2.5126222517669212e-15,
+        5.332556330443404e-15
+      ],
+      "normalized_residuals": [
+        6.281555629417305e-16,
+        1.3331390826108513e-15
+      ],
+      "orthogonality_error": 5.525505942809966e-16,
+      "eigenspace_leakage": 6.695701281383015e-15,
+      "status": "passed"
+    },
+    {
+      "name": "minimal-budget-happy-alg2-omp1",
+      "alg": 2,
+      "threads": 1,
+      "expected_status": 0,
+      "input_sha256": "850364521f78a58f682f0d7569d74197e4a5f1ccca0b0bbdf64e94f0765fdec9",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "full invariant space (residuals certified)",
+      "iterations": 8,
+      "eigenvalues": [
+        0.0,
+        0.0
+      ],
+      "residuals": [
+        0.0,
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0,
+        0.0
+      ],
+      "orthogonality_error": 1.527012850337416e-16,
+      "eigenspace_leakage": 0.0,
+      "status": "passed"
+    },
+    {
+      "name": "minimal-budget-happy-alg2-omp2",
+      "alg": 2,
+      "threads": 2,
+      "expected_status": 0,
+      "input_sha256": "850364521f78a58f682f0d7569d74197e4a5f1ccca0b0bbdf64e94f0765fdec9",
+      "exit_code": 0,
+      "solver_status": 0,
+      "reason": "full invariant space (residuals certified)",
+      "iterations": 8,
+      "eigenvalues": [
+        0.0,
+        0.0
+      ],
+      "residuals": [
+        0.0,
+        0.0
+      ],
+      "normalized_residuals": [
+        0.0,
+        0.0
+      ],
+      "orthogonality_error": 2.3998905686688834e-16,
+      "eigenspace_leakage": 0.0,
+      "status": "passed"
+    }
+  ],
+  "passed": 82,
+  "failed": 0
+}

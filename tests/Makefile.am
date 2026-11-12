@@ -44,7 +44,7 @@ lapack_interface_check_SOURCES = lapack_interface_check.f90
 lapack_interface_check_LDADD = $(top_builddir)/source/blas_lapack_interfaces.o
 lapack_failure_check_SOURCES = lapack_failure_check.f90
 lapack_failure_check_LDADD = $(top_builddir)/source/eigen_solver.o \
-  $(top_builddir)/source/krylov_solvers.o \
+  $(top_builddir)/source/krylov_solvers.o $(top_builddir)/source/krylov_observations.o \
   $(top_builddir)/source/ham2vec.o $(top_builddir)/source/state_lists.o \
   $(top_builddir)/source/input_param.o $(top_builddir)/source/blas_lapack_interfaces.o
 EXTRA_DIST += test_lapack_interfaces.sh
@@ -69,7 +69,7 @@ check-sparse-field: sparse_field_operator_check
 # Numerical kernel tests require only the existing optional NumPy test dependency.
 check_PROGRAMS += lanczos_stability_driver
 lanczos_stability_driver_SOURCES = lanczos_stability_driver.f90
-lanczos_stability_driver_LDADD = $(top_builddir)/source/krylov_solvers.o \
+lanczos_stability_driver_LDADD = $(top_builddir)/source/krylov_solvers.o $(top_builddir)/source/krylov_observations.o \
   $(top_builddir)/source/blas_lapack_interfaces.o
 EXTRA_DIST += lanczos_stability.py lanczos_cli_stability.py
 .PHONY: check-lanczos
@@ -84,7 +84,7 @@ check-lanczos: lanczos_stability_driver sparse_field_operator_check
 # Characterization is optional and records numerical findings without hiding them.
 EXTRA_PROGRAMS = krylov_stress_driver
 krylov_stress_driver_SOURCES = krylov_stress_driver.f90
-krylov_stress_driver_LDADD = $(top_builddir)/source/krylov_solvers.o \
+krylov_stress_driver_LDADD = $(top_builddir)/source/krylov_solvers.o $(top_builddir)/source/krylov_observations.o \
   $(top_builddir)/source/blas_lapack_interfaces.o
 EXTRA_DIST += krylov_stress.py krylov_benchmarks.py krylov_benchmark_probe.f90 krylov_acceptance_probe.py
 .PHONY: check-krylov-stress
@@ -98,3 +98,16 @@ EXTRA_DIST += precision_contract.py
 check-precision-contract: krylov_stress_driver
 	$(PYTHON) $(srcdir)/precision_contract.py --driver "$(abs_builddir)/krylov_stress_driver" \
 	  $(if $(PRECISION_OUTPUT),--output "$(PRECISION_OUTPUT)",)
+
+# Additive internal telemetry/replay checks. A base-version driver is optional.
+EXTRA_PROGRAMS += krylov_diagnostics_driver
+krylov_diagnostics_driver_SOURCES = krylov_diagnostics_driver.F90
+krylov_diagnostics_driver_FCFLAGS = $(AM_FCFLAGS) $(FCFLAGS) -DPHASE1F
+krylov_diagnostics_driver_LDADD = $(top_builddir)/source/krylov_solvers.o \
+  $(top_builddir)/source/krylov_observations.o $(top_builddir)/source/blas_lapack_interfaces.o
+EXTRA_DIST += diagnostics_reproducibility.py
+.PHONY: check-diagnostics
+check-diagnostics: krylov_diagnostics_driver
+	$(PYTHON) $(srcdir)/diagnostics_reproducibility.py --driver "$(abs_builddir)/krylov_diagnostics_driver" \
+	  --exe "$(abs_top_builddir)/source/QS3ED2" \
+	  $(if $(DIAGNOSTICS_OUTPUT),--output "$(DIAGNOSTICS_OUTPUT)",)

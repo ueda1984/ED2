@@ -60,13 +60,13 @@ program lanczos_stability_driver
   if(status/=0)stop 1
   open(72,file='eigenpairs.dat',status='new')
   do j=1,wanted
-    write(72,'(i8,2es25.15)') j,values(j),residuals(j)
+    write(72,'(i8,2es26.15e3)') j,values(j),residuals(j)
   end do
   close(72)
   open(73,file='vectors.dat',status='new')
   do j=1,wanted
     do i=1,n
-      write(73,'(2i8,2es25.15)') j,i,real(vectors(i,j),8),aimag(vectors(i,j))
+      write(73,'(2i8,2es26.15e3)') j,i,real(vectors(i,j),8),aimag(vectors(i,j))
     end do
   end do
   close(73)

@@ -39,3 +39,8 @@ check-krylov-stress:
 check-precision-contract:
 	$(AM_V_at)$(MAKE) -C source all
 	$(AM_V_at)$(MAKE) -C tests check-precision-contract PRECISION_OUTPUT="$(PRECISION_OUTPUT)"
+
+.PHONY: check-diagnostics
+check-diagnostics:
+	$(AM_V_at)$(MAKE) -C source all
+	$(AM_V_at)$(MAKE) -C tests check-diagnostics DIAGNOSTICS_OUTPUT="$(DIAGNOSTICS_OUTPUT)"
