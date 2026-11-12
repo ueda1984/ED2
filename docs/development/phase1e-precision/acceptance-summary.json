@@ -1,0 +1,34 @@
+{
+  "o2": {
+    "executable_sha256": "30c961835321a4e221d9d8ae961aa2610696d3a968526362b367af5f53fd8b1c",
+    "harness_sha256": "b85f633f4ad30c1c28fe43d26952f968743883b0e98365b45958042456f55fbf",
+    "counts": {
+      "observable_agreement": 768,
+      "solver_failure": 256
+    },
+    "raw_report_sha256": "77794eb7b264a5027e7b85a8e34bb4dffafd5873596161db7487875ef39b229e",
+    "total": 1024,
+    "all_failures_are_alg2_tol_1e18_budget_exhaustion": true,
+    "failure_eigenvalue_file_count": 0,
+    "selected_failure": {
+      "id": "alg2-tol1e-18-omp1-seed1000003",
+      "stdout_tail": "    0\nNumerical near-breakdown; orthogonal continuation, beta =   2.6935E-15\nNumerical near-breakdown; orthogonal continuation, beta =   2.4543E-15\nNumerical near-breakdown; orthogonal continuation, beta =   2.6284E-15\nNumerical near-breakdown; orthogonal continuation, beta =   5.1641E-15\ntritr, ene(NOK), max_conv, flag:   997   -4.306794700701435E-01    1.9E-15    0\nNumerical near-breakdown; orthogonal continuation, beta =   2.6659E-15\nNumerical near-breakdown; orthogonal continuation, beta =   2.4266E-15\nNumerical near-breakdown; orthogonal continuation, beta =   2.5894E-15\nNumerical near-breakdown; orthogonal continuation, beta =   5.2153E-15\ntritr, ene(NOK), max_conv, flag:   998   -4.306794700701435E-01    8.9E-16    0\nNumerical near-breakdown; orthogonal continuation, beta =   2.6944E-15\nNumerical near-breakdown; orthogonal continuation, beta =   2.4266E-15\nNumerical near-breakdown; orthogonal continuation, beta =   2.6471E-15\nNumerical near-breakdown; orthogonal continuation, beta =   5.1705E-15\ntritr, ene(NOK), max_conv, flag:   999   -4.306794700701437E-01    3.1E-15    0\nNumerical near-breakdown; orthogonal continuation, beta =   2.7401E-15\nNumerical near-breakdown; orthogonal continuation, beta =   2.4417E-15\nNumerical near-breakdown; orthogonal continuation, beta =   2.6367E-15\nNumerical near-breakdown; orthogonal continuation, beta =   5.1614E-15\ntritr, ene(NOK), max_conv, flag:  1000   -4.306794700701433E-01    1.1E-15    0\nTRLan status: maximum restart iterations without convergence\nEigenpair residual norms:     2.914402564212336E-15    2.883067304710757E-15\n"
+    }
+  },
+  "gnu13": {
+    "executable_sha256": "25a41cc836e23b97c2c746c5bf061097e294cbac5ebd633d14f4cd024433d760",
+    "harness_sha256": "b85f633f4ad30c1c28fe43d26952f968743883b0e98365b45958042456f55fbf",
+    "counts": {
+      "observable_agreement": 768,
+      "solver_failure": 256
+    },
+    "raw_report_sha256": "22c695bf2c2ca743ca072c3b950099c938fc1ad5c9a557cffd5d09d074c7ae25",
+    "total": 1024,
+    "all_failures_are_alg2_tol_1e18_budget_exhaustion": true,
+    "failure_eigenvalue_file_count": 0,
+    "selected_failure": {
+      "id": "alg2-tol1e-18-omp1-seed1000003",
+      "stdout_tail": "    0\nNumerical near-breakdown; orthogonal continuation, beta =   2.6935E-15\nNumerical near-breakdown; orthogonal continuation, beta =   2.4543E-15\nNumerical near-breakdown; orthogonal continuation, beta =   2.6284E-15\nNumerical near-breakdown; orthogonal continuation, beta =   5.1641E-15\ntritr, ene(NOK), max_conv, flag:   997   -4.306794700701435E-01    1.9E-15    0\nNumerical near-breakdown; orthogonal continuation, beta =   2.6659E-15\nNumerical near-breakdown; orthogonal continuation, beta =   2.4266E-15\nNumerical near-breakdown; orthogonal continuation, beta =   2.5894E-15\nNumerical near-breakdown; orthogonal continuation, beta =   5.2153E-15\ntritr, ene(NOK), max_conv, flag:   998   -4.306794700701435E-01    8.9E-16    0\nNumerical near-breakdown; orthogonal continuation, beta =   2.6944E-15\nNumerical near-breakdown; orthogonal continuation, beta =   2.4266E-15\nNumerical near-breakdown; orthogonal continuation, beta =   2.6471E-15\nNumerical near-breakdown; orthogonal continuation, beta =   5.1705E-15\ntritr, ene(NOK), max_conv, flag:   999   -4.306794700701437E-01    3.1E-15    0\nNumerical near-breakdown; orthogonal continuation, beta =   2.7401E-15\nNumerical near-breakdown; orthogonal continuation, beta =   2.4417E-15\nNumerical near-breakdown; orthogonal continuation, beta =   2.6367E-15\nNumerical near-breakdown; orthogonal continuation, beta =   5.1614E-15\ntritr, ene(NOK), max_conv, flag:  1000   -4.306794700701433E-01    1.1E-15    0\nTRLan status: maximum restart iterations without convergence\nEigenpair residual norms:     2.914402564212336E-15    2.883067304710757E-15\n"
+    }
+  }
+}

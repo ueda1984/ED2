@@ -91,3 +91,10 @@ EXTRA_DIST += krylov_stress.py krylov_benchmarks.py krylov_benchmark_probe.f90 k
 check-krylov-stress: krylov_stress_driver
 	$(PYTHON) $(srcdir)/krylov_stress.py --driver "$(abs_builddir)/krylov_stress_driver" \
 	  $(if $(KRYLOV_OUTPUT),--output "$(KRYLOV_OUTPUT)",)
+
+# Phase 1-E: diagnostic/contract experiments, no production policy changes.
+EXTRA_DIST += precision_contract.py
+.PHONY: check-precision-contract
+check-precision-contract: krylov_stress_driver
+	$(PYTHON) $(srcdir)/precision_contract.py --driver "$(abs_builddir)/krylov_stress_driver" \
+	  $(if $(PRECISION_OUTPUT),--output "$(PRECISION_OUTPUT)",)

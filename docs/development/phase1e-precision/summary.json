@@ -1,0 +1,154 @@
+{
+  "o2": {
+    "schema": 1,
+    "interpretation": "characterization; zero exit is not universal solver accuracy",
+    "numpy": "2.3.5",
+    "driver_sha256": "d0fea1046917646c86f57b9865d6fe01e97a9b5253620a7232a09b9caa4b0eb7",
+    "harness_sha256": "3423ce57914d120e3936fa7ab92f757224ac24b6e46342c000445de043fb454d",
+    "support_sha256": {
+      "krylov_stress.py": "dff114a13b5d0201ff35337a2780ad9ac96b38357b13cca35f3d7ab92ebbce86",
+      "numerical_baseline.py": "ec5d307b42df1845cbd91710ee3ce555a9bd22b2c0c94747c42336cc6e281bff",
+      "sparse_field_validation.py": "2af3c42cc3631cbff8463946c94c37ca4291af89094cf276ca685ddf3c1a3e26"
+    },
+    "counts": {
+      "accepted_reference_targets": 92,
+      "nonconvergence": 30,
+      "accepted_accuracy_or_inclusion_warning": 14
+    },
+    "successful_physical_accuracy_warnings": [],
+    "raw_report_sha256": "fceed262c4263314e095a2551beb6669e497376c6bfedb9cb217adf6e86b9e0e",
+    "total": 136,
+    "endpoint_comparison": {
+      "absolute_residual_le_1e_minus10": {
+        "all_available_candidates": 108,
+        "successful_candidates": 86
+      },
+      "relative_residual_le_1e_minus10": {
+        "all_available_candidates": 112,
+        "successful_candidates": 90
+      },
+      "centered_residual_le_1e_minus10": {
+        "all_available_candidates": 108,
+        "successful_candidates": 86
+      },
+      "reference_subspace_le_1e_minus5": {
+        "all_available_candidates": 98,
+        "successful_candidates": 76
+      }
+    }
+  },
+  "gnu13": {
+    "schema": 1,
+    "interpretation": "characterization; zero exit is not universal solver accuracy",
+    "numpy": "2.3.5",
+    "driver_sha256": "99c7ab80030ca35275433404a9e8ffe03c362791ece752cb8a9f2f3011f2904d",
+    "harness_sha256": "3423ce57914d120e3936fa7ab92f757224ac24b6e46342c000445de043fb454d",
+    "support_sha256": {
+      "krylov_stress.py": "dff114a13b5d0201ff35337a2780ad9ac96b38357b13cca35f3d7ab92ebbce86",
+      "numerical_baseline.py": "ec5d307b42df1845cbd91710ee3ce555a9bd22b2c0c94747c42336cc6e281bff",
+      "sparse_field_validation.py": "2af3c42cc3631cbff8463946c94c37ca4291af89094cf276ca685ddf3c1a3e26"
+    },
+    "counts": {
+      "accepted_reference_targets": 92,
+      "nonconvergence": 30,
+      "accepted_accuracy_or_inclusion_warning": 14
+    },
+    "successful_physical_accuracy_warnings": [],
+    "raw_report_sha256": "eec2a6625eadb17da3a0aee66581fa0a015b26d57efab35599c680d35a53d58c",
+    "total": 136,
+    "endpoint_comparison": {
+      "absolute_residual_le_1e_minus10": {
+        "all_available_candidates": 108,
+        "successful_candidates": 86
+      },
+      "relative_residual_le_1e_minus10": {
+        "all_available_candidates": 112,
+        "successful_candidates": 90
+      },
+      "centered_residual_le_1e_minus10": {
+        "all_available_candidates": 108,
+        "successful_candidates": 86
+      },
+      "reference_subspace_le_1e_minus5": {
+        "all_available_candidates": 98,
+        "successful_candidates": 76
+      }
+    }
+  },
+  "bounds": {
+    "schema": 1,
+    "interpretation": "characterization; zero exit is not universal solver accuracy",
+    "numpy": "2.3.5",
+    "driver_sha256": "04bfad5f90138d04fa7ffbed1bb53914491162c72304623e393ff52f562901c6",
+    "harness_sha256": "3423ce57914d120e3936fa7ab92f757224ac24b6e46342c000445de043fb454d",
+    "support_sha256": {
+      "krylov_stress.py": "dff114a13b5d0201ff35337a2780ad9ac96b38357b13cca35f3d7ab92ebbce86",
+      "numerical_baseline.py": "ec5d307b42df1845cbd91710ee3ce555a9bd22b2c0c94747c42336cc6e281bff",
+      "sparse_field_validation.py": "2af3c42cc3631cbff8463946c94c37ca4291af89094cf276ca685ddf3c1a3e26"
+    },
+    "counts": {
+      "accepted_reference_targets": 92,
+      "nonconvergence": 30,
+      "accepted_accuracy_or_inclusion_warning": 14
+    },
+    "successful_physical_accuracy_warnings": [],
+    "raw_report_sha256": "f6bb5f3749e8787df891a9b83f3304dd3d4ff481280f9ec2efc4b42f10dc2adb",
+    "total": 136,
+    "endpoint_comparison": {
+      "absolute_residual_le_1e_minus10": {
+        "all_available_candidates": 108,
+        "successful_candidates": 86
+      },
+      "relative_residual_le_1e_minus10": {
+        "all_available_candidates": 112,
+        "successful_candidates": 90
+      },
+      "centered_residual_le_1e_minus10": {
+        "all_available_candidates": 108,
+        "successful_candidates": 86
+      },
+      "reference_subspace_le_1e_minus5": {
+        "all_available_candidates": 98,
+        "successful_candidates": 76
+      }
+    }
+  },
+  "default": {
+    "schema": 1,
+    "interpretation": "characterization; zero exit is not universal solver accuracy",
+    "numpy": "2.3.5",
+    "driver_sha256": "e1f2a571057dd434345067258efda9ccc23b9bc8c34c90ec58ab9733285bccdc",
+    "harness_sha256": "3423ce57914d120e3936fa7ab92f757224ac24b6e46342c000445de043fb454d",
+    "support_sha256": {
+      "krylov_stress.py": "dff114a13b5d0201ff35337a2780ad9ac96b38357b13cca35f3d7ab92ebbce86",
+      "numerical_baseline.py": "ec5d307b42df1845cbd91710ee3ce555a9bd22b2c0c94747c42336cc6e281bff",
+      "sparse_field_validation.py": "2af3c42cc3631cbff8463946c94c37ca4291af89094cf276ca685ddf3c1a3e26"
+    },
+    "counts": {
+      "accepted_reference_targets": 92,
+      "nonconvergence": 31,
+      "accepted_accuracy_or_inclusion_warning": 13
+    },
+    "successful_physical_accuracy_warnings": [],
+    "raw_report_sha256": "61fa9cbe785826af8757080a844327055b07114674c8cc9db4416ae6e1490026",
+    "total": 136,
+    "endpoint_comparison": {
+      "absolute_residual_le_1e_minus10": {
+        "all_available_candidates": 108,
+        "successful_candidates": 86
+      },
+      "relative_residual_le_1e_minus10": {
+        "all_available_candidates": 111,
+        "successful_candidates": 89
+      },
+      "centered_residual_le_1e_minus10": {
+        "all_available_candidates": 106,
+        "successful_candidates": 84
+      },
+      "reference_subspace_le_1e_minus5": {
+        "all_available_candidates": 98,
+        "successful_candidates": 76
+      }
+    }
+  }
+}

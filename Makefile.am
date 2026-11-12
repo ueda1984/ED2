@@ -34,3 +34,8 @@ check-lanczos:
 check-krylov-stress:
 	$(AM_V_at)$(MAKE) -C source all
 	$(AM_V_at)$(MAKE) -C tests check-krylov-stress KRYLOV_OUTPUT="$(KRYLOV_OUTPUT)"
+
+.PHONY: check-precision-contract
+check-precision-contract:
+	$(AM_V_at)$(MAKE) -C source all
+	$(AM_V_at)$(MAKE) -C tests check-precision-contract PRECISION_OUTPUT="$(PRECISION_OUTPUT)"

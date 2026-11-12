@@ -1,0 +1,994 @@
+{
+  "o2": [
+    {
+      "family": "gap-1e-10",
+      "n": 32,
+      "alg": 1,
+      "tol": 1e-12,
+      "seed": 73,
+      "wanted": 1,
+      "keep": 8,
+      "capacity": 16,
+      "budget": 32,
+      "id": "0017-omp1",
+      "threads": 1,
+      "input_sha256": "7e45286bfe0a38bc13a079921ce4960abcbd54034030147e136f4ecaa25fda1d",
+      "solver_status": 0,
+      "reason": "energy convergence (residual certified)",
+      "iterations": 19,
+      "exit_code": 0,
+      "legacy_success": true,
+      "rng_state": [
+        "           0         110         147         184         221         258         295         332         369"
+      ],
+      "h_applications": 38,
+      "classification": "accepted_accuracy_or_inclusion_warning",
+      "candidate_assessment": {
+        "residual_norms": [
+          1.7048916388215193e-07
+        ],
+        "spectral_scale": 2.0,
+        "centered_scale": 1.5,
+        "boundary_gap": 1.000000082740371e-10,
+        "reference_separation": 1.9284018826226657e-11,
+        "reference_subspace_bound": 1.0,
+        "reference_eigensystem_residual": 2.130502891612317e-15,
+        "reference_bound_correction": 4.041566397941098e-16,
+        "orthogonality_error": 0.0,
+        "requested_space_leakage": 0.9811714719546638,
+        "projector_error": 0.9811714719546639,
+        "complete_cluster": true,
+        "broad_cluster_leakage": 1.3829979052791378e-07,
+        "lowest_eigenvalue_errors": [
+          2.1928403537430086e-10
+        ],
+        "absolute_residual_le_1e_minus10": false,
+        "relative_residual_le_1e_minus10": false,
+        "centered_residual_le_1e_minus10": false,
+        "reference_subspace_le_1e_minus5": false
+      },
+      "last_printed_energy_change": 2.1e-13
+    },
+    {
+      "family": "gap-1e-10",
+      "n": 32,
+      "alg": 1,
+      "tol": 1e-20,
+      "seed": 19,
+      "wanted": 1,
+      "keep": 8,
+      "capacity": 16,
+      "budget": 32,
+      "id": "0018-omp1",
+      "threads": 1,
+      "input_sha256": "cc369e69163fe99d405890911b0038722edf27f7c6bb3f987603dab3de51fd3c",
+      "solver_status": 0,
+      "reason": "energy convergence (residual certified)",
+      "iterations": 25,
+      "exit_code": 0,
+      "legacy_success": true,
+      "rng_state": [
+        "           0          56          93         130         167         204         241         278         315"
+      ],
+      "h_applications": 119,
+      "classification": "accepted_accuracy_or_inclusion_warning",
+      "candidate_assessment": {
+        "residual_norms": [
+          8.931891218343627e-11
+        ],
+        "spectral_scale": 2.0,
+        "centered_scale": 1.5,
+        "boundary_gap": 1.000000082740371e-10,
+        "reference_separation": 4.578892820461533e-12,
+        "reference_subspace_bound": 1.0,
+        "reference_eigensystem_residual": 2.130502891612317e-15,
+        "reference_bound_correction": 3.0463789970574807e-16,
+        "orthogonality_error": 0.0,
+        "requested_space_leakage": 0.9042986885465294,
+        "projector_error": 0.9042986885465295,
+        "complete_cluster": true,
+        "broad_cluster_leakage": 2.658789927725388e-11,
+        "lowest_eigenvalue_errors": [
+          1.0457890109449863e-10
+        ],
+        "absolute_residual_le_1e_minus10": true,
+        "relative_residual_le_1e_minus10": true,
+        "centered_residual_le_1e_minus10": true,
+        "reference_subspace_le_1e_minus5": false
+      },
+      "last_printed_energy_change": 0.0
+    },
+    {
+      "family": "scale-1.0-shift-1000000.0",
+      "n": 32,
+      "alg": 1,
+      "tol": 1e-12,
+      "seed": 19,
+      "wanted": 1,
+      "keep": 6,
+      "capacity": 12,
+      "budget": 32,
+      "id": "0040-omp2",
+      "threads": 2,
+      "input_sha256": "93b238eb3aa1a9fa140dd88d56e0f029a9297fcb56b0618ec48bef987d27f02c",
+      "solver_status": 0,
+      "reason": "energy convergence (residual certified)",
+      "iterations": 21,
+      "exit_code": 0,
+      "legacy_success": true,
+      "rng_state": [
+        "           0          56          93         130         167         204         241         278         315",
+        "           1      104785      104822      104859      104896      104933      104970      105007      105044"
+      ],
+      "h_applications": 42,
+      "classification": "accepted_accuracy_or_inclusion_warning",
+      "candidate_assessment": {
+        "residual_norms": [
+          0.0004186810427257279
+        ],
+        "spectral_scale": 1000002.0,
+        "centered_scale": 1.5,
+        "boundary_gap": 0.09677419357467443,
+        "reference_separation": 0.09677396772895008,
+        "reference_subspace_bound": 0.004326382617450681,
+        "reference_eigensystem_residual": 4.119972951263068e-10,
+        "reference_bound_correction": 1.6907853484750554e-10,
+        "orthogonality_error": 2.220446049250313e-16,
+        "requested_space_leakage": 0.000666642289475316,
+        "projector_error": 0.0006666422894754829,
+        "complete_cluster": true,
+        "broad_cluster_leakage": 0.000666642289475316,
+        "lowest_eigenvalue_errors": [
+          2.2584572434425354e-07
+        ],
+        "absolute_residual_le_1e_minus10": false,
+        "relative_residual_le_1e_minus10": false,
+        "centered_residual_le_1e_minus10": false,
+        "reference_subspace_le_1e_minus5": false
+      },
+      "last_printed_energy_change": 6.9e-13
+    },
+    {
+      "family": "excluded-ground",
+      "n": 4,
+      "alg": 1,
+      "tol": 1e-12,
+      "seed": 19,
+      "wanted": 1,
+      "keep": 2,
+      "capacity": 4,
+      "budget": 4,
+      "id": "0042-omp1",
+      "threads": 1,
+      "input_sha256": "70010ccd4e7d6607871e1ac4b7db0572178f23c5256d569b0b9790f9c70a4e22",
+      "solver_status": 0,
+      "reason": "happy breakdown (exact zero beta; residual certified)",
+      "iterations": 1,
+      "exit_code": 0,
+      "legacy_success": true,
+      "rng_state": [
+        "           0          56          93         130         167         204         241         278         315"
+      ],
+      "h_applications": 2,
+      "classification": "accepted_accuracy_or_inclusion_warning",
+      "candidate_assessment": {
+        "residual_norms": [
+          0.0
+        ],
+        "spectral_scale": 2.0,
+        "centered_scale": 1.5,
+        "boundary_gap": 1.000000082740371e-10,
+        "reference_separation": 0.0,
+        "reference_subspace_bound": null,
+        "reference_eigensystem_residual": 0.0,
+        "reference_bound_correction": 0.0,
+        "orthogonality_error": 0.0,
+        "requested_space_leakage": 1.0,
+        "projector_error": 1.0,
+        "complete_cluster": true,
+        "broad_cluster_leakage": 0.0,
+        "lowest_eigenvalue_errors": [
+          1.000000082740371e-10
+        ],
+        "absolute_residual_le_1e_minus10": true,
+        "relative_residual_le_1e_minus10": true,
+        "centered_residual_le_1e_minus10": true,
+        "reference_subspace_le_1e_minus5": false
+      },
+      "last_printed_energy_change": 1.0
+    },
+    {
+      "family": "weak-ground-overlap",
+      "n": 4,
+      "alg": 1,
+      "tol": 1e-12,
+      "seed": 19,
+      "wanted": 1,
+      "keep": 2,
+      "capacity": 4,
+      "budget": 4,
+      "id": "0043-omp1",
+      "threads": 1,
+      "input_sha256": "744760990588ba907aafc2622f67cfa445ee69af9f427d90aeb0aa099645bdb6",
+      "solver_status": 0,
+      "reason": "numerical near-breakdown (residual certified)",
+      "iterations": 1,
+      "exit_code": 0,
+      "legacy_success": true,
+      "rng_state": [
+        "           0          56          93         130         167         204         241         278         315"
+      ],
+      "h_applications": 2,
+      "classification": "accepted_accuracy_or_inclusion_warning",
+      "candidate_assessment": {
+        "residual_norms": [
+          1.1102680595724626e-16
+        ],
+        "spectral_scale": 2.0,
+        "centered_scale": 1.5,
+        "boundary_gap": 1.000000082740371e-10,
+        "reference_separation": 1.1102230246251565e-16,
+        "reference_subspace_bound": 1.0,
+        "reference_eigensystem_residual": 0.0,
+        "reference_bound_correction": 0.0,
+        "orthogonality_error": 0.0,
+        "requested_space_leakage": 1.0,
+        "projector_error": 1.0,
+        "complete_cluster": true,
+        "broad_cluster_leakage": 0.0,
+        "lowest_eigenvalue_errors": [
+          9.999989725173464e-11
+        ],
+        "absolute_residual_le_1e_minus10": true,
+        "relative_residual_le_1e_minus10": true,
+        "centered_residual_le_1e_minus10": true,
+        "reference_subspace_le_1e_minus5": false
+      },
+      "last_printed_energy_change": 1.0
+    }
+  ],
+  "gnu13": [
+    {
+      "family": "gap-1e-10",
+      "n": 32,
+      "alg": 1,
+      "tol": 1e-12,
+      "seed": 73,
+      "wanted": 1,
+      "keep": 8,
+      "capacity": 16,
+      "budget": 32,
+      "id": "0017-omp1",
+      "threads": 1,
+      "input_sha256": "7e45286bfe0a38bc13a079921ce4960abcbd54034030147e136f4ecaa25fda1d",
+      "solver_status": 0,
+      "reason": "energy convergence (residual certified)",
+      "iterations": 19,
+      "exit_code": 0,
+      "legacy_success": true,
+      "rng_state": [
+        "           0         110         147         184         221         258         295         332         369"
+      ],
+      "h_applications": 38,
+      "classification": "accepted_accuracy_or_inclusion_warning",
+      "candidate_assessment": {
+        "residual_norms": [
+          1.7048916388215193e-07
+        ],
+        "spectral_scale": 2.0,
+        "centered_scale": 1.5,
+        "boundary_gap": 1.000000082740371e-10,
+        "reference_separation": 1.9284018826226657e-11,
+        "reference_subspace_bound": 1.0,
+        "reference_eigensystem_residual": 2.130502891612317e-15,
+        "reference_bound_correction": 4.041566397941098e-16,
+        "orthogonality_error": 0.0,
+        "requested_space_leakage": 0.9811714719546638,
+        "projector_error": 0.9811714719546639,
+        "complete_cluster": true,
+        "broad_cluster_leakage": 1.3829979052791378e-07,
+        "lowest_eigenvalue_errors": [
+          2.1928403537430086e-10
+        ],
+        "absolute_residual_le_1e_minus10": false,
+        "relative_residual_le_1e_minus10": false,
+        "centered_residual_le_1e_minus10": false,
+        "reference_subspace_le_1e_minus5": false
+      },
+      "last_printed_energy_change": 2.1e-13
+    },
+    {
+      "family": "gap-1e-10",
+      "n": 32,
+      "alg": 1,
+      "tol": 1e-20,
+      "seed": 19,
+      "wanted": 1,
+      "keep": 8,
+      "capacity": 16,
+      "budget": 32,
+      "id": "0018-omp1",
+      "threads": 1,
+      "input_sha256": "cc369e69163fe99d405890911b0038722edf27f7c6bb3f987603dab3de51fd3c",
+      "solver_status": 0,
+      "reason": "energy convergence (residual certified)",
+      "iterations": 25,
+      "exit_code": 0,
+      "legacy_success": true,
+      "rng_state": [
+        "           0          56          93         130         167         204         241         278         315"
+      ],
+      "h_applications": 119,
+      "classification": "accepted_accuracy_or_inclusion_warning",
+      "candidate_assessment": {
+        "residual_norms": [
+          8.931891218343627e-11
+        ],
+        "spectral_scale": 2.0,
+        "centered_scale": 1.5,
+        "boundary_gap": 1.000000082740371e-10,
+        "reference_separation": 4.578892820461533e-12,
+        "reference_subspace_bound": 1.0,
+        "reference_eigensystem_residual": 2.130502891612317e-15,
+        "reference_bound_correction": 3.0463789970574807e-16,
+        "orthogonality_error": 0.0,
+        "requested_space_leakage": 0.9042986885465294,
+        "projector_error": 0.9042986885465295,
+        "complete_cluster": true,
+        "broad_cluster_leakage": 2.658789927725388e-11,
+        "lowest_eigenvalue_errors": [
+          1.0457890109449863e-10
+        ],
+        "absolute_residual_le_1e_minus10": true,
+        "relative_residual_le_1e_minus10": true,
+        "centered_residual_le_1e_minus10": true,
+        "reference_subspace_le_1e_minus5": false
+      },
+      "last_printed_energy_change": 0.0
+    },
+    {
+      "family": "scale-1.0-shift-1000000.0",
+      "n": 32,
+      "alg": 1,
+      "tol": 1e-12,
+      "seed": 19,
+      "wanted": 1,
+      "keep": 6,
+      "capacity": 12,
+      "budget": 32,
+      "id": "0040-omp2",
+      "threads": 2,
+      "input_sha256": "93b238eb3aa1a9fa140dd88d56e0f029a9297fcb56b0618ec48bef987d27f02c",
+      "solver_status": 0,
+      "reason": "energy convergence (residual certified)",
+      "iterations": 21,
+      "exit_code": 0,
+      "legacy_success": true,
+      "rng_state": [
+        "           0          56          93         130         167         204         241         278         315",
+        "           1      104785      104822      104859      104896      104933      104970      105007      105044"
+      ],
+      "h_applications": 42,
+      "classification": "accepted_accuracy_or_inclusion_warning",
+      "candidate_assessment": {
+        "residual_norms": [
+          0.0004186810427257279
+        ],
+        "spectral_scale": 1000002.0,
+        "centered_scale": 1.5,
+        "boundary_gap": 0.09677419357467443,
+        "reference_separation": 0.09677396772895008,
+        "reference_subspace_bound": 0.004326382617450681,
+        "reference_eigensystem_residual": 4.119972951263068e-10,
+        "reference_bound_correction": 1.6907853484750554e-10,
+        "orthogonality_error": 2.220446049250313e-16,
+        "requested_space_leakage": 0.000666642289475316,
+        "projector_error": 0.0006666422894754829,
+        "complete_cluster": true,
+        "broad_cluster_leakage": 0.000666642289475316,
+        "lowest_eigenvalue_errors": [
+          2.2584572434425354e-07
+        ],
+        "absolute_residual_le_1e_minus10": false,
+        "relative_residual_le_1e_minus10": false,
+        "centered_residual_le_1e_minus10": false,
+        "reference_subspace_le_1e_minus5": false
+      },
+      "last_printed_energy_change": 6.9e-13
+    },
+    {
+      "family": "excluded-ground",
+      "n": 4,
+      "alg": 1,
+      "tol": 1e-12,
+      "seed": 19,
+      "wanted": 1,
+      "keep": 2,
+      "capacity": 4,
+      "budget": 4,
+      "id": "0042-omp1",
+      "threads": 1,
+      "input_sha256": "70010ccd4e7d6607871e1ac4b7db0572178f23c5256d569b0b9790f9c70a4e22",
+      "solver_status": 0,
+      "reason": "happy breakdown (exact zero beta; residual certified)",
+      "iterations": 1,
+      "exit_code": 0,
+      "legacy_success": true,
+      "rng_state": [
+        "           0          56          93         130         167         204         241         278         315"
+      ],
+      "h_applications": 2,
+      "classification": "accepted_accuracy_or_inclusion_warning",
+      "candidate_assessment": {
+        "residual_norms": [
+          0.0
+        ],
+        "spectral_scale": 2.0,
+        "centered_scale": 1.5,
+        "boundary_gap": 1.000000082740371e-10,
+        "reference_separation": 0.0,
+        "reference_subspace_bound": null,
+        "reference_eigensystem_residual": 0.0,
+        "reference_bound_correction": 0.0,
+        "orthogonality_error": 0.0,
+        "requested_space_leakage": 1.0,
+        "projector_error": 1.0,
+        "complete_cluster": true,
+        "broad_cluster_leakage": 0.0,
+        "lowest_eigenvalue_errors": [
+          1.000000082740371e-10
+        ],
+        "absolute_residual_le_1e_minus10": true,
+        "relative_residual_le_1e_minus10": true,
+        "centered_residual_le_1e_minus10": true,
+        "reference_subspace_le_1e_minus5": false
+      },
+      "last_printed_energy_change": 1.0
+    },
+    {
+      "family": "weak-ground-overlap",
+      "n": 4,
+      "alg": 1,
+      "tol": 1e-12,
+      "seed": 19,
+      "wanted": 1,
+      "keep": 2,
+      "capacity": 4,
+      "budget": 4,
+      "id": "0043-omp1",
+      "threads": 1,
+      "input_sha256": "744760990588ba907aafc2622f67cfa445ee69af9f427d90aeb0aa099645bdb6",
+      "solver_status": 0,
+      "reason": "numerical near-breakdown (residual certified)",
+      "iterations": 1,
+      "exit_code": 0,
+      "legacy_success": true,
+      "rng_state": [
+        "           0          56          93         130         167         204         241         278         315"
+      ],
+      "h_applications": 2,
+      "classification": "accepted_accuracy_or_inclusion_warning",
+      "candidate_assessment": {
+        "residual_norms": [
+          1.1102680595724626e-16
+        ],
+        "spectral_scale": 2.0,
+        "centered_scale": 1.5,
+        "boundary_gap": 1.000000082740371e-10,
+        "reference_separation": 1.1102230246251565e-16,
+        "reference_subspace_bound": 1.0,
+        "reference_eigensystem_residual": 0.0,
+        "reference_bound_correction": 0.0,
+        "orthogonality_error": 0.0,
+        "requested_space_leakage": 1.0,
+        "projector_error": 1.0,
+        "complete_cluster": true,
+        "broad_cluster_leakage": 0.0,
+        "lowest_eigenvalue_errors": [
+          9.999989725173464e-11
+        ],
+        "absolute_residual_le_1e_minus10": true,
+        "relative_residual_le_1e_minus10": true,
+        "centered_residual_le_1e_minus10": true,
+        "reference_subspace_le_1e_minus5": false
+      },
+      "last_printed_energy_change": 1.0
+    }
+  ],
+  "bounds": [
+    {
+      "family": "gap-1e-10",
+      "n": 32,
+      "alg": 1,
+      "tol": 1e-12,
+      "seed": 73,
+      "wanted": 1,
+      "keep": 8,
+      "capacity": 16,
+      "budget": 32,
+      "id": "0017-omp1",
+      "threads": 1,
+      "input_sha256": "7e45286bfe0a38bc13a079921ce4960abcbd54034030147e136f4ecaa25fda1d",
+      "solver_status": 0,
+      "reason": "energy convergence (residual certified)",
+      "iterations": 19,
+      "exit_code": 0,
+      "legacy_success": true,
+      "rng_state": [
+        "           0         110         147         184         221         258         295         332         369"
+      ],
+      "h_applications": 38,
+      "classification": "accepted_accuracy_or_inclusion_warning",
+      "candidate_assessment": {
+        "residual_norms": [
+          1.7048916388215193e-07
+        ],
+        "spectral_scale": 2.0,
+        "centered_scale": 1.5,
+        "boundary_gap": 1.000000082740371e-10,
+        "reference_separation": 1.9284018826226657e-11,
+        "reference_subspace_bound": 1.0,
+        "reference_eigensystem_residual": 2.130502891612317e-15,
+        "reference_bound_correction": 4.041566397941098e-16,
+        "orthogonality_error": 0.0,
+        "requested_space_leakage": 0.9811714719546638,
+        "projector_error": 0.9811714719546639,
+        "complete_cluster": true,
+        "broad_cluster_leakage": 1.3829979052791378e-07,
+        "lowest_eigenvalue_errors": [
+          2.1928403537430086e-10
+        ],
+        "absolute_residual_le_1e_minus10": false,
+        "relative_residual_le_1e_minus10": false,
+        "centered_residual_le_1e_minus10": false,
+        "reference_subspace_le_1e_minus5": false
+      },
+      "last_printed_energy_change": 2.1e-13
+    },
+    {
+      "family": "gap-1e-10",
+      "n": 32,
+      "alg": 1,
+      "tol": 1e-20,
+      "seed": 19,
+      "wanted": 1,
+      "keep": 8,
+      "capacity": 16,
+      "budget": 32,
+      "id": "0018-omp1",
+      "threads": 1,
+      "input_sha256": "cc369e69163fe99d405890911b0038722edf27f7c6bb3f987603dab3de51fd3c",
+      "solver_status": 0,
+      "reason": "energy convergence (residual certified)",
+      "iterations": 25,
+      "exit_code": 0,
+      "legacy_success": true,
+      "rng_state": [
+        "           0          56          93         130         167         204         241         278         315"
+      ],
+      "h_applications": 119,
+      "classification": "accepted_accuracy_or_inclusion_warning",
+      "candidate_assessment": {
+        "residual_norms": [
+          8.931891218343627e-11
+        ],
+        "spectral_scale": 2.0,
+        "centered_scale": 1.5,
+        "boundary_gap": 1.000000082740371e-10,
+        "reference_separation": 4.578892820461533e-12,
+        "reference_subspace_bound": 1.0,
+        "reference_eigensystem_residual": 2.130502891612317e-15,
+        "reference_bound_correction": 3.0463789970574807e-16,
+        "orthogonality_error": 0.0,
+        "requested_space_leakage": 0.9042986885465294,
+        "projector_error": 0.9042986885465295,
+        "complete_cluster": true,
+        "broad_cluster_leakage": 2.658789927725388e-11,
+        "lowest_eigenvalue_errors": [
+          1.0457890109449863e-10
+        ],
+        "absolute_residual_le_1e_minus10": true,
+        "relative_residual_le_1e_minus10": true,
+        "centered_residual_le_1e_minus10": true,
+        "reference_subspace_le_1e_minus5": false
+      },
+      "last_printed_energy_change": 0.0
+    },
+    {
+      "family": "scale-1.0-shift-1000000.0",
+      "n": 32,
+      "alg": 1,
+      "tol": 1e-12,
+      "seed": 19,
+      "wanted": 1,
+      "keep": 6,
+      "capacity": 12,
+      "budget": 32,
+      "id": "0040-omp2",
+      "threads": 2,
+      "input_sha256": "93b238eb3aa1a9fa140dd88d56e0f029a9297fcb56b0618ec48bef987d27f02c",
+      "solver_status": 0,
+      "reason": "energy convergence (residual certified)",
+      "iterations": 21,
+      "exit_code": 0,
+      "legacy_success": true,
+      "rng_state": [
+        "           0          56          93         130         167         204         241         278         315",
+        "           1      104785      104822      104859      104896      104933      104970      105007      105044"
+      ],
+      "h_applications": 42,
+      "classification": "accepted_accuracy_or_inclusion_warning",
+      "candidate_assessment": {
+        "residual_norms": [
+          0.0004186810427257279
+        ],
+        "spectral_scale": 1000002.0,
+        "centered_scale": 1.5,
+        "boundary_gap": 0.09677419357467443,
+        "reference_separation": 0.09677396772895008,
+        "reference_subspace_bound": 0.004326382617450681,
+        "reference_eigensystem_residual": 4.119972951263068e-10,
+        "reference_bound_correction": 1.6907853484750554e-10,
+        "orthogonality_error": 2.220446049250313e-16,
+        "requested_space_leakage": 0.000666642289475316,
+        "projector_error": 0.0006666422894754829,
+        "complete_cluster": true,
+        "broad_cluster_leakage": 0.000666642289475316,
+        "lowest_eigenvalue_errors": [
+          2.2584572434425354e-07
+        ],
+        "absolute_residual_le_1e_minus10": false,
+        "relative_residual_le_1e_minus10": false,
+        "centered_residual_le_1e_minus10": false,
+        "reference_subspace_le_1e_minus5": false
+      },
+      "last_printed_energy_change": 6.9e-13
+    },
+    {
+      "family": "excluded-ground",
+      "n": 4,
+      "alg": 1,
+      "tol": 1e-12,
+      "seed": 19,
+      "wanted": 1,
+      "keep": 2,
+      "capacity": 4,
+      "budget": 4,
+      "id": "0042-omp1",
+      "threads": 1,
+      "input_sha256": "70010ccd4e7d6607871e1ac4b7db0572178f23c5256d569b0b9790f9c70a4e22",
+      "solver_status": 0,
+      "reason": "happy breakdown (exact zero beta; residual certified)",
+      "iterations": 1,
+      "exit_code": 0,
+      "legacy_success": true,
+      "rng_state": [
+        "           0          56          93         130         167         204         241         278         315"
+      ],
+      "h_applications": 2,
+      "classification": "accepted_accuracy_or_inclusion_warning",
+      "candidate_assessment": {
+        "residual_norms": [
+          0.0
+        ],
+        "spectral_scale": 2.0,
+        "centered_scale": 1.5,
+        "boundary_gap": 1.000000082740371e-10,
+        "reference_separation": 0.0,
+        "reference_subspace_bound": null,
+        "reference_eigensystem_residual": 0.0,
+        "reference_bound_correction": 0.0,
+        "orthogonality_error": 0.0,
+        "requested_space_leakage": 1.0,
+        "projector_error": 1.0,
+        "complete_cluster": true,
+        "broad_cluster_leakage": 0.0,
+        "lowest_eigenvalue_errors": [
+          1.000000082740371e-10
+        ],
+        "absolute_residual_le_1e_minus10": true,
+        "relative_residual_le_1e_minus10": true,
+        "centered_residual_le_1e_minus10": true,
+        "reference_subspace_le_1e_minus5": false
+      },
+      "last_printed_energy_change": 1.0
+    },
+    {
+      "family": "weak-ground-overlap",
+      "n": 4,
+      "alg": 1,
+      "tol": 1e-12,
+      "seed": 19,
+      "wanted": 1,
+      "keep": 2,
+      "capacity": 4,
+      "budget": 4,
+      "id": "0043-omp1",
+      "threads": 1,
+      "input_sha256": "744760990588ba907aafc2622f67cfa445ee69af9f427d90aeb0aa099645bdb6",
+      "solver_status": 0,
+      "reason": "numerical near-breakdown (residual certified)",
+      "iterations": 1,
+      "exit_code": 0,
+      "legacy_success": true,
+      "rng_state": [
+        "           0          56          93         130         167         204         241         278         315"
+      ],
+      "h_applications": 2,
+      "classification": "accepted_accuracy_or_inclusion_warning",
+      "candidate_assessment": {
+        "residual_norms": [
+          1.1102680595724626e-16
+        ],
+        "spectral_scale": 2.0,
+        "centered_scale": 1.5,
+        "boundary_gap": 1.000000082740371e-10,
+        "reference_separation": 1.1102230246251565e-16,
+        "reference_subspace_bound": 1.0,
+        "reference_eigensystem_residual": 0.0,
+        "reference_bound_correction": 0.0,
+        "orthogonality_error": 0.0,
+        "requested_space_leakage": 1.0,
+        "projector_error": 1.0,
+        "complete_cluster": true,
+        "broad_cluster_leakage": 0.0,
+        "lowest_eigenvalue_errors": [
+          9.999989725173464e-11
+        ],
+        "absolute_residual_le_1e_minus10": true,
+        "relative_residual_le_1e_minus10": true,
+        "centered_residual_le_1e_minus10": true,
+        "reference_subspace_le_1e_minus5": false
+      },
+      "last_printed_energy_change": 1.0
+    }
+  ],
+  "default": [
+    {
+      "family": "gap-1e-10",
+      "n": 32,
+      "alg": 1,
+      "tol": 1e-12,
+      "seed": 73,
+      "wanted": 1,
+      "keep": 8,
+      "capacity": 16,
+      "budget": 32,
+      "id": "0017-omp1",
+      "threads": 1,
+      "input_sha256": "7e45286bfe0a38bc13a079921ce4960abcbd54034030147e136f4ecaa25fda1d",
+      "solver_status": 0,
+      "reason": "energy convergence (residual certified)",
+      "iterations": 19,
+      "exit_code": 0,
+      "legacy_success": true,
+      "rng_state": [
+        "           0         110         147         184         221         258         295         332         369"
+      ],
+      "h_applications": 38,
+      "classification": "accepted_accuracy_or_inclusion_warning",
+      "candidate_assessment": {
+        "residual_norms": [
+          1.7048916393988665e-07
+        ],
+        "spectral_scale": 2.0,
+        "centered_scale": 1.5,
+        "boundary_gap": 1.000000082740371e-10,
+        "reference_separation": 1.928424087083158e-11,
+        "reference_subspace_bound": 1.0,
+        "reference_eigensystem_residual": 2.130502891612317e-15,
+        "reference_bound_correction": 4.041566397941094e-16,
+        "orthogonality_error": 2.220446049250313e-16,
+        "requested_space_leakage": 0.9811714719546636,
+        "projector_error": 0.9811714719546636,
+        "complete_cluster": true,
+        "broad_cluster_leakage": 1.3829979049569117e-07,
+        "lowest_eigenvalue_errors": [
+          2.1928425741890578e-10
+        ],
+        "absolute_residual_le_1e_minus10": false,
+        "relative_residual_le_1e_minus10": false,
+        "centered_residual_le_1e_minus10": false,
+        "reference_subspace_le_1e_minus5": false
+      },
+      "last_printed_energy_change": 2.1e-13
+    },
+    {
+      "family": "gap-1e-10",
+      "n": 32,
+      "alg": 1,
+      "tol": 1e-20,
+      "seed": 19,
+      "wanted": 1,
+      "keep": 8,
+      "capacity": 16,
+      "budget": 32,
+      "id": "0018-omp1",
+      "threads": 1,
+      "input_sha256": "cc369e69163fe99d405890911b0038722edf27f7c6bb3f987603dab3de51fd3c",
+      "solver_status": 0,
+      "reason": "energy convergence (residual certified)",
+      "iterations": 25,
+      "exit_code": 0,
+      "legacy_success": true,
+      "rng_state": [
+        "           0          56          93         130         167         204         241         278         315"
+      ],
+      "h_applications": 97,
+      "classification": "accepted_accuracy_or_inclusion_warning",
+      "candidate_assessment": {
+        "residual_norms": [
+          8.931890917807423e-11
+        ],
+        "spectral_scale": 2.0,
+        "centered_scale": 1.5,
+        "boundary_gap": 1.000000082740371e-10,
+        "reference_separation": 4.578670775856608e-12,
+        "reference_subspace_bound": 1.0,
+        "reference_eigensystem_residual": 2.130502891612317e-15,
+        "reference_bound_correction": 3.0463789970574817e-16,
+        "orthogonality_error": 0.0,
+        "requested_space_leakage": 0.9042986885465297,
+        "projector_error": 0.9042986885465295,
+        "complete_cluster": true,
+        "broad_cluster_leakage": 2.658788740590452e-11,
+        "lowest_eigenvalue_errors": [
+          1.0457867904989371e-10
+        ],
+        "absolute_residual_le_1e_minus10": true,
+        "relative_residual_le_1e_minus10": true,
+        "centered_residual_le_1e_minus10": true,
+        "reference_subspace_le_1e_minus5": false
+      },
+      "last_printed_energy_change": 0.0
+    },
+    {
+      "family": "scale-1.0-shift-1000000.0",
+      "n": 32,
+      "alg": 1,
+      "tol": 1e-12,
+      "seed": 19,
+      "wanted": 1,
+      "keep": 6,
+      "capacity": 12,
+      "budget": 32,
+      "id": "0040-omp2",
+      "threads": 2,
+      "input_sha256": "93b238eb3aa1a9fa140dd88d56e0f029a9297fcb56b0618ec48bef987d27f02c",
+      "solver_status": 0,
+      "reason": "energy convergence (residual certified)",
+      "iterations": 21,
+      "exit_code": 0,
+      "legacy_success": true,
+      "rng_state": [
+        "           0          56          93         130         167         204         241         278         315",
+        "           1      104785      104822      104859      104896      104933      104970      105007      105044"
+      ],
+      "h_applications": 42,
+      "classification": "accepted_accuracy_or_inclusion_warning",
+      "candidate_assessment": {
+        "residual_norms": [
+          0.00041868103594213817
+        ],
+        "spectral_scale": 1000002.0,
+        "centered_scale": 1.5,
+        "boundary_gap": 0.09677419357467443,
+        "reference_separation": 0.09677396749611944,
+        "reference_subspace_bound": 0.004326382557762363,
+        "reference_eigensystem_residual": 4.119972951263068e-10,
+        "reference_bound_correction": 1.6907853486166357e-10,
+        "orthogonality_error": 0.0,
+        "requested_space_leakage": 0.0006666422139426082,
+        "projector_error": 0.0006666422139427614,
+        "complete_cluster": true,
+        "broad_cluster_leakage": 0.0006666422139426082,
+        "lowest_eigenvalue_errors": [
+          2.260785549879074e-07
+        ],
+        "absolute_residual_le_1e_minus10": false,
+        "relative_residual_le_1e_minus10": false,
+        "centered_residual_le_1e_minus10": false,
+        "reference_subspace_le_1e_minus5": false
+      },
+      "last_printed_energy_change": 6.9e-13
+    },
+    {
+      "family": "excluded-ground",
+      "n": 4,
+      "alg": 1,
+      "tol": 1e-12,
+      "seed": 19,
+      "wanted": 1,
+      "keep": 2,
+      "capacity": 4,
+      "budget": 4,
+      "id": "0042-omp1",
+      "threads": 1,
+      "input_sha256": "70010ccd4e7d6607871e1ac4b7db0572178f23c5256d569b0b9790f9c70a4e22",
+      "solver_status": 0,
+      "reason": "happy breakdown (exact zero beta; residual certified)",
+      "iterations": 1,
+      "exit_code": 0,
+      "legacy_success": true,
+      "rng_state": [
+        "           0          56          93         130         167         204         241         278         315"
+      ],
+      "h_applications": 2,
+      "classification": "accepted_accuracy_or_inclusion_warning",
+      "candidate_assessment": {
+        "residual_norms": [
+          0.0
+        ],
+        "spectral_scale": 2.0,
+        "centered_scale": 1.5,
+        "boundary_gap": 1.000000082740371e-10,
+        "reference_separation": 0.0,
+        "reference_subspace_bound": null,
+        "reference_eigensystem_residual": 0.0,
+        "reference_bound_correction": 0.0,
+        "orthogonality_error": 0.0,
+        "requested_space_leakage": 1.0,
+        "projector_error": 1.0,
+        "complete_cluster": true,
+        "broad_cluster_leakage": 0.0,
+        "lowest_eigenvalue_errors": [
+          1.000000082740371e-10
+        ],
+        "absolute_residual_le_1e_minus10": true,
+        "relative_residual_le_1e_minus10": true,
+        "centered_residual_le_1e_minus10": true,
+        "reference_subspace_le_1e_minus5": false
+      },
+      "last_printed_energy_change": 1.0
+    },
+    {
+      "family": "weak-ground-overlap",
+      "n": 4,
+      "alg": 1,
+      "tol": 1e-12,
+      "seed": 19,
+      "wanted": 1,
+      "keep": 2,
+      "capacity": 4,
+      "budget": 4,
+      "id": "0043-omp1",
+      "threads": 1,
+      "input_sha256": "744760990588ba907aafc2622f67cfa445ee69af9f427d90aeb0aa099645bdb6",
+      "solver_status": 0,
+      "reason": "numerical near-breakdown (residual certified)",
+      "iterations": 1,
+      "exit_code": 0,
+      "legacy_success": true,
+      "rng_state": [
+        "           0          56          93         130         167         204         241         278         315"
+      ],
+      "h_applications": 2,
+      "classification": "accepted_accuracy_or_inclusion_warning",
+      "candidate_assessment": {
+        "residual_norms": [
+          1.1102680595724626e-16
+        ],
+        "spectral_scale": 2.0,
+        "centered_scale": 1.5,
+        "boundary_gap": 1.000000082740371e-10,
+        "reference_separation": 1.1102230246251565e-16,
+        "reference_subspace_bound": 1.0,
+        "reference_eigensystem_residual": 0.0,
+        "reference_bound_correction": 0.0,
+        "orthogonality_error": 0.0,
+        "requested_space_leakage": 1.0,
+        "projector_error": 1.0,
+        "complete_cluster": true,
+        "broad_cluster_leakage": 0.0,
+        "lowest_eigenvalue_errors": [
+          9.999989725173464e-11
+        ],
+        "absolute_residual_le_1e_minus10": true,
+        "relative_residual_le_1e_minus10": true,
+        "centered_residual_le_1e_minus10": true,
+        "reference_subspace_le_1e_minus5": false
+      },
+      "last_printed_energy_change": 1.0
+    }
+  ]
+}

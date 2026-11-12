@@ -1,0 +1,89 @@
+{
+  "numerical_source_base": "b56fe21678e62b8b6216fe0ec742d5dbd62a8df6",
+  "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "cpu": "AMD EPYC 9V74 80-Core Processor",
+  "source_sha256": {
+    "blas_lapack_interfaces.f90": "d32e3dd65a61961867c3d156d9d27b545406f6616e788d1f7c75df6997402abc",
+    "eigen_solver.f90": "feeb0b79c3135d76ca7674fe3a61fa9b43f7c714feb5032c33bb393f8fe2798e",
+    "get_expectation_values.f90": "766439b901c3c3a985f6983542451d8d02a39eef4837fe7254da1506c6bbc34b",
+    "ham2vec.f90": "148ee9d28fbef2053ad86dcb702e4e3a3bbcd518c137e33581f3261a1bdeeaf2",
+    "input_param.f90": "96f83ae7b6af3188de463e285a349e4f055ffc92bff49a53aed2b0acb19e82f4",
+    "krylov_solvers.f90": "18c43ab3d4cafc0617bf915df347c70f59c9a80739ebebe9f6bcb4d1bfcd50a8",
+    "lanczos.f90": "198bd57f9c6c9dcaa972e78cfd101a2528ecad6f2223a9b86c97c9df64652eba",
+    "main.f90": "fffca6f3035492f347e30e1897f2bfcb4c29921dfa9006844dc149dae9e2cbf3",
+    "state_lists.f90": "977c6f513a351ab087da648795ff15cae83248f22b9476fb1135ae12b76b5f1a"
+  },
+  "validation_sha256": {
+    "tests/precision_contract.py": "3423ce57914d120e3936fa7ab92f757224ac24b6e46342c000445de043fb454d",
+    "tests/krylov_stress_driver.f90": "c84e6990799639b064313ca7793f7d0f8d5cfd9dd8d3ec9a5ed5380d8e2b891d",
+    "tests/krylov_acceptance_probe.py": "b85f633f4ad30c1c28fe43d26952f968743883b0e98365b45958042456f55fbf",
+    "tests/krylov_benchmark_probe.f90": "110e8031b6f6c2995af5fc6e7844e47e69706278942834a80f6ea07a892fe1dc",
+    "tools/summarize_precision_contract.py": "53e2c4ca12ee1395fd6f6026ce0109c2f1c6fe602969f48f39973b62df6b04db"
+  },
+  "original_gnu13_failure_sha256": "463317a2715638d0a50e7e51166c05fb183f2dd635870b83b39b3cce77141d81",
+  "original_gnu13_failure": [
+    {
+      "suite": "sparse-cli",
+      "fixture": "single-site4",
+      "alg": 1,
+      "cache": -1,
+      "threads": 2,
+      "input_sha256": {
+        "bonds.dat": "717d5950873d59227c9ed97fb9e4cb77bffff15f76daba6c2c4cd17bb5a3037b",
+        "caps.dat": "a0db8280e47040bfa328b02b87c122e236c9e04571ae34dffbe91f1f8cb05bb4",
+        "fields.dat": "ec5f4a910655f3920e3ead6ed8bf92126fe2f75fba6953ce084f1c6a515f10a5",
+        "input.dat": "8104065e2badc3f09bff25d0b05ce770901a681f68c1ab2fd4d37166e830718f",
+        "pairs.dat": "6ac64eee63a49500333a1663de5ce98c0491ec0bc0bd92f0f87a129e5fd84f02",
+        "spins.dat": "276a496114e72d4640629558f138d76f4b172990ca987d67bed8546dd844fc45"
+      },
+      "exit_code": 0,
+      "status": "failed",
+      "error": "\nNot equal to tolerance rtol=1e-09, atol=1e-09\nmagnetization\nMismatched elements: 10 / 12 (83.3%)\nMax absolute difference among violations: 1.53227552e-08\nMax relative difference among violations: 1.41378683e-07\n ACTUAL: array([[ 0.108381, -0.06011 ,  0.202701],\n       [-0.142368,  0.05716 , -0.126662],\n       [ 0.270407, -0.136441,  0.279645],\n       [-0.320989,  0.158369, -0.287781]])\n DESIRED: array([[ 0.108381, -0.06011 ,  0.202701],\n       [-0.142368,  0.05716 , -0.126662],\n       [ 0.270407, -0.136441,  0.279645],\n       [-0.320989,  0.158369, -0.287781]])"
+    }
+  ],
+  "thread_environment": {
+    "OMP_NUM_THREADS": [
+      1,
+      2
+    ],
+    "OMP_DYNAMIC": "FALSE",
+    "OPENBLAS_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1"
+  },
+  "profiles": {
+    "o2": {
+      "compiler": "GNU Fortran (Debian 14.2.0-19) 14.2.0",
+      "flags": "-O2 -fopenmp",
+      "driver_sha256": "d0fea1046917646c86f57b9865d6fe01e97a9b5253620a7232a09b9caa4b0eb7",
+      "executable_sha256": "86e3a8011584ac434f504c57800a866c8f2c280d0aa5f37b454e4315f0a73e2a",
+      "linked_libraries": "\tlinux-vdso.so.1 (0x00007fd59040b000)\n\tliblapack.so.3 => /workspace/ed2-env/tools/usr/lib/x86_64-linux-gnu/openblas-pthread/liblapack.so.3 (0x00007fd58fc9c000)\n\tlibopenblas.so.0 => /workspace/ed2-env/tools/usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblas.so.0 (0x00007fd58d6c0000)\n\tlibgfortran.so.5 => /workspace/ed2-env/tools/usr/lib/x86_64-linux-gnu/libgfortran.so.5 (0x00007fd58d3bc000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007fd58d2a9000)\n\tlibgomp.so.1 => /lib/x86_64-linux-gnu/libgomp.so.1 (0x00007fd58d254000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fd58d060000)\n\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007fd58d033000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007fd59040d000)\n"
+    },
+    "gnu13": {
+      "compiler": "GNU Fortran (Debian 13.3.0-16) 13.3.0",
+      "flags": "-O2 -fopenmp",
+      "driver_sha256": "99c7ab80030ca35275433404a9e8ffe03c362791ece752cb8a9f2f3011f2904d",
+      "executable_sha256": "c7d1caaeb49e5f208af1118d76a5a77a3968f65b8c4bb5dc1cceb85a5708dcca",
+      "linked_libraries": "\tlinux-vdso.so.1 (0x00007f7c33e66000)\n\tliblapack.so.3 => /workspace/ed2-env/tools/usr/lib/x86_64-linux-gnu/openblas-pthread/liblapack.so.3 (0x00007f7c336fb000)\n\tlibopenblas.so.0 => /workspace/ed2-env/tools/usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblas.so.0 (0x00007f7c31120000)\n\tlibgfortran.so.5 => /workspace/ed2-env/tools/usr/lib/x86_64-linux-gnu/libgfortran.so.5 (0x00007f7c30e1c000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f7c30d09000)\n\tlibgomp.so.1 => /lib/x86_64-linux-gnu/libgomp.so.1 (0x00007f7c30cb4000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f7c30ac0000)\n\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f7c30a93000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f7c33e68000)\n"
+    },
+    "bounds": {
+      "compiler": "GNU Fortran (Debian 14.2.0-19) 14.2.0",
+      "flags": "-O2 -g -fopenmp -fcheck=all -fbacktrace -Wall -Wextra",
+      "driver_sha256": "04bfad5f90138d04fa7ffbed1bb53914491162c72304623e393ff52f562901c6",
+      "executable_sha256": "40c80cfcdd6cd46433da1a57b666d5d2ab4e368a09e6aab89bbc855aad61e6e8",
+      "linked_libraries": "\tlinux-vdso.so.1 (0x00007fe7bf3d3000)\n\tliblapack.so.3 => /workspace/ed2-env/tools/usr/lib/x86_64-linux-gnu/openblas-pthread/liblapack.so.3 (0x00007fe7bec48000)\n\tlibopenblas.so.0 => /workspace/ed2-env/tools/usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblas.so.0 (0x00007fe7bc668000)\n\tlibgfortran.so.5 => /workspace/ed2-env/tools/usr/lib/x86_64-linux-gnu/libgfortran.so.5 (0x00007fe7bc364000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007fe7bc251000)\n\tlibgomp.so.1 => /lib/x86_64-linux-gnu/libgomp.so.1 (0x00007fe7bc1fc000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007fe7bc008000)\n\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007fe7bbfdb000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007fe7bf3d5000)\n"
+    },
+    "default": {
+      "compiler": "GNU Fortran (Debian 14.2.0-19) 14.2.0",
+      "flags": "-fopenmp -Ofast",
+      "driver_sha256": "e1f2a571057dd434345067258efda9ccc23b9bc8c34c90ec58ab9733285bccdc",
+      "executable_sha256": "64ab46485702d4ca122d3ec0df9cab41fa7ee7fd9e355e31d41bf3eb00a767ac",
+      "linked_libraries": "\tlinux-vdso.so.1 (0x00007f7e24b81000)\n\tliblapack.so.3 => /workspace/ed2-env/tools/usr/lib/x86_64-linux-gnu/openblas-pthread/liblapack.so.3 (0x00007f7e24412000)\n\tlibopenblas.so.0 => /workspace/ed2-env/tools/usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblas.so.0 (0x00007f7e21e38000)\n\tlibgfortran.so.5 => /workspace/ed2-env/tools/usr/lib/x86_64-linux-gnu/libgfortran.so.5 (0x00007f7e21b34000)\n\tlibm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f7e21a21000)\n\tlibmvec.so.1 => /lib/x86_64-linux-gnu/libmvec.so.1 (0x00007f7e21926000)\n\tlibgomp.so.1 => /lib/x86_64-linux-gnu/libgomp.so.1 (0x00007f7e218d1000)\n\tlibc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f7e216dd000)\n\tlibgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f7e216b0000)\n\t/lib64/ld-linux-x86-64.so.2 (0x00007f7e24b83000)\n"
+    }
+  },
+  "replay": {
+    "records": 136,
+    "identical": true,
+    "excluded_fields": "timings (not collected in contract report)"
+  }
+}
