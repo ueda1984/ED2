@@ -1,0 +1,68 @@
+name: Mixed-spin non-U1 scientific demonstrator
+
+on:
+  push:
+    branches:
+      - codex/ed2-cpc-mixed-spin-demo
+    paths:
+      - ".github/workflows/mixed-spin-demo.yml"
+      - "tests/mixed_spin_nonu1_demo.py"
+      - "tests/Makefile.am"
+      - "source/**"
+      - "configure.ac"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scientific-demo:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      FC: gfortran-13
+      FCFLAGS: "-O2 -fopenmp"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Scientific Python and Fortran toolchain
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends gfortran-13 libopenblas-dev liblapack-dev autoconf automake make python3-numpy
+      - name: Build source archive
+        run: |
+          autoreconf -vfi
+          ./configure FC="$FC" FCFLAGS="$FCFLAGS"
+          make -j2
+          make dist
+          git rev-parse HEAD
+      - name: Independently check mixed-spin non-U1 observables from archive
+        run: |
+          set -eu
+          work="$RUNNER_TEMP/ed2-cpc-mixed-spin"
+          mkdir -p "$work/src" "$work/build"
+          tarball=$(find "$GITHUB_WORKSPACE" -maxdepth 1 -name '*.tar.gz' -print -quit)
+          test -n "$tarball"
+          tar -xzf "$tarball" -C "$work/src"
+          src=$(find "$work/src" -mindepth 1 -maxdepth 1 -type d -print -quit)
+          cd "$work/build"
+          "$src/configure" FC="$FC" FCFLAGS="$FCFLAGS"
+          make -j2
+          python3 "$src/tests/mixed_spin_nonu1_demo.py" \
+            --exe "$work/build/source/QS3ED2" \
+            --output "$work/results"
+          python3 - "$work/results/report.json" <<'PY'
+          import json,sys
+          r=json.load(open(sys.argv[1],encoding="utf-8"))
+          print("DEMO VALIDATION:",r["passed"],"passed /",r["failed"],"failed")
+          for case in r["cases"]:
+              print(case["case"],"E0=",case["ground_energy"],
+                    "max spectra err=",case["spectrum_max_error"],
+                    "max Sz err=",case["magnetization_max_error"],
+                    "max CF err=",case["correlation_max_error"])
+          if r["passed"]!=6 or r["failed"]!=0:
+              raise SystemExit("Independent physics demonstrator failed")
+          PY
