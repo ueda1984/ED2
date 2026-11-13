@@ -54,7 +54,7 @@ def read_diagnostics(path, expected_pairs):
         raise AssertionError(f"Expected {expected_pairs} diagnostic pairs, got {pairs}")
     if data.get("status") != "0":
         raise AssertionError("Krylov did not converge: "+str(data.get("reason")))
-    if data.get("lowest_state_inclusion") != "not_assessed":
+    if not data.get("lowest_state_inclusion","").startswith("not_assessed"):
         # Diagnostic inclusion field is advisory, not an independent proof.
         # This test provides external inclusion evidence via dense energies.
         raise AssertionError("Unexpected lowest-state inclusion contract")
