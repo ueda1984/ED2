@@ -153,7 +153,7 @@ relations.
 - Do **not** claim identical status counts or random bitstreams
   across compilers.
 
-### 5. Scientific application and performance (requires new data)
+### 5. Scientific application and performance (small-system validation complete; larger study pending)
 
 **Recommended compact demonstrator:**
 an alternating mixed-spin chain
@@ -164,7 +164,14 @@ general spin, interaction anisotropy, nonconserved \(S^z\) and local
 observables; it is outside the original spin-1/2 U(1)-restricted
 QS³ use case.
 
-First run small \(L\) with the **complete** occupation range
+The initial independent [mixed-spin demonstration](cpc-mixed-spin-demo.md)
+has now verified full-space four- and six-site chains, plus a
+four-site projected non-U(1) space, against all independent dense
+eigenvalues and local/two-site observables (six cases total).
+These are implementation checks, not yet substantive large-scale
+physics results or an advantage benchmark.
+
+For any further model, first run small \(L\) with the **complete** occupation range
 \(\text{NODmin}=0,\ \text{NODmax}=\sum_i 2S_i\).
 Use an independently constructed dense Hamiltonian to compare
 energies, residuals, local magnetization and correlation functions.
@@ -204,8 +211,9 @@ compiler portability, algorithmic cost, API scope).
 
 ## Preconditions before a full first submission draft
 
-- Run and archive the **scientific demonstrator** above; without
-  it, novelty is a proposal rather than demonstrated physics.
+- Extend the successfully verified **small-system demonstrator** to a
+  physics-motivated larger calculation with meaningful observables,
+  resource scaling and uncertainty/convergence evidence.
 - Agree author/order and distinguish the **2022 QS³** authors
   from the current software's attribution.
 - Choose CPC CPiP or CP route and associated software-archive

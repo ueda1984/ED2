@@ -69,5 +69,6 @@ nav:
       - Phase 2-A distribution readiness: development/phase2a-distribution-readiness.md
       - Phase 2-B independent validation and metadata audit: development/phase2b-release-audit.md
       - CPC manuscript plan (working draft): development/cpc-manuscript-outline.md
+      - CPC mixed-spin non-U1 scientific demonstration: development/cpc-mixed-spin-demo.md
   - Reference:
       - Citation & Versioning: reference/citation-versioning.md      
