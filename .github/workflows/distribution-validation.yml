@@ -64,3 +64,31 @@ jobs:
             find . -name 'test-suite.log' -print -exec cat {} \;
             exit 1
           fi
+
+      - name: Validate extended models and historical observables from archive
+        run: |
+          set -eu
+          archive=$(find . -maxdepth 1 -name '*.tar.gz' -print -quit)
+          test -n "$archive"
+          archive=$(realpath "$archive")
+          work="$RUNNER_TEMP/ed2-release-validation"
+          mkdir -p "$work/src" "$work/build"
+          tar -xzf "$archive" -C "$work/src"
+          release_src=$(find "$work/src" -mindepth 1 -maxdepth 1 -type d -print -quit)
+          test -f "$release_src/configure"
+          cd "$work/build"
+          "$release_src/configure" FC=gfortran FCFLAGS='-O2 -fopenmp'
+          make -j2
+          ED2_TEST_CAPTURE_ROOT="$work/build/examples" make check-long
+          cp -R "$release_src/examples/ref_data" "$work/build/examples/ref_data"
+          python3 "$release_src/tests/compare_historical.py" \
+            --build "$work/build" --output "$work/historical.json"
+          python3 - "$work/historical.json" <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1],encoding='utf-8'))
+          cases=d.get('comparisons',[])
+          passed=sum(x.get('status')=='passed' for x in cases)
+          print(f'Historical reference comparisons: {passed}/{len(cases)} passed')
+          if len(cases)!=27 or passed!=27:
+              raise SystemExit('Expected 27 independent historical comparisons')
+          PY
