@@ -1,0 +1,85 @@
+name: CPC mixed-spin iterative crosscheck
+
+on:
+  push:
+    branches:
+      - codex/ed2-cpc-iterative-crosscheck
+    paths:
+      - ".github/workflows/cpc-iterative-crosscheck.yml"
+      - "tests/mixed_spin_*.py"
+      - "tests/Makefile.am"
+      - "source/**"
+      - "configure.ac"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  independent-iterative:
+    name: Independent ALG1/ALG2 crosscheck
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      FC: gfortran-13
+      FCFLAGS: "-O2 -fopenmp"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install GNU Fortran and independent dense reference
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends gfortran-13 libopenblas-dev liblapack-dev autoconf automake make python3-numpy
+      - name: Produce source distribution
+        run: |
+          autoreconf -vfi
+          ./configure FC="$FC" FCFLAGS="$FCFLAGS"
+          make -j2
+          make dist
+          git rev-parse HEAD
+      - name: Build from unpacked archive, separate from checkout
+        run: |
+          set -eu
+          work="$RUNNER_TEMP/ed2-cpc-iterative"
+          mkdir -p "$work/src" "$work/build"
+          archive=$(find "$GITHUB_WORKSPACE" -maxdepth 1 -name '*.tar.gz' -print -quit)
+          test -n "$archive"
+          tar -xzf "$archive" -C "$work/src"
+          src=$(find "$work/src" -mindepth 1 -maxdepth 1 -type d -print -quit)
+          echo "$src" > "$work/source-path"
+          cd "$work/build"
+          "$src/configure" FC="$FC" FCFLAGS="$FCFLAGS"
+          make -j2
+      - name: Compare 12 iterative cases with independently verified dense reference
+        run: |
+          set -eu
+          work="$RUNNER_TEMP/ed2-cpc-iterative"
+          src=$(cat "$work/source-path")
+          python3 "$src/tests/mixed_spin_iterative_crosscheck.py" \
+            --exe "$work/build/source/QS3ED2" \
+            --threads 1 \
+            --output "$work/results-omp1"
+          python3 - "$work/results-omp1/report.json" <<'PY'
+          import json,sys
+          r=json.load(open(sys.argv[1],encoding="utf-8"))
+          print("Crosscheck:",r["passed"],"passed;",r["failed"],"failed")
+          for c in r["cases"]:
+              print(c["case"],c["status"],"Eerror=",c.get("energy_max_error"),
+                    "residual=",c.get("max_residual"),
+                    "mag_error=",c.get("magnetization_max_error"),
+                    "corr_error=",c.get("correlation_max_error"),
+                    "Hcalls=",c.get("h_applications"))
+          if r["checks"]!=12 or r["passed"]!=12 or r["failed"]!=0:
+              raise SystemExit("Iterative mixed-spin numerical test failed")
+          PY
+      - name: Upload numerical reports, including failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mixed-spin-iterative-evidence
+          path: ${{ runner.temp }}/ed2-cpc-iterative/results-omp1/
+          if-no-files-found: warn
+          retention-days: 14
