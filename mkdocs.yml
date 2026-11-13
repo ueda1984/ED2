@@ -37,6 +37,7 @@ nav:
   - User Guide:
       - Input format: user-guide/input-format.md
       - Outputs: user-guide/outputs.md
+      - Solver accuracy and reproducibility: user-guide/solver-accuracy.md
   - Examples:
       - Chain: examples/chain.md
       - J1–J2 chain: examples/j1j2_chain.md
@@ -61,5 +62,10 @@ nav:
       - Phase 1-C Lanczos stability: development/phase1c-lanczos-stability.md
       - Phase 1-D stress and benchmarks: development/phase1d-krylov-stress-benchmarks.md
       - Phase 1-D policy proposals: development/phase1d-policy-proposals.md
+      - Phase 1-E precision contract: development/phase1e-precision-contract.md
+      - Phase 1-E validation: development/phase1e-validation.md
+      - Phase 1-F diagnostics and reproducibility: development/phase1f-diagnostics-reproducibility.md
+      - Phase 1-G opt-in residual policy: development/phase1g-optin-residual-policy.md
+      - Read the Docs release workflow: development/readthedocs-workflow.md
   - Reference:
       - Citation & Versioning: reference/citation-versioning.md      

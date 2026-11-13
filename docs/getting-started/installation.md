@@ -16,10 +16,10 @@ This guide focuses strictly on:
 
 ### Required
 
-- Fortran compiler (tested with `ifort`, `gfortran`)
+- A compatible Fortran compiler. Phase 1-G development validation covered GNU Fortran 13 and 14 on Linux; equivalent validation of Intel compilers has not yet been recorded.
 - BLAS / LAPACK
   - OpenBLAS (preferred)
-  - Intel MKL (automatic fallback supported)
+  - Intel MKL (configure attempts an automatic MKL fallback only with Intel `ifort`)
 - GNU Make
 - POSIX shell
 
@@ -56,9 +56,8 @@ autoreconf -vfi
 or explicitly specify compiler:
 
 ```bash
-./configure FC=gfortran
-# or
-./configure FC=ifort
+./configure FC=gfortran FCFLAGS='-O2 -fopenmp'
+# Other toolchains require their own compatibility validation.
 ```
 
 ### BLAS / LAPACK detection
@@ -95,7 +94,7 @@ source/QS3ED2
 
 Important design choices:
 
-- The executable is **not installed into PATH**
+- A normal build leaves the executable in `source/`; optional `make install` installs it under the configured prefix.
 - Example scripts locate the binary explicitly
 - No recompilation occurs inside example runs
 
@@ -188,7 +187,9 @@ For numerical reproducibility, record:
 - BLAS thread count
 - success of `make check` and `make check-long`
 
-Floating‑point roundoff may vary across systems, but physical observables should remain consistent within numerical precision.
+Floating‑point roundoff may vary across systems, but small residuals alone do not guarantee accurate individual eigenvectors or
+observables in near-degenerate problems. See
+[Solver accuracy and reproducibility](../user-guide/solver-accuracy.md).
 
 ---
 
@@ -242,7 +243,7 @@ or
 
 Ensure compiler supports OpenMP:
 
-- ifort: enabled by default
+- ifort: use the OpenMP settings appropriate to the selected toolchain
 - gfortran: may require `-fopenmp`
 
 ### Test failures
@@ -257,4 +258,5 @@ make check-long
 
 ---
 
-This installation procedure is designed for portability, reproducibility, and HPC robustness.
+These instructions are a starting point, not a guarantee for all platforms.
+Source distribution and `make distcheck` are under separate audit before release.

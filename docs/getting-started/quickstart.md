@@ -1,6 +1,6 @@
 # Quickstart
 
-This page demonstrates the **fastest fully reproducible workflow** to verify that QS³-ED2
+This page demonstrates the **shortest build-and-smoke-test workflow** to verify that QS³-ED2
 builds and runs correctly on your system.
 
 The objective is deliberately minimal:
@@ -19,7 +19,7 @@ Conceptual background, design philosophy, and citation information are documente
 git clone https://github.com/QS-Cube/ED2.git
 cd ED2
 autoreconf -vfi
-./configure
+./configure FC=gfortran FCFLAGS='-O2 -fopenmp'
 make -j
 ```
 
@@ -48,7 +48,8 @@ Expected result:
 PASS: test_ex1.sh
 ```
 
-If this passes, the core solver, BLAS/LAPACK linkage, and OpenMP configuration are working.
+A pass means this smoke-test path completed; it does not independently
+validate every Hamiltonian, solver or physical observable.
 
 ---
 
@@ -61,7 +62,7 @@ cd script_chain
 ./run.sh
 ```
 
-This performs a small Exact Diagonalization calculation and prints:
+This generates the corresponding chain input and performs an ED calculation, printing:
 
 - solver configuration,
 - convergence information,
@@ -77,7 +78,7 @@ local_mag.dat
 two_body_cf_xyz.dat
 ```
 
-are generated in the working directory.
+are generated under `examples/chain/` by the helper script.
 
 Important properties of the example scripts:
 
@@ -86,7 +87,7 @@ Important properties of the example scripts:
 - PATH is never used,
 - helper programs are built at `make` time only.
 
-These choices ensure reproducible execution on shared HPC environments.
+These choices avoid path-related failures. Record the source revision, inputs, compiler, BLAS implementation, thread counts and initial-state settings when numerical reproducibility is required.
 
 ---
 
