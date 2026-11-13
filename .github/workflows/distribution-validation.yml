@@ -57,4 +57,10 @@ jobs:
           tar tzf ./*.tar.gz | head -n 30
       - name: Out-of-tree distribution validation
         run: |
-          make distcheck DISTCHECK_CONFIGURE_FLAGS='FC=gfortran FCFLAGS=-O2\ -fopenmp'
+          if ! make distcheck DISTCHECK_CONFIGURE_FLAGS='FC=gfortran FCFLAGS=-O2\ -fopenmp'; then
+            echo "::error::make distcheck failed. Showing preserved Automake test logs."
+            find . -name 'test-suite.log' -o -name 'test_ex1.log' -o -name 'test_ex1.trs' | sort
+            find . -name 'test_ex1.log' -print -exec cat {} \;
+            find . -name 'test-suite.log' -print -exec cat {} \;
+            exit 1
+          fi
