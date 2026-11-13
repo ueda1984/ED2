@@ -155,3 +155,6 @@ EXTRA_DIST += mixed_spin_alg2_n12_sweep.py
 
 # Test-only ALG2 two-eigenpair workspace robustness characterization.
 EXTRA_DIST += mixed_spin_alg2_multipair_sweep.py
+
+# Independent physical low-doublet/near-degeneracy diagnostic (optional scientific test).
+EXTRA_DIST += mixed_spin_near_degenerate.py
