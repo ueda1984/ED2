@@ -153,7 +153,7 @@ relations.
 - Do **not** claim identical status counts or random bitstreams
   across compilers.
 
-### 5. Scientific application and performance (small-system validation complete; larger study pending)
+### 5. Scientific application and performance (small and intermediate validation complete; physics application pending)
 
 **Recommended compact demonstrator:**
 an alternating mixed-spin chain
@@ -165,20 +165,32 @@ observables; it is outside the original spin-1/2 U(1)-restricted
 QS³ use case.
 
 The initial independent [mixed-spin demonstration](cpc-mixed-spin-demo.md)
-has now verified full-space four- and six-site chains, plus a
-four-site projected non-U(1) space, against all independent dense
-eigenvalues and local/two-site observables (six cases total).
-These are implementation checks, not yet substantive large-scale
-physics results or an advantage benchmark.
+verified full-space four- and six-site chains and a four-site
+projected non-U(1) space against all dense eigenvalues and
+local/two-site observables (six cases). The follow-up
+[independent sparse study](cpc-sparse-scaling.md)
+extended fully nonconserving calculations to eight, ten and
+twelve sites (Hilbert dimension up to 46,656) with lowest-pair,
+magnetization and correlation checks at OMP=1 and 2.
+The [one-eigenpair matched-start study](cpc-matched-krylov.md)
+and [ALG2 workspace scan](cpc-alg2-workspace.md) then measured
+restart parameters at fixed requested accuracy, including
+two-low-eigenpair runs with independent physical references.
 
-For any further model, first run small \(L\) with the **complete** occupation range
-\(\text{NODmin}=0,\ \text{NODmax}=\sum_i 2S_i\).
-Use an independently constructed dense Hamiltonian to compare
-energies, residuals, local magnetization and correlation functions.
-Keep site/bond orientation and correlation-column ordering explicit.
-Only then scale to larger \(L\), measuring runtime, RSS memory,
-Hamiltonian actions and the effect of `wk_dim`, and compare
-OpenMP 1 versus 2 threads.
+These are **verified implementation and resource-characterization
+results**, not yet a claim of new physics or a universal
+performance advantage. The tested lowest-pair gaps are about
+0.18–0.21 in the eight/ten-site cases, so near-degeneracy robustness
+must still be evaluated independently.
+
+For any additional model, begin at small \(L\) with the **complete**
+occupation range \(\text{NODmin}=0,\ \text{NODmax}=\sum_i 2S_i\).
+Cross-check energies, residuals, magnetization and two-body correlation
+functions against an independent dense or sparse Hamiltonian. The
+existing scaling study has already recorded wall time, peak RSS and
+H-action counts at OMP=1/2 for a single couplings family; it does
+**not** replace a controlled repeated-node benchmark, a cache-policy
+scan (`wk_dim`), or a physically diverse spectral study.
 
 Choose a physically motivated parameter cut and interpret at least
 one nontrivial observable or avoided crossing rather than reporting
@@ -211,9 +223,11 @@ compiler portability, algorithmic cost, API scope).
 
 ## Preconditions before a full first submission draft
 
-- Extend the successfully verified **small-system demonstrator** to a
-  physics-motivated larger calculation with meaningful observables,
-  resource scaling and uncertainty/convergence evidence.
+- Turn the already verified **4–12-site mixed-spin demonstrator** into
+  a physically motivated application with interpretable parameter
+  dependence, resource/finite-size scaling and convergence evidence;
+  current CI runs are scientifically verified test cases, not a claim
+  of a new phase or a universal numerical advantage.
 - Agree author/order and distinguish the **2022 QS³** authors
   from the current software's attribution.
 - Choose CPC CPiP or CP route and associated software-archive
@@ -229,6 +243,9 @@ compiler portability, algorithmic cost, API scope).
 - [Phase 2-A archive build, nine models and historical references](https://github.com/ueda1984/ED2/actions/runs/43350378812).
 - [Phase 2-B independent GNU 11/13 archive-based validation](https://github.com/ueda1984/ED2/actions/runs/43392314521).
 - [Release/attribution audit](phase2b-release-audit.md).
+- [Independent sparse scaling with physical tests](cpc-sparse-scaling.md).
+- [Matched one-eigenpair cost and residual](cpc-matched-krylov.md).
+- [ALG2 workspace and two-pair robustness study](cpc-alg2-workspace.md).
 
 **No manuscript authorship, official source tag, DOI or journal
 publication is assigned by this planning document.**
