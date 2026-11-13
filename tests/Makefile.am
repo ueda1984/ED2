@@ -140,3 +140,6 @@ EXTRA_DIST += mixed_spin_nonu1_demo.py
 
 # Test-only independent dense validation of ALG=1 and ALG=2 on mixed-spin non-U(1) cases.
 EXTRA_DIST += mixed_spin_iterative_crosscheck.py
+
+# Research/test-only SciPy sparse reference (not an ED2 runtime requirement).
+EXTRA_DIST += mixed_spin_sparse_scale.py
