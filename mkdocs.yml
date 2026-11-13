@@ -73,5 +73,6 @@ nav:
       - CPC sparse 8-12 site scaling: development/cpc-sparse-scaling.md
       - CPC matched Krylov precision and cost: development/cpc-matched-krylov.md
       - CPC ALG2 restart workspace study: development/cpc-alg2-workspace.md
+      - CPC near-degenerate numerical limits: development/cpc-near-degenerate-gaps.md
   - Reference:
       - Citation & Versioning: reference/citation-versioning.md      

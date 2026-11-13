@@ -238,6 +238,26 @@ compiler portability, algorithmic cost, API scope).
 - Freeze input decks, result files, compiler/backend metadata,
   provenance and program summary against one source SHA.
 
+### Near-degenerate accuracy interpretation
+
+A new [physical near-degenerate study](cpc-near-degenerate-gaps.md)
+verified an **exactly twofold** or weakly split low-energy doublet
+with an independent dense reference. For (Delta=10^{-10}),
+an ALG=1 result can pass a direct residual `1e-8`
+while the unique ground-state edge-spin observable is inaccurate;
+tightening the residual resolves these particular starts but
+increases Hamiltonian applications.
+
+A controlled first-excited initial vector gives a stronger general
+counterexample: for (Delta=10^{-6}), ALG=1 returned
+a **correct excited eigenpair**, residual (10^{-15}), success
+status zero, and the **wrong state to call the global ground**.
+This is mathematical Krylov behavior, not a regression failure.
+The manuscript should explicitly distinguish residual certification,
+low-doublet inclusion, individual-state observable fidelity and
+global ground-state identification. Do **not** advertise an
+unimplemented spectral inclusion guarantee.
+
 ## Existing reproducibility evidence
 
 - [Phase 2-A archive build, nine models and historical references](https://github.com/ueda1984/ED2/actions/runs/43350378812).
@@ -246,6 +266,7 @@ compiler portability, algorithmic cost, API scope).
 - [Independent sparse scaling with physical tests](cpc-sparse-scaling.md).
 - [Matched one-eigenpair cost and residual](cpc-matched-krylov.md).
 - [ALG2 workspace and two-pair robustness study](cpc-alg2-workspace.md).
+- [Physical near-degenerate and excited-start controls](cpc-near-degenerate-gaps.md).
 
 **No manuscript authorship, official source tag, DOI or journal
 publication is assigned by this planning document.**

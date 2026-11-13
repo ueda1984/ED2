@@ -106,6 +106,43 @@ ALG=1 and ALG=2 vectors gave a range of isolated-site
 physical inaccuracy: one must instead compare the *projector* onto
 the whole ground doublet, or basis-invariant doublet averages.
 
+## A direct excited-state-start counterexample
+
+To separate **residual accuracy** from **ground-state inclusion**
+even more sharply, the follow-up test prepares the second eigenvector
+with ED2 ALG=2, verifies that eigenvector's eigenvalue against the
+independent dense reference, and passes the resulting **native-basis**
+vector to ALG=1 via `ED2_INITIAL_VECTOR`. The source eigenvector
+is not constructed by guessing ED2's internal basis ordering.
+
+This is still a *physical* four-site mixed-spin model, with the
+isolated edge spin splitting \(\delta=10^{-6}\). The true ground
+state has \(\langle S_1^z\rangle=-1/2\) and the first excited
+state has \(+1/2\).
+
+[Independent OMP=1/2 witness execution](https://github.com/ueda1984/ED2/actions/runs/43403308571):
+
+| Quantity | OMP=1 | OMP=2 |
+| --- | ---: | ---: |
+| Independently verified \(E_0\) | -1.533921122613122 | -1.533921122613122 |
+| Independently verified \(E_1\) | -1.533920122613121 | -1.533920122613121 |
+| ALG=1 returned energy | -1.533920122613122 | -1.533920122613122 |
+| ALG=1 direct residual | 1.279e-15 | 5.960e-16 |
+| Requested absolute residual | 1e-12 | 1e-12 |
+| ALG=1 success status | 0 | 0 |
+| Returned \(\langle S_1^z\rangle\) | +0.5 | +0.5 |
+
+Thus ALG=1 returned a **mathematically correct excited eigenpair**
+under the specified residual policy, but **not the lowest eigenpair**.
+This remains true even though the residual is three orders of
+magnitude smaller than the requested tolerance. It illustrates a
+fundamental Krylov starting-space limitation, **not** an ED2-specific
+bug or a failure to enforce the documented residual contract.
+
+Reproduce with the separate
+[`tests/mixed_spin_excited_start_probe.py`](https://github.com/ueda1984/ED2/blob/codex/ed2-cpc-near-degenerate-physics/tests/mixed_spin_excited_start_probe.py)
+and retain both the source and candidate-wavefunction records.
+
 ## What can be certified from residual plus a *known external gap*
 
 Let \(P_{\mathcal C}\) be the exact spectral projector on the two
@@ -141,9 +178,9 @@ and `gap_sensitivity_warning` as *separate* notions.
 
 ## Remaining research tasks
 
-1. Complete a **controlled first-excited initial-vector** test with
-   independently verified \(E_1>E_0\): exact excited states can
-   satisfy arbitrarily small residual targets.
+1. **Completed:** controlled excited-start tests independently
+   verified that a correct excited state can pass even `1e-12`
+   absolute residual, in both OMP profiles.
 2. Demonstrate projector or trace-based ground-doublet observables
    from the returned `NOE=2` state vectors. Care is needed
    because the Fortran sequential unformatted wavefunctions use
@@ -166,5 +203,5 @@ python3 tests/mixed_spin_near_degenerate.py \
 
 Repeat with `--omp 2`. The output contains each case's input
 deck, full stdout, diagnostics, native-binary eigenvectors and
-machine-readable `report.json`; only the validated CI jobs linked
-above are asserted as completed.
+machine-readable `report.json`; the linked GitHub Actions jobs establish completion of the physical
+64-case matrix and the two additional excited-start probes.

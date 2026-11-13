@@ -134,6 +134,36 @@ magnetization error of `0.5` despite a residual around
 inclusion, near-degenerate eigenvector fidelity or the accuracy
 of physical observables.
 
+### A concrete counterexample: an accurate excited eigenpair is not the ground state
+
+The [CPC near-degeneracy validation](../development/cpc-near-degenerate-gaps.md)
+uses an actual mixed-spin XYZ/DM/Gamma Hamiltonian with a
+controlled, nonzero lowest gap \(\Delta=10^{-6}\).
+
+A validated first-excited eigenvector, supplied using
+`ED2_INITIAL_VECTOR`, makes ALG=1 return `status=0`
+with direct residual around \(10^{-15}\), although the returned
+energy exceeds the independently verified ground energy by
+\(10^{-6}\). The returned edge-spin magnetization is \(+1/2\),
+while the unique ground state has \(-1/2\).
+
+For a smaller gap \(\Delta=10^{-10}\) and an ALG=1 random
+start, `ED2_RESIDUAL_ATOL=1e-8` also permits a low-doublet
+state whose individual ground-state magnetization is markedly
+wrong. Tightening the residual to `1e-12` fixes **those specific
+runs**, but does not solve the excited-start counterexample.
+
+This is the standard mathematical distinction between
+**eigenpair residual**, **membership in a low-energy cluster**,
+and **identification of the lowest individual eigenvector**.
+At exact degeneracy, a state-specific magnetization is not
+unique at all; use cluster projectors, traces, or invariant
+quantities.
+
+The current `lowest_state_inclusion` diagnostic remains
+`not_assessed` for precisely this reason. No output flag should
+be interpreted as a universal ground-state certificate.
+
 For published calculations record the full Git SHA, all model inputs,
 compiler/BLAS versions, OpenMP thread settings, initial state/seed,
 the requested and achieved tolerances, and unsuccessful runs.
@@ -144,3 +174,4 @@ the requested and achieved tolerances, and unsuccessful runs.
 - [Phase 1-E validation](../development/phase1e-validation.md)
 - [Phase 1-F diagnostics](../development/phase1f-diagnostics-reproducibility.md)
 - [Phase 1-G residual policy](../development/phase1g-optin-residual-policy.md)
+- [CPC physical near-degenerate and excited-start tests](../development/cpc-near-degenerate-gaps.md)
