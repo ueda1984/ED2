@@ -134,3 +134,6 @@ AM_TESTS_ENVIRONMENT = ED2_TEST_SOURCE_ROOT='$(abs_top_srcdir)'; export ED2_TEST
 
 # Fortran module files are compiler-generated in the build directory.
 DISTCLEANFILES = *.mod *.smod
+
+# Test-only independent mixed-spin/non-U(1) scientific demonstrator.
+EXTRA_DIST += mixed_spin_nonu1_demo.py
