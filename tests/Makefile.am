@@ -152,3 +152,6 @@ EXTRA_DIST += mixed_spin_alg2_restart_sweep.py
 
 # Optional 12-site mixed-spin ALG2 tuning diagnostics.
 EXTRA_DIST += mixed_spin_alg2_n12_sweep.py
+
+# Test-only ALG2 two-eigenpair workspace robustness characterization.
+EXTRA_DIST += mixed_spin_alg2_multipair_sweep.py
