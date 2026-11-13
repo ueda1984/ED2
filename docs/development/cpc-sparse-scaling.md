@@ -54,7 +54,36 @@ the physics reference uses SciPy, not ED2's Hamiltonian construction.
 These rows use the transverse-field control value 0.15. A second
 8-site control value 0.38 was also verified.
 **All eight ALG=1/2 cases passed** independent energy,
-magnetization, correlation and residual assertions.
+magnetization, correlation and residual assertions for OMP=1.
+The same eight physical cases passed at **OMP=2**, giving 16/16
+total cases on the same compiler/backend in
+[this extended run](https://github.com/ueda1984/ED2/actions/runs/43396664043).
+
+## Additional logical and mathematical invariants
+
+A further [validation run](https://github.com/ueda1984/ED2/actions/runs/43397157881)
+confirmed these assertions for OMP=1 **and** OMP=2:
+
+- The independently built SciPy sparse Hamiltonian exactly matches
+  the separately constructed NumPy dense Hamiltonian, element by
+  element, for 4 sites (dimension 36) and 6 sites (dimension 216).
+- The normalized Frobenius commutator
+  \\(\|[H,S^z_{\\mathrm{tot}}]\|_F/\|H\|_F\\)
+  is decisively nonzero, around \\(0.27\\) to \\(0.32\\)
+  for the tested 8-12-site systems. Thus the chosen Hamiltonian
+  genuinely breaks U(1) conservation.
+- A central finite difference of the independent lowest energy,
+  \\(\partial E_0/\partial h_x\\), agrees with the
+  weighted local transverse magnetization according to
+  Hellmann-Feynman, with errors below \\(8\\times10^{-9}\\).
+  The ED2 local magnetization is also checked against this
+  independent energy derivative.
+
+The sparse reference is **algorithmically independent of the ED2
+Hamiltonian-vector routines**, but uses the same declared physical
+coupling conventions; the extra dense/sparse matrix self-check
+protects against an accidental mismatch between the two Python
+constructions.
 
 | Sites | ALG | Requested eigenpairs | Max energy error | Max residual | \(H\) applications | Wall time (s) | Max RSS (KiB) |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
