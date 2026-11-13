@@ -54,6 +54,41 @@ This shows that **workspace/restart policy strongly affects the
 current ALG=2 implementation** and makes a speedup claim based on
 one arbitrary `NOK/NOM` choice scientifically weak.
 
+## 12-site, 46,656-dimensional follow-up
+
+A second, independent
+[GitHub Actions validation](https://github.com/ueda1984/ED2/actions/runs/43398889217)
+on the *same physical model* extended the single-pair fixed-start
+and requested absolute residual `1e-8` test to 12 sites.
+Every workspace passed the independent energy, magnetization and
+two-body correlation checks. The five configurations
+(one ALG=1 baseline, four ALG=2 workspaces) were **all accepted**;
+zero contract violations and no nonconvergent trials were observed.
+
+| Solver configuration | H applications | Wall time (s) | Peak RSS (KiB) | Measured residual |
+| --- | ---: | ---: | ---: | ---: |
+| ALG=1 | 260 | 6.746 | 119,408 | 5.142e-10 |
+| ALG=2: `NOK=2, NOM=16` | 323 | 9.059 | 148,924 | 5.709e-11 |
+| ALG=2: `NOK=4, NOM=24` | 825 | 19.585 | 166,396 | 7.983e-15 |
+| ALG=2: `NOK=6, NOM=32` | 1,287 | 31.194 | 183,912 | 1.183e-14 |
+| ALG=2: `NOK=10, NOM=64` | 2,470 | 82.157 | 254,316 | 1.189e-14 |
+
+For this one-instance 12-site comparison, `2/16` used about
+**86.9% fewer Hamiltonian actions** and **89% less observed wall
+time** than `10/64`. It used about **41% less peak RSS**.
+At the same time, `2/16` remained more expensive than ALG=1
+in this single lowest-eigenpair workload (323 versus 260 H actions).
+All timings are *single shared-runner observations*, not independent
+replicate samples or speedup confidence intervals.
+
+The result strengthens the narrow conclusion that the current
+ALG=2 implementation is **highly sensitive to restart workspace
+choices**; it does **not** validate `2/16` as a universal default.
+In particular, `NOK=2` cannot retain two independent directions
+per low-energy cluster when multiple degenerate eigenpairs are wanted.
+A separate several-eigenpair and near-degenerate workload matrix
+must be passed before recommending an automatic workspace policy.
+
 ## Interpretation and limitations
 
 - All settings were tested on the same source and comparable physical
@@ -79,8 +114,9 @@ one arbitrary `NOK/NOM` choice scientifically weak.
 
 ## What to do before a CPC performance figure
 
-1. Verify promising workspaces on a larger 12-site problem and
-   both OMP=1 and OMP=2; track nonconverged settings explicitly.
+1. **12-site OMP=1 follow-up passed** (table above). Repeat tuned
+   workspace comparisons at OMP=2, and track nonconverged settings
+   explicitly on multiple models and spectra.
 2. Repeat timings under controlled node conditions (not only CI),
    with RSS and H-application counts, and report medians and spread.
 3. Include both `NOE=1` and `NOE>1`, a near-degenerate spectrum,
