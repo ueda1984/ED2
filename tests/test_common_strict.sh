@@ -1,59 +1,70 @@
 #!/bin/sh
 set -eu
+# Usage: test_common.sh script_chain examples/chain/output.dat ...
+# All numerical output goes into a writable sandbox. Build binaries come
+# from the build tree, while scripts and model templates come from source.
 
-# Usage:
-#   test_common.sh <script_dir_name> <expected_output_relpath1> [<expected_output_relpath2> ...]
-#
-# Example:
-#   test_common.sh script_chain examples/chain/output.dat examples/chain/eigenvalues.dat
-
-SCRIPT_DIR="$1"
+model_dir=$1
 shift
+source_root=${ED2_TEST_SOURCE_ROOT:-$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)}
+build_root=${ED2_TEST_BUILD_ROOT:-$source_root}
+case "$source_root" in
+  /*) ;;
+  *) source_root=$(CDPATH= cd -- "$source_root" && pwd) ;;
+esac
+case "$build_root" in
+  /*) ;;
+  *) build_root=$(CDPATH= cd -- "$build_root" && pwd) ;;
+esac
 
-# Repo top (where this script lives is <top>/tests/)
-TOPDIR=$(cd "$(dirname "$0")/.." && pwd)
-
-# Built executable (do not rely on PATH)
-EXE="$TOPDIR/source/QS3ED2"
-if [ ! -x "$EXE" ]; then
-  echo "ERROR: executable not found: $EXE"
-  echo "Hint: run 'make' first."
+exe=${ED2_EXE:-$build_root/source/QS3ED2}
+if [ ! -x "$exe" ]; then
+  echo "ERROR: missing ED2 executable: $exe" >&2
   exit 1
 fi
+generator="$build_root/$model_dir/mk_input"
+if [ ! -x "$generator" ]; then
+  echo "ERROR: missing model generator: $generator" >&2
+  exit 1
+fi
+export OMP_NUM_THREADS=${OMP_NUM_THREADS:-1}
+export MKL_NUM_THREADS=${MKL_NUM_THREADS:-1}
+export OPENBLAS_NUM_THREADS=${OPENBLAS_NUM_THREADS:-1}
+export FC=${FC:-gfortran}
 
-# Determinism / avoid nested threading
-export OMP_NUM_THREADS="${OMP_NUM_THREADS:-1}"
-export MKL_NUM_THREADS="${MKL_NUM_THREADS:-1}"
-export OPENBLAS_NUM_THREADS="${OPENBLAS_NUM_THREADS:-1}"
-
-# Respect FC if provided by user/build environment
-: "${FC:=ifort}"
-
-TMPDIR="$(mktemp -d)"
-trap 'rm -rf "$TMPDIR"' EXIT INT TERM
-
-# Prepare sandbox with repo-like layout
-mkdir -p "$TMPDIR/ED2"
-cp -a "$TOPDIR/$SCRIPT_DIR" "$TMPDIR/ED2/"
-cp -a "$TOPDIR/input"       "$TMPDIR/ED2/"
-
-# Run inside sandbox
-cd "$TMPDIR/ED2/$SCRIPT_DIR"
-
-ED2_EXE="$EXE" FC="$FC" ./run.sh > test.log 2>&1 || {
-  echo "===== ${SCRIPT_DIR}/run.sh failed; last 200 lines ====="
-  tail -n 200 test.log || true
+scratch=$(mktemp -d)
+trap 'rm -rf "$scratch"' EXIT HUP INT TERM
+sandbox="$scratch/ED2"
+mkdir -p "$sandbox"
+cp -R "$source_root/$model_dir" "$sandbox/"
+cp -R "$source_root/input" "$sandbox/"
+cp "$generator" "$sandbox/$model_dir/mk_input"
+(
+  cd "$sandbox/$model_dir"
+  TOPDIR="$sandbox" ED2_EXE="$exe" ./run.sh > test.log 2>&1
+) || {
+  echo "ERROR: $model_dir/run.sh failed (isolated test):" >&2
+  tail -n 200 "$sandbox/$model_dir/test.log" >&2 || true
   exit 1
 }
 
-# Minimal success criteria: expected outputs exist and are non-empty
-for f in "$@"; do
-  if [ ! -s "$TMPDIR/ED2/$f" ]; then
-    echo "ERROR: expected output missing/empty: $f"
-    echo "===== log tail ====="
-    tail -n 200 test.log || true
+for output in "$@"; do
+  if [ ! -s "$sandbox/$output" ]; then
+    echo "ERROR: required output missing or empty: $output" >&2
+    tail -n 200 "$sandbox/$model_dir/test.log" >&2 || true
     exit 1
   fi
 done
 
-echo "OK: ${SCRIPT_DIR} passed."
+if [ "${LONGTEST:-0}" = 1 ]; then
+  # Preserve the historical extended-test eigenvalue-token sanity check.
+  name=${model_dir#script_}
+  eigen="$sandbox/examples/$name/eigenvalues.dat"
+  if [ -s "$eigen" ]; then
+    e0=$(awk 'NR==1 { print $1; exit }' "$eigen")
+    case "$e0" in
+      ""|*[!0-9eE+.-]*) echo "ERROR: nonnumeric first eigenvalue token: '$e0'" >&2; exit 1 ;;
+    esac
+  fi
+fi
+echo "OK: $model_dir passed in isolated sandbox."

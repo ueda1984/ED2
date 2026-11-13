@@ -2,7 +2,7 @@
 
 # make check は軽量（ex1のみ）→ これは Automake ハーネスでOK
 TESTS = test_ex1.sh
-EXTRA_DIST = test_ex1.sh test_common.sh \
+EXTRA_DIST = test_ex1.sh test_common.sh test_common_strict.sh compare_historical.py requirements-baseline.txt \
              test_ex2.sh test_ex3.sh test_ex4.sh test_ex5.sh \
              test_ex6.sh test_ex7.sh test_ex8.sh test_ex9.sh
 
@@ -25,8 +25,9 @@ check-long:
 	for t in $(LONG_TESTS); do \
 	  echo "---- $$t ----"; \
 	  rm -f "$$t.long.log"; \
-	  TOPDIR="$(top_srcdir)" \
-	  ED2_EXE="$(top_builddir)/source/QS3ED2" \
+	  ED2_TEST_SOURCE_ROOT="$(abs_top_srcdir)" \
+	  ED2_TEST_BUILD_ROOT="$(abs_top_builddir)" \
+	  ED2_EXE="$(abs_top_builddir)/source/QS3ED2" \
 	  LONGTEST=1 $(SHELL) "$(srcdir)/$$t" > "$$t.long.log" 2>&1 || { \
 	    echo "FAIL: $$t"; \
 	    echo "===== last 200 lines of $$t.long.log ====="; \
@@ -125,3 +126,8 @@ check-residual-policy: krylov_policy_driver
 	$(PYTHON) $(srcdir)/residual_policy_validation.py --driver "$(abs_builddir)/krylov_policy_driver" \
 	  --exe "$(abs_top_builddir)/source/QS3ED2" \
 	  $(if $(RESIDUAL_OUTPUT),--output "$(RESIDUAL_OUTPUT)",)
+
+# Source tree can be read-only and distinct from the build tree in distcheck.
+AM_TESTS_ENVIRONMENT = ED2_TEST_SOURCE_ROOT='$(abs_top_srcdir)'; export ED2_TEST_SOURCE_ROOT; \
+                       ED2_TEST_BUILD_ROOT='$(abs_top_builddir)'; export ED2_TEST_BUILD_ROOT; \
+                       FC='$(FC)'; export FC;
