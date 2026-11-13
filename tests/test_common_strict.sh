@@ -38,6 +38,9 @@ sandbox="$scratch/ED2"
 mkdir -p "$sandbox"
 cp -R "$source_root/$model_dir" "$sandbox/"
 cp -R "$source_root/input" "$sandbox/"
+# Automake distcheck intentionally makes the unpacked source tree read-only.
+# cp -R propagates those modes, so normalize permissions in the private copy.
+chmod -R u+w "$sandbox"
 cp "$generator" "$sandbox/$model_dir/mk_input"
 (
   cd "$sandbox/$model_dir"
