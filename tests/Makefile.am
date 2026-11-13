@@ -131,3 +131,6 @@ check-residual-policy: krylov_policy_driver
 AM_TESTS_ENVIRONMENT = ED2_TEST_SOURCE_ROOT='$(abs_top_srcdir)'; export ED2_TEST_SOURCE_ROOT; \
                        ED2_TEST_BUILD_ROOT='$(abs_top_builddir)'; export ED2_TEST_BUILD_ROOT; \
                        FC='$(FC)'; export FC;
+
+# Fortran module files are compiler-generated in the build directory.
+DISTCLEANFILES = *.mod *.smod

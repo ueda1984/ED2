@@ -35,3 +35,6 @@ main.o: input_param.o state_lists.o ham2vec.o lanczos.o eigen_solver.o get_expec
 
 krylov_observations.o: blas_lapack_interfaces.o krylov_residual_policy.o
 krylov_solvers.o: blas_lapack_interfaces.o krylov_observations.o
+
+# Fortran module files are compiler-generated in the build directory.
+DISTCLEANFILES = *.mod *.smod
