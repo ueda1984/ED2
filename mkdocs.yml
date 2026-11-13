@@ -70,5 +70,6 @@ nav:
       - Phase 2-B independent validation and metadata audit: development/phase2b-release-audit.md
       - CPC manuscript plan (working draft): development/cpc-manuscript-outline.md
       - CPC mixed-spin non-U1 scientific demonstration: development/cpc-mixed-spin-demo.md
+      - CPC sparse 8-12 site scaling: development/cpc-sparse-scaling.md
   - Reference:
       - Citation & Versioning: reference/citation-versioning.md      
