@@ -9,6 +9,7 @@ on:
       - codex/ed2-cpc-mixed-spin-demo
       - codex/ed2-cpc-sparse-scaling
       - codex/ed2-cpc-alg2-restart-sweep
+      - codex/ed2-cpc-alg2-multipair-stress
     paths:
       - "docs/**"
       - "mkdocs.yml"
