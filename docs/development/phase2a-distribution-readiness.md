@@ -47,11 +47,14 @@ All of these **passed** in the recorded
 This includes out-of-tree configure/compile/test, installation,
 uninstallation and distclean verification.
 
-A further CI task is running all nine extended example generators from a
-freshly unpacked release tarball and comparing 27 output tables with the
-unchanged historical reference data. Its outcome must be inspected
-[here](https://github.com/ueda1984/ED2/actions/runs/43350378812)
-before claiming this additional coverage has passed.
+The additional archive-only validation has now **passed**:
+`make check-long` ran the nine extended model examples (**9/9 passed**),
+and `tests/compare_historical.py` reported **27/27 historical reference
+comparisons passed** using the unchanged reference data. These comparisons
+use the project's documented numerical acceptance criteria, not necessarily
+bitwise file identity. The CI log provides reproducible evidence:
+[full source-distribution and numerical validation](https://github.com/ueda1984/ED2/actions/runs/43350378812).
+The validated source commit was `33fdefff12fab1ae393a46956a7afcc365a25554`.
 
 ## Build and documentation integration
 
@@ -67,7 +70,9 @@ The combined branch adds the reviewed documentation changes from
 
 ## Remaining publication gates
 
-- Confirm the final tarball nine-case and 27-table historical results.
+- Completed: distribution-archive extended models (9/9) and historical
+  comparisons (27/27) passed in the recorded CI run; retain this evidence
+  when cutting the release tag.
 - Run additional numerical validation from the tarball, including
   the independent Hamiltonian fixtures and the optional solver policy tests.
 - Choose the intended public version: `configure.ac` currently uses
