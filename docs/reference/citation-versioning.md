@@ -21,7 +21,9 @@ Once a DOI is available, cite ED2 as:
 > Hiroshi Ueda *et al.*, Computer Physics Communications,  
 > DOI: `<DOI>`.
 
-The DOI will be provided via Zenodo and linked from the GitHub repository.
+**Two DOI types must not be conflated.** The journal assigns a DOI to an
+accepted CPC article; Zenodo can assign a **different software-archive DOI**.
+Do not cite a prospective article as published until publication is confirmed.
 
 ---
 
@@ -39,7 +41,7 @@ Always include the exact version or commit hash used in your calculations.
 
 ## Versioning policy
 
-ED2 follows a **semantic versioning–inspired scheme**:
+ED2 **proposes** a semantic versioning–inspired scheme for future releases:
 
 ```
 vMAJOR.MINOR.PATCH
@@ -62,7 +64,7 @@ vMAJOR.MINOR.PATCH
 
 ## Release tags
 
-Official releases are created as **Git tags** in the GitHub repository:
+Proposed official releases would use **Git tags** in the GitHub repository (illustrative names, **not assertions that these tags exist**):
 
 ```
 v1.0.0
@@ -70,10 +72,10 @@ v1.1.0
 v1.1.1
 ```
 
-Each release tag corresponds to:
+Once the release workflow has been approved, each release tag should correspond to:
 - a frozen code state,
-- matching documentation,
-- a Zenodo archive entry (once DOI is enabled).
+- matching documentation and automated test evidence,
+- an archival software DOI if enabled through Zenodo.
 
 ---
 
@@ -102,7 +104,15 @@ Recommended procedure:
 ## CITATION.cff file
 
 The repository includes a `CITATION.cff` file to support automated citation
-by tools such as GitHub, Zotero, and reference managers.
+by tools such as GitHub and reference managers.
+
+!!! warning "Metadata reconciliation required before a tagged release"
+    `configure.ac` currently declares `1.0.0`, while `CITATION.cff`
+    declares `0.1.0` and `date-released: 2026-01-01`. These values have
+    not been established as one coherent released version. The README
+    lists two maintainers, while the citation file names three authors;
+    the differing roles must be confirmed, without deleting attribution.
+    Until a release decision is recorded, cite the exact source commit.
 
 Users can obtain citation information directly from the repository page.
 

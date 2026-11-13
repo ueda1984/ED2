@@ -31,9 +31,12 @@ ED2 (QS³-ED2) is a **Fortran-based Exact Diagonalization (ED) code** for numeri
 
 ## Documentation
 
-Official documentation:
+Upstream documentation (for `QS-Cube/ED2`):
 
 https://ed2.readthedocs.io/en/latest/
+
+Development-branch documentation may be newer than the published upstream site.
+Verify the repository and Git SHA before using newly introduced solver controls.
 
 Includes:
 
@@ -50,8 +53,8 @@ Includes:
 
 - Linux (x86_64)
 - Fortran compiler
-  - GNU Fortran (`gfortran`, GCC ≥ 10 recommended)
-  - Intel oneAPI Fortran (`ifort` / `ifx`)
+  - GNU Fortran (`gfortran`; source-archive verification recorded with versions 11 and 13)
+  - Intel oneAPI Fortran (`ifort` / `ifx`; compatibility requires separate validation)
 - BLAS/LAPACK (OpenBLAS or Intel MKL)
 - OpenMP-capable compiler
 
@@ -65,14 +68,14 @@ ED2 uses GNU Autotools.
 git clone https://github.com/QS-Cube/ED2.git
 cd ED2
 autoreconf -vfi
-./configure FC=ifort     # or FC=gfortran
+./configure FC=gfortran FCFLAGS='-O2 -fopenmp'
 make -j
 ```
 
 BLAS/LAPACK:
 
 - OpenBLAS is detected automatically when available.
-- Otherwise Intel MKL is used as fallback (via `-qmkl`).
+- Configure checks other BLAS/LAPACK libraries when OpenBLAS is unavailable. The automatic Intel MKL fallback applies **only to `ifort`**, not to GNU Fortran or `ifx`.
 
 No PATH dependency is assumed for the ED2 executable.
 
@@ -141,7 +144,9 @@ version <tag> or commit <hash>.
 
 After DOI release, please use the Zenodo DOI.
 
-A `CITATION.cff` file is provided.
+A `CITATION.cff` file is provided. Its release version, date and author metadata
+must be reconciled with the release manifest before the next formal publication;
+for a development version, record and cite the full Git SHA.
 
 ---
 

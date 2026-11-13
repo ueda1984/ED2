@@ -5,6 +5,7 @@ on:
     branches:
       - codex/ed2-docs-cpc-preparation
       - codex/ed2-docs-distribution-integration
+      - codex/ed2-phase2b-release-audit
     paths:
       - "docs/**"
       - "mkdocs.yml"
