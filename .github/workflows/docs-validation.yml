@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - codex/ed2-docs-cpc-preparation
+      - codex/ed2-docs-distribution-integration
     paths:
       - "docs/**"
       - "mkdocs.yml"
