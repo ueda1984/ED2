@@ -143,3 +143,6 @@ EXTRA_DIST += mixed_spin_iterative_crosscheck.py
 
 # Research/test-only SciPy sparse reference (not an ED2 runtime requirement).
 EXTRA_DIST += mixed_spin_sparse_scale.py
+
+# Exploratory matched-target tolerance/resource profile (SciPy is test-only).
+EXTRA_DIST += mixed_spin_matched_benchmark.py
