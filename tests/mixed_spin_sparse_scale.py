@@ -197,15 +197,15 @@ def main():
     p.add_argument("--exe",required=True,type=Path)
     p.add_argument("--output",required=True,type=Path)
     p.add_argument("--threads",default=1,type=int,choices=(1,2))
-    p.add_argument("--sizes",default="8,10",
-                   help="Comma-delimited site counts, currently 8 and/or 10")
+    p.add_argument("--sizes",default="8,10,12",
+                   help="Comma-delimited site counts, currently 8, 10, 12")
     args=p.parse_args()
     exe=args.exe.resolve(strict=True)
     root=args.output.resolve()
     root.mkdir(parents=True,exist_ok=False)
     sizes=tuple(int(s.strip()) for s in args.sizes.split(","))
-    if any(n not in (8,10) for n in sizes) or len(set(sizes))!=len(sizes):
-        raise ValueError("Expected distinct site counts from 8,10")
+    if any(n not in (8,10,12) for n in sizes) or len(set(sizes))!=len(sizes):
+        raise ValueError("Expected distinct site counts from 8,10,12")
     scenarios=[(n,hx) for n in sizes for hx in ((0.15,0.38) if n==8 else (0.15,))]
     records=[]
     for n,hx in scenarios:
