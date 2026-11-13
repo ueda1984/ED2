@@ -72,7 +72,27 @@ def construct_sparse_hamiltonian(spins,bonds,fields):
 
 
 def expectation(q,A):
-    return float(np.vdot(q,A @ q).real)
+    z=np.vdot(q,A@q)
+    if abs(z.imag)>2e-8:
+        raise AssertionError("Nonreal Hermitian expectation: "+str(z))
+    return float(z.real)
+
+
+def crosscheck_sparse_and_dense():
+    """Ensure SciPy's separate sparse construction equals the prior dense model."""
+    records=[]
+    for n in (4,6):
+        spins=[0.5,1.]*(n//2)
+        bonds,fields=ref.couplings(n,0.15)
+        Hs,_=construct_sparse_hamiltonian(spins,bonds,fields)
+        dense_ops,_=ref.product_operators(spins)
+        Hd=ref.dense_hamiltonian(dense_ops,bonds,fields)
+        maximum=float(np.max(np.abs(Hs.toarray()-Hd)))
+        if maximum>2e-13:
+            raise AssertionError("Independent sparse/dense construction differs "+
+                                 str((n,maximum)))
+        records.append(dict(n_sites=n,dimension=Hs.shape[0],max_matrix_error=maximum))
+    return records
 
 
 def reference_model(n,hx):
@@ -93,6 +113,27 @@ def reference_model(n,hx):
         raise AssertionError("Independent sparse solver did not establish distinct low eigenpairs")
     v=vectors[:,0]
     lm=np.array([[expectation(v,op) for op in site] for site in ops])
+    total_sz=sum((site[2] for site in ops),start=sparse.csr_matrix(H.shape,dtype=complex))
+    comm=H@total_sz-total_sz@H
+    comm_norm=float(np.linalg.norm(comm.data))
+    H_norm=float(np.linalg.norm(H.data))
+    relative_commutator=comm_norm/H_norm
+    if relative_commutator < 1e-5:
+        raise AssertionError("Model expected to break U(1), but [H,Sz] is small")
+    weights=np.array([0.4*((-1)**i)+0.09*(i+1) for i in range(n)])
+    V=sum((weights[i]*ops[i][0] for i in range(n)),
+          start=sparse.csr_matrix(H.shape,dtype=complex))
+    delta=1e-4
+    eval_plus=float(eigsh(H+delta*V,k=1,which="SA",tol=1e-11,
+                          ncv=48,maxiter=20000,return_eigenvectors=False)[0])
+    eval_minus=float(eigsh(H-delta*V,k=1,which="SA",tol=1e-11,
+                           ncv=48,maxiter=20000,return_eigenvectors=False)[0])
+    hf_finite_difference=(eval_plus-eval_minus)/(2*delta)
+    hf_exact=float(weights@lm[:,0])
+    hf_error=abs(hf_finite_difference-hf_exact)
+    if hf_error>5e-6:
+        raise AssertionError("Independent Hellmann-Feynman identity failed "+
+                             str((hf_finite_difference,hf_exact,hf_error)))
     pairs=[(i,j) for i in range(n) for j in range(i+1,n)]
     cf=np.array([[expectation(v,ops[i][a] @ ops[j][b])
                   for b in range(3) for a in range(3)] for i,j in pairs])
@@ -100,7 +141,11 @@ def reference_model(n,hx):
                 dimension=H.shape[0],energies=energies,mag=lm,corr=cf,
                 eigenpair_residuals=residuals,
                 independent_build_seconds=dt_build,
-                independent_eigensolve_seconds=dt_ref,nnz=int(H.nnz))
+                independent_eigensolve_seconds=dt_ref,nnz=int(H.nnz),
+                relative_sz_commutator_frobenius=relative_commutator,
+                hellmann_feynman_finite_difference=hf_finite_difference,
+                hellmann_feynman_exact_spin_expectation=hf_exact,
+                hellmann_feynman_error=hf_error)
 
 
 def run_ed2(exe,root,n,hx,alg,omp,reference):
@@ -171,6 +216,12 @@ i_vec_min=1, i_vec_max=2
     np.testing.assert_array_equal(m[:,0],np.arange(1,n+1))
     np.testing.assert_array_equal(cf[:,:2],
                                   np.array([(i+1,j+1) for i,j in pairs]))
+    weights=np.array([0.4*((-1)**i)+0.09*(i+1) for i in range(n)])
+    hf_ed2=float(weights @ m[:,1])
+    hf_ed2_error=abs(hf_ed2-reference["hellmann_feynman_finite_difference"])
+    if hf_ed2_error>5e-6:
+        raise AssertionError("ED2 magnetization inconsistent with independent "
+                             "energy derivative "+str(hf_ed2_error))
     magerr=float(np.max(np.abs(m[:,1:4]-reference["mag"])))
     cferr=float(np.max(np.abs(cf[:,2:11]-reference["corr"])))
     if max(magerr,cferr)>OBS_ATOL:
@@ -186,6 +237,8 @@ i_vec_min=1, i_vec_max=2
                 ed2_eigenvalues=energies.tolist(),energy_max_error=eerr,
                 magnetization_max_error=magerr,correlation_max_error=cferr,
                 max_reported_residual=max(x["residual"] for x in pairrows),
+                relative_sz_commutator_frobenius=reference["relative_sz_commutator_frobenius"],
+                hellmann_feynman_ed2_error=hf_ed2_error,
                 reference_max_residual=max(reference["eigenpair_residuals"]),
                 h_applications=int(diag["h_applications"]),iterations=int(diag["iterations"]),
                 cycles=int(diag["cycles"]),wall_seconds=elapsed,peak_rss_kib=peak_rss,
@@ -207,6 +260,8 @@ def main():
     if any(n not in (8,10,12) for n in sizes) or len(set(sizes))!=len(sizes):
         raise ValueError("Expected distinct site counts from 8,10,12")
     scenarios=[(n,hx) for n in sizes for hx in ((0.15,0.38) if n==8 else (0.15,))]
+    sparse_dense_check=crosscheck_sparse_and_dense()
+    print("SPARSE-DENSE INDEPENDENT SELFTEST:",sparse_dense_check,flush=True)
     records=[]
     for n,hx in scenarios:
         print(f"REFERENCE: {n} sites, hx control {hx}",flush=True)
@@ -214,7 +269,9 @@ def main():
         print(f"REFERENCE DONE: dimension={reference['dimension']} "
               f"nnz={reference['nnz']} "
               f"eigvals={reference['energies'].tolist()} "
-              f"residual={max(reference['eigenpair_residuals']):.3e}",flush=True)
+              f"residual={max(reference['eigenpair_residuals']):.3e} "
+              f"commutator_rel={reference['relative_sz_commutator_frobenius']:.3e} "
+              f"HF_error={reference['hellmann_feynman_error']:.3e}",flush=True)
         for alg in (1,2):
             name=f"mixed-n{n}-hx{hx:.2f}-alg{alg}-omp{args.threads}"
             try:
@@ -232,6 +289,7 @@ def main():
                 print(f"FAIL {name}: {error}",flush=True)
     result=dict(schema=1,kind="independent sparse mixed-spin ED2 benchmark",
                 git_sha=os.environ.get("GITHUB_SHA","not provided"),
+                sparse_dense_matrix_selftest=sparse_dense_check,
                 omp=args.threads,sizes=list(sizes),
                 total=len(records),passed=sum(x["status"]=="passed" for x in records),
                 failed=sum(x["status"]=="failed" for x in records),
