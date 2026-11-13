@@ -176,15 +176,64 @@ state" solely because the residual passes. A reliable package may
 report `residual_accepted`, `lowest_inclusion_not_assessed`,
 and `gap_sensitivity_warning` as *separate* notions.
 
+## Verified doublet-invariant observables from native ED2 states
+
+In the additional [16-case trace validation](https://github.com/ueda1984/ED2/actions/runs/43404082525),
+ED2 ALG=2 returned the lowest two eigenvectors for 4- and 6-site
+chains at exact degeneracy (\(\delta=0\)) or splitting
+\(\delta=10^{-10}\), with `NOK/NOM=2/16` and
+`4/24`, OMP=1 and OMP=2.
+
+The code loads the second eigenvector in its **native ED2 basis**
+through the existing `re_wf=1` path (after copying its Fortran
+binary record into an isolated first-state readback directory).
+It separately computes magnetic and all Cartesian two-site
+observables of the first and second eigenvectors, then compares
+their equal-weight average with
+\[
+\langle O\rangle_{\mathcal C}
+=\tfrac12\operatorname{Tr}(P_{\mathcal C}O),
+\qquad
+P_{\mathcal C}=\sum_{j=0}^{1}|\phi_j\rangle\langle\phi_j|,
+\]
+where the independent NumPy dense eigensolver supplies
+the reference low-doublet eigenvectors \(\phi_j\).
+
+**16/16 comparisons passed**: over all reported local
+magnetizations and nine Cartesian pair correlations, the maximum
+discrepancy was \(<3\times10^{-9}\). The observed two-state
+ensemble free-spin magnetization was zero (within floating-point
+roundoff), independent of the gauge or rotation inside the
+low doublet.
+
+Representative 6-site **exact-doublet** results:
+
+| OMP | `NOK/NOM` | First \(\langle S_1^z\rangle\) | Second \(\langle S_1^z\rangle\) | Mean | Largest mag / correlation error |
+| ---: | --- | ---: | ---: | ---: | ---: |
+| 1 | 2 / 16 | +0.122891 | -0.122891 | 0 | 2.43e-10 / 2.31e-10 |
+| 1 | 4 / 24 | +0.484167 | -0.484167 | 0 | 2.88e-14 / 2.88e-14 |
+| 2 | 2 / 16 | -0.251835 | +0.251835 | 0 | 4.84e-10 / 6.47e-10 |
+| 2 | 4 / 24 | +0.490023 | -0.490023 | 0 | 3.64e-15 / 4.05e-15 |
+
+The test also verifies that both native eigenvectors are
+approximately orthonormal and records a *conditional* cluster
+leakage estimate based on independent knowledge of the external
+spectral gap. It is not a universal lowest-subspace guarantee.
+The equal-weight ensemble is the **normalized projector**; it
+does not assert that every experimental preparation is mixed.
+
+Reproduction script:
+[`tests/mixed_spin_doublet_trace.py`](https://github.com/ueda1984/ED2/blob/codex/ed2-cpc-near-degenerate-physics/tests/mixed_spin_doublet_trace.py).
+The existing ED2 numerical algorithms were not modified.
+
 ## Remaining research tasks
 
 1. **Completed:** controlled excited-start tests independently
    verified that a correct excited state can pass even `1e-12`
    absolute residual, in both OMP profiles.
-2. Demonstrate projector or trace-based ground-doublet observables
-   from the returned `NOE=2` state vectors. Care is needed
-   because the Fortran sequential unformatted wavefunctions use
-   ED2's internal basis ordering, not an ordinary text product basis.
+2. **Completed:** the equal-weight doublet projector/trace
+   observables were independently verified in **16/16** native-basis
+   ED2 readback tests, despite large differences among individual states.
 3. Study genuinely *interacting* avoided crossings and
    near-degenerate clusters (this intentionally decoupled
    spin is a transparent numerical counterexample).
