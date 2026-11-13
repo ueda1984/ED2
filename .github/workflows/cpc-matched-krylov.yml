@@ -50,13 +50,13 @@ jobs:
           "$src/configure" FC="$FC" FCFLAGS="$FCFLAGS"
           make -j2
           git -C "$GITHUB_WORKSPACE" rev-parse HEAD
-      - name: Characterize matched one-pair solver on 10-site model
+      - name: Characterize matched one-pair solver on 10/12-site models
         run: |
           set -eu
           work="$RUNNER_TEMP/ed2-matched"
           src=$(cat "$work/source-path")
           python3 "$src/tests/mixed_spin_matched_benchmark.py" \
-            --exe "$work/build/source/QS3ED2" --sizes 10 \
+            --exe "$work/build/source/QS3ED2" --sizes 10,12 \
             --output "$work/results"
           python3 - "$work/results/report.json" <<'PY'
           import json,sys
@@ -69,7 +69,7 @@ jobs:
               print("SUMMARY",case["case"],"status",case["status"],"Hcalls",case["h_applications"],
                     "wall",case["wall_seconds"],"RSS",case["peak_rss_kib"],
                     "residual",case.get("residual"))
-          if report["run_count"]!=16 or report["contract_violations"]:
+          if report["run_count"]!=20 or report["contract_violations"]:
               raise SystemExit("Matched solver benchmark assertions failed")
           PY
       - name: Save inputs, diagnostics and all numerical outcomes
