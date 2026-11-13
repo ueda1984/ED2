@@ -16,8 +16,9 @@ ED2 is developed for:
 -   **Controlled Hilbert-space truncation**
 -   **High-performance shared-memory execution via OpenMP**
 
-This documentation constitutes the **official user and developer
-reference**.
+This documentation describes the ED2 source revision used to build the site.
+Features in a development fork should not be assumed to exist in the
+upstream QS-Cube/ED2 release until explicitly integrated.
 
 Its primary objective is to guarantee that any third party can:
 
@@ -71,7 +72,7 @@ J^{\alpha}_{rr'} \hat S^{\alpha}_r \hat S^{\alpha}_{r'}
 + D^{\alpha}_{rr'} ( \hat{\mathbf S}_r \times \hat{\mathbf S}_{r'} )_{\alpha}
 + \Gamma^{\alpha}_{rr'} ( \hat S^{\beta}_r \hat S^{\gamma}_{r'} + \hat S^{\gamma}_r \hat S^{\beta}_{r'} )
 \Big]
-- \sum_r \mathbf h_r \cdot \hat{\mathbf S}_r .
++ \sum_r \mathbf h_r \cdot \hat{\mathbf S}_r .
 $$
 
 with mutually distinct indices $\alpha\neq\beta\neq\gamma$. Here
@@ -80,6 +81,12 @@ denote exchange, Dzyaloshinskii--Moriya, and symmetric anisotropic
 interactions between spins on sites $r,r'$, while $\mathbf h_r$
 represents local Zeeman fields. Local spin magnitudes
 $S_r = 1/2, 1, 3/2, \ldots$ may be specified independently at each site.
+
+!!! important "Magnetic-field sign convention"
+    ED2's field input enters the implemented Hamiltonian as **+ h · S**,
+    not - h · S. To model a Zeeman term - B · S, supply h = -B
+    in the field records (in your Hamiltonian's energy units).
+    See [Input format](user-guide/input-format.md).
 
 Typical scientific applications include:
 

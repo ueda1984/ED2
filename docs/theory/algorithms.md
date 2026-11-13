@@ -1,128 +1,92 @@
-# Theory and Algorithms
+# Theory and numerical algorithms
 
-This page summarizes the theoretical background and numerical algorithms implemented in ED2.
+This page describes features implemented in the source, rather than
+promising support for every possible symmetry or representation.
 
----
+## Basis construction and truncation
 
-## Exact Diagonalization overview
-
-Exact Diagonalization (ED) solves the many-body eigenvalue problem
-
-$$
-H |\psi_n\rangle = E_n |\psi_n\rangle
-$$
-
-by representing the Hamiltonian $H$ as a matrix in a chosen basis and computing its eigenvalues
-and eigenvectors exactly (up to numerical precision).
-
----
-
-## Hilbert-space construction
-
-### Local basis
-
-Each lattice site is associated with a local spin basis $|m_i\rangle$, where
+ED2 constructs states from the fully polarized reference state by
+applying spin-lowering operators. A site may have its own spin `S_r`
+and local occupation cap. Without restrictions, the dimension is
 
 $$
-m_i = -S, -S+1, \ldots, S .
+\dim\mathcal H_{\mathrm{full}}=\prod_{r=1}^{N}(2S_r+1).
 $$
 
-The full Hilbert space for a system of $L$ sites has dimension
+`NODmin` and `NODmax` restrict the total number of lowering
+excitations; `FILE_NODmax` additionally restricts each site.
+
+!!! important "Truncation is not always a symmetry sector"
+    If transverse fields or other terms change excitation number,
+    a restricted NOD calculation is a **projected Hamiltonian** on
+    that space, not generally a conserved block of the full model.
+
+## Hamiltonian convention
+
+The supported interactions include XYZ exchange, DM exchange,
+symmetric off-diagonal Gamma terms, and site-dependent fields.
+For the field terms, the implementation uses
 
 $$
-\dim \mathcal{H}_{\mathrm{full}} = (2S + 1)^L .
+H_{\mathrm{field}} =
++\sum_r (h_r^x S_r^x+h_r^y S_r^y+h_r^z S_r^z).
 $$
 
----
+To model a physical Zeeman term `-B · S`, input the negative
+coefficients `h = -B`. DM signs follow directed bonds; the
+parser reverses the DM coefficients if it swaps the two site indices.
+See [Input format](../user-guide/input-format.md).
 
-## Symmetry decomposition
+## Symmetry reduction
 
-ED2 explicitly exploits **lattice and internal symmetries** to decompose the Hilbert space
-into independent symmetry sectors. Calculations are performed within selected sectors,
-leading to block-diagonal Hamiltonian matrices and substantial reductions in computational cost.
+ED2 accepts up to six user-defined site permutations and their
+orders and one-dimensional character labels. These may represent
+translations and **compatible** point-group operations.
 
-### Translation symmetry
+It is the user's responsibility to ensure that the supplied operations
+are genuine symmetries of the Hamiltonian and mutually compatible.
+The input parser does not generally validate noncommuting group
+relations or construct arbitrary point-group irreducible
+representations.
 
-For translationally invariant lattices with periodic boundary conditions, ED2 can enforce
-translation symmetry and work in fixed **crystal-momentum sectors**.
-Basis states are classified according to their momentum quantum number $k$, and only states
-belonging to the selected momentum sector are retained.
+A lattice reflection/inversion permutation is **not**
+the global *spin-inversion* map `S_i^z -> -S_i^z`.
+A separate general spin-inversion sector implementation has not
+been established in the current source.
 
-This symmetry reduces the effective Hilbert-space dimension by approximately a factor of the
-number of lattice sites.
+## Hamiltonian-vector product
 
-### Point-group symmetries
+ED2 applies the Hamiltonian using a transition cache and
+on-demand matrix elements. `wk_dim` controls the extent of caching.
+The represented Hamiltonian must not depend on the cache policy.
+Independent small-system and cache-on/off tests are included in
+the development validation suite.
 
-If the lattice geometry admits point-group symmetries (e.g., reflections or rotations),
-ED2 can project the Hilbert space onto irreducible representations of the corresponding
-point group.
+## Eigensolvers
 
-This allows further block-diagonalization of the Hamiltonian and facilitates the
-classification of eigenstates by symmetry.
+| `ALG` | Method | Use |
+| --- | --- | --- |
+| 1 | Three-term Lanczos, with candidate-vector reconstruction | Single low-lying eigenpair |
+| 2 | Restarted Hermitian Krylov solver, multiple Ritz pairs | Several low-lying eigenpairs |
+| 3 | Dense Hermitian diagonalization via LAPACK | Small sectors |
 
-### Spin-inversion symmetry
+ALG=1/2 measure direct `||H psi - lambda psi||` residuals.
+In the Phase 1-G development branch, an optional user-supplied
+residual acceptance condition is added to their legacy
+energy-convergence rules. See
+[Solver accuracy and reproducibility](../user-guide/solver-accuracy.md).
 
-For spin-$1/2$ systems without explicit symmetry-breaking fields, ED2 can exploit
-**spin-inversion symmetry**, defined by simultaneous inversion of all spins
-($S_i^z \rightarrow -S_i^z$).
+## Numerical interpretation
 
-The Hilbert space is decomposed into even and odd spin-inversion sectors, which can be
-treated independently.
+A small residual for a normalized vector means that it nearly solves
+the eigenvalue equation for *some* eigenvalue of the represented
+Hermitian operator. It does **not** establish that the true lowest
+eigenspace was found. If levels are nearly degenerate, individual
+eigenvector components and physical expectation values may be much
+less accurate than the energies or residuals suggest.
 
----
-
-## Truncated Hilbert space
-
-In addition to symmetry decomposition, ED2 supports calculations in a **restricted Hilbert space**
-defined by the number of spin-down (or equivalent) excitations.
-
-For spin-$1/2$ systems, define
-
-$$
-N_{\downarrow} = \sum_i \frac{1 - \sigma_i^z}{2} .
-$$
-
-The truncated space is defined by bounds
-
-$$
-N_{\downarrow}^{\min} \le N_{\downarrow} \le N_{\downarrow}^{\max} .
-$$
-
-Only basis states satisfying these conditions are included.
-
----
-
-## Hamiltonian representation
-
-The Hamiltonian is assembled as a sparse matrix in the chosen symmetry-adapted basis.
-Matrix elements are generated on-the-fly during Hamiltonian construction.
-
-Typical Hamiltonian terms include exchange interactions and external fields.
-
----
-
-## Eigenvalue solvers
-
-### Full diagonalization
-
-For very small Hilbert spaces, ED2 can perform full diagonalization using dense
-BLAS/LAPACK routines.
-
-### Lanczos algorithm
-
-For larger systems, ED2 employs Lanczos-type iterative eigensolvers to compute a small number
-of extremal eigenvalues within a given symmetry sector.
-
----
-
-## Computational considerations
-
-By combining symmetry decomposition, Hilbert-space truncation, and iterative solvers,
-ED2 enables calculations that would otherwise be infeasible in the full Hilbert space.
-
----
-
-## Relation to the CPC manuscript
-
-This section corresponds to the algorithmic description presented in the accompanying
-journal manuscript.
+Validate observables and ground-space inclusion separately whenever
+these distinctions affect the scientific result. The
+[Phase 1-G report](../development/phase1g-optin-residual-policy.md)
+records reproducible counterexamples and the limitations of the
+optional tolerance policy.

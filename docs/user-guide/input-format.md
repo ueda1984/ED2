@@ -1,7 +1,9 @@
 # Input format
 
 QS³-ED2 reads its input from **standard input (STDIN)** and expects a **Fortran NAMELIST** file (typically named `input.dat`).  
-This page documents the **actual input format used by this repository** (QS-Cube/ED2).
+This page documents the **Fortran NAMELIST fields in ED2 source**.
+Development-branch solver controls are described in
+[Solver accuracy and reproducibility](solver-accuracy.md).
 
 > **Reproducibility note**  
 > Always record (i) the ED2 git tag/commit hash, (ii) `input.dat`, and (iii) all referenced `list_*.dat` files.
@@ -28,7 +30,10 @@ cd examples/chain
 ../../source/QS3ED2 < input.dat > output.dat
 ```
 
-Many examples also provide `run.sh` that sets a working directory and runs ED2 in a consistent way.
+The helpers under `script_*/run.sh` generate model inputs and run ED2.
+For a fresh checkout, build ED2 first and execute the appropriate helper
+to generate `examples/<model>/`; do not assume every generated example
+directory already exists.
 
 ---
 
@@ -46,7 +51,7 @@ The repository provides reference examples under `examples/`:
 - `square/`
 - `triangular/`
 
-Each example directory contains:
+After its model-generation helper has run, the example directory normally contains:
 
 - `input.dat` (main NAMELIST input)
 - model-definition lists such as `list_xyz_dm_gamma.dat`, `list_hvec.dat`, `list_spin.dat`, ...
@@ -70,7 +75,7 @@ We recommend starting from `examples/chain/` to understand the basic workflow.
 - Entries are `KEY = VALUE` separated by commas (`,`). Newlines are allowed, but commas are recommended.
 - Strings must be quoted, e.g., `"list_hvec.dat"` or `'list_hvec.dat'`.
 - Double precision constants are written as `1.0d-14` (Fortran `d` exponent).
-- Unknown keys are typically ignored or cause a read error depending on compiler/runtime settings—use the provided examples as the safe reference.
+- Only keys declared in the source NAMELISTs are supported. An unknown name can cause a runtime input error; use the supplied examples and source declarations.
 
 ---
 
@@ -160,6 +165,7 @@ $$
 
 - If you want the **full Hilbert space**, choose a wide range (model-dependent).  
 - If your model has a **U(1) conservation law** (e.g., XXZ-like total $S^z$ conservation), using `NODmin=NODmax` selects a fixed sector (fixed total $S^z$).
+- With excitation-nonconserving terms (e.g., transverse fields), NOD restriction defines a **projected Hamiltonian**, not generally an invariant sector of the unrestricted system.
 
 Local constraints and local spin values are further specified by `FILE_NODmax` and `FILE_spin`.
 
@@ -194,6 +200,19 @@ The permutation vector is $(2,3,\dots,N,1)$, stored as an `NOS`-line integer fil
 ---
 
 ### Hamiltonian term lists
+
+!!! important "Field sign and bond orientation"
+    A field entry contributes **+ h_x S^x + h_y S^y + h_z S^z** at
+    the specified site. To reproduce a physical convention - B · S,
+    supply h = -B.
+
+    Each row of `FILE_hvec`: `site hx hy hz` (1-based site index).
+    Each row of `FILE_xyz_dm_gamma`:
+    `site_i site_j Jx Jy Jz Dx Dy Dz Gx Gy Gz`.
+    The parser flips the three DM coefficients when reordering a
+    reversed input bond. The field record number and its site label
+    are different quantities.
+
 
 | Key | Type | Meaning |
 |---|---:|---|
@@ -316,6 +335,7 @@ Common keys (as used in examples):
    - relative to the directory where ED2 is run, or
    - absolute paths (for batch/HPC runs).
 3. Record environment details (compiler, BLAS/LAPACK, thread settings) for reproducible comparisons.
+4. See [Solver accuracy and reproducibility](solver-accuracy.md) before interpreting a solver's success as an observable-accuracy guarantee.
 
 ---
 
