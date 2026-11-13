@@ -158,3 +158,6 @@ EXTRA_DIST += mixed_spin_alg2_multipair_sweep.py
 
 # Independent physical low-doublet/near-degeneracy diagnostic (optional scientific test).
 EXTRA_DIST += mixed_spin_near_degenerate.py
+
+# Analytic physical excited-start witness, checked against independent dense spectra.
+EXTRA_DIST += mixed_spin_excited_start_probe.py
