@@ -91,6 +91,22 @@ jobs:
                 "residual=",r.get("direct_residuals"),
                 "actual_energy_difference=",r.get("ground_energy_difference"))
           PY
+      - name: Independently check two-state trace and projector-invariant observables
+        run: |
+          set -eu
+          work="$RUNNER_TEMP/ed2-degenerate"
+          src=$(cat "$work/source-path")
+          python3 "$src/tests/mixed_spin_doublet_trace.py" \
+            --exe "$work/build/source/QS3ED2" \
+            --omp "${{ matrix.threads }}" \
+            --output "$work/trace-omp${{ matrix.threads }}"
+          python3 - "$work/trace-omp${{ matrix.threads }}/report.json" <<'PY'
+          import json,sys
+          r=json.load(open(sys.argv[1],encoding="utf-8"))
+          print("DOUBLET TRACE:",r["passed"],"accepted;",len(r["failures"]),"failures")
+          if r["total"]!=8 or r["passed"]!=8 or r["failures"]:
+              raise SystemExit("Doublet invariant observable verification failed")
+          PY
       - name: Retain all inputs, outputs, eigenvectors and nonconvergence records
         if: always()
         uses: actions/upload-artifact@v4
@@ -105,5 +121,13 @@ jobs:
         with:
           name: excited-start-omp${{ matrix.threads }}
           path: ${{ runner.temp }}/ed2-degenerate/excited-start-omp${{ matrix.threads }}/
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Retain independently checked doublet ensemble observables
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: doublet-trace-omp${{ matrix.threads }}
+          path: ${{ runner.temp }}/ed2-degenerate/trace-omp${{ matrix.threads }}/
           if-no-files-found: warn
           retention-days: 14
