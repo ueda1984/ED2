@@ -146,3 +146,6 @@ EXTRA_DIST += mixed_spin_sparse_scale.py
 
 # Exploratory matched-target tolerance/resource profile (SciPy is test-only).
 EXTRA_DIST += mixed_spin_matched_benchmark.py
+
+# Research-only ALG2 restart workspace sweep (not included in default tests).
+EXTRA_DIST += mixed_spin_alg2_restart_sweep.py
