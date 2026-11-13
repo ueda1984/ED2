@@ -5,10 +5,10 @@ not a tuned performance benchmark or a release claim.
 
 ## Model and exact-space meaning
 
-The source code [\`tests/mixed_spin_sparse_scale.py\`](https://github.com/ueda1984/ED2/blob/codex/ed2-cpc-sparse-scaling/tests/mixed_spin_sparse_scale.py)
+The source code [`tests/mixed_spin_sparse_scale.py`](https://github.com/ueda1984/ED2/blob/codex/ed2-cpc-sparse-scaling/tests/mixed_spin_sparse_scale.py)
 constructs an independent complex Hermitian Hamiltonian using SciPy
 sparse matrices in the ordinary spin-product basis and computes its
-lowest two eigenpairs with ARPACK \`eigsh(which="SA")\`.
+lowest two eigenpairs with ARPACK `eigsh(which="SA")`.
 
 The model is the same open alternating \(S=1/2,1\) chain as in
 [the small-system dense ED study](cpc-mixed-spin-demo.md), with
@@ -40,7 +40,7 @@ separately compared against a full dense spectrum in
 ## Verified OMP=1 results
 
 [Primary GitHub Actions execution](https://github.com/ueda1984/ED2/actions/runs/43396341796)
-(13 November 2026; Ubuntu 24.04, GNU Fortran 13, \`-O2 -fopenmp\`,
+(13 November 2026; Ubuntu 24.04, GNU Fortran 13, `-O2 -fopenmp`,
 OpenBLAS one thread, OpenMP one thread).
 An **unrelated extracted source archive** was compiled for ED2;
 the physics reference uses SciPy, not ED2's Hamiltonian construction.
@@ -101,7 +101,7 @@ for ALG=2; the correlation discrepancies were
 \(\le1.82\times10^{-14}\), respectively.
 
 Memory is the peak resident set of the **ED2 child process**
-measured by GNU \`/usr/bin/time\`. Wall-clock includes process startup,
+measured by GNU `/usr/bin/time`. Wall-clock includes process startup,
 the eigenproblem and observable output. Values are individual samples
 on shared CI hardware, **without repeated timings, uncertainty bars
 or guaranteed dedicated CPUs**.

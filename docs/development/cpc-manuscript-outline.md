@@ -48,7 +48,7 @@ research. The intended category requires editorial and author review:
 | Eigensolvers | Lanczos and thick-restart Lanczos already published | ALG=1/2 and dense ALG=3 with tested residual/status handling | Avoid claiming solver families themselves are new |
 | Observables | Local, two-point and static/dynamic structure factors | Local magnetization and static Cartesian/ladder two-body correlations verified | Do **not** assert dynamic structure factors exist in ED2 without code evidence |
 | Software quality | Program published in CPC | Source distribution, diagnostics, replay and numerical acceptance contract | Engineering value versus *scientific* novelty must be argued separately |
-| Installed Fortran library API | Not the claim here | Current Automake target installs \`QS3ED2\` executable | No public library API is currently shipped |
+| Installed Fortran library API | Not the claim here | Current Automake target installs `QS3ED2` executable | No public library API is currently shipped |
 
 **Priority:** independently demonstrate an important model that the
 published QS³ formulation does not directly cover, rather than
@@ -116,7 +116,7 @@ bonds; reversing input bonds changes the oriented DM coefficients.
 
 For site-specific \(S_i\), the full product basis has dimension
 \(\prod_i(2S_i+1)\). Explain how local occupation bounds and total
-\`NODmin\`/\`NODmax\` define the represented space, and why
+`NODmin`/`NODmax` define the represented space, and why
 \(\,P H P\,\) for an NOD-restricted, non-U(1) Hamiltonian is **not**
 a dynamically invariant sector in general.
 
@@ -146,7 +146,7 @@ relations.
   diagnostic/policy acceptance cases. Distinguish *test passed* from
   *physical solver converged*.
 - Archived source builds on GNU Fortran 11/13 with separate build
-  directories; \`make distcheck\`, extended nine examples and
+  directories; `make distcheck`, extended nine examples and
   27 historical reference comparisons (use archived CI links).
 - Show examples of two numerical pitfalls: exact excited-vector
   starting state and low-gap observable errors.
@@ -177,7 +177,7 @@ Use an independently constructed dense Hamiltonian to compare
 energies, residuals, local magnetization and correlation functions.
 Keep site/bond orientation and correlation-column ordering explicit.
 Only then scale to larger \(L\), measuring runtime, RSS memory,
-Hamiltonian actions and the effect of \`wk_dim\`, and compare
+Hamiltonian actions and the effect of `wk_dim`, and compare
 OpenMP 1 versus 2 threads.
 
 Choose a physically motivated parameter cut and interpret at least
@@ -219,7 +219,7 @@ compiler portability, algorithmic cost, API scope).
 - Choose CPC CPiP or CP route and associated software-archive
   obligations; check current author instructions at submission.
 - Decide whether any Fortran library interface is part of the paper.
-- Reconcile \`AC_INIT\`, \`CITATION.cff\`, release date, tag and
+- Reconcile `AC_INIT`, `CITATION.cff`, release date, tag and
   software DOI without confusing the CPC article DOI.
 - Freeze input decks, result files, compiler/backend metadata,
   provenance and program summary against one source SHA.
