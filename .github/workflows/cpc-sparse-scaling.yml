@@ -69,11 +69,35 @@ jobs:
           if report["total"]!=8 or report["passed"]!=8 or report["failed"]!=0:
               raise SystemExit("Sparse scaling verification failed")
           PY
+      - name: Repeat sparse crosscheck with OMP=2
+        run: |
+          set -eu
+          work="$RUNNER_TEMP/ed2-cpc-sparse"
+          src=$(cat "$work/source-path")
+          python3 "$src/tests/mixed_spin_sparse_scale.py" \
+            --exe "$work/build/source/QS3ED2" \
+            --threads 2 --sizes 8,10,12 \
+            --output "$work/results-omp2"
+          python3 - "$work/results-omp2/report.json" <<'PY'
+          import json,sys
+          report=json.load(open(sys.argv[1],encoding="utf-8"))
+          print("SPARSE OMP2:",report["passed"],"passed;",report["failed"],"failed")
+          if report["total"]!=8 or report["passed"]!=8 or report["failed"]!=0:
+              raise SystemExit("Sparse OMP2 validation failed")
+          PY
       - name: Preserve input decks, ED2 logs and numerical report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: cpc-sparse-scaling-omp1
           path: ${{ runner.temp }}/ed2-cpc-sparse/results-omp1/
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Preserve OMP2 numerical evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cpc-sparse-scaling-omp2
+          path: ${{ runner.temp }}/ed2-cpc-sparse/results-omp2/
           if-no-files-found: warn
           retention-days: 14
