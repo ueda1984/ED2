@@ -137,3 +137,6 @@ DISTCLEANFILES = *.mod *.smod
 
 # Test-only independent mixed-spin/non-U(1) scientific demonstrator.
 EXTRA_DIST += mixed_spin_nonu1_demo.py
+
+# Test-only independent dense validation of ALG=1 and ALG=2 on mixed-spin non-U(1) cases.
+EXTRA_DIST += mixed_spin_iterative_crosscheck.py
