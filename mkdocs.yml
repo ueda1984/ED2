@@ -66,5 +66,6 @@ nav:
       - Phase 1-F diagnostics and reproducibility: development/phase1f-diagnostics-reproducibility.md
       - Phase 1-G opt-in residual policy: development/phase1g-optin-residual-policy.md
       - Read the Docs release workflow: development/readthedocs-workflow.md
+      - Phase 2-A distribution readiness: development/phase2a-distribution-readiness.md
   - Reference:
       - Citation & Versioning: reference/citation-versioning.md      
