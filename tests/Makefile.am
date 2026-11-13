@@ -149,3 +149,6 @@ EXTRA_DIST += mixed_spin_matched_benchmark.py
 
 # Research-only ALG2 restart workspace sweep (not included in default tests).
 EXTRA_DIST += mixed_spin_alg2_restart_sweep.py
+
+# Optional 12-site mixed-spin ALG2 tuning diagnostics.
+EXTRA_DIST += mixed_spin_alg2_n12_sweep.py
