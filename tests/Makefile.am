@@ -161,3 +161,6 @@ EXTRA_DIST += mixed_spin_near_degenerate.py
 
 # Analytic physical excited-start witness, checked against independent dense spectra.
 EXTRA_DIST += mixed_spin_excited_start_probe.py
+
+# Test-only native-wavefunction two-state projector/trace comparison.
+EXTRA_DIST += mixed_spin_doublet_trace.py
