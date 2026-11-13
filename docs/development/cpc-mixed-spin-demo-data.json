@@ -1,0 +1,186 @@
+{
+  "schema": 1,
+  "source_commit": "86768728b3191c20e083062762832a9dafd80107",
+  "validation_run": "https://github.com/ueda1984/ED2/actions/runs/43393654799",
+  "platform": "Ubuntu 24.04, GNU Fortran 13, -O2 -fopenmp, OpenBLAS, OMP=1 and BLAS=1",
+  "verifier": "tests/mixed_spin_nonu1_demo.py",
+  "compared_outputs": [
+    "all eigenvalues",
+    "local magnetization (x,y,z)",
+    "nine Cartesian two-body correlations"
+  ],
+  "cases": [
+    {
+      "case": "mixed-n4-hx0.15-capfull",
+      "correlation_max_error": 2.4424906541753444e-15,
+      "ed2_ground_energy": -2.21842772602877,
+      "first_excitation_gap": 0.17538538781840307,
+      "full_space_dimension": 36,
+      "ground_energy": -2.218427726028776,
+      "magnetization_max_error": 2.5396351688300456e-15,
+      "magnetization_z": [
+        0.23207921948035207,
+        -0.6080494621209893,
+        0.2852966205270774,
+        -0.8255736655373684
+      ],
+      "n_sites": 4,
+      "nodmax": 6,
+      "non_u1": true,
+      "projected_dimension": 36,
+      "spectrum_max_error": 5.773159728050814e-15,
+      "spins": [
+        0.5,
+        1,
+        0.5,
+        1
+      ],
+      "transverse_field_parameter": 0.15
+    },
+    {
+      "case": "mixed-n4-hx0.38-capfull",
+      "correlation_max_error": 3.4416913763379853e-15,
+      "ed2_ground_energy": -2.290066537958664,
+      "first_excitation_gap": 0.1895831413569935,
+      "full_space_dimension": 36,
+      "ground_energy": -2.2900665379586687,
+      "magnetization_max_error": 3.552713678800501e-15,
+      "magnetization_z": [
+        0.15120699202986715,
+        -0.4346605167685655,
+        0.20618987957349702,
+        -0.6550608873417524
+      ],
+      "n_sites": 4,
+      "nodmax": 6,
+      "non_u1": true,
+      "projected_dimension": 36,
+      "spectrum_max_error": 4.440892098500626e-15,
+      "spins": [
+        0.5,
+        1,
+        0.5,
+        1
+      ],
+      "transverse_field_parameter": 0.38
+    },
+    {
+      "case": "mixed-n6-hx0.15-capfull",
+      "correlation_max_error": 5.551115123125783e-15,
+      "ed2_ground_energy": -3.569326031062999,
+      "first_excitation_gap": 0.21098362627294742,
+      "full_space_dimension": 216,
+      "ground_energy": -3.5693260310629977,
+      "magnetization_max_error": 8.382183835919932e-15,
+      "magnetization_z": [
+        0.23126539479998326,
+        -0.5974861372554455,
+        0.2904942873396338,
+        -0.7868609957548629,
+        0.3160694988052198,
+        -0.8650149002384766
+      ],
+      "n_sites": 6,
+      "nodmax": 9,
+      "non_u1": true,
+      "projected_dimension": 216,
+      "spectrum_max_error": 3.1086244689504383e-15,
+      "spins": [
+        0.5,
+        1,
+        0.5,
+        1,
+        0.5,
+        1
+      ],
+      "transverse_field_parameter": 0.15
+    },
+    {
+      "case": "mixed-n6-hx0.38-capfull",
+      "correlation_max_error": 4.718447854656915e-15,
+      "ed2_ground_energy": -3.664019235608362,
+      "first_excitation_gap": 0.2086118201158178,
+      "full_space_dimension": 216,
+      "ground_energy": -3.664019235608361,
+      "magnetization_max_error": 6.2727600891321345e-15,
+      "magnetization_z": [
+        0.15289476025944795,
+        -0.4342015878954699,
+        0.2131481229486885,
+        -0.6369582945826058,
+        0.25960292342133334,
+        -0.7780862097048828
+      ],
+      "n_sites": 6,
+      "nodmax": 9,
+      "non_u1": true,
+      "projected_dimension": 216,
+      "spectrum_max_error": 6.217248937900877e-15,
+      "spins": [
+        0.5,
+        1,
+        0.5,
+        1,
+        0.5,
+        1
+      ],
+      "transverse_field_parameter": 0.38
+    },
+    {
+      "case": "mixed-n4-hx0.15-cap2",
+      "correlation_max_error": 9.992007221626409e-16,
+      "ed2_ground_energy": -2.019279330094264,
+      "first_excitation_gap": 1.137657684246952,
+      "full_space_dimension": 36,
+      "ground_energy": -2.0192793300942626,
+      "magnetization_max_error": 1.4432899320127035e-15,
+      "magnetization_z": [
+        -0.31699394370955797,
+        0.7538664814702076,
+        -0.3528323037280372,
+        0.918091542850802
+      ],
+      "n_sites": 4,
+      "nodmax": 2,
+      "non_u1": true,
+      "projected_dimension": 13,
+      "spectrum_max_error": 2.220446049250313e-15,
+      "spins": [
+        0.5,
+        1,
+        0.5,
+        1
+      ],
+      "transverse_field_parameter": 0.15
+    },
+    {
+      "case": "mixed-n4-hx0.38-cap2",
+      "correlation_max_error": 6.661338147750939e-16,
+      "ed2_ground_energy": -2.035179677451781,
+      "first_excitation_gap": 1.1429279368672645,
+      "full_space_dimension": 36,
+      "ground_energy": -2.035179677451778,
+      "magnetization_max_error": 7.771561172376096e-16,
+      "magnetization_z": [
+        -0.3092397501103548,
+        0.7515886255295405,
+        -0.3491171553129012,
+        0.9187735647675932
+      ],
+      "n_sites": 4,
+      "nodmax": 2,
+      "non_u1": true,
+      "projected_dimension": 13,
+      "spectrum_max_error": 3.1086244689504383e-15,
+      "spins": [
+        0.5,
+        1,
+        0.5,
+        1
+      ],
+      "transverse_field_parameter": 0.38
+    }
+  ],
+  "passed": 6,
+  "failed": 0
+}
