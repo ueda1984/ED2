@@ -17,13 +17,21 @@ permissions:
 
 jobs:
   independent-iterative:
-    name: Independent ALG1/ALG2 crosscheck
-    runs-on: ubuntu-24.04
+    name: Independent ALG1/ALG2 crosscheck (${{ matrix.fc }}, OMP=${{ matrix.threads }})
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {os: ubuntu-22.04, fc: gfortran-11, threads: 1}
+          - {os: ubuntu-22.04, fc: gfortran-11, threads: 2}
+          - {os: ubuntu-24.04, fc: gfortran-13, threads: 1}
+          - {os: ubuntu-24.04, fc: gfortran-13, threads: 2}
     env:
-      FC: gfortran-13
+      FC: ${{ matrix.fc }}
       FCFLAGS: "-O2 -fopenmp"
-      OMP_NUM_THREADS: "1"
+      OMP_NUM_THREADS: ${{ matrix.threads }}
       OPENBLAS_NUM_THREADS: "1"
       MKL_NUM_THREADS: "1"
     steps:
@@ -32,7 +40,7 @@ jobs:
       - name: Install GNU Fortran and independent dense reference
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends gfortran-13 libopenblas-dev liblapack-dev autoconf automake make python3-numpy
+          sudo apt-get install -y --no-install-recommends "$FC" libopenblas-dev liblapack-dev autoconf automake make python3-numpy
       - name: Produce source distribution
         run: |
           autoreconf -vfi
@@ -60,9 +68,9 @@ jobs:
           src=$(cat "$work/source-path")
           python3 "$src/tests/mixed_spin_iterative_crosscheck.py" \
             --exe "$work/build/source/QS3ED2" \
-            --threads 1 \
-            --output "$work/results-omp1"
-          python3 - "$work/results-omp1/report.json" <<'PY'
+            --threads "${{ matrix.threads }}" \
+            --output "$work/results-omp${{ matrix.threads }}"
+          python3 - "$work/results-omp${{ matrix.threads }}/report.json" <<'PY'
           import json,sys
           r=json.load(open(sys.argv[1],encoding="utf-8"))
           print("Crosscheck:",r["passed"],"passed;",r["failed"],"failed")
@@ -79,7 +87,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: mixed-spin-iterative-evidence
-          path: ${{ runner.temp }}/ed2-cpc-iterative/results-omp1/
+          name: mixed-spin-iterative-${{ matrix.fc }}-omp${{ matrix.threads }}
+          path: ${{ runner.temp }}/ed2-cpc-iterative/results-omp${{ matrix.threads }}/
           if-no-files-found: warn
           retention-days: 14
