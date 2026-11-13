@@ -68,14 +68,14 @@ confirmed these assertions for OMP=1 **and** OMP=2:
   the separately constructed NumPy dense Hamiltonian, element by
   element, for 4 sites (dimension 36) and 6 sites (dimension 216).
 - The normalized Frobenius commutator
-  \\(\|[H,S^z_{\\mathrm{tot}}]\|_F/\|H\|_F\\)
-  is decisively nonzero, around \\(0.27\\) to \\(0.32\\)
+  \(\|[H,S^z_{\mathrm{tot}}]\|_F/\|H\|_F\)
+  is decisively nonzero, around \(0.27\) to \(0.32\)
   for the tested 8-12-site systems. Thus the chosen Hamiltonian
   genuinely breaks U(1) conservation.
 - A central finite difference of the independent lowest energy,
-  \\(\partial E_0/\partial h_x\\), agrees with the
+  \(\partial E_0/\partial h_x\), agrees with the
   weighted local transverse magnetization according to
-  Hellmann-Feynman, with errors below \\(8\\times10^{-9}\\).
+  Hellmann-Feynman, with errors below \(8\times10^{-9}\).
   The ED2 local magnetization is also checked against this
   independent energy derivative.
 
