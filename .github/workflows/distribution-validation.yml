@@ -1,0 +1,60 @@
+name: Phase 2-A source distribution smoke test
+
+on:
+  push:
+    branches:
+      - codex/ed2-phase2-distribution-validation
+    paths:
+      - "Makefile.am"
+      - "configure.ac"
+      - "source/**"
+      - "tests/**"
+      - "script_*/**"
+      - "input/**"
+      - "docs/**"
+      - ".github/workflows/distribution-validation.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  distcheck:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 35
+    env:
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+      FC: gfortran
+      FCFLAGS: -O2 -fopenmp
+      MAKEFLAGS: -j2
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+      - name: Install Fortran and numerical dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends gfortran libopenblas-dev liblapack-dev autoconf automake make python3-numpy
+      - name: Report environment
+        run: |
+          git rev-parse HEAD
+          gfortran --version | head -n 1
+          autoconf --version | head -n 1
+          automake --version | head -n 1
+          python3 -c "import numpy; print('numpy',numpy.__version__)"
+      - name: Configure and compile
+        run: |
+          autoreconf -vfi
+          ./configure FC="$FC" FCFLAGS="$FCFLAGS"
+          make -j2
+      - name: Build and smoke test
+        run: make check
+      - name: Construct source distribution
+        run: |
+          make dist
+          ls -lh ./*.tar.gz
+          tar tzf ./*.tar.gz | head -n 30
+      - name: Out-of-tree distribution validation
+        run: |
+          make distcheck DISTCHECK_CONFIGURE_FLAGS='FC=gfortran FCFLAGS=-O2\ -fopenmp'
