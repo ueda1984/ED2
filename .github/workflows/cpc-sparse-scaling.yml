@@ -53,20 +53,20 @@ jobs:
           "$src/configure" FC="$FC" FCFLAGS="$FCFLAGS"
           make -j2
           python3 -c "import numpy,scipy; print('numpy',numpy.__version__,'scipy',scipy.__version__)"
-      - name: Cross-check 8/10-site low eigenpairs and observables with independent sparse ED
+      - name: Cross-check 8/10/12-site low eigenpairs and observables with independent sparse ED
         run: |
           set -eu
           work="$RUNNER_TEMP/ed2-cpc-sparse"
           src=$(cat "$work/source-path")
           python3 "$src/tests/mixed_spin_sparse_scale.py" \
             --exe "$work/build/source/QS3ED2" \
-            --threads 1 --sizes 8,10 \
+            --threads 1 --sizes 8,10,12 \
             --output "$work/results-omp1"
           python3 - "$work/results-omp1/report.json" <<'PY'
           import json,sys
           report=json.load(open(sys.argv[1],encoding="utf-8"))
           print("SPARSE VERIFICATION:",report["passed"],"passed;",report["failed"],"failed")
-          if report["total"]!=6 or report["passed"]!=6 or report["failed"]!=0:
+          if report["total"]!=8 or report["passed"]!=8 or report["failed"]!=0:
               raise SystemExit("Sparse scaling verification failed")
           PY
       - name: Preserve input decks, ED2 logs and numerical report
