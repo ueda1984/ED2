@@ -70,4 +70,16 @@ if [ "${LONGTEST:-0}" = 1 ]; then
     esac
   fi
 fi
+# Optional capture of the exact generated outputs for independent historical
+# comparisons. The default sandbox remains ephemeral and self-cleaning.
+if [ -n "${ED2_TEST_CAPTURE_ROOT:-}" ]; then
+  name=${model_dir#script_}
+  mkdir -p "$ED2_TEST_CAPTURE_ROOT"
+  if [ -e "$ED2_TEST_CAPTURE_ROOT/$name" ]; then
+    echo "ERROR: capture destination exists: $ED2_TEST_CAPTURE_ROOT/$name" >&2
+    exit 1
+  fi
+  cp -R "$sandbox/examples/$name" "$ED2_TEST_CAPTURE_ROOT/$name"
+fi
+
 echo "OK: $model_dir passed in isolated sandbox."
