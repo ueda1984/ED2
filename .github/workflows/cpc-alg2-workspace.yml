@@ -68,11 +68,36 @@ jobs:
           if report["total_recorded"]!=7 or report["contract_violations"]:
               raise SystemExit("Restart sweep invalid")
           PY
+      - name: Test tuned ALG2 restart policies on 12-site physical problem
+        run: |
+          set -eu
+          work="$RUNNER_TEMP/ed2-alg2-workspace"
+          src=$(cat "$work/source-path")
+          python3 "$src/tests/mixed_spin_alg2_n12_sweep.py" \
+            --exe "$work/build/source/QS3ED2" \
+            --output "$work/results-n12"
+          python3 - "$work/results-n12/report.json" <<'PY'
+          import json,sys
+          r=json.load(open(sys.argv[1],encoding="utf-8"))
+          print("12-SITE RESTART SWEEP:",r["total_recorded"],"records,",
+                r["accepted"],"accepted,",r["nonconverged"],"nonconverged,",
+                len(r["contract_violations"]),"contract violations")
+          if r["total_recorded"]!=5 or r["contract_violations"]:
+              raise SystemExit("12-site restart sweep is invalid")
+          PY
       - name: Preserve diagnostics and full scientific outcomes
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: cpc-alg2-workspace-sweep
           path: ${{ runner.temp }}/ed2-alg2-workspace/results/
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Preserve 12-site restart evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cpc-alg2-n12-workspace
+          path: ${{ runner.temp }}/ed2-alg2-workspace/results-n12/
           if-no-files-found: warn
           retention-days: 14
