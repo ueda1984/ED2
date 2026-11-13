@@ -9,11 +9,11 @@
     historical methodological description, **not** a verified performance
     benchmark or a citable numerical result.
 
-This performance example demonstrates how **QS³‑ED2** can reproduce numerical analyses of symmetry‑breaking responses in quantum spin systems near saturation magnetization.
+This historical note sketches a procedure for analyzing symmetry-breaking responses in quantum spin systems near saturation magnetization. It should not be treated as evidence of reproduced numerical results until the original data and scripts are restored.
 
-The purpose of this page is **not to present new physics**, but to demonstrate that the numerical procedure used in previous studies can be **practically executed using QS³‑ED2** for relatively large system sizes.
+The intended purpose is methodological: to show which calculations a user would need to perform with QS³-ED2, without asserting that the quoted numerical estimates have been independently validated in the current code revision.
 
-In particular, this benchmark illustrates that QS³‑ED2 enables
+In principle, such a workflow would use ED2 for
 
 - calculations close to **saturation magnetization**
 - controlled truncation of the Hilbert space using the **number of down spins**
@@ -22,7 +22,7 @@ In particular, this benchmark illustrates that QS³‑ED2 enables
 
 for lattice sizes that are difficult to treat using conventional exact‑diagonalization approaches.
 
-The calculations below are performed for the **antiferromagnetic Heisenberg model on the square lattice** near the saturation field.
+The historical example concerns the **antiferromagnetic Heisenberg model on the square lattice** near the saturation field.
 
 ---
 
@@ -84,10 +84,9 @@ $$
 H/J = 3.7 .
 $$
 
-This value corresponds to the **center of the magnetization plateau** intersecting this value of $H/J$.
+The earlier notes treat this as a representative field within a finite-size magnetization interval; the precise plateau interpretation requires the missing reference data.
 
-Using the plateau center stabilizes the numerical calculation when transverse fields are introduced.  
-Although the optimal longitudinal field slightly shifts for finite systems, the extrapolated value **converges to $H/J = 3.7$ in the thermodynamic limit**, so the procedure remains consistent.
+The finite-size selection of the longitudinal field, and any thermodynamic extrapolation of that value, have not been independently verified here.
 
 The historical notes suggest testing an excitation cutoff extending to
 
@@ -124,19 +123,16 @@ $$
 
 These functions do not have a strict theoretical justification; they are introduced as **empirical fitting forms** to test the stability of the extrapolation.
 
-A key point is that in both cases the parameter
+Interpreting the fit parameter $a$ as a spontaneous order parameter
+requires verifying the order of limits: take the thermodynamic limit
+$L\to\infty$ **before** the vanishing staggered-field limit
+$\delta h_s\to 0^+$. For a finite $g$, the stated hyperbolic-tangent
+function vanishes as the field goes to zero; $a$ is therefore **not
+automatically** the zero-field finite-size magnetization.
 
-$$
-a
-$$
-
-corresponds to the **staggered magnetization in the thermodynamic limit**
-
-$$
-m_x = a \qquad (L \rightarrow \infty).
-$$
-
-Thus, by fitting the finite‑field response we obtain an estimate of the spontaneous order parameter.
+These empirical fitting functions are illustrative and cannot establish
+the existence or value of spontaneous order without reliable size
+scaling, fit-window tests and uncertainty estimates.
 
 ---
 
@@ -148,13 +144,19 @@ The final step is to analyze the **finite‑size scaling** of the numerical resu
 
 Two quantities are examined:
 
-1. **Staggered susceptibility**
+1. **Staggered susceptibility**. With sublattice pattern
+   $\eta_i=\pm 1$ and $\delta h_s^{(i)}=\eta_i\delta h_s$,
+   define $m_s^x=(1/N)\sum_i\eta_i\langle S_i^x\rangle$.
+   Its zero-field linear response is
 
-$$
-\chi_s =
-\frac{1}{N\,\delta h_s}
-\sum_i \langle S_i^x \rangle
-$$
+$
+\chi_s=
+\left.\frac{\partial m_s^x}{\partial \delta h_s}\right|_{\delta h_s=0}.
+$
+
+A finite difference $m_s^x/\delta h_s$ is only appropriate if the
+zero-field baseline is zero and the applied field is sufficiently small.
+The staggered sign factor must not be omitted.
 
 2. **Spontaneous staggered magnetization** extracted from the fitting parameter $a$.
 

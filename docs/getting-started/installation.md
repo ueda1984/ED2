@@ -75,8 +75,10 @@ Manual override examples:
 ```
 
 ```bash
-./configure LIBS="-qmkl=parallel"
+./configure FC=ifort --with-lapack=mkl
 ```
+
+The explicit MKL configuration above is supported only with Intel `ifort` in the current `configure.ac`. It is **not** a tested GNU Fortran configuration.
 
 ---
 
