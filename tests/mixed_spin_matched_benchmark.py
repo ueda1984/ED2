@@ -81,11 +81,18 @@ i_vec_min=1, i_vec_max=1
     (work/"input.dat").write_text(deck)
 
 
-def run_one(exe,root,n,alg,eps,rep,model,initial):
+def run_one(exe,root,n,alg,eps,rep,model,initial,keep=10,capacity=64):
     tag=f"n{n}-alg{alg}-tol{eps:.0e}-repeat{rep}".replace("-","m",1)
     work=root/tag
     work.mkdir(exist_ok=False)
     setup_input(work,n,alg,model,initial)
+    if alg==2:
+        deck=(work/"input.dat").read_text()
+        marker="NOE=1, NOK=10, NOM=64"
+        if deck.count(marker)!=1:
+            raise AssertionError("Ambiguous TRLan workspace template")
+        deck=deck.replace(marker,f"NOE=1, NOK={keep}, NOM={capacity}")
+        (work/"input.dat").write_text(deck)
     env=dict(os.environ,OMP_NUM_THREADS="1",OPENBLAS_NUM_THREADS="1",
              MKL_NUM_THREADS="1",ED2_RNG_SEED=str(SEED),
              ED2_INITIAL_VECTOR=str(work/"initial-vector.txt"),
@@ -114,8 +121,12 @@ def run_one(exe,root,n,alg,eps,rep,model,initial):
         raise AssertionError("Expected one requested eigenpair for both methods")
     if status not in (0,1,2):
         raise AssertionError("Unexpected solver status "+str(status))
+    if alg==2 and (int(diag["keep"])!=keep or int(diag["capacity"])!=capacity):
+        raise AssertionError("Krylov workspace not equal to requested values")
     results=dict(case=tag,n_sites=n,dimension=model["dimension"],
-                 alg=alg,wanted=1,initial_sha256=hashlib.sha256(initial.encode()).hexdigest(),
+                 alg=alg,wanted=1,requested_keep=keep if alg==2 else None,
+                 requested_capacity=capacity if alg==2 else None,
+                 initial_sha256=hashlib.sha256(initial.encode()).hexdigest(),
                  seed=SEED,residual_atol=eps,repeat=rep,
                  status=status,reason=diag["reason"],exit_code=proc.returncode,
                  h_applications=int(diag["h_applications"]),
