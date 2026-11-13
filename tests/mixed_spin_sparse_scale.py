@@ -148,8 +148,10 @@ def reference_model(n,hx):
                 hellmann_feynman_error=hf_error)
 
 
-def run_ed2(exe,root,n,hx,alg,omp,reference):
-    name=f"mixed-n{n}-hx{hx:.2f}-alg{alg}-omp{omp}"
+def run_ed2(exe,root,n,hx,alg,omp,reference,keep=10,capacity=64):
+    extra=(f"-k{keep}-m{capacity}" if alg==2 and
+           (keep,capacity)!=(10,64) else "")
+    name=f"mixed-n{n}-hx{hx:.2f}-alg{alg}-omp{omp}{extra}"
     work=root/name
     work.mkdir(exist_ok=False)
     bonds,fields,spins,pairs=(reference[x] for x in ("bonds","fields","spin","pairs"))
@@ -177,7 +179,7 @@ cal_lm=1, cal_cf=1, NO_two_cf={len(pairs)}, FILE_two_cf='pairs.dat'
 lnc_ene_conv=1d-12, minitr=5, maxitr=700, itrint=10
 /
 &input_TRLan
-NOE=2, NOK=10, NOM=64, maxitr=260, lnc_ene_conv=1d-12,
+NOE=2, NOK={keep}, NOM={capacity}, maxitr=260, lnc_ene_conv=1d-12,
 i_vec_min=1, i_vec_max=2
 /
 """
@@ -232,7 +234,11 @@ i_vec_min=1, i_vec_max=2
         for line in timefile.read_text().splitlines():
             if line.startswith("MAX_RSS_KIB="):
                 peak_rss=int(line.split("=",1)[1])
+    if alg==2 and (int(diag["keep"])!=keep or int(diag["capacity"])!=capacity):
+        raise AssertionError("Effective ALG2 workspace differs from requested")
     return dict(case=name,alg=alg,omp=omp,n_sites=n,dimension=reference["dimension"],
+                requested_keep=keep if alg==2 else None,
+                requested_capacity=capacity if alg==2 else None,
                 nnz=reference["nnz"],hx=hx,reference_eigenvalues=reference["energies"].tolist(),
                 ed2_eigenvalues=energies.tolist(),energy_max_error=eerr,
                 magnetization_max_error=magerr,correlation_max_error=cferr,
