@@ -89,6 +89,42 @@ per low-energy cluster when multiple degenerate eigenpairs are wanted.
 A separate several-eigenpair and near-degenerate workload matrix
 must be passed before recommending an automatic workspace policy.
 
+## Two-eigenpair robustness check (8 and 10 sites)
+
+The [two-eigenpair scan](https://github.com/ueda1984/ED2/actions/runs/43399840657)
+also varied the same ALG=2 workspace settings when requesting **two**
+lowest eigenpairs simultaneously, rather than one. The test uses
+the independently constructed SciPy sparse Hamiltonian to check
+**both** lowest eigenvalues, residuals for both returned pairs, and
+ground-state local magnetizations and Cartesian correlations.
+
+Three preselected magnetic-field/system-size cases and three workspaces
+yielded **9/9 accepted, 0 nonconvergent, 0 contract violations**:
+
+| Sites / transverse control | Lowest pair gap | `NOK=2, NOM=16` H calls | `NOK=4, NOM=24` H calls | `NOK=10, NOM=64` H calls |
+| --- | ---: | ---: | ---: | ---: |
+| 8 / 0.15 | 0.210915 | 306 | 650 | 792 |
+| 8 / 0.38 | 0.210581 | 288 | 598 | 924 |
+| 10 / 0.15 | 0.180645 | 378 | 858 | 1,650 |
+
+All accepted pairs satisfied the requested absolute residual threshold
+`1e-8`. The `2/16` setting attained residuals
+`9.36e-10`, `8.70e-9`, and `5.43e-10`, respectively,
+for the three rows.
+
+**Crucial limitation:** these examples have reasonably separated
+lowest eigenvalues, with `E1-E0 ≈ 0.18–0.21`. None of them tests
+a near-degenerate low-energy cluster (e.g. splitting below the
+requested residual), nor `NOE>2`. Therefore the results support
+a **model-dependent tuning hypothesis**, not a robust default
+`NOK=2` recommendation. In a genuine multi-state degeneracy, a
+two-dimensional retained subspace may not capture all physically
+relevant directions.
+
+All data, diagnostic sidecars and source are retained by the CI
+artifact and
+[`tests/mixed_spin_alg2_multipair_sweep.py`](https://github.com/ueda1984/ED2/blob/codex/ed2-cpc-alg2-multipair-stress/tests/mixed_spin_alg2_multipair_sweep.py).
+
 ## Interpretation and limitations
 
 - All settings were tested on the same source and comparable physical
@@ -119,8 +155,9 @@ must be passed before recommending an automatic workspace policy.
    explicitly on multiple models and spectra.
 2. Repeat timings under controlled node conditions (not only CI),
    with RSS and H-application counts, and report medians and spread.
-3. Include both `NOE=1` and `NOE>1`, a near-degenerate spectrum,
-   and at least one nontrivial symmetry-reduced test.
+3. **NOE=2 passed for three well-gapped cases** (table above).
+   Still require a **near-degenerate spectrum**, `NOE>2`, and at least
+   one nontrivial symmetry-reduced test before recommending defaults.
 4. Only after these checks consider adjusting recommended `NOK/NOM`;
    the solver's numerical algorithm and default behavior must remain
    unchanged until a separately reviewed optimization.
