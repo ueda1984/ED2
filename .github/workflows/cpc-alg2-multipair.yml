@@ -1,0 +1,79 @@
+name: CPC ALG2 multipair workspace robustness
+
+on:
+  push:
+    branches:
+      - codex/ed2-cpc-alg2-multipair-stress
+    paths:
+      - ".github/workflows/cpc-alg2-multipair.yml"
+      - "tests/mixed_spin_*.py"
+      - "tests/Makefile.am"
+      - "source/**"
+      - "configure.ac"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  two-eigenpairs:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      FC: gfortran-13
+      FCFLAGS: "-O2 -fopenmp"
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install compilers and test-only sparse diagonalization
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends gfortran-13 libopenblas-dev liblapack-dev autoconf automake make python3-numpy python3-scipy time
+      - name: Package and independently compile source archive
+        run: |
+          set -eu
+          autoreconf -vfi
+          ./configure FC="$FC" FCFLAGS="$FCFLAGS"
+          make -j2
+          make dist
+          work="$RUNNER_TEMP/ed2-alg2-multipair"
+          mkdir -p "$work/src" "$work/build"
+          archive=$(find "$GITHUB_WORKSPACE" -maxdepth 1 -name '*.tar.gz' -print -quit)
+          test -n "$archive"
+          tar -xzf "$archive" -C "$work/src"
+          src=$(find "$work/src" -mindepth 1 -maxdepth 1 -type d -print -quit)
+          echo "$src" > "$work/source-path"
+          cd "$work/build"
+          "$src/configure" FC="$FC" FCFLAGS="$FCFLAGS"
+          make -j2
+          git -C "$GITHUB_WORKSPACE" rev-parse HEAD
+      - name: Independently check two-eigenpair workspace convergence and observables
+        run: |
+          set -eu
+          work="$RUNNER_TEMP/ed2-alg2-multipair"
+          src=$(cat "$work/source-path")
+          python3 "$src/tests/mixed_spin_alg2_multipair_sweep.py" \
+            --exe "$work/build/source/QS3ED2" \
+            --output "$work/results"
+          python3 - "$work/results/report.json" <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1],encoding="utf-8"))
+          print("MULTIPAIR SUMMARY:",d["total"],"trials",d["accepted"],"accepted",
+                d["nonconverged"],"nonconverged",d["failures"],"contract failures")
+          for x in d["results"]:
+              print("MULTIPAIR CASE:",x["case"],x["status"],
+                    "Hcalls",x.get("h_applications"),"reason",x.get("reason"))
+          if d["total"]!=9 or d["failures"]:
+              raise SystemExit("Invalid two-eigenpair workspace scan")
+          PY
+      - name: Retain all numerical results and unsuccessful runs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cpc-alg2-two-pair-evidence
+          path: ${{ runner.temp }}/ed2-alg2-multipair/results/
+          if-no-files-found: warn
+          retention-days: 14
