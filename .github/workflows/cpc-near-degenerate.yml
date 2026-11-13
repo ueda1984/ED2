@@ -73,11 +73,37 @@ jobs:
           if d["tested"]!=32 or d["harness_violations"]:
               raise SystemExit("Near-degenerate characterization incomplete")
           PY
+      - name: Independently verify an excited-state start with a strict residual policy
+        run: |
+          set -eu
+          work="$RUNNER_TEMP/ed2-degenerate"
+          src=$(cat "$work/source-path")
+          python3 "$src/tests/mixed_spin_excited_start_probe.py" \
+            --exe "$work/build/source/QS3ED2" \
+            --omp "${{ matrix.threads }}" \
+            --output "$work/excited-start-omp${{ matrix.threads }}"
+          python3 - "$work/excited-start-omp${{ matrix.threads }}/report.json" <<'PY'
+          import json,sys
+          x=json.load(open(sys.argv[1],encoding="utf-8"))
+          r=x["result"]
+          print("EXCITED-START OUTCOME:",r["outcome"],
+                "witness=",r.get("explicit_excited_state_witness"),
+                "residual=",r.get("direct_residuals"),
+                "actual_energy_difference=",r.get("ground_energy_difference"))
+          PY
       - name: Retain all inputs, outputs, eigenvectors and nonconvergence records
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: near-degenerate-omp${{ matrix.threads }}
           path: ${{ runner.temp }}/ed2-degenerate/results-omp${{ matrix.threads }}/
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Retain independent excited-start witness evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: excited-start-omp${{ matrix.threads }}
+          path: ${{ runner.temp }}/ed2-degenerate/excited-start-omp${{ matrix.threads }}/
           if-no-files-found: warn
           retention-days: 14
