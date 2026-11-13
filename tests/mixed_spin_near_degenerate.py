@@ -128,8 +128,8 @@ def load_fortran_vector(work,index,n):
                          f"file bytes={len(raw)}, expected payload={expected}")
 
 
-def run_case(exe,root,n,delta,alg,keep,capacity,atol,omp,ref):
-    name=f"n{n}-d{label_delta(delta)}-alg{alg}-k{keep}-m{capacity}-a{atol:.0e}-omp{omp}"
+def run_case(exe,root,n,delta,alg,keep,capacity,atol,omp,ref,initial_vector=None,suffix=''):
+    name=f"n{n}-d{label_delta(delta)}-alg{alg}-k{keep}-m{capacity}-a{atol:.0e}-omp{omp}{suffix}"
     work=root/name
     work.mkdir(exist_ok=False)
     bonds,fields,spins,pairs=(ref[k] for k in ("bonds","fields","spins","pairs"))
@@ -164,10 +164,18 @@ maxitr=180, lnc_ene_conv=1d-11, i_vec_min=1, i_vec_max=2
 /
 """
     (work/"input.dat").write_text(deck)
+    if initial_vector is not None:
+        initial_vector=np.asarray(initial_vector,dtype=complex)
+        if initial_vector.shape!=(ref["dimension"],):
+            raise AssertionError("Wrong explicit initial-vector shape")
+        (work/"initial-vector.txt").write_text(
+            "".join(f"{z.real:.17g} {z.imag:.17g}\n" for z in initial_vector))
     env=dict(os.environ,OMP_NUM_THREADS=str(omp),OMP_DYNAMIC="FALSE",
              OPENBLAS_NUM_THREADS="1",MKL_NUM_THREADS="1",
              ED2_RNG_SEED=str(SEED),ED2_DIAGNOSTICS="diagnostics.txt",
              ED2_RESIDUAL_ATOL=str(atol))
+    if initial_vector is not None:
+        env["ED2_INITIAL_VECTOR"]=str(work/"initial-vector.txt")
     start=time.perf_counter()
     with (work/"input.dat").open("rb") as inp:
         proc=subprocess.run([str(exe)],cwd=work,stdin=inp,env=env,
