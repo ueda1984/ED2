@@ -1,0 +1,47 @@
+name: CPC ultra-narrow crossreference audit and figures
+
+on:
+  push:
+    branches:
+      - codex/ed2-cpc-stationary-dm-scaling
+    paths:
+      - ".github/workflows/cpc-ultranarrow-crossreference-figures.yml"
+      - "tests/plot_cpc_ultranarrow_reference_comparison.py"
+      - "docs/development/cpc-ultranarrow-dense-lapack-raw-ci.csv"
+      - "docs/development/cpc-ultranarrow-ed2-second-order-raw-ci.csv"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compare-and-render:
+    name: Audit 33 frozen precision cases and render two plot pairs
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install headless Python plotting dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends python3-matplotlib python3-numpy
+      - name: Verify complete frozen ED2 and three-LAPACK provenance
+        run: |
+          set -eu
+          python3 tests/plot_cpc_ultranarrow_reference_comparison.py --validate-only
+      - name: Render numerical precision crossreference
+        run: |
+          set -eu
+          python3 tests/plot_cpc_ultranarrow_reference_comparison.py \
+            --outdir "$RUNNER_TEMP/cpc-crossreference"
+          test "$(find "$RUNNER_TEMP/cpc-crossreference" -maxdepth 1 -name '*.svg' | wc -l)" -eq 2
+          test "$(find "$RUNNER_TEMP/cpc-crossreference" -maxdepth 1 -name '*.png' | wc -l)" -eq 2
+          test -s "$RUNNER_TEMP/cpc-crossreference/ultra_reference_method_summary.csv"
+          sha256sum "$RUNNER_TEMP/cpc-crossreference"/*.svg
+      - name: Preserve figure pairs and machine-derived summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: cpc-ultra-crossreference-figures
+          path: ${{ runner.temp }}/cpc-crossreference/
+          retention-days: 21
+          if-no-files-found: error
