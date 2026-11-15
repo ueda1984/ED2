@@ -191,3 +191,6 @@ EXTRA_DIST += cpc_stationary_cache_sweep.py
 
 # Optional independently checked two-eigenpair stationary DM restart study.
 EXTRA_DIST += cpc_stationary_multipair_benchmark.py
+
+# Optional independent full-cache MNTE row-capacity calibration and performance study.
+EXTRA_DIST += cpc_stationary_mnte_capacity.py
