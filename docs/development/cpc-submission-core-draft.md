@@ -127,6 +127,39 @@ supported physics, correctness evidence,
 and resource behavior rather than
 claiming unprecedented algorithmic complexity.
 
+### 1.1 Relation to the previously published QS³ software
+
+The scope difference is summarized below for the
+**actual CPC-published original**
+[QS-Cube/ED](https://github.com/QS-Cube/ED),
+rather than the already-public but as yet
+**unpublished-in-journal**
+[QS-Cube/ED2](https://github.com/QS-Cube/ED2)
+repository. The individual program inputs
+were checked in their Fortran source;
+see the [complete capability audit](cpc-qs3-ed-to-ed2-scope-matrix.md).
+
+| Capability | Published QS³/ED | This first ED2 program |
+| --- | --- | --- |
+| Local Hilbert space | Fixed spin-1/2 | Site-specific \(S_i\), including mixed spins |
+| Bilinear bonds | XXZ-type \(J_{xy},J_z\) | XYZ, all DM vector components, all symmetric Gamma components |
+| Site fields | No general three-axis site-record Hamiltonian input | Individually specified Cartesian \(h_i^{x,y,z}\) |
+| Excitation sectors | Fixed \(N_\downarrow\), optionally momentum-reduced | Full/product space, or local/global occupation windows and compatible user-specified symmetry |
+| Static observables | Longitudinal/transverse channel correlations | All local Cartesian moments and nine two-site Cartesian components |
+| Dynamic structure factor | Original DSFLan route available | Equivalent native ED2 route not demonstrated |
+| Eigensolvers/OpenMP | Already implemented | Mathematical solver families inherited and numerically revised, not invented |
+
+We separately verify the **same XXZ Hamiltonian**
+in both executable codes for three invariant
+magnetization sectors. All **32 eigenvalues**
+of the combined \(L=4\) and \(L=6\) tests
+match an independent Hamiltonian;
+the maximum original-to-ED2 discrepancy is
+\(2.89\times10^{-15}\).
+This tests backward *physical-model*
+continuity, not binary/file compatibility
+or legacy dynamical features.
+
 ## 2. Physical model and input conventions
 
 ED2 represents a lattice of site-dependent
