@@ -173,3 +173,6 @@ EXTRA_DIST += mixed_spin_noncommuting_xy.py
 
 # Test-only 8/10-site independent sparse interacting avoided-crossing study.
 EXTRA_DIST += mixed_spin_interacting_sparse810.py
+
+# Optional research-only staggered-DM/vector-chirality response study.
+EXTRA_DIST += mixed_spin_dm_chirality_scan.py
