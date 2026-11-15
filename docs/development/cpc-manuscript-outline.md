@@ -212,8 +212,13 @@ rules**, not a new chiral phase, thermodynamic
 extrapolation, performance advantage or material
 parameterization. The [reference CSV](cpc-stationary-dm-reference.csv)
 is committed for figure reproduction.
-Publication-grade resource benchmarks and a literature-grounded
-model choice remain priorities.
+A [Hamiltonian-level reproduction of Yi et al. (2019)](cpc-literature-matched-benchmark.md)
+now validates a published XYZ/DM/field model in finite periodic chains,
+with 12/12 independent ED2 comparisons successful at OMP=1/2.
+This is **not** a reproduction of the article's phase diagram or its
+numerical plotted datasets. The main scientific example remains the
+size-stationary mixed-spin chain, and controlled-node resource
+benchmarks remain a publication priority.
 
 **Literature position (not a parameter-source claim):**
 Lahiri and Pati's alternating spin-\(1/2\)/spin-1
@@ -272,16 +277,17 @@ compiler portability, algorithmic cost, API scope).
 5. Concise comparison table: published QS³ capabilities, verified
    ED2 capabilities, and explicitly unsupported/unverified items.
 
-## Preconditions before a full first submission draft
+## Preconditions before a submission-ready manuscript
 
 - **Illustrative physics application completed:** the 4–12-site
   two-site-periodic mixed-spin DM/chirality response is verified
   against independent finite-difference, sparse/dense and full
-  correlation checks. For submission, strengthen the link to
-  literature-grounded Hamiltonians, verify a larger length/window
-  where feasible, and obtain repeated controlled-node resource
-  benchmarks. No new phase or asymptotic numerical advantage
-  has been established.
+  correlation checks. An additional published-Hamiltonian
+  finite-size check and a preliminary matched-target resource
+  study have been verified; see the [follow-up report](cpc-literature-matched-benchmark.md).
+  For submission, verify a larger length/window where feasible
+  and obtain repeated isolated-node resource benchmarks. No new
+  phase or asymptotic numerical advantage has been established.
 - Agree author/order and distinguish the **2022 QS³** authors
   from the current software's attribution.
 - Choose CPC CPiP or CP route and associated software-archive
@@ -363,6 +369,8 @@ benchmarks remain necessary.
 - [Interacting avoided crossings and noncommuting bond physics](cpc-interacting-avoided-crossing.md).
 - [Interacting 8-/10-site sparse spectral and observable checks](cpc-interacting-sparse810.md).
 - [Size-stationary DM/chirality response, susceptibility and figure data](cpc-stationary-dm-application.md).
+- [Published XYZ-DM Hamiltonian and matched-target resource verification (12+36 cases)](cpc-literature-matched-benchmark.md).
+- [Working CPC manuscript prose draft](cpc-manuscript-draft.md).
 
 **No manuscript authorship, official source tag, DOI or journal
 publication is assigned by this planning document.**
