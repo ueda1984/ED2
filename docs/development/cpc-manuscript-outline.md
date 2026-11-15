@@ -214,6 +214,19 @@ is committed for figure reproduction.
 Publication-grade resource benchmarks and a literature-grounded
 model choice remain priorities.
 
+**Literature position (not a parameter-source claim):**
+Lahiri and Pati's alternating spin-\(1/2\)/spin-1
+chain with NN/NNN exchanges and \(D_z\)
+([*J. Phys.: Condens. Matter*, 2022](https://doi.org/10.1088/1361-648X/ac4aab))
+and Yi *et al.*'s anisotropic spin-\(1/2\) XYZ/DM/field
+example ([*Phys. Rev. B* **100**, 024423 (2019)](https://doi.org/10.1103/PhysRevB.100.024423))
+motivate the importance of these interaction classes.
+**Neither paper supplied the present stationary
+demonstrator's exact coefficients**: they should not be
+cited as if we reproduced their numerical phases.
+The 2022 QS³ scope comparison belongs in the
+Introduction, not in a claim of new underlying chiral physics.
+
 For any additional model, begin at small \(L\) with the **complete**
 occupation range \(\text{NODmin}=0,\ \text{NODmax}=\sum_i 2S_i\).
 Cross-check energies, residuals, magnetization and two-body correlation
