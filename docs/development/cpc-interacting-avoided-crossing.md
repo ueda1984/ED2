@@ -257,10 +257,10 @@ The primary **fully dense** independent validations have
 [8-/10-site interacting sparse reference study](cpc-interacting-sparse810.md)
 extends this very same XY avoided-crossing Hamiltonian
 to **1,296 and 7,776 states**, with 52/52 successful
-OMP=1/2 trials and additional near-(10^{-7}) gaps.
+OMP=1/2 trials and additional near-\(10^{-7}\) gaps.
 The largest individual-state differences at tiny gaps are
-about (10^{-7}), while the low-doublet trace comparisons
-are more stable (below (6	imes10^{-9})).
+about \(10^{-7}\), while the low-doublet trace comparisons
+are more stable (below \(6\times10^{-9}\)).
 At tiny gaps, the **independent reference eigenvector**
 also has finite residual and must not be treated as
 mathematically exact.
