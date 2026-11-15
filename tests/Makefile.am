@@ -206,3 +206,6 @@ EXTRA_DIST += cpc_stationary_cache_pareto.py
 
 # Optional frozen same-job cache frontier data audit and figure script.
 EXTRA_DIST += plot_cpc_pareto.py
+
+# Optional independent eight-site low-doublet projector and native ED2 readback.
+EXTRA_DIST += cpc_stationary_low_doublet_trace.py
