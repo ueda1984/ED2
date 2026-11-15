@@ -192,7 +192,8 @@ def reference(n,D,check_dense=False,profile="diagnostic"):
 
     return dict(
         profile=profile,n_sites=n,D=float(D),dimension=dim,spins=spins,bonds=bonds,fields=fields,pairs=pairs,
-        H_nonzeros=int(H.nnz),energies=E.tolist(),E0=float(E[0]),
+        H_nonzeros=int(H.nnz),max_sparse_row_nonzeros=int(np.max(np.diff(H.indptr))),
+        energies=E.tolist(),E0=float(E[0]),
         gap=float(E[1]-E[0]),reference_residual=residual,
         lm=lm,corr=corr,bond_kappa=bond_kappa,staggered_kappa=staggered,
         mean_abs_kappa=float(np.mean(np.abs(bond_kappa))),
