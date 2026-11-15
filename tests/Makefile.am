@@ -197,3 +197,6 @@ EXTRA_DIST += cpc_stationary_mnte_capacity.py
 
 # Optional paper plot/reproducibility pipeline for frozen cache and multipair CI CSVs.
 EXTRA_DIST += plot_cpc_cache_multipair.py
+
+# Optional frozen 72-case MNTE capacity CSV validator and performance plots.
+EXTRA_DIST += plot_cpc_mnte.py
