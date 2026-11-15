@@ -5,8 +5,11 @@ an accepted, submitted or finalized article.
 
 - [Main manuscript](cpc_ed2_main.tex) uses Elsevier's `elsarticle` class.
 - [Paper compilation CI](https://github.com/ueda1984/ED2/actions/workflows/cpc-manuscript-latex.yml)
-  builds the PDF twice, checks it with `pdfinfo`/`pdftotext`, and archives
-  a proof artifact for visual review. The workflow does not publish the PDF.
+  first verifies that **all 25 plotted DM/chirality points** match the
+  committed independent stationary-reference CSV via
+  `paper/check_dm_figure.py`. It then compiles the PDF twice,
+  checks it with `pdfinfo`/`pdftotext`, and archives a proof artifact
+  for visual review. The workflow does not publish the PDF.
 - The [compact manuscript working draft](../docs/development/cpc-submission-core-draft.md)
   contains the longer scientific argument and release TODOs.
 - The [detailed technical draft](../docs/development/cpc-manuscript-draft.md)
@@ -53,7 +56,12 @@ natively reproduced by the current ED2 executable. Do not describe
 ED2 as automatically backward-compatible or the whole output feature
 set as a superset.
 
-The main figures are not yet incorporated in the LaTeX proof, and the
-current residual/resource numbers should not be interpreted as a
-controlled-node performance study. Scientific results and references
-require final author review before an external submission.
+The first physical figure (five system sizes, 25 finite-size DM-response
+points) is now embedded directly as a `pgfplots` figure. Its coordinates
+must pass the independent CSV-integrity gate in the build workflow.
+The full scientific figure set (in particular the excitation-gap and
+finite-size susceptibility visualizations) still needs author review
+for main-text versus supplementary placement. The present resource
+numbers are **not** a controlled-node performance study.
+Scientific results and references require final author review before
+external submission.
