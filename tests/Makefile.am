@@ -188,3 +188,6 @@ EXTRA_DIST += cpc_stationary_resource_benchmark.py
 
 # Optional, independently referenced wk_dim cache-policy performance study.
 EXTRA_DIST += cpc_stationary_cache_sweep.py
+
+# Optional independently checked two-eigenpair stationary DM restart study.
+EXTRA_DIST += cpc_stationary_multipair_benchmark.py
