@@ -1,0 +1,101 @@
+name: CPC exact shared XXZ limit between published QS3 ED and generalized ED2
+
+on:
+  push:
+    branches:
+      - codex/ed2-cpc-stationary-dm-scaling
+    paths:
+      - ".github/workflows/cpc-legacy-qs3-ed2-crosscheck.yml"
+      - "tests/cpc_qs3_ed_shared_xxz_crosscheck.py"
+      - "tests/Makefile.am"
+      - "source/**"
+      - "configure.ac"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  historical-to-modern:
+    name: CPC-era QS3-ED vs ED2 shared spin-half XXZ sector
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      FC: gfortran-13
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+      OMP_NUM_THREADS: "1"
+      OMP_DYNAMIC: "FALSE"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: ed2-cpc
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: QS-Cube/ED
+          ref: a3b09934bba5f966bfb564718528de8778c2b46c
+          path: qs3-ed-original
+          persist-credentials: false
+      - name: Install gfortran, LAPACK and independent NumPy reference
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends gfortran-13 \
+            libopenblas-dev liblapack-dev autoconf automake make python3-numpy
+      - name: Build historical QS3_only_u1 with unchanged source code
+        run: |
+          set -eu
+          cd "$GITHUB_WORKSPACE/qs3-ed-original"
+          git rev-parse HEAD
+          test "$(git rev-parse HEAD)" = "a3b09934bba5f966bfb564718528de8778c2b46c"
+          autoreconf -vfi
+          ./configure FC="$FC" FCFLAGS="-O2 -fopenmp -fallow-argument-mismatch"
+          make -j2
+          test -x source_only_u1/QS3_only_u1
+      - name: Build the distribution extracted from tested ED2 source
+        run: |
+          set -eu
+          cd "$GITHUB_WORKSPACE/ed2-cpc"
+          autoreconf -vfi
+          ./configure FC="$FC" FCFLAGS="-O2 -fopenmp"
+          make -j2
+          make dist
+          root="$RUNNER_TEMP/cpc-old-vs-new"
+          mkdir -p "$root/src" "$root/build"
+          archive=$(find "$PWD" -maxdepth 1 -name '*.tar.gz' -print -quit)
+          test -n "$archive"
+          sha256sum "$archive"
+          tar -xzf "$archive" -C "$root/src"
+          src=$(find "$root/src" -mindepth 1 -maxdepth 1 -type d -print -quit)
+          test -f "$src/tests/cpc_qs3_ed_shared_xxz_crosscheck.py"
+          printf '%s\n' "$src" > "$root/source-path"
+          cd "$root/build"
+          "$src/configure" FC="$FC" FCFLAGS="-O2 -fopenmp"
+          make -j2
+          test -x source/QS3ED2
+      - name: Independent six-state model and two original dense solver paths
+        run: |
+          set -eu
+          root="$RUNNER_TEMP/cpc-old-vs-new"
+          src=$(cat "$root/source-path")
+          python3 "$src/tests/cpc_qs3_ed_shared_xxz_crosscheck.py" \
+            --old-exe "$GITHUB_WORKSPACE/qs3-ed-original/source_only_u1/QS3_only_u1" \
+            --new-exe "$root/build/source/QS3ED2" \
+            --old-commit a3b09934bba5f966bfb564718528de8778c2b46c \
+            --output "$RUNNER_TEMP/cpc-old-new-xxz"
+          python3 - "$RUNNER_TEMP/cpc-old-new-xxz/report.json" <<'PY'
+          import json,sys
+          r=json.load(open(sys.argv[1],encoding="utf-8"))
+          assert r["pass_complete"],r["maximum_absolute_disagreements"]
+          assert len(r["old_spectrum"])==len(r["new_spectrum"])==6
+          assert max(r["maximum_absolute_disagreements"].values())<3e-9
+          print("CPC LEGACY -> ED2 COMMON XXZ LIMIT 6/6 INDEPENDENT LEVELS")
+          PY
+      - name: Archive both input conventions, all solver output and SHA digests
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cpc-original-qs3-ed-vs-ed2-xxz
+          path: ${{ runner.temp }}/cpc-old-new-xxz/
+          retention-days: 21
+          if-no-files-found: warn
