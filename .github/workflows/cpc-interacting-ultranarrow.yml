@@ -7,6 +7,7 @@ on:
     paths:
       - ".github/workflows/cpc-interacting-ultranarrow.yml"
       - "tests/cpc_interacting_ultranarrow_probe.py"
+      - "tests/cpc_ultranarrow_second_order_reference.py"
       - "tests/plot_cpc_interacting_ultranarrow.py"
       - "docs/development/cpc-interacting-ultranarrow-raw-ci.csv"
       - "tests/cpc_stationary_interacting_sparse_doublet.py"
@@ -78,6 +79,11 @@ jobs:
           assert d["scenarios_with_accepted_pair"]
           assert all(x["effective_low_gap_error"] is not None and
                      x["effective_low_gap_error"]<1e-9 for x in d["source_references"])
+          assert all(x["second_order_gap_error"]<1e-9 and
+                     x["dressed_second_order_edge_z_error"]<2e-4 and
+                     x["second_order_reference"]["upper_Q_residual"]<2e-9 and
+                     x["second_order_reference"]["lower_Q_residual"]<2e-9
+                     for x in d["source_references"])
           for r in d["raw"]:
               if r["status"]==0:
                   assert r["direct_residuals"]
