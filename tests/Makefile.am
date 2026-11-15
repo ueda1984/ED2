@@ -203,3 +203,6 @@ EXTRA_DIST += plot_cpc_mnte.py
 
 # Optional paired tight-full versus conservative-half cache resource comparison.
 EXTRA_DIST += cpc_stationary_cache_pareto.py
+
+# Optional frozen same-job cache frontier data audit and figure script.
+EXTRA_DIST += plot_cpc_pareto.py
