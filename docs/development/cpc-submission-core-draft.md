@@ -219,7 +219,17 @@ recovering the original QS³ basis
 occupations and a complete
 global window it gives
 \(\prod_i(2S_i+1)\).
-See the [code-verified derivation](cpc-qs3-ed-to-ed2-basis-generalization.md).
+This counting rule is additionally checked
+against the actual ED2 dense solver
+for three distinct four-site mixed-spin
+occupation windows of dimensions
+36, 10 and 26. The
+[CI #43713235842](https://github.com/ueda1984/ED2/actions/runs/43713235842)
+passes **72/72** independently
+enumerated eigenvalues,
+with maximum absolute difference
+\(1.11\times10^{-16}\).
+See the [code-verified derivation and numerical test](cpc-qs3-ed-to-ed2-basis-generalization.md).
 Selected basis representations may exploit
 compatible symmetries or restrict local/total
 occupation ranges. **A restricted excitation
