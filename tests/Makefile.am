@@ -176,3 +176,6 @@ EXTRA_DIST += mixed_spin_interacting_sparse810.py
 
 # Optional research-only staggered-DM/vector-chirality response study.
 EXTRA_DIST += mixed_spin_dm_chirality_scan.py
+
+# Optional plotting of validated finite-chain DM study; matplotlib is test-only.
+EXTRA_DIST += plot_cpc_dm_chirality.py
