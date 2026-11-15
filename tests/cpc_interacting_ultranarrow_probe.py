@@ -24,6 +24,7 @@ from cpc_stationary_interacting_sparse_doublet import (
     reference,ULTRA_SCENARIOS,RESTARTS,SPINS,
 )
 from mixed_spin_interacting_avoided_crossing import run_case
+from cpc_ultranarrow_second_order_reference import effective_second_order
 
 RESIDUALS=(1e-8,1e-12)
 
@@ -42,6 +43,13 @@ def main():
     violations=[]
     for eps,delta in ULTRA_SCENARIOS:
         model=reference(SPINS,eps,delta)
+        second=effective_second_order(model)
+        second_gap_error=abs(second["second_order_gap"]-model["ground_gap"])
+        first_edge_error=abs(second["first_order_edge_z"]-model["edge_sz"])
+        second_edge_error=abs(second["second_order_dressed_edge_z"]-model["edge_sz"])
+        if second_gap_error>1e-9 or second_edge_error>2e-4:
+            raise AssertionError("Independent core-resolvent reduction disagrees with full sparse reference "+
+                                 str((eps,delta,second_gap_error,second_edge_error)))
         refs.append(dict(n_sites=SPINS,epsilon=eps,delta=delta,
                          true_low_energies=model["low_e"],
                          internal_gap=model["ground_gap"],
@@ -52,12 +60,23 @@ def main():
                          nonu1_commutator_relative=model["commutator_relative"],
                          effective_low_gap=model["effective_low_gap"],
                          effective_low_gap_error=model["effective_low_gap_error"],
-                         effective_firstorder_edge_z=model["effective_edge_z_firstorder"]))
+                         effective_firstorder_edge_z=model["effective_edge_z_firstorder"],
+                         second_order_reference=second,
+                         second_order_gap_error=second_gap_error,
+                         first_order_edge_z_error=first_edge_error,
+                         dressed_second_order_edge_z_error=second_edge_error))
         print("ULTRA REFERENCE",eps,delta,
               "gap",model["ground_gap"],"outer",model["outer_gap"],
               "edge entropy",model["edge_linear_entropy"],
               "effective_gap",model["effective_low_gap"],
-              "effective_gap_error",model["effective_low_gap_error"],flush=True)
+              "effective_gap_error",model["effective_low_gap_error"],
+              "second_gap",second["second_order_gap"],
+              "second_gap_error",second_gap_error,
+              "edge_z_sparse",model["edge_sz"],
+              "edge_z_first",second["first_order_edge_z"],
+              "edge_z_second",second["second_order_edge_z"],
+              "edge_z_dressed",second["second_order_dressed_edge_z"],
+              "edge_z_second_error",second_edge_error,flush=True)
         for atol in RESIDUALS:
             for keep,capacity in RESTARTS:
                 case=f"n{SPINS}-eps{eps:.1g}-delta{delta:+.1g}-k{keep}-m{capacity}-tol{atol:.0e}-omp{a.omp}"
@@ -89,6 +108,10 @@ def main():
                               individual_edge_z=r.get("measured_edge_sz"),
                               independent_ground_edge_z=model["edge_sz"],
                               individual_edge_z_error=r.get("edge_sz_error"),
+                              edge_z_second_order_reference=second["second_order_dressed_edge_z"],
+                              ed2_vs_second_order_edge_z_abs_error=(
+                                  abs(r["measured_edge_sz"]-second["second_order_dressed_edge_z"])
+                                  if r.get("measured_edge_sz") is not None else None),
                               trace_mag_max_error=r.get("cluster_ensemble_mag_error"),
                               trace_corr_max_error=r.get("cluster_ensemble_cf_error"),
                               h_applications=r["h_applications"])
