@@ -127,7 +127,10 @@ At the time of this draft:
   projector/observable checks, plus 20 independent
   interacting eight-site sparse low-doublet trials,
   plus 24 ultra-small-gap interacting numerical
-  classification trials. **Do not add these counts blindly:**
+  classification trials, plus a separately sourced
+  four-point zero-bias induced-edge polarization scaling and
+  twelve ED2/native-readback second-order comparisons.
+  **Do not add these counts blindly:**
   some categories reuse models or runs but test different
   properties and source commits.
 - Archived GNU Fortran 11 and 13 source-package verification
