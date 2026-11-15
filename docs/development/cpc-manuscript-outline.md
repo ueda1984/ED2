@@ -375,6 +375,9 @@ benchmarks remain necessary.
 - [Size-stationary DM/chirality response, susceptibility and figure data](cpc-stationary-dm-application.md).
 - [Published XYZ-DM Hamiltonian and matched-target resource verification (12+36 cases)](cpc-literature-matched-benchmark.md).
 - [Cache-policy sweep and ALG=2 two-eigenpair robustness (52+36 trials)](cpc-cache-multipair-evaluation.md).
+- [Exact MNTE row-capacity derivation, independent CSR sparsity and resource measurements](cpc-mnte-capacity-evaluation.md).
+- [72-run frozen full-cache MNTE CI measurements](cpc-mnte-capacity-raw-ci.csv).
+- [CPC CPiP positioning and draft program-summary fields](cpc-cpip-program-summary.md).
 - [Working CPC manuscript prose draft](cpc-manuscript-draft.md).
 
 **No manuscript authorship, official source tag, DOI or journal
