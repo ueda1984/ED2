@@ -202,8 +202,9 @@ actual ED2 NN correlations. The positive finite-size
 susceptibility \(-\partial^2 E_0/\partial D^2/(L-1)\)
 is checked by energy curvature and direct chiral response;
 four-/six-site models also use the complete spectral sum.
-**54/54 scientific trials passed**, from \(L=4\)
-to \(12\), including OMP=1 and OMP=2 at \(L\le10\).
+**60/60 scientific trials passed**, from \(L=4\)
+to \(12\), including OMP=1 and OMP=2 at **every tested length
+through \(L=12\)**.
 
 For the CPC draft, this establishes a **reproducible
 non-U(1) response example with size-stationary local
