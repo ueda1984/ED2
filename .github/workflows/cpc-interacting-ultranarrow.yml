@@ -7,6 +7,8 @@ on:
     paths:
       - ".github/workflows/cpc-interacting-ultranarrow.yml"
       - "tests/cpc_interacting_ultranarrow_probe.py"
+      - "tests/plot_cpc_interacting_ultranarrow.py"
+      - "docs/development/cpc-interacting-ultranarrow-raw-ci.csv"
       - "tests/cpc_stationary_interacting_sparse_doublet.py"
       - "tests/mixed_spin_interacting_avoided_crossing.py"
       - "tests/mixed_spin_sparse_scale.py"
@@ -92,3 +94,33 @@ jobs:
           path: ${{ runner.temp }}/cpc-ultra-omp${{ matrix.omp }}/
           retention-days: 21
           if-no-files-found: warn
+
+  frozen-figures:
+    name: Audit 24 frozen ultra-small-gap classifications and render plots
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install reproducible headless plotting dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends python3-matplotlib python3-numpy
+      - name: Check source identity and the complete accepted-case matrix
+        run: |
+          set -eu
+          python3 tests/plot_cpc_interacting_ultranarrow.py --validate-only
+      - name: Render individual-versus-projector precision plots
+        run: |
+          set -eu
+          python3 tests/plot_cpc_interacting_ultranarrow.py \
+            --outdir "$RUNNER_TEMP/cpc-ultra-figures"
+          test "$(find "$RUNNER_TEMP/cpc-ultra-figures" -name '*.svg' | wc -l)" -eq 3
+          test "$(find "$RUNNER_TEMP/cpc-ultra-figures" -name '*.png' | wc -l)" -eq 3
+          sha256sum "$RUNNER_TEMP/cpc-ultra-figures"/*.svg
+      - name: Archive reproducible numerical precision figure prototypes
+        uses: actions/upload-artifact@v4
+        with:
+          name: cpc-ultra-doublet-figures
+          path: ${{ runner.temp }}/cpc-ultra-figures/
+          retention-days: 21
+          if-no-files-found: error
