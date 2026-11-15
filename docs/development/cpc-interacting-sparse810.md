@@ -86,6 +86,13 @@ The separated two-dimensional cluster is therefore
 numerically much better conditioned than the individual
 very closely spaced eigenvectors.
 
+The eight independent reference points are also available in
+[CSV form](cpc-interacting-sparse810-reference.csv) for a
+reproducible CPC figure. These are the OMP=1 reference values
+**rounded as printed in the validation log**; the full
+precision results and solver outputs are retained in the
+linked GitHub Actions artifacts.
+
 ## ED2 validation and numerical precision
 
 [Successful CI execution (GNU Fortran 13, OMP=1 and 2)](https://github.com/ueda1984/ED2/actions/runs/43687903591).
