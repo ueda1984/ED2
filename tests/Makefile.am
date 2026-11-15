@@ -236,3 +236,6 @@ EXTRA_DIST += cpc_ultranarrow_dense_lapack_crosscheck.py
 
 # Frozen 9 dense + 24 ED2 ultra-narrow near-degeneracy reference method comparison.
 EXTRA_DIST += plot_cpc_ultranarrow_reference_comparison.py
+
+# Independent ED2/second-order Q-resolvent observable and gap comparison.
+EXTRA_DIST += cpc_ultranarrow_second_order_validate.py
