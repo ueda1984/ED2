@@ -47,7 +47,7 @@ def kron_product(factors):
 def physical_operators(length):
     # Independent site-index/orientation convention: j=0,...,L-1.
     spins = [local_spin(.5 if j % 2 == 0 else 1.) for j in range(length)]
-    identity = [sparse.eye(len(t[0]), dtype=complex, format="csr")
+    identity = [sparse.eye(t[0].shape[0], dtype=complex, format="csr")
                 for t in spins]
     dim = int(np.prod([x.shape[0] for x in identity]))
     zero = sparse.csr_matrix((dim, dim), dtype=complex)
