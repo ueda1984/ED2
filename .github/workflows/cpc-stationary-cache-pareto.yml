@@ -1,0 +1,95 @@
+name: CPC stationary cache memory frontier
+
+on:
+  push:
+    branches:
+      - codex/ed2-cpc-stationary-dm-scaling
+    paths:
+      - ".github/workflows/cpc-stationary-cache-pareto.yml"
+      - "tests/cpc_stationary_cache_pareto.py"
+      - "tests/mixed_spin_matched_benchmark.py"
+      - "tests/cpc_stationary_resource_benchmark.py"
+      - "tests/mixed_spin_dm_chirality_scan.py"
+      - "tests/Makefile.am"
+      - "source/**"
+      - "configure.ac"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  paired-frontier:
+    name: "Pareto ${{ matrix.tag }}"
+    runs-on: ubuntu-24.04
+    timeout-minutes: 50
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {tag: "small-omp1", threads: 1, sizes: "8,10"}
+          - {tag: "small-omp2", threads: 2, sizes: "8,10"}
+          - {tag: "large-omp1", threads: 1, sizes: "12"}
+          - {tag: "large-omp2", threads: 2, sizes: "12"}
+    env:
+      FC: gfortran-13
+      FCFLAGS: "-O2 -fopenmp"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+      OMP_DYNAMIC: "FALSE"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Fortran and SciPy independent references
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends gfortran-13 libopenblas-dev liblapack-dev autoconf automake make python3-numpy python3-scipy time
+      - name: Build from separately unpacked archive
+        run: |
+          set -eu
+          autoreconf -vfi
+          ./configure FC="$FC" FCFLAGS="$FCFLAGS"
+          make -j2
+          make dist
+          tmp="$RUNNER_TEMP/ed2-pareto"
+          mkdir -p "$tmp/src" "$tmp/build"
+          tgz=$(find "$GITHUB_WORKSPACE" -maxdepth 1 -name '*.tar.gz' -print -quit)
+          test -n "$tgz"
+          tar -xzf "$tgz" -C "$tmp/src"
+          src=$(find "$tmp/src" -mindepth 1 -maxdepth 1 -type d -print -quit)
+          test -f "$src/tests/cpc_stationary_cache_pareto.py"
+          printf '%s\n' "$src" > "$tmp/source-path"
+          cd "$tmp/build"
+          "$src/configure" FC="$FC" FCFLAGS="$FCFLAGS"
+          make -j2
+      - name: Independently verify A/B cache and memory-cost ranking
+        run: |
+          set -eu
+          tmp="$RUNNER_TEMP/ed2-pareto"
+          src=$(cat "$tmp/source-path")
+          python3 "$src/tests/cpc_stationary_cache_pareto.py" \
+            --exe "$tmp/build/source/QS3ED2" \
+            --sizes "${{ matrix.sizes }}" \
+            --algs "1,2" --omp "${{ matrix.threads }}" \
+            --D 0.12 --residual-atol 1e-8 \
+            --repeats 2 --warmups 1 --keep 2 --capacity 16 \
+            --timeout-seconds 350 \
+            --output "$RUNNER_TEMP/pareto-${{ matrix.tag }}"
+          python3 - "$RUNNER_TEMP/pareto-${{ matrix.tag }}/report.json" <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1],encoding="utf-8"))
+          assert d["pass_complete"],d["violations"]
+          assert d["completed"]==d["expected"]==d["accepted"]
+          assert all(x["measurements"]==x["expected_measurements"] for x in d["summary"])
+          for r in d["references"]:
+              c=r["nominal_cache_bytes"]
+              assert c["full_tight"]<c["half_generic"]<c["full_generic"]
+          print("PARETO VALIDATED",d["completed"],"/",d["expected"])
+          PY
+      - name: Preserve all paired inputs, solver outputs and telemetry
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cpc-pareto-${{ matrix.tag }}
+          path: ${{ runner.temp }}/pareto-${{ matrix.tag }}/
+          retention-days: 21
+          if-no-files-found: warn
