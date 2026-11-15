@@ -3,6 +3,8 @@
 % Never assign a CPC accession, software DOI, or credit unconfirmed authors.
 \documentclass[preprint,12pt,nopreprintline]{elsarticle}
 \usepackage{amsmath,amssymb,bm,booktabs,hyperref}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.17}
 \hypersetup{colorlinks=true,linkcolor=black,citecolor=blue,urlcolor=blue}
 \emergencystretch=2em
 \journal{Computer Physics Communications}
@@ -302,6 +304,42 @@ $L$ & $\chi_\kappa(L)$\\
 \bottomrule
 \end{tabular}
 \end{table}
+
+
+% DATA PROVENANCE: docs/development/cpc-stationary-dm-reference.csv
+% Five D points for each L; re-verify against source CSV after any edit.
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+ width=0.88\linewidth, height=6.3cm,
+ xmin=-0.25, xmax=0.25, ymin=-0.165, ymax=0.165,
+ xlabel={$D$},
+ ylabel={$\bar\kappa_{\mathrm{stag}}$},
+ xtick={-0.24,-0.12,0,0.12,0.24},
+ grid=major,
+ legend columns=3,
+ legend style={at={(0.5,-0.30)},anchor=north,draw=none,font=\small}
+]
+\addplot+[mark=*,thick] coordinates {(-0.24,0.1490669111) (-0.12,0.07606183469) (0,0.0003834158887) (0.12,-0.0752541082) (0.24,-0.1481511796)};
+\addlegendentry{$L=4$}
+\addplot+[mark=*,thick] coordinates {(-0.24,0.1347374411) (-0.12,0.06823183021) (0,0.0002180106964) (0.12,-0.06773345395) (0.24,-0.1340445297)};
+\addlegendentry{$L=6$}
+\addplot+[mark=*,thick] coordinates {(-0.24,0.127667629) (-0.12,0.06446533643) (0,0.0001562908303) (0.12,-0.06409869328) (0.24,-0.1271197533)};
+\addlegendentry{$L=8$}
+\addplot+[mark=*,thick] coordinates {(-0.24,0.1236346982) (-0.12,0.0623495264) (0,0.0001334762108) (0.12,-0.06203513532) (0.24,-0.1231565869)};
+\addlegendentry{$L=10$}
+\addplot+[mark=*,thick] coordinates {(-0.24,0.1210662392) (-0.12,0.06100992836) (0,0.0001230441888) (0.12,-0.06072012735) (0.24,-0.1206238829)};
+\addlegendentry{$L=12$}
+\end{axis}
+\end{tikzpicture}
+\caption{Finite-size mean staggered vector chirality per bond versus
+the oriented DM coupling for the same two-site-periodic alternating-spin
+Hamiltonian at all five lengths. The 25 points originate from the
+independently validated stationary-DM reference CSV; lines are visual
+guides, not bulk-limit fits.}
+\label{fig:dm-response}
+\end{figure}
 
 The 60 source-archived, independent OMP=1/2 checks through
 12 sites reproduce ground energies and full nearest-neighbor
