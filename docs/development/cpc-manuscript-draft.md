@@ -34,10 +34,11 @@ the Hamiltonian. Dense and iterative eigensolvers, local magnetic
 moments and Cartesian two-spin correlations are verified using
 independently constructed Hamiltonians, with numerical diagnostics
 that distinguish convergence from ground-state inclusion.
-For the common spin-1/2 XXZ limit, all six levels of a four-site
-invariant magnetization sector agree between the original
-QS³/ED executable, ED2 and an independent Hamiltonian
-to absolute differences below \(3\times10^{-15}\). As a
+For the common spin-1/2 XXZ limit, all 32 levels
+of three four- and six-site invariant magnetization
+sectors agree between the original QS³/ED executable,
+ED2 and an independent Hamiltonian, with a maximum
+cross-code difference of \(2.89\times10^{-15}\). As a
 reproducible scientific application we compute the response to a
 staggered directed DM interaction in an alternating spin-1/2 and
 spin-1 chain containing XYZ, symmetric off-diagonal and transverse
@@ -218,6 +219,25 @@ The [frozen six-state spectrum](cpc-qs3-ed-ed2-shared-xxz-spectrum-ci.csv),
 [pinned CI comparison](https://github.com/ueda1984/ED2/actions/runs/43712076117)
 and [model/feature scope matrix](cpc-qs3-ed-to-ed2-scope-matrix.md)
 retain original-source provenance.
+To also sample the older program's
+near-saturation regime, the actual
+historical/modern executable comparison
+was expanded to \(L=6,N_\downarrow=1\)
+and \(L=6,N_\downarrow=3\).
+The resulting **three-case / 32-eigenvalue**
+reference suite passed
+[CI #43712595377](https://github.com/ueda1984/ED2/actions/runs/43712595377);
+the maximum old-versus-ED2 discrepancy
+is \(2.89\times10^{-15}\), and the largest
+ED2-versus-independent-sector deviation
+is \(3.44\times10^{-15}\).
+All three per-level spectra, differences,
+source SHAs and test provenance are frozen
+in the [32-level benchmark CSV](cpc-qs3-ed-ed2-32level-extended-ci.csv).
+The original static/dynamic output
+formats are not treated as
+automatically compatible with ED2.
+
 The nonconserving mixed-spin
 response in Section 4 illustrates
 the distinct extended Hamiltonian scope.
