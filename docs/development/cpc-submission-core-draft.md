@@ -31,7 +31,7 @@ observables, and numerical acceptance diagnostics.
 The preserved XXZ limit is checked directly against the original
 QS³ executable in a six-dimensional fixed-magnetization sector,
 with all six levels agreeing with an independent matrix to
-within (3\times10^{-15}).
+within \(3\times10^{-15}\).
 Independent dense and sparse constructions validate
 fully nonconserving alternating spin-1/2–spin-1 chains
 of up to 12 sites (Hilbert-space dimension 46,656).
@@ -76,7 +76,7 @@ The published **QS³** program [1] and its
 [CPC-era source `QS-Cube/ED`](https://github.com/QS-Cube/ED)
 focused on large, low-down-spin-density,
 spin-1/2 XXZ-type models in a fixed
-(N_\downarrow) sector, exploiting momentum
+\(N_\downarrow\) sector, exploiting momentum
 blocks when appropriate. In addition to
 Lanczos and static spin observables, the
 original code included a dynamical
@@ -108,8 +108,7 @@ controls. Those maintenance changes
 must be credited, but are not the
 sole new contribution of the first
 ED2 software article. The
-[primary published-program comparison]
-(cpc-qs3-ed-to-ed2-scope-matrix.md)
+[primary published-program comparison](cpc-qs3-ed-to-ed2-scope-matrix.md)
 identifies these boundaries precisely.
 
 Other packages, including **QuSpin** [4],
@@ -186,8 +185,7 @@ direct-residual policies. These are
 engineering correctness changes, not
 new eigenvalue algorithms. Their
 exact upstream/source comparison is
-recorded in the [contribution audit]
-(cpc-software-provenance-contribution-audit.md).
+recorded in the [contribution audit](cpc-software-provenance-contribution-audit.md).
 
 For a returned Ritz pair
 \((E_j,\psi_j)\), define its
@@ -222,17 +220,16 @@ QS³ implementation, we compiled the original
 and the ED2 source distribution at SHA
 `88c72032c26e52e507bc1217ec030479ada486fc`.
 On a four-site open spin-1/2 XXZ chain
-with (J_{xy}=0.8), (J_z=1.1) and
-(N_\downarrow=2), both executable
+with \(J_{xy}=0.8\), \(J_z=1.1\) and
+\(N_\downarrow=2\), both executable
 dense solvers represent the same
 six-dimensional invariant sector.
 All six eigenvalues coincide with a
 third independently assembled
 product-state Hamiltonian. The largest
 old-to-new absolute difference is
-(2.89\times10^{-15}).
-The [fully frozen comparison]
-(cpc-qs3-ed-ed2-shared-xxz-spectrum-ci.csv)
+\(2.89\times10^{-15}\).
+The [fully frozen comparison](cpc-qs3-ed-ed2-shared-xxz-spectrum-ci.csv)
 is a shared-physics limit, not a
 speed benchmark.
 
@@ -401,10 +398,8 @@ proof of a universally optimal
 cache setting.
 
 A CPU-pinned, source-/input-hashed
-[dedicated-node protocol]
-(cpc-controlled-node-protocol.md)
-and strict [postprocessor]
-(cpc-controlled-node-protocol.md#d-relevance-to-the-cpc-paper)
+[dedicated-node protocol](cpc-controlled-node-protocol.md)
+and strict [postprocessor](cpc-controlled-node-protocol.md#d-relevance-to-the-cpc-paper)
 are available; fully repeated,
 operator-verified exclusive-node
 performance measurements are
@@ -417,8 +412,7 @@ requires only the compiled
 ED2 executable, its
 Fortran BLAS/LAPACK runtime,
 and input records. We supply
-a [portable quickstart]
-(cpc-portable-dm-quickstart.md)
+a [portable quickstart](cpc-portable-dm-quickstart.md)
 that builds the complete
 \(L=4,6\) physical models,
 runs \(D=-2\times10^{-4},0,
@@ -438,15 +432,13 @@ source was public before the present work.
 The earlier published QS³ program and its
 original [`QS-Cube/ED` source](https://github.com/QS-Cube/ED)
 are the paper's principal software lineage.
-The [direct feature and XXZ-spectrum comparison]
-(cpc-qs3-ed-to-ed2-scope-matrix.md)
+The [direct feature and XXZ-spectrum comparison](cpc-qs3-ed-to-ed2-scope-matrix.md)
 is part of this first ED2 submission.
 
 The current development work
 is publicly visible in the
 [ED2 fork](https://github.com/ueda1984/ED2/tree/codex/ed2-cpc-stationary-dm-scaling).
-The [upstream source repository]
-(https://github.com/QS-Cube/ED2)
+The [upstream source repository](https://github.com/QS-Cube/ED2)
 and MIT notice remain the
 underlying program lineage.
 The formal CPC source archive
