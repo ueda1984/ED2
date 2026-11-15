@@ -42,7 +42,13 @@ cross-code difference of \(2.89\times10^{-15}\).
 Direct conventional-Lanczos (ALG=1) comparisons
 on larger 12-, 18- and 24-site common-sector
 problems likewise reproduce independent ground
-energies. As a reproducible scientific application we compute the response to a
+energies. A separate six-site periodic XXZ
+test independently resolves the complete
+\(N_\downarrow=2\) spectrum into
+six momentum sectors, with all
+15 sector-resolved levels matching
+the original QS³ and ED2 executables
+to better than \(3.2\times10^{-15}\). As a reproducible scientific application we compute the response to a
 staggered directed DM interaction in an alternating spin-1/2 and
 spin-1 chain containing XYZ, symmetric off-diagonal and transverse
 field terms. For 4–12 sites, ground energies and all nearest-neighbor
@@ -291,6 +297,63 @@ so iteration counts (35/35,
 45/55 and 60/60, old/new) are
 **not** treated as evidence of
 a matched-start speedup.
+
+In a second source-pinned
+[CI execution #43769238290](https://github.com/ueda1984/ED2/actions/runs/43769238290),
+the iterative comparison
+again passed 3/3 cases,
+but the old QS³ random
+initialization yielded
+an \(L=24\) old-to-new
+difference of
+\(1.85\times10^{-13}\)
+rather than the
+\(1.20\times10^{-14}\)
+in the first archived run.
+Both outcomes satisfy the
+independent ground-state
+energy target. This is an
+observed stochastic
+starting-vector dependence,
+not numerical evidence
+of a universal speed advantage.
+
+A separate direct
+**momentum-sector test**
+compares the original
+published QS³ translational
+basis construction with ED2's
+user-provided cyclic
+permutation for an
+\(L=6\), \(N_\downarrow=2\)
+periodic XXZ ring.
+All \(m=0,\ldots,5\)
+momentum sectors
+(\(k=2\pi m/6\), dimensions
+3,2,3,2,3,2)
+are checked against a
+third independent
+\(P_k=\frac{1}{6}\sum_r
+e^{-ikr}T^r\)
+projector construction.
+The **15/15** levels match
+across the two Fortran
+executables, with maximum
+absolute difference
+\(3.11\times10^{-15}\);
+the complete fixed-down-spin
+15-state spectrum is
+reconstructed by the
+independent sectors.
+The [frozen per-momentum spectra](cpc-qs3-ed-ed2-momentum-15level-ci.csv)
+and [source-pinned verification report](cpc-original-qs3-ed2-iterative-continuity.md)
+document this previously
+published computational
+capability. It checks
+static eigenenergies, not
+wavefunction phase
+conventions or old
+dynamical structure factors.
 
 The nonconserving mixed-spin
 response in Section 4 illustrates
