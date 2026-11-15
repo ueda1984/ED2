@@ -81,6 +81,31 @@ No PATH dependency is assumed for the ED2 executable.
 
 ---
 
+## CPC development and reproducible worked example
+
+The [CPC submission-focused draft](docs/development/cpc-submission-core-draft.md)
+and [upstream-versus-development contribution audit](docs/development/cpc-software-provenance-contribution-audit.md)
+are **development documents, not a submitted article or official release**.
+For a quick physics reproduction after building this branch,
+run the [mixed-spin DM/chirality quickstart](docs/development/cpc-portable-dm-quickstart.md):
+
+```bash
+python3 -S tests/cpc_portable_dm_quickstart.py \
+  --exe "$(pwd)/source/QS3ED2" \
+  --size 4 --omp 1 --output "$(pwd)/cpc-portable-example"
+```
+
+This example uses only the Python standard library and the compiled ED2
+binary. It verifies an open, two-site-periodic mixed-spin XYZ/Gamma/DM
+Hamiltonian with **nonconserved total Sz**, its Hellmann–Feynman
+vector-chirality response and independent frozen finite-size results.
+The source-archive CI validates L=4/6 at OMP=1/2. The exhaustive
+independent reference scripts remain optional and require NumPy/SciPy.
+No controlled-node speedup, stable installed Fortran API or software DOI
+is claimed by this development fork.
+
+---
+
 ## Testing
 
 Two test levels are provided.
