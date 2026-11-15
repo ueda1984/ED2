@@ -80,6 +80,7 @@ nav:
       - CPC published XYZ-DM and matched benchmark: development/cpc-literature-matched-benchmark.md
       - CPC stationary cache and two-eigenpair benchmarks: development/cpc-cache-multipair-evaluation.md
       - CPC model-specific exact MNTE capacity and memory: development/cpc-mnte-capacity-evaluation.md
+      - CPC CPiP program summary and submission scope: development/cpc-cpip-program-summary.md
       - CPC manuscript scientific first draft: development/cpc-manuscript-draft.md
   - Reference:
       - Citation & Versioning: reference/citation-versioning.md      
