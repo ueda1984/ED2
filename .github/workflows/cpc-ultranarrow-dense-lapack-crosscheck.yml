@@ -1,0 +1,79 @@
+name: CPC ultra-narrow dense LAPACK eigenvector crosscheck
+
+on:
+  push:
+    branches:
+      - codex/ed2-cpc-stationary-dm-scaling
+    paths:
+      - ".github/workflows/cpc-ultranarrow-dense-lapack-crosscheck.yml"
+      - "tests/cpc_ultranarrow_dense_lapack_crosscheck.py"
+      - "tests/cpc_ultranarrow_second_order_reference.py"
+      - "tests/cpc_stationary_interacting_sparse_doublet.py"
+      - "tests/mixed_spin_sparse_scale.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dense-independent:
+    name: Dense EVR/EVX/EVD numerical individual-state audit
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+      OMP_NUM_THREADS: "1"
+      OMP_DYNAMIC: "FALSE"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install independent numerical reference dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends python3-numpy python3-scipy autoconf automake
+      - name: Check source archive contains exact test version
+        run: |
+          set -eu
+          autoreconf -vfi
+          ./configure
+          make dist
+          root="$RUNNER_TEMP/cpc-lapack-check"
+          mkdir -p "$root/source"
+          archive=$(find "$GITHUB_WORKSPACE" -maxdepth 1 -name '*.tar.gz' -print -quit)
+          test -n "$archive"
+          tar -xzf "$archive" -C "$root/source"
+          src=$(find "$root/source" -mindepth 1 -maxdepth 1 -type d -print -quit)
+          test -f "$src/tests/cpc_ultranarrow_dense_lapack_crosscheck.py"
+          test -f "$src/tests/cpc_ultranarrow_second_order_reference.py"
+          printf '%s\n' "$src" > "$root/source-path"
+          sha256sum "$archive"
+          git rev-parse HEAD
+      - name: Compare three dense drivers, sparse eigsh, and core resolvent
+        run: |
+          set -eu
+          root="$RUNNER_TEMP/cpc-lapack-check"
+          src=$(cat "$root/source-path")
+          python3 "$src/tests/cpc_ultranarrow_dense_lapack_crosscheck.py" \
+            --drivers evr,evx,evd \
+            --output "$RUNNER_TEMP/cpc-dense-low-precision"
+          python3 - "$RUNNER_TEMP/cpc-dense-low-precision/report.json" <<'PY'
+          import json,sys
+          r=json.load(open(sys.argv[1],encoding="utf-8"))
+          assert r["pass_complete"],r["failures"]
+          assert r["accepted"]==r["expected"]==3
+          for entry in r["cases"]:
+              assert len(entry["dense"])==3
+              for x in entry["dense"]:
+                  assert max(x["direct_residuals"])<1e-11
+                  assert x["trace_corr_eigsh_error"]<1e-7
+                  assert x["second_order_edge_z_abs_error"]<7e-8
+          print("DENSE LAPACK INDEPENDENT NUMERICAL CROSSCHECK",r["accepted"],"/",r["expected"])
+          PY
+      - name: Retain full numerical evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cpc-dense-lapack-ultra-crosscheck
+          path: ${{ runner.temp }}/cpc-dense-low-precision/
+          if-no-files-found: warn
+          retention-days: 21
