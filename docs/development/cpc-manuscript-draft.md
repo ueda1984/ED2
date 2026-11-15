@@ -72,6 +72,16 @@ or parallel exact diagonalization. In particular, ED2's generalized
 exchange and field inputs can represent Hamiltonians in which
 total \(S^z\) is not conserved.
 
+Other exact-diagonalization frameworks, including QuSpin [4],
+already offer general spin-model Hamiltonians and
+user-programmable symmetry representations. Therefore
+our claim is **not** that nonconserving XYZ or DM models
+are inaccessible to all existing software. Rather,
+we seek to document and independently validate the
+specific native mixed-local-spin interaction inputs,
+numerical acceptance contracts and resource tradeoffs
+of ED2 relative to its previously published QS³ lineage.
+
 A challenge in assessing generalized spin software is to establish
 that independent definitions of the Hamiltonian, symmetry,
 spectrum and observables agree. A directed
@@ -587,6 +597,11 @@ DOI: 10.1088/1361-648X/ac4aab.
 [3] T.-C. Yi, W.-L. You, N. Wu and A. M. Oleś,
 *Physical Review B* **100**, 024423 (2019).
 DOI: 10.1103/PhysRevB.100.024423.
+
+[4] P. Weinberg and M. Bukov, *QuSpin: a Python package
+for dynamics and exact diagonalisation of quantum many body
+systems. Part I: spin chains*, *SciPost Physics* **2**, 003 (2017).
+Project documentation: https://quspin.github.io/QuSpin/ .
 
 Primary independent DM response:
 https://github.com/ueda1984/ED2/actions/runs/43690041312
