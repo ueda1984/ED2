@@ -28,6 +28,7 @@ jobs:
           - {threads: 1, sizes: "4,6,8,10", tag: "small-omp1"}
           - {threads: 2, sizes: "4,6,8,10", tag: "small-omp2"}
           - {threads: 1, sizes: "12", tag: "large-omp1"}
+          - {threads: 2, sizes: "12", tag: "large-omp2"}
     env:
       FC: gfortran-13
       FCFLAGS: "-O2 -fopenmp"
