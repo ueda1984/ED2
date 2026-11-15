@@ -34,6 +34,15 @@ matching invariant sectors of four- and six-site spin-1/2
 chains, verifying **all 32 eigenvalues** against a
 separately assembled matrix. The maximum cross-code
 difference is \(2.89\times10^{-15}\).
+In the same conserved physical limit, the
+historical and ED2 **conventional Lanczos**
+executables additionally reproduce the
+independent ground energies for
+\(L=12,18,24\), with old-to-new
+differences at most \(1.78\times10^{-14}\).
+These source-pinned direct runs test the
+predecessor's iterative computational
+workflow, not a matched-start speedup.
 Independent dense and sparse constructions validate
 fully nonconserving alternating spin-1/2–spin-1 chains
 of up to 12 sites (Hilbert-space dimension 46,656).
@@ -327,6 +336,13 @@ physics, not a demonstration of new
 solver performance, fully backward-compatible
 input format or the old dynamical
 structure-factor pathway.
+The [independently checked three-size ALG=1 comparison](cpc-original-qs3-ed2-iterative-continuity.md)
+records actual historical and ED2 energies,
+iteration counts and independent spectral
+references; the old code uses an uncontrolled
+random start, so differences in reported
+iteration count are not treated as controlled
+timing comparisons.
 
 Small-system dense Hamiltonians
 and independent sparse product-basis
