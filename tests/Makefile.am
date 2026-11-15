@@ -242,3 +242,6 @@ EXTRA_DIST += cpc_ultranarrow_second_order_validate.py
 
 # Dense-LAPACK and exact edge-sign symmetry zero-field perturbative scaling check.
 EXTRA_DIST += cpc_weak_edge_polarization_scaling.py
+
+# Frozen 4+6+12 weak-edge perturbative scaling and native ED2 plotter.
+EXTRA_DIST += plot_cpc_weak_edge_scaling.py
