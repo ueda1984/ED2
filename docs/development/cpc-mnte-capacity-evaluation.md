@@ -16,6 +16,10 @@ projection or symmetry truncation.
 
 - [CI execution 43703623648](https://github.com/ueda1984/ED2/actions/runs/43703623648),
   source SHA `315bed65b0c21d4db4f3af834d5807d361839d29`.
+- [Additional independent sparse-row verification #43704146968](https://github.com/ueda1984/ED2/actions/runs/43704146968)
+  independently constructs the SciPy CSR Hamiltonian and confirms
+  that its maximum nonzero count per row is exactly 27, 34, 41,
+  respectively. All four CI jobs passed for this stronger check.
 - GitHub Actions checks: **72/72 cases accepted** (L=8,10,12;
   ALG=1/2, OMP=1/2, default/calibrated capacity; one warmup and
   two measured runs for each combination). All solver statuses,
@@ -94,8 +98,10 @@ Different product-basis restrictions also require revalidation.
 All four combinations of ALG=1/2 and OMP=1/2 confirm
 these exact row-length maxima at every L, including
 the calibrated reruns. The proof addresses the channel count;
-the CI observations separately establish agreement with
-ED2's actual source enumerator.
+the independent SciPy Hamiltonian's maximum CSR-row nonzero count
+and ED2's own `Optimal MNTE` agree separately with the formula.
+This protects against accidentally validating only two code paths
+that share the same transition enumerator.
 
 ## 3. Predicted reduction in allocated arrays versus RSS
 
