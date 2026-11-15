@@ -31,13 +31,37 @@ separately articulated and demonstrable methodological novelty.
 The current installed deliverable is an executable, not a
 public reusable Fortran library.
 
-The CPiP claim must distinguish (i) the earlier
-CPC 2022 near-saturation QS³ publication and
-(ii) the already-public QS-Cube/ED2 upstream program
-from (iii) subsequent development, tests and documentation
-on the fork. A new scientific result about Hellmann–Feynman
-or a universally optimal `wk_dim`/`MNTE` setting is **not**
-being claimed.
+**Publication baseline:** the existing 2022 CPC QS³ article
+describes the program whose source is
+[QS-Cube/ED](https://github.com/QS-Cube/ED),
+not QS-Cube/ED2. ED2 has been available publicly
+as a repository since 2023 but has **not previously
+been described in a journal program article**.
+The requested paper is its **first formal ED2 program
+description**, showing the real computational extensions
+from the published QS³/ED code.
+
+The [code-level comparison](cpc-qs3-ed-to-ed2-scope-matrix.md)
+documents the transition from uniform spin-1/2,
+fixed-(N_{\downarrow}) XXZ/translation calculations
+to mixed local spins, three-component site fields,
+XYZ/DM/Gamma operators, full-space non-U(1)
+calculations and complete Cartesian static correlations.
+The modern ED2 source already publicly contained
+most generalized inputs before the *fork maintenance*
+work. The latter adds validated numerical correctness,
+diagnostics and reproducibility, not the physical
+Hamiltonian's initial invention.
+
+The original QS³ also contains a dynamical
+structure-factor pathway not currently confirmed
+in ED2's native executable. Therefore
+**do not describe ED2 as a strict superset**
+of every QS³ feature or compare their
+distinct numerical targets as equivalent.
+A new result about Hellmann–Feynman or a
+universally optimal `wk_dim`/`MNTE`
+configuration is likewise **not** claimed.
 
 **Broader ED software landscape:** ED2 is not the only general
 exact-diagonalization framework. For example, QuSpin provides
@@ -118,9 +142,13 @@ claims remain pending.
 ## Submission-focused source and reproducibility checks (November 2026)
 
 The [source contribution audit](cpc-software-provenance-contribution-audit.md)
-now distinguishes the **published 2022 QS³ program**,
-the **already-generalized upstream ED2 repository**,
-and the **Phase 1 development-fork numerical maintenance**.
+distinguishes **already-public ED2 implementation**
+from **Phase 1 maintenance**. The newly examined
+[QS³/ED-to-ED2 scope matrix](cpc-qs3-ed-to-ed2-scope-matrix.md)
+establishes that the actual published predecessor
+is QS-Cube/ED and that the first ED2 article can
+describe the complete generalized ED2 program
+rather than only post-publication fork changes.
 It confirms that the fork's `main` and upstream are at
 the same observed SHA `49941dc4b437a8fb6c2b5c8dac7d621866731d7c`,
 while the working branch changes **eight** production
