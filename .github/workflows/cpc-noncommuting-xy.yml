@@ -1,0 +1,99 @@
+name: CPC noncommuting XY avoided crossing and excited-start witness
+
+on:
+  push:
+    branches:
+      - codex/ed2-cpc-interacting-avoided-crossing
+    paths:
+      - ".github/workflows/cpc-noncommuting-xy.yml"
+      - "tests/mixed_spin_noncommuting_xy.py"
+      - "tests/mixed_spin_interacting_avoided_crossing.py"
+      - "tests/Makefile.am"
+      - "source/**"
+      - "configure.ac"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  noncommuting-xy:
+    name: "XY avoided crossing and excited witness (OMP=${{ matrix.threads }})"
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        threads: [1, 2]
+    env:
+      FC: gfortran-13
+      FCFLAGS: "-O2 -fopenmp"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+      OMP_DYNAMIC: "FALSE"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install GNU Fortran and independent NumPy reference
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends gfortran-13 libopenblas-dev liblapack-dev autoconf automake make python3-numpy
+      - name: Package and rebuild from independent source archive
+        run: |
+          set -eu
+          autoreconf -vfi
+          ./configure FC="$FC" FCFLAGS="$FCFLAGS"
+          make -j2
+          make dist
+          work="$RUNNER_TEMP/ed2-noncommuting-xy"
+          mkdir -p "$work/src" "$work/build"
+          tarball=$(find "$GITHUB_WORKSPACE" -maxdepth 1 -name '*.tar.gz' -print -quit)
+          test -n "$tarball"
+          tar -xzf "$tarball" -C "$work/src"
+          src=$(find "$work/src" -mindepth 1 -maxdepth 1 -type d -print -quit)
+          printf '%s\n' "$src" > "$work/source-path"
+          cd "$work/build"
+          "$src/configure" FC="$FC" FCFLAGS="$FCFLAGS"
+          make -j2
+          git -C "$GITHUB_WORKSPACE" rev-parse HEAD
+      - name: Crosscheck interacting low doublet and native excited-start inclusion
+        run: |
+          set -eu
+          work="$RUNNER_TEMP/ed2-noncommuting-xy"
+          src=$(cat "$work/source-path")
+          python3 "$src/tests/mixed_spin_noncommuting_xy.py" \
+            --exe "$work/build/source/QS3ED2" \
+            --omp "${{ matrix.threads }}" \
+            --output "$work/results-omp${{ matrix.threads }}"
+          python3 - "$work/results-omp${{ matrix.threads }}/report.json" <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1],encoding="utf-8"))
+          print("XY INTERACTING SCIENCE:",d["completed"],"of",d["expected"],
+                "accepted",d["accepted"],
+                "nonconverged",d["nonconverged"],
+                "individually unresolved",d["individually_unresolved"],
+                "excited witness",d["excited_initial_witness"] is not None,
+                "contract violations",len(d["contract_violations"]))
+          if d["completed"]!=54 or d["expected"]!=54 or d["contract_violations"]:
+              raise SystemExit("Noncommuting avoided crossing verification failed")
+          v=d["excited_initial_witness"]
+          if not v or not v["first_excited_witness"] or v["direct_residual"]>1e-12:
+              raise SystemExit("Interacting excited-state-start witness missing")
+          if any(not (x["edge_entanglement_linear_entropy"]>1e-4)
+                 for x in d["independent_models"]
+                 if x["epsilon"]==.02 and x["delta"]==0):
+              raise SystemExit("Noncommuting edge coupling did not entangle central ground state")
+          strong=[x for x in d["trials"] if x["epsilon"]==.02]
+          if len(strong)!=30 or any(x["status"]!=0 or
+                   x["classification"]!="accepted_correct_individual_ground"
+                   for x in strong):
+              raise SystemExit("Well-separated noncommuting ED2 ground-state validation failed")
+          PY
+      - name: Preserve every trial, including native eigenvectors and acceptance diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: noncommuting-xy-omp${{ matrix.threads }}
+          path: ${{ runner.temp }}/ed2-noncommuting-xy/results-omp${{ matrix.threads }}/
+          if-no-files-found: warn
+          retention-days: 14
