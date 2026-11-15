@@ -248,3 +248,6 @@ EXTRA_DIST += plot_cpc_weak_edge_scaling.py
 
 # Standalone CPiP portable no-NumPy mixed-spin DM/HF example.
 EXTRA_DIST += cpc_portable_dm_quickstart.py
+
+# NumPy-free postprocessor for complete pinned-node cache-policy benchmarks.
+EXTRA_DIST += cpc_controlled_node_analyze.py
