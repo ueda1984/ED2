@@ -245,7 +245,6 @@ with `tests/cpc_ultranarrow_dense_lapack_crosscheck.py`
 and the ED2/core reference with
 `tests/cpc_interacting_ultranarrow_probe.py`
 and `tests/cpc_ultranarrow_second_order_reference.py`.
-The [frozen-data audit and two SVG/PNG
-comparison figures](../../tests/plot_cpc_ultranarrow_reference_comparison.py)
+The [frozen-data audit and two SVG/PNG comparison figure code](https://github.com/ueda1984/ED2/blob/codex/ed2-cpc-stationary-dm-scaling/tests/plot_cpc_ultranarrow_reference_comparison.py)
 regenerate the method comparison without
 rerunning the full Hamiltonian tests.
