@@ -53,7 +53,7 @@ def hermitian_expectation(psi,op):
     return float(value.real)
 
 
-def physical_reference(n,delta,epsilon):
+def physical_reference(n,delta,epsilon,edge_y_fraction=0.0):
     """Full dense matrix independently constructed from physical spin operators."""
     spins=[.5,1.]*(n//2)
     bonds,fields=couplings(n,.15)
@@ -61,7 +61,7 @@ def physical_reference(n,delta,epsilon):
         raise AssertionError("Unexpected mixed-spin model connection list")
     # Make the edge weakly interacting, with NO artificial local S1x field.
     # All original active-core XYZ/DM/Gamma bonds are preserved.
-    bonds[0]=(0,1,[epsilon,0.,0.,0.,0.,0.,0.,0.,0.])
+    bonds[0]=(0,1,[epsilon,edge_y_fraction*epsilon,0.,0.,0.,0.,0.,0.,0.])
     fields[0]=[0.,0.,delta]
     ops,dims=product_operators(spins)
     H=dense_hamiltonian(ops,bonds,fields)
@@ -104,10 +104,12 @@ def physical_reference(n,delta,epsilon):
     if epsilon==.02 and delta!=0:
         if impurity<1e-5 or abs(connected_xx)<1e-4:
             raise AssertionError("Weak bond failed to entangle edge with active core")
-    if abs(delta)<1e-20 and abs(magnetizations[0,2])>5e-6:
+    if edge_y_fraction==0 and abs(delta)<1e-20 and abs(magnetizations[0,2])>5e-6:
         raise AssertionError("Zero-bias avoided crossing should have zero edge Sz")
     return dict(
         n_sites=n,spins=spins,bonds=bonds,fields=fields,pairs=pairs,
+        edge_y_fraction=edge_y_fraction,
+        excited_edge_sz=hermitian_expectation(vecs[:,1],ops[0][2]),
         dimension=H.shape[0],ground_e=float(vals[0]),low_e=vals[:3].tolist(),
         ground_gap=ground_gap,outer_gap=outer_gap,
         mag=magnetizations,corr=correlations,
@@ -164,13 +166,13 @@ i_vec_min=1, i_vec_max=2
 """
 
 
-def run_case(exe,root,model,alg,keep,capacity,atol,omp):
+def run_case(exe,root,model,alg,keep,capacity,atol,omp,initial_vector=None,suffix=''):
     n=model["n_sites"]
     epsilon=model["epsilon"]
     delta=model["delta"]
     mark=lambda x: ("zero" if x==0 else f"{x:+.0e}".replace("+","p").replace("-","m"))
     tag=(f"n{n}-epsilon{mark(epsilon)}-delta{mark(delta)}-"
-         f"alg{alg}-k{keep}-m{capacity}-a{mark(atol)}-omp{omp}")
+         f"alg{alg}-k{keep}-m{capacity}-a{mark(atol)}-omp{omp}{suffix}")
     work=root/tag
     work.mkdir(exist_ok=False)
     (work/"bonds.dat").write_text(
@@ -185,10 +187,18 @@ def run_case(exe,root,model,alg,keep,capacity,atol,omp):
         "".join(f"{i+1} {j+1}\n" for i,j in model["pairs"]))
     (work/"input.dat").write_text(input_deck(n,model,alg,keep,capacity))
     noe=1 if alg==1 else 2
+    if initial_vector is not None:
+        candidate=np.asarray(initial_vector,dtype=complex)
+        if candidate.shape!=(model["dimension"],):
+            raise AssertionError("Incorrect explicit starting-vector size")
+        (work/"initial-vector.txt").write_text(
+            "".join(f"{z.real:.17g} {z.imag:.17g}\n" for z in candidate))
     env=dict(os.environ,OMP_NUM_THREADS=str(omp),OMP_DYNAMIC="FALSE",
              OPENBLAS_NUM_THREADS="1",MKL_NUM_THREADS="1",
              ED2_RNG_SEED=str(SEED),ED2_DIAGNOSTICS="diagnostics.txt",
              ED2_RESIDUAL_ATOL=str(atol))
+    if initial_vector is not None:
+        env["ED2_INITIAL_VECTOR"]=str(work/"initial-vector.txt")
     started=time.perf_counter()
     with (work/"input.dat").open("rb") as inp:
         proc=subprocess.run([str(exe)],cwd=work,stdin=inp,env=env,
@@ -277,10 +287,11 @@ def run_case(exe,root,model,alg,keep,capacity,atol,omp):
     # For clearly split models, a residual of 1e-8 must produce an
     # accurate individual ground vector; fail that test separately
     # rather than misclassifying it as a benign near-gap effect.
-    if epsilon==.02 and not ground_correct:
+    if epsilon==.02 and not ground_correct and initial_vector is None:
         raise AssertionError("Accepted state misses well-separated physical ground: "+
                              str((energy_err,mag_err,corr_err)))
     result.update(classification=category,inside_low_cluster=inside_low_cluster,
+                  explicit_initial_vector=initial_vector is not None,
                   returned_energies=E.tolist(),direct_residuals=[
                       float(p["residual"]) for p in pairs],
                   energy_ground_error=energy_err,local_magnetization_error=mag_err,
