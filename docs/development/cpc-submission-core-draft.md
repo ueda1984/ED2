@@ -28,10 +28,12 @@ exchange and site-dependent magnetic fields. We document
 the generalized basis and input conventions, dense and iterative
 Hermitian eigensolvers, local and Cartesian two-spin
 observables, and numerical acceptance diagnostics.
-The preserved XXZ limit is checked directly against the original
-QS³ executable in a six-dimensional fixed-magnetization sector,
-with all six levels agreeing with an independent matrix to
-within \(3\times10^{-15}\).
+In the common XXZ limit, we directly compare the original
+published QS³ executable with ED2 in three exactly
+matching invariant sectors of four- and six-site spin-1/2
+chains, verifying **all 32 eigenvalues** against a
+separately assembled matrix. The maximum cross-code
+difference is \(2.89\times10^{-15}\).
 Independent dense and sparse constructions validate
 fully nonconserving alternating spin-1/2–spin-1 chains
 of up to 12 sites (Hilbert-space dimension 46,656).
@@ -229,9 +231,27 @@ third independently assembled
 product-state Hamiltonian. The largest
 old-to-new absolute difference is
 \(2.89\times10^{-15}\).
-The [fully frozen comparison](cpc-qs3-ed-ed2-shared-xxz-spectrum-ci.csv)
-is a shared-physics limit, not a
-speed benchmark.
+The expanded source-pinned test
+further verifies \(L=6,N_\downarrow=1\) and
+\(L=6,N_\downarrow=3\) at the same physical
+XXZ couplings. Together, the three invariant
+sectors contain **32 independently verified
+eigenvalues**, with maximum original-to-ED2
+difference \(2.89\times10^{-15}\) and maximum
+ED2-to-independent difference
+\(3.44\times10^{-15}\).
+The [32-row frozen spectrum](cpc-qs3-ed-ed2-32level-extended-ci.csv)
+and the [full original/modern source comparison]
+(cpc-qs3-ed-to-ed2-scope-matrix.md)
+document both the original
+near-saturation regime and the
+more populated conserved sector.
+
+This is a direct continuity test for shared
+physics, not a demonstration of new
+solver performance, fully backward-compatible
+input format or the old dynamical
+structure-factor pathway.
 
 Small-system dense Hamiltonians
 and independent sparse product-basis
