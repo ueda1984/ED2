@@ -558,6 +558,70 @@ algorithm. The
 and plotting script `tests/plot_cpc_mnte.py`
 provide independent reproducibility.
 
+### 6.4 Paired memory-time frontier at the same numerical target
+
+The two resource controls can be combined. Rather than
+allocating the generic row width and caching only the first
+half of the representative states, we may cache **all**
+representative states at the proven model-specific
+row capacity. The nominal cache allocation is
+
+\[
+B_{\rm half,generic}=20(10L-7)\mathcal D/2,\qquad
+B_{\rm full,tight}=20(7L/2)\mathcal D,
+\]
+
+for the even open-chain lengths and
+\(\mathcal D=6^{L/2}\). At \(L=12\),
+these cache arrays require 50.279 and
+37.375 MiB, respectively. Thus the
+tight full cache uses **less memory than
+the default half cache** despite storing
+the Hamiltonian actions on every basis state.
+
+A separate same-job comparison with
+one warm-up and two measured repetitions
+per condition now independently validates
+**108/108 cases** across \(L=8,10,12\),
+OMP=1/2, ALG=1/2 and three cache policies.
+The following \(L=12\) numbers are measured
+two-run medians, on GitHub-hosted CI,
+for one lowest eigenpair and the same
+requested residual accuracy.
+
+| OMP | ALG | Policy | H actions | Wall (s) | Peak RSS (KiB) |
+| ---: | ---: | --- | ---: | ---: | ---: |
+| 1 | 1 | half/generic | 140 | 21.804 | 67,970 |
+| 1 | 1 | full/tight | 140 | 1.297 | 54,886 |
+| 1 | 2 | half/generic | 459 | 71.144 | 97,448 |
+| 1 | 2 | full/tight | 442 | 3.652 | 84,238 |
+| 2 | 1 | half/generic | 140 | 14.254 | 67,944 |
+| 2 | 1 | full/tight | 140 | 0.892 | 54,944 |
+| 2 | 2 | half/generic | 425 | 43.845 | 97,472 |
+| 2 | 2 | full/tight | 442 | 3.510 | 84,322 |
+
+For ALG=1 at fixed size the
+Hamiltonian-application count is identical,
+so the observed wall-time difference is not
+explained by more Krylov iterations. For
+ALG=2 the action count differs between
+policies and must be reported. In every
+listed case the model-specific full cache
+uses less measured process RSS and less
+observed wall time than the generic half cache.
+These **shared-hosted-runner** results
+motivate but cannot replace controlled
+CPU-pinned, statistically repeated benchmarks.
+
+The [full resource analysis](cpc-cache-pareto-evaluation.md),
+[108-row trial CSV](cpc-cache-pareto-raw-ci.csv)
+and `tests/plot_cpc_pareto.py` reproduce
+the calculation, raw timings and SVG/PNG
+figure prototypes. This represents a
+**model-dependent configuration result
+within an existing cache implementation**,
+not a new general solver algorithm.
+
 ## 7. Conclusion and limitations
 
 ED2 provides a generalized exact-diagonalization
