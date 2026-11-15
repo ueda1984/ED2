@@ -163,6 +163,48 @@ sparse reference Hamiltonians. Actual nonconvergence
 and invalid solver-output states are recorded separately
 from successful numerical validations.
 
+### 3.1 Near-degenerate spectral subspaces
+
+We further test a deliberately adversarial eight-site Hamiltonian
+formed by detaching the first spin-1/2 from a seven-site,
+non-\(U(1)\), XYZ/Gamma/DM interacting core. The detached spin
+is subjected to a small longitudinal bias \(\delta\). This
+**stress Hamiltonian is not** the connected size-stationary
+DM-response application of Sec. 4. It admits the independently
+checkable tensor structure
+\[
+H_{\rm stress}=I_2\otimes H_{\rm core}
++\delta S^z_{\rm edge}\otimes I_{\rm core}.
+\]
+The first two levels are separated by \(|\delta|\) for
+\(\delta=0,10^{-10},10^{-6}\), while their separation
+from the third level remains approximately 0.339. An
+independent sparse calculation constructs the two-dimensional
+projector \(P_{\mathcal C}\) using the active-core ground
+vector and verifies the tensor factorization. Within a
+doublet, an individual eigenvector may change under an
+arbitrary unitary rotation even if its direct residual
+is tiny; for an observable \(O\) the invariant comparison is
+\[
+\langle O\rangle_{\mathcal C}=\tfrac12
+\operatorname{Tr}(P_{\mathcal C}O).
+\]
+We independently read the two ED2 native Fortran
+wavefunctions and evaluate the local moments and all nine
+Cartesian correlations for all 28 site pairs. All **12/12**
+OMP=1/2 and two-workspace doublet trials passed; the
+largest trace-averaged correlation or magnetization
+error was below \(3.7\times10^{-10}\). At exact degeneracy,
+the first-state edge magnetization ranged, for example,
+from approximately \(-0.025\) to \(-0.400\) between two
+OMP runs of NOK/NOM=2/16, while the two-state mean
+remained zero. This verifies **subspace-invariant
+observables**; it neither makes each state uniquely
+physical nor certifies global ground-state inclusion
+from a small residual. The complete setup and outputs
+are archived in the [eight-site doublet report]
+(cpc-stationary-sparse-doublet.md).
+
 ## 4. Scientific application: staggered DM vector chirality
 
 Consider an open chain with
@@ -621,6 +663,24 @@ figure prototypes. This represents a
 **model-dependent configuration result
 within an existing cache implementation**,
 not a new general solver algorithm.
+
+### 6.5 Dedicated-node measurement protocol
+
+We implemented a CPU-affinity pinned benchmark wrapper
+([protocol](cpc-controlled-node-protocol.md)) that runs the
+independently validated paired-cache cases while recording
+source-archive and binary SHA256 hashes, input-file digests,
+CPU topology, compiler and linked-library information,
+OpenMP/BLAS thread controls and all trial-level output.
+The launcher requires explicit operator attestation before
+a run is labelled as taking place in an exclusive
+allocation; a shared-runner smoke run is labelled
+exploratory. This **reproducibility protocol is not itself
+evidence of a completed dedicated-node benchmark**.
+No isolated-node timing or strong-scaling efficiency
+is claimed until the requested physical workloads have
+been repeated under verified exclusive CPU allocation
+with statistical uncertainty assessment.
 
 ## 7. Conclusion and limitations
 
