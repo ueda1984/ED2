@@ -230,3 +230,6 @@ EXTRA_DIST += plot_cpc_interacting_ultranarrow.py
 
 # Independent second-order core-resolvent reference for ultra-small interacting gaps.
 EXTRA_DIST += cpc_ultranarrow_second_order_reference.py
+
+# Independent dense LAPACK EVR/EVX/EVD validation of near-degenerate individual states.
+EXTRA_DIST += cpc_ultranarrow_dense_lapack_crosscheck.py
