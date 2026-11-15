@@ -182,9 +182,8 @@ energy mismatch was below \(1.4\times10^{-13}\);
 the largest staggered-chirality-sum difference was
 below \(1.5\times10^{-9}\) and the \(D=0\) energy
 derivative/chirality discrepancy was below
-\(5.6\times10^{-11}\) in the 4/6-site **independent
-small-system reference** and below about
-\(3\times10^{-10}\) at 8--12 sites.
+\(2.5\times10^{-10}\) across **all five independently
+referenced sizes**.
 The exact case-by-case errors and compiler provenance
 are retained in the linked workflow artifacts.
 
