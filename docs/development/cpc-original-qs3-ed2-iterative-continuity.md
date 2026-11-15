@@ -119,30 +119,122 @@ QS³**, not proof of a speedup.
   [the dedicated-node protocol]
   (cpc-controlled-node-protocol.md).
 
-## 4. Translation sectors under review
+## 4. Direct translation-sector continuity: all six momenta
 
-The original QS³ also exploits
-crystal momentum. A separate
-[pinned-source translation test](https://github.com/ueda1984/ED2/blob/codex/ed2-cpc-stationary-dm-scaling/tests/cpc_qs3_ed_translation_sector.py)
-constructs every one-site
-translation sector of an
-\(L=6\), \(N_\downarrow=2\)
-periodic XXZ ring with \(k=0,\ldots,5\)
-and independently constructs
-the projector
+**Verified [CI #43769238290](https://github.com/ueda1984/ED2/actions/runs/43769238290).**
+The test builds the actual original
+`QS-Cube/ED/source/QS3`
+and the modern `source/QS3ED2`
+from the clean source distribution.
+For a periodic six-site spin-1/2
+XXZ chain with \(N_\downarrow=2\),
+\(J_{xy}=0.8\), \(J_z=1.1\),
+both codes use ALG=3 (dense LAPACK)
+and their own native translation-sector
+basis constructions, with input wavevectors
+\(k=2\pi m/6,\ m=0,\ldots,5\).
+
+A third, independent product-state
+constructor builds the complete
+15-dimensional sector \(H\), the
+unitary one-site translation matrix
+\(T\), and the projectors
 
 \[
-P_k = \frac{1}{6}\sum_{r=0}^{5}
-e^{-2\pi i k r/6}T^r .
+P_m=\frac{1}{6}\sum_{r=0}^{5}
+e^{-2\pi i m r/6}T^r.
 \]
 
-This is designed to verify
-all 15 basis energies after
-momentum resolution. **Do not
-quote a numerical success
-until its own CI has passed.**
-The predecessor's dynamical
-spin-structure-factor path
-is not included in this
-static spectral equivalence
-check.
+It explicitly checks
+\(P_m^\dagger=P_m\),
+\(P_m^2=P_m\),
+\([H,T]=0\), and
+the reconstruction of all
+15 full-sector energy levels
+from the projected subspaces.
+The original and ED2 code path
+eigenenergies are independently
+compared against the projection
+reference. Thus this is a
+**three-way spectral test**,
+not just a comparison of
+ED2 output to a static
+previously frozen table.
+
+| Momentum \(m\) | Exact sector dimension | Maximum original QS³–ED2 absolute energy difference |
+| ---: | ---: | ---: |
+| 0 | 3 | 3.11e-15 |
+| 1 | 2 | 4.44e-16 |
+| 2 | 3 | 2.00e-15 |
+| 3 | 2 | 0 |
+| 4 | 3 | 2.00e-15 |
+| 5 | 2 | 4.44e-16 |
+
+**6/6 momentum sectors and 15/15
+individual levels passed**. The
+highest old-vs-independent
+difference is \(1.78\times10^{-15}\);
+the highest ED2-vs-independent
+difference is likewise
+\(1.78\times10^{-15}\).
+The max original-vs-ED2
+difference is \(3.11\times10^{-15}\).
+
+Full per-level energy and source
+provenance are frozen in the
+[15-level momentum CSV](cpc-qs3-ed-ed2-momentum-15level-ci.csv);
+all solver input/output files
+are also in the
+[archived CI artifact](https://github.com/ueda1984/ED2/actions/runs/43769238290).
+The regeneration source is
+[`tests/cpc_qs3_ed_translation_sector.py`](https://github.com/ueda1984/ED2/blob/codex/ed2-cpc-stationary-dm-scaling/tests/cpc_qs3_ed_translation_sector.py).
+
+**Limitations:** the chosen XXZ
+Hamiltonian has real matrix elements,
+so the \(m\) and \(6-m\)
+sectors are isospectral.
+Energy comparisons alone cannot
+uniquely certify the overall
+sign convention of momentum
+eigenvectors or complex
+transition observables.
+These must be checked by
+separate wavefunction/correlation
+tests, and the earlier
+QS³ dynamical structure-factor
+path is *not* being
+reproduced here.
+
+## 5. Re-run variability and honest performance interpretation
+
+The original code uses a
+randomized Lanczos start.
+On an independent repeat
+[CI #43769238290](https://github.com/ueda1984/ED2/actions/runs/43769238290),
+the three ALG=1 sector tests
+again **passed 3/3**, but the
+\(L=24\) old-to-ED2 energy
+difference changed from
+\(1.20\times10^{-14}\)
+to \(1.85\times10^{-13}\)
+and the old/new iteration counts
+from 60/60 to 55/60.
+Both outputs agree well
+with the independent
+ground energy; neither
+run is silently discarded.
+
+This observed variability
+reinforces that the **same
+physical objective** was tested
+but the **same starting vector
+was not**. The test
+therefore does not support a
+scientific speedup statement.
+Controlled-node benchmarks
+using source-pinned binary,
+matched eigenpair targets,
+recorded starting state,
+hardware exclusivity and
+resource statistics remain
+a separate publication task.
