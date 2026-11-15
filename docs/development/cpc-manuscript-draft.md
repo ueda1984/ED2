@@ -327,15 +327,49 @@ was \(2.255\times10^{-9}\).
 Tightening the direct residual request
 did **not** systematically decrease
 the independent-reference
-individual-observable discrepancy.
-At this ultra-small inner gap,
-the independently computed ground
-reference eigenvector may itself be
-sensitive to finite numerical precision,
-so the preceding differences cannot
-be assigned solely to ED2. The
-underlying ultraweak edge bond is
-nonzero, but the measured edge
+individual-observable disagreement.
+Consequently, we separately audited
+the **reference eigensolver**.
+At zero bias, the original sparse
+`eigsh` reference yielded
+\(\langle S_1^z\rangle
+=9.1074011\times10^{-7}\), whereas
+dense LAPACK `ZHEEVR` and `ZHEEVD`
+gave \(7.3714597\times10^{-7}\)
+and \(7.2836928\times10^{-7}\),
+respectively. The second-order
+core-resolvent reference (below)
+gave \(7.3738945\times10^{-7}\);
+the eight ED2 solver configurations
+returned values between approximately
+\(7.354\times10^{-7}\) and
+\(7.463\times10^{-7}\). Thus the
+previous \(\sim10^{-7}\)-scale
+ED2/`eigsh` discrepancy is **not
+a certified ED2 error**.
+
+Across all 24 ED2 cases, the
+largest ED2/second-order
+edge-magnetization difference was
+\(9.95\times10^{-9}\), whereas
+the largest ED2/original sparse
+reference difference was
+\(1.75\times10^{-7}\).
+All nine multi-driver dense LAPACK
+comparisons passed their direct
+residual and two-state trace checks.
+This strongly suggests conditioning
+of the original iterative
+reference eigenvectors as the main
+source of the apparent discrepancy.
+Even the dense LAPACK drivers differ
+at the \(10^{-8}\) scale for
+individual observables, so we
+do not claim arbitrary-precision
+certification.
+
+The underlying ultraweak edge bond
+is nonzero, but the measured edge
 linear entropy is of order \(10^{-13}\)
 or smaller and cannot be used as
 quantitative entanglement evidence
@@ -374,6 +408,41 @@ not a \(10^{-13}\)-accurate individual
 ground-state magnetization. The
 [source-identified effective-gap table](cpc-interacting-effective-gap-raw-ci.csv)
 documents this independent calculation.
+
+To further check the weak-edge problem,
+we constructed a second-order
+low-energy Hamiltonian using
+\(R=Q(H_{\rm core}-e_g)^{-1}Q\)
+in the orthogonal complement of the
+seven-site core ground state.
+The two virtual transitions give
+\(\Sigma_{\uparrow,\downarrow}
+=-\varepsilon^2\langle
+w_{\pm}|R|w_{\pm}\rangle/4\),
+where
+\(w_{\pm}=Q(S_2^x\pm0.6iS_2^y)|g\rangle\).
+The resulting \(2\times2\) Hamiltonian
+and its dressed low eigenvector yield
+the edge moment reported above.
+For \(\delta=0\), the second-order
+energy gap
+\(1.072694270570897\times10^{-7}\)
+agrees with dense `ZHEEVR` at
+\(1.072694271186947\times10^{-7}\);
+their difference in this double-precision
+experiment is about \(6.2\times10^{-17}\).
+Agreement in the energy splitting
+does not automatically guarantee
+individual-state accuracy to the
+same number of digits.
+
+This reference-method diagnosis,
+including nine frozen dense-LAPACK
+results and 24 ED2/second-order
+observations, is fully documented
+in the
+[precision diagnosis](cpc-ultranarrow-reference-diagnosis.md)
+and its [crossreference figure code](https://github.com/ueda1984/ED2/blob/codex/ed2-cpc-stationary-dm-scaling/tests/plot_cpc_ultranarrow_reference_comparison.py).
 
 These [24 frozen CI results](cpc-interacting-ultranarrow-raw-ci.csv)
 are therefore presented as
