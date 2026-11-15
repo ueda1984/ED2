@@ -7,6 +7,8 @@ on:
     paths:
       - ".github/workflows/cpc-interacting-8site-sparse-doublet.yml"
       - "tests/cpc_stationary_interacting_sparse_doublet.py"
+      - "tests/plot_cpc_interacting_sparse_doublet.py"
+      - "docs/development/cpc-interacting-8site-raw-ci.csv"
       - "tests/mixed_spin_interacting_avoided_crossing.py"
       - "tests/mixed_spin_doublet_trace.py"
       - "tests/mixed_spin_dm_chirality_scan.py"
@@ -90,3 +92,34 @@ jobs:
           path: ${{ runner.temp }}/cpc-interacting-omp${{ matrix.omp }}/
           retention-days: 21
           if-no-files-found: warn
+
+  frozen-plot:
+    name: Check 20 accepted sparse doublets and produce SVG/PNG
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install headless matplotlib
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends python3-numpy python3-matplotlib
+      - name: Enforce complete CI provenance, gap and trace bounds
+        run: |
+          set -eu
+          python3 tests/plot_cpc_interacting_sparse_doublet.py --validate-only
+      - name: Draw accepted interacting low-doublet data
+        run: |
+          set -eu
+          python3 tests/plot_cpc_interacting_sparse_doublet.py \
+            --outdir "$RUNNER_TEMP/cpc-interacting-figures"
+          test "$(find "$RUNNER_TEMP/cpc-interacting-figures" -maxdepth 1 -name '*.svg' | wc -l)" -eq 3
+          test "$(find "$RUNNER_TEMP/cpc-interacting-figures" -maxdepth 1 -name '*.png' | wc -l)" -eq 3
+          test -s "$RUNNER_TEMP/cpc-interacting-figures/interacting-sparse-summary.csv"
+          sha256sum "$RUNNER_TEMP/cpc-interacting-figures"/*.svg
+      - name: Retain all plot prototypes and data-derived summary
+        uses: actions/upload-artifact@v4
+        with:
+          name: cpc-interacting-8site-figures
+          path: ${{ runner.temp }}/cpc-interacting-figures/
+          retention-days: 21
+          if-no-files-found: error
