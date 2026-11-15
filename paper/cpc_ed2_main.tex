@@ -4,6 +4,7 @@
 \documentclass[preprint,12pt,nopreprintline]{elsarticle}
 \usepackage{amsmath,amssymb,bm,booktabs,hyperref}
 \usepackage{pgfplots}
+\usetikzlibrary{positioning}
 \pgfplotsset{compat=1.17}
 \hypersetup{colorlinks=true,linkcolor=black,citecolor=blue,urlcolor=blue}
 \emergencystretch=2em
@@ -98,12 +99,15 @@ The original program's numerical solvers and OpenMP methodology
 are not claimed as new algorithms, nor is ED2 presented as a strict
 feature superset of the original dynamical-response code.
 
-Other general ED tools such as QuSpin~\cite{weinberg2017} exist.
-The contribution is therefore the documented \emph{program-specific}
-combination of generalized mixed-spin operators, compact Fortran
-execution, flexible Hilbert-space representations, independently
-verified physical observables and reproducible numerical contracts,
-rather than exclusivity of XYZ/DM models.
+The broader computational ecosystem includes ALPS~\cite{bauer2011},
+QuSpin~\cite{weinberg2017} and the H$\Phi$ quantum-lattice solver,
+including its later updates~\cite{kawamura2017,ido2024}.
+These tools have different numerical designs and supported workflows;
+we make no assertion that mixed spins or DM couplings are exclusive
+to ED2. The contribution here is instead the documented
+\emph{program-specific} extension of the CPC-published QS$^3$
+software, its compact Fortran model input and its independently
+verified numerical and physical observable contracts.
 
 
 Table~\ref{tab:program-scope} summarizes scientific scope relative
@@ -184,6 +188,45 @@ generally defines a projected Hamiltonian $PHP$, not an
 exact representation of the original ground-state problem.
 Similarly, user-provided site permutations represent physical
 symmetry sectors only when they commute with the full Hamiltonian.
+
+
+\subsection{Program organization}
+Figure~\ref{fig:workflow} summarizes the main operations.
+Spin and bond input records define the local operator basis
+and optionally a symmetry-compatible representation.
+The Hamiltonian action is supplied either on demand or
+through a configurable transition cache, and the selected
+eigensolver passes its states to the observable and numerical
+diagnostic stages. The modular depiction describes data flow,
+not a distinct newly proposed diagonalization algorithm.
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[
+box/.style={draw,rounded corners=2pt,align=center,
+            text width=0.78\linewidth,minimum height=0.72cm,
+            inner sep=4pt,font=\small},
+node distance=0.27cm
+]
+\node[box] (inputs) {Spin/site, oriented-bond and field records;
+requested observables};
+\node[box,below=of inputs] (basis) {Bounded-occupation Hilbert basis
+and optional compatible spatial symmetry};
+\node[box,below=of basis] (action) {Hermitian Hamiltonian action:
+on-demand transitions or optional cache};
+\node[box,below=of action] (solver) {Dense LAPACK (ALG=3),
+Lanczos (ALG=1) or restarted iteration (ALG=2)};
+\node[box,below=of solver] (outputs) {Energies/eigenvectors,
+Cartesian static observables and residual diagnostics};
+\draw[->] (inputs)--(basis);
+\draw[->] (basis)--(action);
+\draw[->] (action)--(solver);
+\draw[->] (solver)--(outputs);
+\end{tikzpicture}
+\caption{Program-level data flow. Neither the eigensolver
+families nor OpenMP execution are introduced as new algorithms.}
+\label{fig:workflow}
+\end{figure}
 
 \section{Numerical implementation and validation}
 ED2 supports dense Hermitian LAPACK diagonalization (ALG=3),
@@ -299,6 +342,36 @@ Published XYZ--DM conventions & 12 runs & $<3\times10^{-14}$ in spectrum \\
 \bottomrule
 \end{tabular}
 \end{table}
+
+
+\subsection{Low-energy subspace observables near degeneracy}
+When low eigenvalues approach one another, a small
+individual Ritz residual is not enough to establish
+stable state-specific magnetizations. For a separated
+two-state low-energy manifold, we additionally compare
+the subspace-averaged observable
+\begin{equation}
+\overline A_{\rm low}=\frac12\operatorname{Tr}(P_{\rm low}A),
+\qquad
+P_{\rm low}=\sum_{n=0}^1 |\psi_n\rangle\langle\psi_n|.
+\label{eq:projector}
+\end{equation}
+This is invariant under a unitary rotation of the
+two basis vectors spanning the same projector.
+An interacting eight-site sparse doublet test
+compared native ED2 wavefunctions with an independently
+constructed reference projector: 20/20 runs passed,
+with the largest reported trace-observable difference
+below $3.75\times10^{-10}$.
+A separate numerical stress test with first gaps
+of order $10^{-7}$ accepted 24/24 runs; the low-doublet
+correlation traces differed by at most about
+$2.26\times10^{-9}$ from the sparse reference.
+Dense-LAPACK and perturbative-reference crosschecks
+also show why a near-degenerate reference eigenvector
+cannot automatically be regarded as exact.
+These are numerical robustness tests, not claims
+of arbitrary-precision state certification.
 
 \section{Scientific example: staggered vector chirality}
 Consider an open, alternating spin-$1/2$/spin-$1$ chain
@@ -697,5 +770,28 @@ J. Phys.: Condens. Matter \textbf{34}, 175802 (2022).
 P. Weinberg and M. Bukov,
 QuSpin: a Python package for dynamics and exact diagonalisation of quantum many body systems,
 SciPost Phys. \textbf{2}, 003 (2017).
+
+\bibitem{bauer2011}
+B. Bauer \emph{et al.},
+The ALPS project release 2.0: open source software for
+strongly correlated systems,
+J. Stat. Mech. (2011) P05001.
+\href{https://doi.org/10.1088/1742-5468/2011/05/P05001}
+{doi:10.1088/1742-5468/2011/05/P05001}.
+\bibitem{kawamura2017}
+M. Kawamura, K. Yoshimi, T. Misawa, Y. Yamaji,
+S. Todo and N. Kawashima,
+Quantum lattice model solver H$\Phi$,
+Comput. Phys. Commun. \textbf{217}, 180--192 (2017).
+\href{https://doi.org/10.1016/j.cpc.2017.04.006}
+{doi:10.1016/j.cpc.2017.04.006}.
+\bibitem{ido2024}
+K. Ido, M. Kawamura, Y. Motoyama, K. Yoshimi,
+Y. Yamaji, S. Todo, N. Kawashima and T. Misawa,
+Update of H$\Phi$: Newly added functions and methods
+in versions 2 and 3,
+Comput. Phys. Commun. \textbf{298}, 109093 (2024).
+\href{https://doi.org/10.1016/j.cpc.2024.109093}
+{doi:10.1016/j.cpc.2024.109093}.
 \end{thebibliography}
 \end{document}
