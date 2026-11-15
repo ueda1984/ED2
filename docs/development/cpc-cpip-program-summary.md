@@ -152,9 +152,20 @@ A separate [ultra-small-gap interacting test](cpc-interacting-ultranarrow.md)
 classified 24/24 accepted trials with first gaps near
 1e-7. It found doublet-averaged correlations stable
 within approximately 2.26e-9 of the independent sparse
-reference. Individual edge-moment discrepancies of up
-to 1.90e-7 require further assessment of the reference
-eigenvector precision; they are not attributed only to ED2. The model is explicitly a numerical stress
+reference. A subsequent [three-driver dense LAPACK and
+second-order effective reference audit](cpc-ultranarrow-reference-diagnosis.md)
+resolved the interpretation of the originally observed
+individual edge-moment differences. At zero bias,
+the old sparse eigsh ground reference gave edge
+Sz approximately 9.11e-7, whereas dense ZHEEVR,
+second-order reduction and ED2 agreed around
+7.37e-7. Across all 24 ED2 cases, the ED2/second-order
+difference was at most 9.95e-9. These calculations
+strongly indicate the prior 1e-7-scale disagreement
+was dominated by the sparse iterative *reference*
+eigenvector, not a demonstrated ED2 defect.
+This is a conditional numerical cross-check, not an
+arbitrary-precision eigenvector certification. The model is explicitly a numerical stress
 probe and is not substituted for the connected DM-response
 scientific application.
 The [CPU-pinned measurement protocol](cpc-controlled-node-protocol.md)
