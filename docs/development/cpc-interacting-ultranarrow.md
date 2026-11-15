@@ -129,6 +129,69 @@ effective-doublet construction.
 We do **not** attribute this apparent
 error floor entirely to ED2.
 
+## An independently projected effective two-level cross-check
+
+To avoid relying only on a potentially ill-conditioned
+full eight-site eigenvector, the active **seven-site**
+non-\(U(1)\) core is diagonalized independently with
+SciPy. For its lowest vector \(|g_{\rm core}\rangle\),
+define
+
+\[
+m_x=\langle g_{\rm core}|S_2^x|g_{\rm core}\rangle,
+\qquad
+m_y=\langle g_{\rm core}|S_2^y|g_{\rm core}\rangle .
+\]
+
+Projecting the weak edge coupling onto the two
+free-edge-spin orientations gives, to first
+order in \(\varepsilon\),
+
+\[
+H_{\rm eff}=e_{\rm core}I_2+
+\frac12\left(
+\delta\sigma_z+
+\varepsilon m_x\sigma_x+
+0.6\varepsilon m_y\sigma_y
+\right),
+\]
+
+and hence the first-order avoided gap
+
+\[
+\boxed{\Delta_{\rm eff}=
+\sqrt{\delta^2+\varepsilon^2(m_x^2+0.36m_y^2)}.}
+\]
+
+The neglected virtual core excitations introduce
+corrections of order \(\varepsilon^2/\Delta_{\rm core}\)
+to this effective description. It is **not**
+an exact identity for the interacting full
+Hamiltonian. Nonetheless, at
+\(\varepsilon=5\times10^{-7}\)
+the agreement is extremely close:
+
+| Edge bias \(\delta\) | Full independent sparse gap | First-order gap prediction | Absolute difference |
+| ---: | ---: | ---: | ---: |
+| -1e-7 | 1.4665184711e-7 | 1.4665173024e-7 | 1.17e-13 |
+| 0 | 1.0726940403e-7 | 1.0726942706e-7 | 2.30e-14 |
+| +1e-7 | 1.4665161974e-7 | 1.4665173024e-7 | 1.10e-13 |
+
+The independent core-to-effective reduction was
+checked by both OpenMP CI profiles in
+[workflow #43706671626](https://github.com/ueda1984/ED2/actions/runs/43706671626)
+with all three jobs successful. A separate
+[6-row frozen provenance CSV](cpc-interacting-effective-gap-raw-ci.csv)
+retains the source SHA, job IDs, independent
+sparse gaps and effective predictions.
+
+This strengthens the interpretation of the
+*energy splitting*, but does not by itself
+provide a \(10^{-13}\)-accurate state-specific
+magnetization reference. Eigenvector
+orientation in a nearly degenerate doublet
+requires separately controlled precision.
+
 ## Krylov work and numerical safety
 
 With NOK/NOM=2/16 in these cases,
