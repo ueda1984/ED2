@@ -227,3 +227,6 @@ EXTRA_DIST += cpc_interacting_ultranarrow_probe.py
 
 # Frozen ultra-narrow interacting-doublet numerical precision figures.
 EXTRA_DIST += plot_cpc_interacting_ultranarrow.py
+
+# Independent second-order core-resolvent reference for ultra-small interacting gaps.
+EXTRA_DIST += cpc_ultranarrow_second_order_reference.py
