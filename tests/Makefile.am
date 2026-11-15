@@ -212,3 +212,6 @@ EXTRA_DIST += cpc_stationary_low_doublet_trace.py
 
 # Optional pinned-node benchmark orchestrator (shared-runner smoke or operator-attested exclusive run).
 EXTRA_DIST += cpc_controlled_node_benchmark.py
+
+# Optional frozen eight-site doublet evidence audit and SVG/PNG plots.
+EXTRA_DIST += plot_cpc_sparse_doublet.py
