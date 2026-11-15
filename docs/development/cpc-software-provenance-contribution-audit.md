@@ -36,14 +36,15 @@ to ED2 after it had appeared on GitHub.
 The [old-to-new source and feature matrix]
 (cpc-qs3-ed-to-ed2-scope-matrix.md)
 directly checks the two repositories.
-A [six-level same-physics test]
-(cpc-qs3-ed-ed2-shared-xxz-spectrum-ci.csv)
-also builds the original and modern
-executables and compares the identical
-fixed-magnetization XXZ sector with
-an independent 6x6 Hamiltonian:
-the largest cross-program difference
-is \(2.89\times10^{-15}\).
+A [32-level same-physics suite](cpc-qs3-ed-ed2-32level-extended-ci.csv)
+builds and runs the historical QS³ and
+modern ED2 executables in three
+matched invariant XXZ sectors, including
+the near-saturation (N_\downarrow=1)
+case, each independently diagonalized
+by a third product-state reference.
+The largest cross-program difference
+is (2.89\times10^{-15}).
 This makes the progression from
 published QS³ to generalized ED2 a
 **checked mathematical and source-level
