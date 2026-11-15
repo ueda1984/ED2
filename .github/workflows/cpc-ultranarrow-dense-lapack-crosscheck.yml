@@ -30,12 +30,12 @@ jobs:
       - name: Install independent numerical reference dependencies
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends python3-numpy python3-scipy autoconf automake
+          sudo apt-get install -y --no-install-recommends python3-numpy python3-scipy gfortran-13 libopenblas-dev liblapack-dev autoconf automake make
       - name: Check source archive contains exact test version
         run: |
           set -eu
           autoreconf -vfi
-          ./configure
+          ./configure FC=gfortran-13 FCFLAGS="-O2 -fopenmp"
           make dist
           root="$RUNNER_TEMP/cpc-lapack-check"
           mkdir -p "$root/source"
