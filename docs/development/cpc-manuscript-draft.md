@@ -202,8 +202,7 @@ remained zero. This verifies **subspace-invariant
 observables**; it neither makes each state uniquely
 physical nor certifies global ground-state inclusion
 from a small residual. The complete setup and outputs
-are archived in the [eight-site doublet report]
-(cpc-stationary-sparse-doublet.md).
+are archived in the [eight-site doublet report](cpc-stationary-sparse-doublet.md).
 
 ## 4. Scientific application: staggered DM vector chirality
 
