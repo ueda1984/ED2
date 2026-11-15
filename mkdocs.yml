@@ -85,6 +85,9 @@ nav:
       - CPC interacting eight-site sparse low doublet: development/cpc-interacting-8site-sparse-doublet.md
       - CPC ultra-narrow interacting low-doublet test: development/cpc-interacting-ultranarrow.md
       - CPC low-doublet sparse-reference precision diagnosis: development/cpc-ultranarrow-reference-diagnosis.md
+      - CPC portable mixed-spin DM reproduction (stdlib only): development/cpc-portable-dm-quickstart.md
+      - CPC provenance and contribution audit: development/cpc-software-provenance-contribution-audit.md
+      - CPC submission-focused manuscript core: development/cpc-submission-core-draft.md
       - CPC exact edge sign symmetry and second-order polarization scaling: development/cpc-weak-edge-polarization-scaling.md
       - CPC dedicated-node performance protocol: development/cpc-controlled-node-protocol.md
       - CPC CPiP program summary and submission scope: development/cpc-cpip-program-summary.md
