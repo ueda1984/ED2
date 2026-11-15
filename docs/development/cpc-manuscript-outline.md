@@ -6,6 +6,23 @@
 > category remain subject to review. This draft is **not** a released
 > program or a peer-reviewed manuscript.
 
+**Publication lineage correction (15 November 2026):**
+This is the *first proposed journal program paper for ED2*.
+ED2 has been publicly available on GitHub but is
+**not** already journal-published. The published
+source-code predecessor is
+[QS-Cube/ED](https://github.com/QS-Cube/ED),
+described in the 2022 CPC QS³ article.
+The distinct [QS-Cube/ED2](https://github.com/QS-Cube/ED2)
+repository is the current generalized code source.
+The principal novelty comparator is the
+**original published QS³/ED program**, not
+merely a patch delta against publicly hosted ED2.
+See the [actual feature/source matrix]
+(cpc-qs3-ed-to-ed2-scope-matrix.md)
+and the [direct six-level XXZ comparison]
+(cpc-qs3-ed-ed2-shared-xxz-spectrum-ci.csv).
+
 ## Scientifically defensible central claim
 
 **Proposed thesis:** ED2 extends the symmetry-adapted, near-saturation
@@ -85,6 +102,9 @@ documented, externally exercised reusable API exists.
   anisotropies, DM/Gamma terms and spatially varying fields remain
   important, alongside the Hilbert-space scaling challenge.
 - Cite the 2022 QS³ paper precisely and state what it already provides.
+- State explicitly that this is the **first journal program description of ED2**, not an already-published ED2 version update; QS-Cube/ED is the original code baseline.
+- Include the original QS³ dynamic-structure-factor capability as a preserved predecessor feature not currently demonstrated by ED2.
+- Document the fully independent 6-level identical XXZ sector cross-check, including original source commit, ED2 source commit and maximum discrepancy 2.89e-15.
 - Explain **where ED2 adds scientifically usable model coverage**,
   not just improved build/CI infrastructure.
 - Explain the intended users and boundary between exact full-space
