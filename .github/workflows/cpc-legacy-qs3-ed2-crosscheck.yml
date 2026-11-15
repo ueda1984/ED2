@@ -7,6 +7,7 @@ on:
     paths:
       - ".github/workflows/cpc-legacy-qs3-ed2-crosscheck.yml"
       - "tests/cpc_qs3_ed_shared_xxz_crosscheck.py"
+      - "tests/cpc_qs3_ed_shared_xxz_extended.py"
       - "tests/Makefile.am"
       - "source/**"
       - "configure.ac"
@@ -68,6 +69,7 @@ jobs:
           tar -xzf "$archive" -C "$root/src"
           src=$(find "$root/src" -mindepth 1 -maxdepth 1 -type d -print -quit)
           test -f "$src/tests/cpc_qs3_ed_shared_xxz_crosscheck.py"
+          test -f "$src/tests/cpc_qs3_ed_shared_xxz_extended.py"
           printf '%s\n' "$src" > "$root/source-path"
           cd "$root/build"
           "$src/configure" FC="$FC" FCFLAGS="-O2 -fopenmp"
@@ -91,11 +93,33 @@ jobs:
           assert max(r["maximum_absolute_disagreements"].values())<3e-9
           print("CPC LEGACY -> ED2 COMMON XXZ LIMIT 6/6 INDEPENDENT LEVELS")
           PY
+      - name: Validate historical near-saturation and half-filled six-site sectors
+        run: |
+          set -eu
+          root="$RUNNER_TEMP/cpc-old-vs-new"
+          src=$(cat "$root/source-path")
+          python3 "$src/tests/cpc_qs3_ed_shared_xxz_extended.py" \
+            --old-exe "$GITHUB_WORKSPACE/qs3-ed-original/source_only_u1/QS3_only_u1" \
+            --new-exe "$root/build/source/QS3ED2" \
+            --old-commit a3b09934bba5f966bfb564718528de8778c2b46c \
+            --output "$RUNNER_TEMP/cpc-old-new-extended"
+          python3 - "$RUNNER_TEMP/cpc-old-new-extended/report.json" <<'PY'
+          import json,sys
+          r=json.load(open(sys.argv[1],encoding="utf-8"))
+          assert r["pass_complete"],r["failures"]
+          assert r["accepted_cases"]==r["expected_cases"]==3
+          assert r["verified_levels"]==r["expected_levels"]==32
+          for row in r["records"]:
+              assert max(row["errors"].values())<1e-8
+          print("PUBLISHED QS3 -> ED2 COMMON PHYSICAL SECTORS 32/32 LEVELS VERIFIED")
+          PY
       - name: Archive both input conventions, all solver output and SHA digests
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: cpc-original-qs3-ed-vs-ed2-xxz
-          path: ${{ runner.temp }}/cpc-old-new-xxz/
+          path: |
+            ${{ runner.temp }}/cpc-old-new-xxz/
+            ${{ runner.temp }}/cpc-old-new-extended/
           retention-days: 21
           if-no-files-found: warn
