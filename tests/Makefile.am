@@ -224,3 +224,6 @@ EXTRA_DIST += plot_cpc_interacting_sparse_doublet.py
 
 # Optional near-resolution-limit interacting low-doublet characterization.
 EXTRA_DIST += cpc_interacting_ultranarrow_probe.py
+
+# Frozen ultra-narrow interacting-doublet numerical precision figures.
+EXTRA_DIST += plot_cpc_interacting_ultranarrow.py
