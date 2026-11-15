@@ -185,3 +185,6 @@ EXTRA_DIST += cpc_literature_yi_xyz_dm.py
 
 # Optional matched resource characterization of the size-stationary DM model.
 EXTRA_DIST += cpc_stationary_resource_benchmark.py
+
+# Optional, independently referenced wk_dim cache-policy performance study.
+EXTRA_DIST += cpc_stationary_cache_sweep.py
