@@ -340,6 +340,41 @@ linear entropy is of order \(10^{-13}\)
 or smaller and cannot be used as
 quantitative entanglement evidence
 without additional precision analysis.
+
+As a separate physical validation of the
+tiny splitting, the **seven-site core**
+ground state is computed independently.
+Writing
+\(m_\alpha=\langle g_{\rm core}|
+S_2^\alpha|g_{\rm core}\rangle\),
+first-order projection of the
+weak XY edge interaction gives
+
+\[
+\Delta_{\rm eff}=
+\sqrt{\delta^2+\varepsilon^2
+(m_x^2+0.36m_y^2)}.
+\]
+
+For \(\varepsilon=5\times10^{-7}\),
+the independently constructed
+full eight-site sparse gap differs
+from this projected prediction by
+\(2.30\times10^{-14}\) at zero bias
+and at most \(1.17\times10^{-13}\)
+over the three biases. These differences
+are consistent with virtual-core
+corrections of order
+\(\varepsilon^2/\Delta_{\rm core}\).
+This is a **first-order effective
+Hamiltonian**, not an exact factorization
+of the interacting full problem.
+The agreement concerns the *gap*,
+not a \(10^{-13}\)-accurate individual
+ground-state magnetization. The
+[source-identified effective-gap table](cpc-interacting-effective-gap-raw-ci.csv)
+documents this independent calculation.
+
 These [24 frozen CI results](cpc-interacting-ultranarrow-raw-ci.csv)
 are therefore presented as
 near-resolution-limit **characterization**,
