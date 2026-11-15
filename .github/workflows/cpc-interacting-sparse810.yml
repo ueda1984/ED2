@@ -1,0 +1,94 @@
+name: CPC 8/10-site interacting sparse low-doublet validation
+
+on:
+  push:
+    branches:
+      - codex/ed2-cpc-interacting-sparse-810
+    paths:
+      - ".github/workflows/cpc-interacting-sparse810.yml"
+      - "tests/mixed_spin_*.py"
+      - "tests/Makefile.am"
+      - "source/**"
+      - "configure.ac"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  interacting-sparse:
+    name: "8/10-site XY sparse references (OMP=${{ matrix.threads }})"
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        threads: [1, 2]
+    env:
+      FC: gfortran-13
+      FCFLAGS: "-O2 -fopenmp"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+      OMP_DYNAMIC: "FALSE"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install compiler and independent sparse reference
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends gfortran-13 libopenblas-dev liblapack-dev autoconf automake make python3-numpy python3-scipy
+      - name: Build and extract clean source distribution
+        run: |
+          set -eu
+          autoreconf -vfi
+          ./configure FC="$FC" FCFLAGS="$FCFLAGS"
+          make -j2
+          make dist
+          work="$RUNNER_TEMP/ed2-xy-sparse"
+          mkdir -p "$work/src" "$work/build"
+          tgz=$(find "$GITHUB_WORKSPACE" -maxdepth 1 -name '*.tar.gz' -print -quit)
+          test -n "$tgz"
+          tar -xzf "$tgz" -C "$work/src"
+          src=$(find "$work/src" -mindepth 1 -maxdepth 1 -type d -print -quit)
+          printf '%s\n' "$src" > "$work/source-path"
+          cd "$work/build"
+          "$src/configure" FC="$FC" FCFLAGS="$FCFLAGS"
+          make -j2
+          git -C "$GITHUB_WORKSPACE" rev-parse HEAD
+          python3 -c "import scipy,numpy; print('scipy',scipy.__version__,'numpy',numpy.__version__)"
+      - name: Validate two lowest eigenpairs, magnetization, correlations and traces
+        run: |
+          set -eu
+          work="$RUNNER_TEMP/ed2-xy-sparse"
+          src=$(cat "$work/source-path")
+          python3 "$src/tests/mixed_spin_interacting_sparse810.py" \
+            --exe "$work/build/source/QS3ED2" \
+            --omp "${{ matrix.threads }}" \
+            --output "$work/results-omp${{ matrix.threads }}"
+          python3 - "$work/results-omp${{ matrix.threads }}/report.json" <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1],encoding="utf-8"))
+          print("LARGER INTERACTING:",d["completed"],"of",d["expected"],
+                "accepted",d["accepted"],"nonconverged",d["nonconverged"],
+                "individual unresolved",d["individual_ground_unresolved"],
+                "contract failures",len(d["contract_violations"]))
+          if d["expected"]!=26 or d["completed"]!=26 or d["contract_violations"]:
+              raise SystemExit("Sparse interacting verification incomplete")
+          strong=[x for x in d["cases"] if x["epsilon"]==.02]
+          if len(strong)!=18 or any(x["status"]!=0 or
+                  x["classification"]!="accepted_correct_individual_ground"
+                  for x in strong):
+              raise SystemExit("Clearly split large-system ground states incorrect")
+          if any(x["alg"]==2 and x["status"]==0 and
+                 x.get("cluster_ensemble_mag_error",1.)>=1e-5
+                 for x in d["cases"]):
+              raise SystemExit("Large-system low-doublet trace mismatch")
+          PY
+      - name: Retain raw independent sparse references and ED2 outputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: xy-sparse-810-omp${{ matrix.threads }}
+          path: ${{ runner.temp }}/ed2-xy-sparse/results-omp${{ matrix.threads }}/
+          if-no-files-found: warn
+          retention-days: 14
