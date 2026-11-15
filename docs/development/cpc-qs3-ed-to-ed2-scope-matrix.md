@@ -145,13 +145,26 @@ a legacy compatibility *compiler flag*
 is documented separately from physical
 source changes.
 
-**CI result and maximum absolute error
-must be added only after the workflow
-has completed successfully.**
-The test is meant to demonstrate
-preservation of the shared XXZ limit,
-not the old dynamic-response support
-or a speed/memory improvement.
+**Verified result:** [successful CI #43712076117](https://github.com/ueda1984/ED2/actions/runs/43712076117),
+using the original Git SHA `a3b09934bba5f966bfb564718528de8778c2b46c`
+and tested ED2 SHA `88c72032c26e52e507bc1217ec030479ada486fc`,
+returned **all six levels correctly**.
+
+| Comparison of six eigenvalues | Maximum absolute difference |
+| --- | ---: |
+| Original QS³/ED versus separately assembled exact sector | 3.3306690738754696e-16 |
+| Generalized ED2 versus separately assembled exact sector | 2.6645352591003757e-15 |
+| Original QS³/ED versus ED2 | 2.886579864025407e-15 |
+
+The full [six-row source-identified spectrum CSV](cpc-qs3-ed-ed2-shared-xxz-spectrum-ci.csv)
+and GitHub Actions [archived input decks / complete solver outputs](https://github.com/ueda1984/ED2/actions/runs/43712076117)
+preserve the measured results. This is an actual
+**three-way physical-spectrum agreement**, not a claim
+that all old QS³ inputs are automatically compatible
+with ED2, that old dynamic response has been
+ported, or that ED2 is faster on matched workloads.
+Observed elapsed times for these tiny dense solves
+are explicitly **not** used for performance comparisons.
 
 ## 4. What should be the contribution in the first ED2 paper?
 
