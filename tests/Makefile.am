@@ -167,3 +167,6 @@ EXTRA_DIST += mixed_spin_doublet_trace.py
 
 # Scientific/test-only interacting avoided-crossing verification (NumPy required).
 EXTRA_DIST += mixed_spin_interacting_avoided_crossing.py
+
+# Scientific/test-only anisotropic XY edge bond and excited-start inclusion witness.
+EXTRA_DIST += mixed_spin_noncommuting_xy.py
