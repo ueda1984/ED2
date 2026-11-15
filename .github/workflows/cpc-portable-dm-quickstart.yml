@@ -1,0 +1,88 @@
+name: CPC portable mixed-spin DM application quickstart
+
+on:
+  push:
+    branches:
+      - codex/ed2-cpc-stationary-dm-scaling
+    paths:
+      - ".github/workflows/cpc-portable-dm-quickstart.yml"
+      - "tests/cpc_portable_dm_quickstart.py"
+      - "tests/Makefile.am"
+      - "configure.ac"
+      - "source/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  standard-library-physics-example:
+    name: "Portable DM/HF L=${{ matrix.sites }} OMP=${{ matrix.omp }}"
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        sites: [4, 6]
+        omp: [1, 2]
+    env:
+      FC: gfortran-13
+      FCFLAGS: "-O2 -fopenmp"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+      OMP_DYNAMIC: "FALSE"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install only toolchain and BLAS/LAPACK, not NumPy/SciPy
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends gfortran-13 libopenblas-dev liblapack-dev autoconf automake make python3
+      - name: Build from a fresh source distribution
+        run: |
+          set -eu
+          autoreconf -vfi
+          ./configure FC="$FC" FCFLAGS="$FCFLAGS"
+          make -j2
+          make dist
+          root="$RUNNER_TEMP/ed2-portable"
+          mkdir -p "$root/src" "$root/build"
+          tgz=$(find "$GITHUB_WORKSPACE" -maxdepth 1 -name '*.tar.gz' -print -quit)
+          test -n "$tgz"
+          sha256sum "$tgz"
+          tar -xzf "$tgz" -C "$root/src"
+          src=$(find "$root/src" -mindepth 1 -maxdepth 1 -type d -print -quit)
+          test -f "$src/tests/cpc_portable_dm_quickstart.py"
+          printf '%s\n' "$src" > "$root/source-path"
+          cd "$root/build"
+          "$src/configure" FC="$FC" FCFLAGS="$FCFLAGS"
+          make -j2
+          "$FC" --version | head -n 1
+          git -C "$GITHUB_WORKSPACE" rev-parse HEAD
+      - name: Run three physical Hamiltonians and verify HF and independent archive
+        run: |
+          set -eu
+          root="$RUNNER_TEMP/ed2-portable"
+          src=$(cat "$root/source-path")
+          python3 -S "$src/tests/cpc_portable_dm_quickstart.py" \
+            --exe "$root/build/source/QS3ED2" \
+            --size "${{ matrix.sites }}" --omp "${{ matrix.omp }}" \
+            --output "$RUNNER_TEMP/cpc-portable-l${{ matrix.sites }}-omp${{ matrix.omp }}"
+          python3 -S - "$RUNNER_TEMP/cpc-portable-l${{ matrix.sites }}-omp${{ matrix.omp }}/report.json" <<'PY'
+          import json,sys
+          r=json.load(open(sys.argv[1],encoding="utf-8"))
+          assert r["pass_complete"],r["failures"]
+          assert len(r["rows"])==3
+          assert all(x["status"]==0 for x in r["rows"])
+          assert all(x["max_direct_residual"]<=1e-8 for x in r["rows"])
+          assert r["metrics"]["HF_abs_error"]<3e-5
+          assert r["metrics"]["chi_abs_error"]<3e-3
+          print("PORTABLE DM/HF INDEPENDENT REPRODUCTION",r["size"],r["omp"],"3/3")
+          PY
+      - name: Archive complete end-user input deck and output
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cpc-portable-dm-l${{ matrix.sites }}-omp${{ matrix.omp }}
+          path: ${{ runner.temp }}/cpc-portable-l${{ matrix.sites }}-omp${{ matrix.omp }}/
+          retention-days: 21
+          if-no-files-found: warn
