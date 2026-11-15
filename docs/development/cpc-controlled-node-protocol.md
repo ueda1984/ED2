@@ -179,7 +179,11 @@ the connected stationary DM physical model.
 
 ## C. Shared-runner functional CI
 
-[CI workflow: CPC pinned-node benchmark protocol smoke](https://github.com/ueda1984/ED2/actions/workflows/cpc-controlled-node-protocol.yml)
+[Completed shared-runner protocol smoke #43705348634](https://github.com/ueda1984/ED2/actions/runs/43705348634)
+passed, including both OMP=1 and OMP=2, the
+source SHA, source-archive SHA256, generated-input
+checksum manifest and independent numerical acceptance.
+The [CI workflow](https://github.com/ueda1984/ED2/actions/workflows/cpc-controlled-node-protocol.yml)
 builds a fresh, separately extracted source
 distribution, sets a small allowed CPU
 affinity, and exercises OMP=1/2 on the
