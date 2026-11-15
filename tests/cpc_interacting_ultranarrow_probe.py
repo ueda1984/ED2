@@ -49,10 +49,15 @@ def main():
                          sparse_reference_residuals=model["reference_residuals"],
                          edge_component_commutators=model["edge_component_commutators"],
                          reference_edge_linear_entropy=model["edge_linear_entropy"],
-                         nonu1_commutator_relative=model["commutator_relative"]))
+                         nonu1_commutator_relative=model["commutator_relative"],
+                         effective_low_gap=model["effective_low_gap"],
+                         effective_low_gap_error=model["effective_low_gap_error"],
+                         effective_firstorder_edge_z=model["effective_edge_z_firstorder"]))
         print("ULTRA REFERENCE",eps,delta,
               "gap",model["ground_gap"],"outer",model["outer_gap"],
-              "edge entropy",model["edge_linear_entropy"],flush=True)
+              "edge entropy",model["edge_linear_entropy"],
+              "effective_gap",model["effective_low_gap"],
+              "effective_gap_error",model["effective_low_gap_error"],flush=True)
         for atol in RESIDUALS:
             for keep,capacity in RESTARTS:
                 case=f"n{SPINS}-eps{eps:.1g}-delta{delta:+.1g}-k{keep}-m{capacity}-tol{atol:.0e}-omp{a.omp}"
