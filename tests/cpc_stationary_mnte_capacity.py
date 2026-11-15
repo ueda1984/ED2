@@ -73,6 +73,15 @@ def main():
                    energies=r["energies"],mag=r["lm"],corr=r["corr"])
         initial=initial_vector_text(r["dimension"])
         initial_sha=hashlib.sha256(initial.encode()).hexdigest()
+        # In this specific OBC model each S=1/2 site admits one
+        # transverse single-site flip, each S=1 site admits up to two,
+        # and every mixed-spin NN bond admits up to two joint flips.
+        # Including the single diagonal row entry gives
+        # 1 + (L/2) + 2*(L/2) + 2*(L-1) = 7L/2 - 1.
+        analytical_mnte=7*(n//2)-1
+        if (r["spins"]!=[.5,1.]*(n//2) or len(r["bonds"])!=n-1
+                or any(i+1!=j for i,j,_ in r["bonds"])):
+            raise AssertionError("Analytical MNTE formula requires the OBC alternating-spin chain")
         refs.append(dict(sites=n,dimension=r["dimension"],D=a.D,
                          ground_energy=r["E0"],first_gap=r["gap"],
                          independent_max_residual=max(r["reference_residual"]),
@@ -99,12 +108,16 @@ def main():
                         observed=entry["reported_optimal_mnte"]
                         if observed<=0: raise AssertionError("Zero/negative max transition capacity")
                         if baseline_optimal is None:
+                            if observed!=analytical_mnte:
+                                raise AssertionError("Observed MNTE violates derived exact bound "+
+                                                     str((n,observed,analytical_mnte)))
                             baseline_optimal=observed
                             if baseline_optimal>entry["reported_current_mnte"]:
                                 raise AssertionError("Calibration exceeds default capacity")
                             capacity_calibration.append(dict(n=n,dimension=r["dimension"],
                                                              default_mnte=entry["reported_current_mnte"],
-                                                             optimal_mnte=baseline_optimal))
+                                                             optimal_mnte=baseline_optimal,
+                                                             analytical_mnte=analytical_mnte))
                         elif observed!=baseline_optimal:
                             raise AssertionError("Maximum row count changed for identical Hamiltonian "+
                                                  str((n,baseline_optimal,observed)))
