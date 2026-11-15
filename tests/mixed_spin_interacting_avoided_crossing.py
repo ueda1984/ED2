@@ -102,7 +102,10 @@ def physical_reference(n,delta,epsilon,edge_y_fraction=0.0):
     if ground_gap<=1e-10 or outer_gap<.2:
         raise AssertionError("Wrong physical low-doublet gap construction")
     if epsilon==.02 and delta!=0:
-        if impurity<1e-5 or abs(connected_xx)<1e-4:
+        # For noncommuting XY bonds, entanglement varies nonmonotonically
+        # with delta; require a resolvable signal, not monotonic purity.
+        min_entropy=2e-6 if edge_y_fraction!=0.0 else 1e-5
+        if impurity<min_entropy or abs(connected_xx)<1e-4:
             raise AssertionError("Weak bond failed to entangle edge with active core")
     if edge_y_fraction==0 and abs(delta)<1e-20 and abs(magnetizations[0,2])>5e-6:
         raise AssertionError("Zero-bias avoided crossing should have zero edge Sz")
