@@ -382,6 +382,7 @@ benchmarks remain necessary.
 - [Interacting eight-site XY-edge sparse low-doublet and projector verification (20/20)](cpc-interacting-8site-sparse-doublet.md).
 - [Ultra-narrow interacting doublet classification (24/24), with reference-precision cautions](cpc-interacting-ultranarrow.md).
 - [Independent second-order core resolvent and three dense-LAPACK drivers: diagnosing the 1e-7 sparse-reference edge-spin discrepancy](cpc-ultranarrow-reference-diagnosis.md).
+- [Exact coupling-sign unitary, induced edge polarization coefficient and four new dense plus twelve ED2 cases](cpc-weak-edge-polarization-scaling.md).
 - [Dedicated-node CPU affinity, source checksum and statistical measurement protocol](cpc-controlled-node-protocol.md).
 - [Working CPC manuscript prose draft](cpc-manuscript-draft.md).
 
