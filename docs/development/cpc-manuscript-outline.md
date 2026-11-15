@@ -281,12 +281,12 @@ with a first-excited rather than globally lowest energy.
 A subsequent [8-/10-site interacting sparse study](cpc-interacting-sparse810.md)
 extends the **same** noncommuting XY avoided-crossing model to
 dimensions 1,296 and 7,776, including independent ARPACK
-references for a ground doublet split by approximately (10^{-7}).
+references for a ground doublet split by approximately \(10^{-7}\).
 Across OMP=1/2, **52/52 additional trials passed**.
 Near this tiny gap, the individual ED2/reference observable
-difference can reach (1.4	imes10^{-7}), while the
+difference can reach \(1.4\times10^{-7}\), while the
 independent low-doublet ensemble trace differs by less
-than (6	imes10^{-9}); the reference's own residual-to-gap
+than \(6\times10^{-9}\); the reference's own residual-to-gap
 sensitivity must be discussed explicitly.
 
 These data are appropriate for **scientific verification figures**,
