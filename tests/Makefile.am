@@ -221,3 +221,6 @@ EXTRA_DIST += cpc_stationary_interacting_sparse_doublet.py
 
 # Frozen interacting eight-site low-doublet CI audit and SVG/PNG figure generation.
 EXTRA_DIST += plot_cpc_interacting_sparse_doublet.py
+
+# Optional near-resolution-limit interacting low-doublet characterization.
+EXTRA_DIST += cpc_interacting_ultranarrow_probe.py
