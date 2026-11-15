@@ -1,0 +1,94 @@
+name: CPC pinned-node benchmark protocol smoke
+
+on:
+  push:
+    branches:
+      - codex/ed2-cpc-stationary-dm-scaling
+    paths:
+      - ".github/workflows/cpc-controlled-node-protocol.yml"
+      - "tests/cpc_controlled_node_benchmark.py"
+      - "tests/cpc_stationary_cache_pareto.py"
+      - "tests/mixed_spin_matched_benchmark.py"
+      - "tests/mixed_spin_dm_chirality_scan.py"
+      - "tests/Makefile.am"
+      - "source/**"
+      - "configure.ac"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  protocol-smoke:
+    name: Pinned-affinity functional smoke, explicitly shared runner
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      FC: gfortran-13
+      FCFLAGS: "-O2 -fopenmp"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install clean Fortran build and SciPy reference requirements
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends gfortran-13 libopenblas-dev liblapack-dev autoconf automake make python3-numpy python3-scipy time
+      - name: Build a separate source distribution
+        run: |
+          set -eu
+          autoreconf -vfi
+          ./configure FC="$FC" FCFLAGS="$FCFLAGS"
+          make -j2
+          make dist
+          root="$RUNNER_TEMP/cpc-protocol"
+          mkdir -p "$root/src" "$root/build"
+          tgz=$(find "$GITHUB_WORKSPACE" -maxdepth 1 -name '*.tar.gz' -print -quit)
+          test -n "$tgz"
+          tar -xzf "$tgz" -C "$root/src"
+          src=$(find "$root/src" -mindepth 1 -maxdepth 1 -type d -print -quit)
+          test -f "$src/tests/cpc_controlled_node_benchmark.py"
+          printf '%s\n' "$src" > "$root/source-path"
+          cd "$root/build"
+          "$src/configure" FC="$FC" FCFLAGS="$FCFLAGS"
+          make -j2
+      - name: Run identical pinned-target benchmark with shared-runner warning
+        run: |
+          set -eu
+          root="$RUNNER_TEMP/cpc-protocol"
+          src=$(cat "$root/source-path")
+          cpus=$(python3 - <<'PY'
+          import os
+          allowed=sorted(os.sched_getaffinity(0))
+          if len(allowed)<2: raise SystemExit("At least two allowed CPUs required")
+          print(",".join(map(str,allowed[:2])))
+          PY
+          )
+          python3 "$src/tests/cpc_controlled_node_benchmark.py" \
+            --exe "$root/build/source/QS3ED2" \
+            --output "$RUNNER_TEMP/cpc-benchmark-smoke" \
+            --cpu-list "$cpus" \
+            --threads 1,2 --sizes 8 --algs 1 \
+            --repeats 1 --warmups 0 --allow-shared
+          python3 - "$RUNNER_TEMP/cpc-benchmark-smoke" <<'PY'
+          from pathlib import Path
+          import json,sys
+          root=Path(sys.argv[1])
+          e=json.loads((root/"environment.json").read_text())
+          r=json.loads((root/"summary.json").read_text())
+          assert not e["exclusive_operator_attestation"]
+          assert e["benchmark_mode"]=="shared_or_exclusivity_unverified"
+          assert e["process_affinity"]==e["selected_affinity"]
+          assert len(r["tasks"])==2 and r["pass_complete"]
+          for omp in (1,2):
+              d=json.loads((root/f"paired-omp{omp}"/"report.json").read_text())
+              assert d["pass_complete"],d["violations"]
+              assert d["completed"]==d["expected"]==3
+          print("CONTROLLED-NODE PROTOCOL FUNCTIONAL SMOKE 2/2, SHARED RUNNER ONLY")
+          PY
+      - name: Archive complete machine fingerprint and inputs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cpc-pinned-node-protocol-shared-smoke
+          path: ${{ runner.temp }}/cpc-benchmark-smoke/
+          if-no-files-found: warn
+          retention-days: 21
