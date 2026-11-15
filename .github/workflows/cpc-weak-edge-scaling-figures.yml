@@ -1,0 +1,47 @@
+name: CPC frozen weak-edge scaling and second-order figures
+
+on:
+  push:
+    branches:
+      - codex/ed2-cpc-stationary-dm-scaling
+    paths:
+      - ".github/workflows/cpc-weak-edge-scaling-figures.yml"
+      - "tests/plot_cpc_weak_edge_scaling.py"
+      - "docs/development/cpc-weak-edge-scaling-new-ci.csv"
+      - "docs/development/cpc-second-order-reference-new-ci.csv"
+      - "docs/development/cpc-second-order-ed2-new-ci.csv"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit-and-render:
+    name: Frozen 4+6+12 source-provenance matrix and SVG/PNG reproduction
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install headless plotting
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends python3-numpy python3-matplotlib
+      - name: Strictly audit frozen source and numeric identities
+        run: |
+          set -eu
+          python3 tests/plot_cpc_weak_edge_scaling.py --validate-only
+      - name: Generate independently reproducible scaling figure prototypes
+        run: |
+          set -eu
+          python3 tests/plot_cpc_weak_edge_scaling.py \
+            --outdir "$RUNNER_TEMP/cpc-weak-edge-figures"
+          test "$(find "$RUNNER_TEMP/cpc-weak-edge-figures" -maxdepth 1 -name '*.svg' | wc -l)" -eq 3
+          test "$(find "$RUNNER_TEMP/cpc-weak-edge-figures" -maxdepth 1 -name '*.png' | wc -l)" -eq 3
+          sha256sum "$RUNNER_TEMP/cpc-weak-edge-figures"/*.svg
+      - name: Retain prototype figures
+        uses: actions/upload-artifact@v4
+        with:
+          name: cpc-weak-edge-scaling-source-verified-figures
+          path: ${{ runner.temp }}/cpc-weak-edge-figures/
+          retention-days: 21
+          if-no-files-found: error
