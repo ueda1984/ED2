@@ -37,6 +37,7 @@ SCENARIOS=(
     (.02,-.002),(.02,0.),(.02,+.002),
     (5e-4,0.),(5e-4,2e-5),
 )
+ULTRA_SCENARIOS=((5e-7,-1e-7),(5e-7,0.),(5e-7,+1e-7))
 RESTARTS=((2,16),(4,24))
 ATOL=1e-8
 
@@ -49,7 +50,7 @@ def hermitian_mean(matrix,operator):
 
 
 def reference(n,epsilon,delta):
-    if n!=SPINS or (epsilon,delta) not in SCENARIOS:
+    if n!=SPINS or (epsilon,delta) not in SCENARIOS+ULTRA_SCENARIOS:
         raise ValueError("Only reviewed eight-site interacting stress cases supported")
     spins,bonds,fields=create_model(n,DM,profile="stationary")
     if len(bonds)!=n-1 or bonds[0][:2]!=(0,1):
@@ -78,7 +79,9 @@ def reference(n,epsilon,delta):
         raise AssertionError("Independent eigenvectors not mutually orthogonal")
     gap=float(energies[1]-energies[0])
     outer=float(energies[2]-energies[1])
-    if not 1e-6<gap<.03 or outer<.05 or gap>.1*outer:
+    if not 1e-9<gap<.03 or outer<.05 or gap>.1*outer:
+        raise AssertionError("Incorrect narrow interacting low-doublet structure "+str((gap,outer)))
+    if (epsilon,delta) in SCENARIOS and gap<=1e-6:
         raise AssertionError("Incorrect narrow interacting low-doublet structure "+str((gap,outer)))
     # The edge cannot be factored out. Each of S_edge^{x,y,z}
     # must have a nonzero commutator with the Hamiltonian.
@@ -86,7 +89,7 @@ def reference(n,epsilon,delta):
     for a in range(3):
         comm=H@ops[0][a]-ops[0][a]@H
         edge_comm.append(float(np.linalg.norm(comm.data)/np.linalg.norm(H.data)))
-    if min(edge_comm)<1e-7:
+    if min(edge_comm)<(1e-10 if epsilon<1e-5 else 1e-7):
         raise AssertionError("Accidentally conserved edge-spin component "+str(edge_comm))
     total_z=sum((o[2] for o in ops),
                 start=sparse.csr_matrix(H.shape,dtype=complex))
