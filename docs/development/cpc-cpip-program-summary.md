@@ -125,7 +125,9 @@ At the time of this draft:
   row-capacity trials, 108 paired-cache frontier trials
   and an additional 12 detached-edge sparse-doublet
   projector/observable checks, plus 20 independent
-  interacting eight-site sparse low-doublet trials. **Do not add these counts blindly:**
+  interacting eight-site sparse low-doublet trials,
+  plus 24 ultra-small-gap interacting numerical
+  classification trials. **Do not add these counts blindly:**
   some categories reuse models or runs but test different
   properties and source commits.
 - Archived GNU Fortran 11 and 13 source-package verification
@@ -145,7 +147,14 @@ independently assembles a 1,296-dimensional sparse XYZ/Gamma/DM
 Hamiltonian with a weak XY edge bond and checks both native ED2
 wavefunction outputs and their rank-two observable traces.
 All 20/20 cases passed, with maximum trace-observable error
-below 3.75e-10. The model is explicitly a numerical stress
+below 3.75e-10.
+A separate [ultra-small-gap interacting test](cpc-interacting-ultranarrow.md)
+classified 24/24 accepted trials with first gaps near
+1e-7. It found doublet-averaged correlations stable
+within approximately 2.26e-9 of the independent sparse
+reference. Individual edge-moment discrepancies of up
+to 1.90e-7 require further assessment of the reference
+eigenvector precision; they are not attributed only to ED2. The model is explicitly a numerical stress
 probe and is not substituted for the connected DM-response
 scientific application.
 The [CPU-pinned measurement protocol](cpc-controlled-node-protocol.md)
