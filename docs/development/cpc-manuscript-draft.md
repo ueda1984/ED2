@@ -298,6 +298,55 @@ and [frozen 20-case source data](cpc-interacting-8site-raw-ci.csv)
 document the observed results and
 qualification.
 
+### 3.3 Ultra-narrow interacting gap and reference-precision limits
+
+As an additional numerical stress test, we reduce the
+anisotropic XY edge coupling to
+\(\varepsilon=5\times10^{-7}\) and examine
+\(\delta=-10^{-7},0,+10^{-7}\). The
+independent sparse reference now resolves
+\(E_1-E_0\approx(1.07\text{–}1.47)\times10^{-7}\),
+while the external third-state separation
+stays around 0.339. We compare the two
+ALG=2 restart workspaces 2/16 and 4/24,
+OMP=1/2, and both loose \(10^{-8}\) and
+tight \(10^{-12}\) absolute residual requests.
+
+All **24/24** solver and physics-contract
+trials were accepted, with no observed
+numerical nonconvergence or harness
+violation. The largest disagreement
+between the first-state edge
+magnetization and the independently
+constructed sparse ground reference
+was approximately \(1.90\times10^{-7}\),
+whereas the largest doublet-averaged
+Cartesian correlation disagreement
+was \(2.255\times10^{-9}\).
+
+Tightening the direct residual request
+did **not** systematically decrease
+the independent-reference
+individual-observable discrepancy.
+At this ultra-small inner gap,
+the independently computed ground
+reference eigenvector may itself be
+sensitive to finite numerical precision,
+so the preceding differences cannot
+be assigned solely to ED2. The
+underlying ultraweak edge bond is
+nonzero, but the measured edge
+linear entropy is of order \(10^{-13}\)
+or smaller and cannot be used as
+quantitative entanglement evidence
+without additional precision analysis.
+These [24 frozen CI results](cpc-interacting-ultranarrow-raw-ci.csv)
+are therefore presented as
+near-resolution-limit **characterization**,
+not a general high-precision individual
+ground-state certificate. See the
+[ultra-small-gap technical report](cpc-interacting-ultranarrow.md).
+
 ## 4. Scientific application: staggered DM vector chirality
 
 Consider an open chain with
