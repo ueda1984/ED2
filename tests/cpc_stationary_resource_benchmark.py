@@ -63,9 +63,11 @@ def environment_record():
     )
 
 def stats(values):
-    if not values:
-        return None
+    # Consume generators before checking emptiness; failed or nonconvergent
+    # groups must remain representable in the final JSON report.
     vals=[float(x) for x in values]
+    if not vals:
+        return None
     med=statistics.median(vals)
     return dict(n=len(vals),median=med,min=min(vals),max=max(vals),
                 median_absolute_deviation=statistics.median(abs(x-med) for x in vals))
