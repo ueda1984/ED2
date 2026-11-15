@@ -168,8 +168,8 @@ The [interacting avoided-crossing validation](../development/cpc-interacting-avo
 now confirms this distinction on an anisotropic XY-coupled
 **entangled** mixed-spin model as well: an accurately verified
 first-excited native ED2 vector is accepted by ALG=1 with
-a residual around (10^{-15}), yet its energy remains
-approximately (4.24	imes10^{-3}) above the ground state.
+a residual around \(10^{-15}\), yet its energy remains
+approximately \(4.24\times10^{-3}\) above the ground state.
 Separately, independently validated low-doublet **traces**
 remain accurate even when a particular eigenvector is not a
 reliable indicator of the lowest state.
