@@ -7,6 +7,7 @@ on:
     paths:
       - ".github/workflows/cpc-controlled-node-protocol.yml"
       - "tests/cpc_controlled_node_benchmark.py"
+      - "tests/cpc_controlled_node_analyze.py"
       - "tests/cpc_stationary_cache_pareto.py"
       - "tests/mixed_spin_matched_benchmark.py"
       - "tests/mixed_spin_dm_chirality_scan.py"
@@ -47,6 +48,7 @@ jobs:
           tar -xzf "$tgz" -C "$root/src"
           src=$(find "$root/src" -mindepth 1 -maxdepth 1 -type d -print -quit)
           test -f "$src/tests/cpc_controlled_node_benchmark.py"
+          test -f "$src/tests/cpc_controlled_node_analyze.py"
           printf '%s\n' "$src" > "$root/source-path"
           cd "$root/build"
           "$src/configure" FC="$FC" FCFLAGS="$FCFLAGS"
@@ -91,11 +93,37 @@ jobs:
               assert d["completed"]==d["expected"]==3
           print("CONTROLLED-NODE PROTOCOL FUNCTIONAL SMOKE 2/2, SHARED RUNNER ONLY")
           PY
+      - name: Audit every repeat and source input hash without declaring dedicated performance
+        run: |
+          set -eu
+          root="$RUNNER_TEMP/cpc-protocol"
+          src=$(cat "$root/source-path")
+          python3 -S "$src/tests/cpc_controlled_node_analyze.py" \
+            --root "$RUNNER_TEMP/cpc-benchmark-smoke" \
+            --output "$RUNNER_TEMP/cpc-benchmark-audit"
+          python3 -S - "$RUNNER_TEMP/cpc-benchmark-audit/audit.json" <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1],encoding="utf-8"))
+          assert not d["publication_gate_passed"]
+          assert d["observed_total_records"]==6
+          assert len(d["rows"])==6
+          assert all(r["count"]==1 for r in d["rows"])
+          print("POSTPROCESS VERIFIED, SHARED RUNNER NOT LABELLED PUBLISHABLE")
+          PY
+          if python3 -S "$src/tests/cpc_controlled_node_analyze.py" \
+              --root "$RUNNER_TEMP/cpc-benchmark-smoke" \
+              --output "$RUNNER_TEMP/must-not-publish-audit" \
+              --require-publication; then
+            echo "ERROR: shared runner was incorrectly accepted as publication-grade" >&2
+            exit 1
+          fi
       - name: Archive complete machine fingerprint and inputs
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: cpc-pinned-node-protocol-shared-smoke
-          path: ${{ runner.temp }}/cpc-benchmark-smoke/
+          path: |
+            ${{ runner.temp }}/cpc-benchmark-smoke/
+            ${{ runner.temp }}/cpc-benchmark-audit/
           if-no-files-found: warn
           retention-days: 21
