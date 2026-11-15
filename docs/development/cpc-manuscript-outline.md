@@ -378,6 +378,8 @@ benchmarks remain necessary.
 - [Exact MNTE row-capacity derivation, independent CSR sparsity and resource measurements](cpc-mnte-capacity-evaluation.md).
 - [72-run frozen full-cache MNTE CI measurements](cpc-mnte-capacity-raw-ci.csv).
 - [CPC CPiP positioning and draft program-summary fields](cpc-cpip-program-summary.md).
+- [Eight-site sparse-reference low-doublet native-readback validation (12/12)](cpc-stationary-sparse-doublet.md).
+- [Dedicated-node CPU affinity, source checksum and statistical measurement protocol](cpc-controlled-node-protocol.md).
 - [Working CPC manuscript prose draft](cpc-manuscript-draft.md).
 
 **No manuscript authorship, official source tag, DOI or journal
