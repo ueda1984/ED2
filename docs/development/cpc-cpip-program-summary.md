@@ -122,7 +122,9 @@ At the time of this draft:
   stationary DM/chirality response, 12 literature-Hamiltonian
   cases, 36 initial matched-resource trials, 52 cache-policy
   trials, 36 two-eigenpair restart trials and 72 full-cache
-  row-capacity trials. **Do not add these counts blindly:**
+  row-capacity trials, 108 paired-cache frontier trials
+  and an additional 12 eight-site sparse-doublet
+  projector/observable checks. **Do not add these counts blindly:**
   some categories reuse models or runs but test different
   properties and source commits.
 - Archived GNU Fortran 11 and 13 source-package verification
@@ -132,6 +134,16 @@ At the time of this draft:
 - `source/` and the public fork's `main` are not being changed
   for the resource test suite; no official release tag is
   being created.
+
+The [eight-site sparse low-doublet verification](cpc-stationary-sparse-doublet.md)
+checks two native ED2 wavefunctions against independently
+computed two-dimensional projector traces, without claiming
+state-specific observables are unique at degeneracy.
+The [CPU-pinned measurement protocol](cpc-controlled-node-protocol.md)
+has passed a **shared-hosted-runner functional smoke** including
+source and input checksum capture. An actual dedicated-node
+measurement remains outstanding, so the CI timings must
+not be described as publication-grade performance.
 
 The metadata mismatch remains unresolved:
 `configure.ac` declares `QS3-ED2 1.0.0`,
