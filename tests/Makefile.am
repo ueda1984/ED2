@@ -179,3 +179,9 @@ EXTRA_DIST += mixed_spin_dm_chirality_scan.py
 
 # Optional plotting of validated finite-chain DM study; matplotlib is test-only.
 EXTRA_DIST += plot_cpc_dm_chirality.py
+
+# Optional published-model (Yi et al., 2019) finite-size validation; NumPy test-only.
+EXTRA_DIST += cpc_literature_yi_xyz_dm.py
+
+# Optional matched resource characterization of the size-stationary DM model.
+EXTRA_DIST += cpc_stationary_resource_benchmark.py
