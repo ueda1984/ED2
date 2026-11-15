@@ -166,6 +166,59 @@ ported, or that ED2 is faster on matched workloads.
 Observed elapsed times for these tiny dense solves
 are explicitly **not** used for performance comparisons.
 
+### 3.1 Extension into the original near-saturation sector and larger conserved sector
+
+We also compiled and directly executed both programs
+in an **expanded three-case same-physics suite**
+([successful CI #43712595377](https://github.com/ueda1984/ED2/actions/runs/43712595377)).
+It tests a \(L=6\), \(N_\downarrow=1\)
+near-saturation case and a
+\(L=6\), \(N_\downarrow=3\)
+half-filled sector alongside the
+original \(L=4,N_\downarrow=2\)
+fixture, using the same OBC
+\(J_{xy}=0.8,J_z=1.1\) Hamiltonian.
+The test does not use the
+old dynamics program or imply
+a matched-runtime speedup.
+
+| Physical sector | Hilbert dimension | Maximum original QS³–ED2 difference |
+| --- | ---: | ---: |
+| \(L=4,\ N_\downarrow=2\) | 6 | 2.89e-15 |
+| \(L=6,\ N_\downarrow=1\) | 6 | 7.77e-16 |
+| \(L=6,\ N_\downarrow=3\) | 20 | 2.89e-15 |
+
+The **32/32 eigenvalues** agree
+across both executable codes,
+and each run is also checked against
+a third independent full
+product-sector Hamiltonian.
+The largest individual
+disagreement with that
+independent reference is
+\(3.44\times10^{-15}\)
+for ED2 and \(1.55\times10^{-15}\)
+for original QS³ across the
+three cases. This comparison
+includes both the original
+software's intended dilute
+down-spin regime and a larger
+conserved sector.
+
+All 32 actual measured eigenvalues,
+reference eigenvalues and differences
+are permanently preserved in the
+[frozen extended 32-level CSV](cpc-qs3-ed-ed2-32level-extended-ci.csv),
+including the original/source
+SHAs and CI job identity.
+A CI artifact temporarily
+retains the full original and ED2
+input, stdout and spectrum output.
+These measurements are **not**
+supplemented with fabricated
+memory, speed or source-compatibility
+results.
+
 ## 4. What should be the contribution in the first ED2 paper?
 
 The central program-level novelty relative to
