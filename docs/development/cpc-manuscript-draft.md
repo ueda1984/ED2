@@ -4,7 +4,9 @@
 > with a software DOI. Author list, article category, program summary and
 > release/version information are to be approved. The main 60/60 DM response
 > results and the auxiliary 12/12 literature-Hamiltonian plus 36/36
-> resource-characterization trials have archived independent validation.
+> resource-characterization trials, 52/52 cache-policy trials,
+> 36/36 two-eigenpair trials and 72/72 MNTE-capacity trials have
+> archived independent validation.
 > Repeated controlled-node performance and a public installed library
 > interface have **not** been established.
 
@@ -38,8 +40,11 @@ bond orientation and Pauli-to-spin conversion. We characterize the
 memory and Hamiltonian-application cost of matched one-eigenpair
 calculations, quantify cache storage against source-level allocation,
 and independently verify two-lowest-eigenpair restart workspaces.
-Definitive timing and parallel-speed comparisons are reserved for
-controlled-node measurements.
+For the selected open alternating-spin model, a model-specific
+exact cached-row capacity of \(7L/2-1\) is derived and verified,
+reducing allocated memory without changing the
+Hamiltonian-application count. Definitive timing and parallel-speed
+comparisons are reserved for controlled-node measurements.
 
 **Abstract revision required before submission:** replace the
 general last sentence with a quantitative controlled-node result
@@ -467,6 +472,81 @@ CI runner from future controlled-node
 timing evidence. No universal
 performance comparison with QS³ follows
 from these observations.
+
+### 6.3 Exact cache-row capacity for the selected Hamiltonian
+
+The preceding cache study varies the fraction of basis states
+stored in memory. A complementary option is to reduce the
+**row width** of the cache itself while retaining *all*
+basis states in the cached representation. The existing ED2
+`MNTE` input specifies a conservative number of matrix
+elements per representative state. With `NO_one=L` and
+`NO_two=L-1`, the generic default `MNTE=-1` expands to a
+capacity of \(10L-8\), which exceeds the transitions
+actually present in the selected alternating-spin model.
+
+The exact maximum for this OBC Hamiltonian can be derived in
+the local spin-product basis. Each spin-1/2 site supports
+at most one outgoing single-site transverse-field flip,
+and each spin-1 site supports at most two. A nearest-neighbor
+spin-1/2/spin-1 bond allows at most two simultaneous
+two-site flips. Including one diagonal entry gives
+
+\[
+\mathrm{MNTE}_{\rm model} =
+1+\frac L2+L+2(L-1) = \frac{7L}{2}-1 .
+\]
+
+The maximum is attained when all spin-1 sites occupy
+\(S^z=0\), because the relevant transverse and
+two-spin-flip coefficients are nonzero. The observed
+program maxima at \(L=8,10,12\) are
+27, 34 and 41, in exact agreement with the derived
+bound. The formula is **model- and representation-specific**
+and cannot be reused for Hamiltonians with other
+DM/Gamma components or longer-range interactions
+without a new derivation.
+
+The two cache arrays of the current GNU Fortran build
+occupy \(20(\mathrm{MNTE}+1)\mathcal D\) bytes,
+where \(\mathcal D=6^{L/2}\). Thus the model-specific
+allocation reduction relative to the generic default
+is \(20[(10L-8)-(7L/2-1)]6^{L/2}\) bytes.
+The predicted cache saving and measured peak-RSS
+reduction agree within about 1.2% for ALG=1,
+OMP=1 across the three tested lengths:
+
+| L | Predicted cache saving (MiB) | Measured RSS saving (MiB) |
+| ---: | ---: | ---: |
+| 8 | 1.112 | 1.100 |
+| 10 | 8.602 | 8.619 |
+| 12 | 63.182 | 63.080 |
+
+At \(L=12\), ALG=1, OMP=1, the two-run median
+peak RSS decreases from 119,452 to 54,858 KiB
+with the Hamiltonian-action count unchanged at 140.
+For ALG=2 (NOK=2,NOM=16), the RSS decreases
+from 148,904 to 84,178 KiB with 442
+Hamiltonian applications in both cases.
+**72/72 trials** across three lengths, two
+solvers and two thread counts pass independent
+low-energy, magnetization, nearest-neighbor
+correlation and direct-residual verification.
+
+At \(L=12\), a complete cache with calibrated
+row width allocates approximately **37.38 MiB**
+in the two work arrays, less than the
+**50.28 MiB** needed to cache only half
+the rows at the conservative default width.
+This is a structural memory result, not a
+dedicated-node timing comparison between
+those two alternatives. The pre-existing
+`MNTE` control is not claimed as a new
+algorithm. The
+[capacity derivation and resource analysis](cpc-mnte-capacity-evaluation.md),
+[frozen 72-case measurements](cpc-mnte-capacity-raw-ci.csv)
+and plotting script `tests/plot_cpc_mnte.py`
+provide independent reproducibility.
 
 ## 7. Conclusion and limitations
 
