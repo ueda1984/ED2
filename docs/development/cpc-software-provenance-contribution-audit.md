@@ -13,6 +13,54 @@ The tested development line is
 [`codex/ed2-cpc-stationary-dm-scaling`](https://github.com/ueda1984/ED2/tree/codex/ed2-cpc-stationary-dm-scaling).
 Always replace the branch with an immutable full SHA for an actual archive release.
 
+## The correct published-program baseline (first ED2 program paper)
+
+**Editorial correction:** ED2 itself has **not yet
+been reported in a peer-reviewed CPC software article**.
+The already-public
+[QS-Cube/ED2](https://github.com/QS-Cube/ED2)
+repository must not be conflated with
+an earlier *published ED2* paper.
+The previous published CPC software is
+**QS³** [CPC **277**, 108369 (2022)],
+and its [original Fortran repository is
+QS-Cube/ED](https://github.com/QS-Cube/ED).
+
+The primary *research contribution of a first
+ED2 program article* is the new computational
+model coverage relative to **this original
+published QS³/ED code**, not merely
+the Phase 1 code-hygiene changes made
+to ED2 after it had appeared on GitHub.
+
+The [old-to-new source and feature matrix]
+(cpc-qs3-ed-to-ed2-scope-matrix.md)
+directly checks the two repositories.
+A [six-level same-physics test]
+(cpc-qs3-ed-ed2-shared-xxz-spectrum-ci.csv)
+also builds the original and modern
+executables and compares the identical
+fixed-magnetization XXZ sector with
+an independent 6x6 Hamiltonian:
+the largest cross-program difference
+is \(2.89\times10^{-15}\).
+This makes the progression from
+published QS³ to generalized ED2 a
+**checked mathematical and source-level
+transition**, not just a narrative claim.
+
+The old QS³ implementation also provides
+a dynamical spin-structure-factor
+pathway. The current ED2 executable
+has not been shown to include a
+matching generalized dynamic path.
+Do **not** market ED2 as a strict
+backward-compatible superset of all
+QS³ outputs. Separate absent dynamic
+capabilities from genuine improvements
+in mixed-spin, nonconserving
+Hamiltonian representations.
+
 ## 1. Compare against two *different* prior baselines
 
 The [published 2022 QS³ article](https://doi.org/10.1016/j.cpc.2022.108369)
