@@ -126,8 +126,31 @@ about individual eigenvectors would require
 a separately validated reference, preferably
 with extended precision or a controlled
 effective-doublet construction.
-We do **not** attribute this apparent
-error floor entirely to ED2.
+Subsequent [dense-LAPACK and second-order
+reference comparisons](cpc-ultranarrow-reference-diagnosis.md)
+identified an important limitation in the
+**original sparse-reference eigenvectors**.
+At \(\delta=0\), dense LAPACK ZHEEVR
+yields \(7.37146\times10^{-7}\)
+and the second-order core model yields
+\(7.37389\times10^{-7}\) for
+the edge magnetization, both much closer
+to the ED2 results (roughly
+\(7.35\)–\(7.46\times10^{-7}\)) than
+the original sparse `eigsh` reference
+\(9.10740\times10^{-7}\).
+Across all 24 cases, the ED2/second-order
+difference is at most
+\(9.95\times10^{-9}\).
+Thus the earlier \(10^{-7}\)-scale
+"error" should be described as a
+**difference from a numerically
+ill-conditioned reference**,
+not a certified ED2 eigenvector
+error. The dense drivers still show
+finite-precision differences, so
+even the improved reference is
+not certified to arbitrary precision.
 
 ## An independently projected effective two-level cross-check
 
