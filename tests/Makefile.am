@@ -245,3 +245,6 @@ EXTRA_DIST += cpc_weak_edge_polarization_scaling.py
 
 # Frozen 4+6+12 weak-edge perturbative scaling and native ED2 plotter.
 EXTRA_DIST += plot_cpc_weak_edge_scaling.py
+
+# Standalone CPiP portable no-NumPy mixed-spin DM/HF example.
+EXTRA_DIST += cpc_portable_dm_quickstart.py
