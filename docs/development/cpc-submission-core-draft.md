@@ -36,13 +36,21 @@ separately assembled matrix. The maximum cross-code
 difference is \(2.89\times10^{-15}\).
 In the same conserved physical limit, the
 historical and ED2 **conventional Lanczos**
-executables additionally reproduce the
+executables additionally reproduce
 independent ground energies for
-\(L=12,18,24\), with old-to-new
-differences at most \(1.78\times10^{-14}\).
-These source-pinned direct runs test the
-predecessor's iterative computational
-workflow, not a matched-start speedup.
+\(L=12,18,24\), with verified
+old-to-new differences below
+\(2\times10^{-13}\) in two
+separate source-archived CI executions.
+A periodic six-site test also compares
+**all 15 levels in six translation
+momentum sectors** with an
+independent projector construction,
+agreeing within \(3.11\times10^{-15}\).
+These source-pinned direct runs
+verify the predecessor's
+numerical workflows, not
+a matched-start speedup.
 Independent dense and sparse constructions validate
 fully nonconserving alternating spin-1/2–spin-1 chains
 of up to 12 sites (Hilbert-space dimension 46,656).
@@ -343,6 +351,31 @@ references; the old code uses an uncontrolled
 random start, so differences in reported
 iteration count are not treated as controlled
 timing comparisons.
+
+The old QS³ solver also uses
+translation-momentum reduction.
+In an independent periodic \(L=6\),
+\(N_\downarrow=2\) XXZ reference,
+the old and ED2 executables reproduce
+**all six** \(k=2\pi m/6\) sectors,
+of dimensions 3,2,3,2,3,2,
+and **15/15** individual energies.
+A third separately constructed
+product-basis projector
+\(P_m=\frac{1}{6}\sum_r
+e^{-2\pi i mr/6}T^r\)
+verifies the sector spectra
+and completeness. The largest
+old-to-ED2 discrepancy is
+\(3.11\times10^{-15}\).
+The measured [15-level momentum benchmark](cpc-qs3-ed-ed2-momentum-15level-ci.csv)
+and [full published-program comparison](cpc-original-qs3-ed2-iterative-continuity.md)
+provide source and input provenance.
+A real XXZ model has
+isospectral \(k\) and \(-k\)
+sectors, so this test does not
+independently certify complex
+wavefunction phase conventions.
 
 Small-system dense Hamiltonians
 and independent sparse product-basis
