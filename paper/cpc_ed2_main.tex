@@ -1,0 +1,399 @@
+% ED2 first journal-program article: authorship and version are NOT finalized.
+% Primary published predecessor: QS-Cube/ED (QS^3, CPC 277 (2022) 108369).
+% Never assign a CPC accession, software DOI, or credit unconfirmed authors.
+\documentclass[preprint,12pt]{elsarticle}
+\usepackage{amsmath,amssymb,bm,booktabs,hyperref}
+\journal{Computer Physics Communications}
+\newcommand{\EDtwo}{ED2}
+\newcommand{\QSthree}{QS$^{3}$}
+\newcommand{\updn}{N_{\downarrow}}
+\begin{document}
+\begin{frontmatter}
+\title{ED2: Generalized exact diagonalization of mixed-spin quantum Hamiltonians with anisotropic and nonconserving interactions}
+\author[aff]{Author list pending project approval}
+\address[aff]{Affiliations to be confirmed before submission}
+\begin{abstract}
+We present the first journal-program description of ED2, a Fortran
+exact-diagonalization code extending the previously published QS$^3$
+spin solver from fixed-magnetization, spin-$1/2$ XXZ models to
+generalized Hamiltonians with site-dependent spin magnitudes, anisotropic
+exchange, Dzyaloshinskii--Moriya interactions, symmetric off-diagonal
+exchange, and vector magnetic fields. Its representation uses
+bounded-occupation combinatorics, optional compatible lattice symmetries,
+dense and iterative eigensolvers, and Cartesian spin observables.
+Physical continuity with the original QS$^3$ executable is verified
+through 32 fixed-magnetization eigenvalues, 15 momentum-resolved levels,
+and independently referenced conventional-Lanczos calculations for
+12--24 sites. In a genuinely non-$U(1)$ alternating spin-$1/2$/spin-$1$
+chain, independent Hamiltonian constructions validate calculations
+through 12 sites (full Hilbert dimension 46,656).
+The staggered vector-chirality response to an oriented DM interaction
+agrees with the Hellmann--Feynman energy derivative and independently
+computed finite-size susceptibilities. Additional numerical tests probe
+near-degenerate states and quantify model-dependent operator-cache
+storage. ED2 thus extends the accessible model and observable scope of
+the earlier program without claiming a new eigensolver or a previously
+unknown magnetic phase.
+\end{abstract}
+\begin{keyword}
+exact diagonalization \sep quantum spin systems \sep mixed spins \sep
+Dzyaloshinskii--Moriya interaction \sep Lanczos method \sep reproducible software
+\end{keyword}
+\end{frontmatter}
+
+\section*{Program summary (provisional; not release metadata)}
+\begin{description}
+\item[Program title:] ED2 (QS$^3$--ED2).
+\item[Program version:] To be assigned after integration and release review.
+\item[Program repository:] \url{https://github.com/QS-Cube/ED2};
+development verification: \url{https://github.com/ueda1984/ED2}.
+\item[Previous CPC program:] QS$^3$,
+\url{https://github.com/QS-Cube/ED}, Ref.~\cite{ueda2022}.
+\item[Program Library accession/DOI:] Not yet assigned.
+\item[License:] MIT; copyright and contributor attribution to be verified
+against the final distributed release.
+\item[Language and dependencies:] Fortran, BLAS/LAPACK, GNU Autotools;
+OpenMP is used for shared-memory parallelism.
+\item[Nature of problem:] Finite-size spectra and static spin observables
+of spin models with unequal local spins and general bilinear couplings.
+\item[Solution method:] Bounded-occupation basis construction,
+optional compatible symmetry representations, dense Hermitian
+diagonalization or iterative Lanczos-type eigensolvers.
+\item[Restrictions:] Exponential Hilbert-space growth. Occupation
+windows of nonconserving Hamiltonians generally represent projected
+operators rather than exact invariant sectors. The released interface
+is an executable, not an installed reusable library ABI.
+\end{description}
+
+\section{Introduction}
+Exact diagonalization (ED) is a reference method for finite quantum
+many-body systems, but the dimension of the full spin Hilbert space
+grows as $\mathcal D=\prod_i(2S_i+1)$.
+Conservation laws and spatial symmetries can significantly reduce this
+dimension. The published \QSthree{} program
+of Ueda, Yunoki and Shimokawa~\cite{ueda2022}
+targets spin-$1/2$ XXZ-type models near saturation, using fixed
+down-spin number, translation/momentum sectors, Lanczos eigensolvers,
+static spin observables and a dynamical spin-structure-factor pathway.
+Its published source is \url{https://github.com/QS-Cube/ED}.
+
+The present work is the \emph{first journal-program paper for ED2}.
+ED2 source has already been available in the distinct
+\url{https://github.com/QS-Cube/ED2} repository; that prior public
+availability must not be confused with an earlier journal publication.
+Relative to the published \QSthree{} code, ED2 extends the represented
+local spin spaces and bilinear operators to mixed spins, XYZ anisotropy,
+directed Dzyaloshinskii--Moriya (DM) exchange, symmetric off-diagonal
+exchange and site-dependent magnetic fields. Total $S^z$ need not be
+conserved. ED2 also provides Cartesian one- and two-spin observables.
+The original program's numerical solvers and OpenMP methodology
+are not claimed as new algorithms, nor is ED2 presented as a strict
+feature superset of the original dynamical-response code.
+
+Other general ED tools such as QuSpin~\cite{weinberg2017} exist.
+The contribution is therefore the documented \emph{program-specific}
+combination of generalized mixed-spin operators, compact Fortran
+execution, flexible Hilbert-space representations, independently
+verified physical observables and reproducible numerical contracts,
+rather than exclusivity of XYZ/DM models.
+
+\section{Hamiltonians and Hilbert-space representation}
+\subsection{General local operators}
+For oriented input bonds $(i,j)$, ED2 represents
+\begin{align}
+H={}&\sum_{(i,j)}\left[
+\sum_{\alpha=x,y,z}J^\alpha_{ij}S_i^\alpha S_j^\alpha
++\bm D_{ij}\cdot(\bm S_i\times\bm S_j)\right.\nonumber\\
+&\left.\hspace{13mm}+
+\sum_{\alpha=x,y,z}\Gamma^\alpha_{ij}
+(S_i^{\beta_\alpha}S_j^{\gamma_\alpha}
+ +S_i^{\gamma_\alpha}S_j^{\beta_\alpha})\right]
++\sum_i\bm h_i\cdot\bm S_i ,
+\label{eq:general}
+\end{align}
+where $(\beta_x,\gamma_x)=(y,z)$,
+$(\beta_y,\gamma_y)=(z,x)$ and
+$(\beta_z,\gamma_z)=(x,y)$.
+The input field convention is $+\bm h\cdot\bm S$.
+A physical Zeeman field $-\bm B\cdot\bm S$ is therefore
+encoded by $\bm h=-\bm B$.
+The DM term changes sign under reversal of the oriented bond.
+Nine real couplings per bond specify the three diagonal exchanges,
+three DM components and three symmetric off-diagonal exchanges.
+
+\subsection{Generalizing the original binomial basis}
+In the published spin-$1/2$ XXZ solver, a fixed
+$\updn=n$ subspace has dimension $\binom{L}{n}$.
+ED2 allows local occupations $n_i=0,\dots,m_i$
+with $0\leq m_i\leq 2S_i$. Define
+\begin{align}
+P_L(x)&=\prod_{i=1}^{L}\left(\sum_{q=0}^{m_i}x^q\right),
+&
+a_L(n)&=[x^n]P_L(x),\nonumber\\
+\mathcal D_{\mathrm{window}}
+&=\sum_{n=N_{\min}}^{N_{\max}}a_L(n),
+&
+a_i(n)&=\sum_{q=0}^{m_i}a_{i-1}(n-q).
+\label{eq:occupation}
+\end{align}
+These are dimensions before spatial-symmetry reduction.
+For $m_i=1$, $P_L=(1+x)^L$, recovering the original
+binomial representation exactly. The complete local product
+space has dimension $P_L(1)=\prod_i(2S_i+1)$.
+
+The allowed occupation window is not automatically a conserved
+sector. If $[H,\sum_i S_i^z]\neq0$, restricting occupations
+generally defines a projected Hamiltonian $PHP$, not an
+exact representation of the original ground-state problem.
+Similarly, user-provided site permutations represent physical
+symmetry sectors only when they commute with the full Hamiltonian.
+
+\section{Numerical implementation and validation}
+ED2 supports dense Hermitian LAPACK diagonalization (ALG=3),
+conventional Lanczos (ALG=1), and restarted Hermitian iteration
+(ALG=2). The numerical-development line adds explicit
+BLAS/LAPACK interfaces, magnetic-field indexing repairs,
+Krylov diagnostics, residual acceptance controls and reproducible
+input/source distributions. It does not introduce a new
+Lanczos method.
+
+For a normalized Ritz pair $(E,\psi)$, the direct residual
+$r=\|H\psi-E\psi\|_2$ is an important numerical diagnostic.
+However, a small residual alone does not certify that $E$
+is the globally lowest eigenvalue; near degeneracy it cannot
+certify an individual state-specific expectation value either.
+We therefore compare energy levels, residuals and physical
+observables against independently assembled Hamiltonians.
+
+\subsection{Continuity with the published QS$^3$ executable}
+The original \QSthree{} source was checked out at immutable commit
+\texttt{a3b09934bba5f966bfb564718528de8778c2b46c} and compiled
+without modifying its production Fortran. In shared spin-$1/2$,
+open-boundary XXZ limits ($J_{xy}=0.8$, $J_z=1.1$),
+all 32 eigenvalues across the three invariant sectors
+$(L,\updn)=(4,2),(6,1),(6,3)$ agree with ED2 and a separately
+constructed sector Hamiltonian. The largest old-to-new
+difference is $2.89\times10^{-15}$.
+
+Table~\ref{tab:continuity} gives an additional direct comparison
+of the original and ED2 \emph{conventional Lanczos} executables.
+Both target the same fixed-$\updn=2$ ground energy at 12--24 sites.
+The original implementation uses a random initial vector:
+iteration counts and wall times cannot be interpreted as
+matched-start performance ratios. Two source-pinned CI repetitions
+independently passed against the exact reference, with observed
+old-to-new energy differences below $2\times10^{-13}$.
+
+\begin{table}[t]
+\centering
+\caption{Direct ALG=1 continuity in a common open XXZ sector.
+The displayed energies are from the independently referenced
+first source-archived execution. Iterations are not matched-start
+performance observations.}
+\label{tab:continuity}
+\begin{tabular}{rrrrr}
+\toprule
+$L$ & $\binom{L}{2}$ & Independent $E_0$
+& Old \QSthree{} $E_0$ & ED2 $E_0$\\
+\midrule
+12 & 66 & -0.622563133745496 & -0.622563133745496 & -0.622563133745496\\
+18 & 153 & 0.940644373074134 & 0.940644373074154 & 0.940644373074136\\
+24 & 276 & 2.561293057049088 & 2.561293057049099 & 2.561293057049087\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+On a periodic six-site XXZ ring, an independent projector
+$P_m=L^{-1}\sum_{r=0}^{L-1}\exp(-2\pi imr/L)T^r$
+resolves the fixed-$\updn=2$ space into six translation
+sectors. Their dimensions are $3,2,3,2,3,2$.
+The original \QSthree{} and ED2 executables reproduce
+all 15 sector-resolved eigenvalues, with maximum
+cross-code difference $3.11\times10^{-15}$.
+This validates inherited \emph{static momentum-sector
+spectra}; the earlier dynamical-response pathway is not
+asserted to have been ported.
+
+\subsection{Independent mixed-spin basis checks}
+For $S_i=(1/2,1,1/2,1)$, the polynomial in
+Eq.~\eqref{eq:occupation} is
+$(1+x)^2(1+x+x^2)^2$.
+The full occupation window $[0,6]$ has 36 states;
+$[3,3]$ has 10 and $[2,4]$ has 26.
+The actual ED2 dense solver reproduces all
+72 independently enumerated levels across these three
+representations, with maximum absolute difference
+$1.11\times10^{-16}$.
+
+\section{Scientific example: staggered vector chirality}
+Consider an open, alternating spin-$1/2$/spin-$1$ chain
+with $S_{2i-1}=1/2$ and $S_{2i}=1$.
+For zero-based site/bond index $j$ let
+$\eta_j=(-1)^j$, and define
+\begin{align}
+H(D)&=H_0+D\hat K,\label{eq:hdm}\\
+\hat K&=\sum_{j=0}^{L-2}
+\eta_j(S_j^xS_{j+1}^y-S_j^yS_{j+1}^x).
+\label{eq:chirality}
+\end{align}
+The baseline $H_0$ retains the non-$U(1)$ terms
+$J_j^\alpha S_j^\alpha S_{j+1}^\alpha$,
+$\Gamma^z_j(S_j^xS_{j+1}^y+S_j^yS_{j+1}^x)$,
+and $h_j^x S_j^x+h_j^z S_j^z$, with a fixed
+two-site periodic coefficient rule:
+\begin{align}
+J_j^x&=0.77+0.05\eta_j,& J_j^y&=0.63+0.03\eta_j,\nonumber\\
+J_j^z&=1.09-0.04\eta_j,& \Gamma_j^z&=0.065+0.015\eta_j,\nonumber\\
+h_j^x&=0.15(0.4\eta_j+0.1),&
+h_j^z&=0.17+0.035\eta_j.
+\label{eq:coefficients}
+\end{align}
+For fields $\eta_j$ is the site parity; for bonds
+it is the parity of the bond's first site.
+The complete $L=12$ Hilbert space contains
+$6^{L/2}=46{,}656$ states and is treated without
+a fixed-magnetization projection.
+
+For a nondegenerate ground state,
+\begin{equation}
+\frac{\partial E_0}{\partial D}=\langle\hat K\rangle,
+\qquad
+\bar\kappa_{\mathrm{stag}}=\frac{\langle\hat K\rangle}{L-1}.
+\label{eq:hf}
+\end{equation}
+Independently evaluated energy differences, direct
+chirality operators and ED2's $xy-yx$ Cartesian
+two-spin correlation outputs agree. The ordering
+of those output components is explicitly audited
+to detect $xy/yx$ sign swaps.
+The finite-size susceptibility is
+\begin{equation}
+\chi_\kappa(L)=-\frac{1}{L-1}
+\left.\frac{\partial^2E_0}{\partial D^2}\right|_{D=0},
+\label{eq:susc}
+\end{equation}
+also checked by finite differencing $\langle\hat K\rangle$.
+For $L=4,6$, full spectral sums provide an additional
+independent reference. Table~\ref{tab:susc} reports the results.
+
+\begin{table}[t]
+\centering
+\caption{Finite-size, bond-normalized staggered chirality susceptibility
+of the explicitly specified alternating-spin model. These values
+are not thermodynamic-limit extrapolations.}
+\label{tab:susc}
+\begin{tabular}{rr}
+\toprule
+$L$ & $\chi_\kappa(L)$\\
+\midrule
+4 & 0.634311\\
+6 & 0.568733\\
+8 & 0.537355\\
+10 & 0.519701\\
+12 & 0.508501\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The 60 source-archived, independent OMP=1/2 checks through
+12 sites reproduce ground energies and full nearest-neighbor
+Cartesian correlators. The calculated smooth finite-size response
+does not establish a chiral phase transition or a reliable
+thermodynamic extrapolation. A separate validation checks a
+properly converted finite-size Hamiltonian from the XYZ/DM
+literature~\cite{yi2019}; it is not a reproduction
+of a published phase diagram. Alternating-spin DM
+models have also been studied elsewhere~\cite{lahiri2022},
+but the coefficients in Eq.~\eqref{eq:coefficients}
+were chosen as a software-validation example
+rather than copied from that literature.
+
+\section{Cache storage and performance limitations}
+The existing ED2 cache controls \texttt{wk\_dim} and \texttt{MNTE}
+trade stored Hamiltonian transitions against on-demand work.
+For the stationary alternating chain in Sec.~5,
+the independently checked exact maximum number of nontrivial
+entries per row is $\mathrm{MNTE}=7L/2-1$.
+The default broad capacity is $10L-7$ \emph{allocated}
+entries per row including the diagonal/spare slot convention.
+On the tested LP64 representation, each cached
+entry uses one 4-byte index and one 16-byte complex
+amplitude, giving the corresponding nominal cache
+allocation formulas
+\begin{align}
+B_{\mathrm{half,generic}}&=
+20(10L-7)\left\lfloor\mathcal D/2\right\rfloor,\nonumber\\
+B_{\mathrm{full,tight}}&=
+20(7L/2)\mathcal D,\nonumber\\
+B_{\mathrm{full,generic}}&=
+20(10L-7)\mathcal D.
+\label{eq:cache}
+\end{align}
+At $L=12$ these are respectively 50.279,
+37.375 and 100.558 MiB \emph{of cache arrays},
+not total process resident memory.
+The full/tight cache can therefore store all rows while
+using less cache-array memory than half/generic for this model.
+This row bound is not asserted for arbitrary Hamiltonians.
+
+The accompanying CI-based resource tests independently check
+energies, observables and direct residuals across cache policies,
+including observed peak RSS and Hamiltonian applications.
+Those shared-runner wall times are exploratory; the program's
+publication benchmark requires exclusive-node,
+CPU-pinned, repeated measurements and operator
+verification of hardware exclusivity. No general speedup
+or parallel efficiency is claimed here.
+
+\section{Availability and limitations}
+The public source lineage is
+\url{https://github.com/QS-Cube/ED2};
+development verification is archived under
+\url{https://github.com/ueda1984/ED2}.
+Build and test scripts reproduce the original
+source-pinned QS$^3$ overlap, stationary mixed-spin
+DM response, independent low-energy references
+and model-specific memory accounting.
+The eventual official merged release, archive version,
+CPC Program Library accession, software DOI and complete
+authorship/credit require project approval and
+must be specified before submission.
+The old program's dynamical spin-structure-factor pathway
+is not verified as a native ED2 capability.
+
+\section{Conclusions}
+ED2 generalizes the published QS$^3$ program's
+spin-$1/2$ XXZ computational setting to mixed local
+spins and nonconserving anisotropic bilinear operators.
+Direct original-code comparisons establish continuity
+in both conserved subspaces and translation sectors,
+while independent physical-response and numerical
+acceptance tests demonstrate the broader executable
+model/observable interface. The software remains
+subject to finite-size growth and model-dependent
+resource costs. The results do not imply a new
+eigensolver, a universal performance improvement
+or an undiscovered magnetic phase.
+
+\begin{thebibliography}{9}
+\bibitem{ueda2022}
+H. Ueda, S. Yunoki and T. Shimokawa,
+Quantum spin solver near saturation: QS$^3$,
+Comput. Phys. Commun. \textbf{277}, 108369 (2022).
+\href{https://doi.org/10.1016/j.cpc.2022.108369}{doi:10.1016/j.cpc.2022.108369}.
+\bibitem{yi2019}
+T.-C. Yi, W.-L. You, N. Wu and A. M. Ole\'s,
+Criticality and factorization in the Heisenberg chain with
+Dzyaloshinskii--Moriya interaction,
+Phys. Rev. B \textbf{100}, 024423 (2019).
+\href{https://doi.org/10.1103/PhysRevB.100.024423}{doi:10.1103/PhysRevB.100.024423}.
+\bibitem{lahiri2022}
+A. Lahiri and S. K. Pati,
+J. Phys.: Condens. Matter (2022),
+\href{https://doi.org/10.1088/1361-648X/ac4aab}{doi:10.1088/1361-648X/ac4aab}.
+\bibitem{weinberg2017}
+P. Weinberg and M. Bukov,
+QuSpin: a Python package for dynamics and exact diagonalisation of quantum many body systems,
+SciPost Phys. \textbf{2}, 003 (2017).
+\end{thebibliography}
+\end{document}
