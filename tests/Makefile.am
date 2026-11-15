@@ -251,3 +251,6 @@ EXTRA_DIST += cpc_portable_dm_quickstart.py
 
 # NumPy-free postprocessor for complete pinned-node cache-policy benchmarks.
 EXTRA_DIST += cpc_controlled_node_analyze.py
+
+# Legacy QS3-ED CPC-era direct physical-limit comparison against generalized ED2.
+EXTRA_DIST += cpc_qs3_ed_shared_xxz_crosscheck.py
