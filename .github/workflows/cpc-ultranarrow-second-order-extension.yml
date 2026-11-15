@@ -1,0 +1,144 @@
+name: CPC ultraweak edge second-order and exact sign-symmetry checks
+
+on:
+  push:
+    branches:
+      - codex/ed2-cpc-stationary-dm-scaling
+    paths:
+      - ".github/workflows/cpc-ultranarrow-second-order-extension.yml"
+      - "tests/cpc_ultranarrow_second_order_validate.py"
+      - "tests/cpc_weak_edge_polarization_scaling.py"
+      - "tests/cpc_ultranarrow_second_order_reference.py"
+      - "tests/cpc_stationary_interacting_sparse_doublet.py"
+      - "tests/mixed_spin_dm_chirality_scan.py"
+      - "tests/mixed_spin_sparse_scale.py"
+      - "tests/mixed_spin_interacting_avoided_crossing.py"
+      - "tests/Makefile.am"
+      - "source/**"
+      - "configure.ac"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  edge-symmetry-and-scaling:
+    name: Independent full-matrix sign symmetry and perturbative scaling
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+      OMP_NUM_THREADS: "1"
+      OMP_DYNAMIC: "FALSE"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install NumPy and SciPy
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends python3-numpy python3-scipy gfortran-13 libopenblas-dev liblapack-dev autoconf automake make
+      - name: Build and extract the exact tested source archive
+        run: |
+          set -eu
+          autoreconf -vfi
+          ./configure FC=gfortran-13 FCFLAGS="-O2 -fopenmp"
+          make dist
+          root="$RUNNER_TEMP/cpc-second-order"
+          mkdir -p "$root/src"
+          tgz=$(find "$GITHUB_WORKSPACE" -maxdepth 1 -name '*.tar.gz' -print -quit)
+          test -n "$tgz"
+          tar -xzf "$tgz" -C "$root/src"
+          src=$(find "$root/src" -mindepth 1 -maxdepth 1 -type d -print -quit)
+          test -f "$src/tests/cpc_ultranarrow_second_order_validate.py"
+          test -f "$src/tests/cpc_weak_edge_polarization_scaling.py"
+          printf '%s\n' "$src" > "$root/source-path"
+          sha256sum "$tgz"
+          git rev-parse HEAD
+      - name: Test exact edge sign symmetry and quasi-degenerate scaling
+        run: |
+          set -eu
+          src=$(cat "$RUNNER_TEMP/cpc-second-order/source-path")
+          python3 "$src/tests/cpc_weak_edge_polarization_scaling.py" \
+            --output "$RUNNER_TEMP/cpc-weak-edge-scaling"
+          python3 - "$RUNNER_TEMP/cpc-weak-edge-scaling/report.json" <<'PY'
+          import json,sys
+          r=json.load(open(sys.argv[1],encoding="utf-8"))
+          assert r["pass_complete"],r["violations"]
+          assert r["passed"]==r["expected"]==4
+          assert r["observed_slope_relative_span"]<0.05
+          assert all(row["exact_sign_symmetry_error"]<1e-12 for row in r["results"])
+          assert all(row["second_order_gap_abs_error"]<1e-10 for row in r["results"])
+          print("CPC WEAK EDGE FOUR-POINT SCALING AND SIGN SYMMETRY VERIFIED")
+          PY
+      - name: Preserve independent dense numerical data
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cpc-weak-edge-four-point-scaling
+          path: ${{ runner.temp }}/cpc-weak-edge-scaling/
+          retention-days: 21
+          if-no-files-found: warn
+
+  second-order-native-ed2:
+    name: Second-order 8-site ED2 cross-check OMP=${{ matrix.omp }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        omp: [1,2]
+    env:
+      FC: gfortran-13
+      FCFLAGS: "-O2 -fopenmp"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+      OMP_DYNAMIC: "FALSE"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install clean toolchain and independent SciPy test dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends gfortran-13 libopenblas-dev liblapack-dev autoconf automake make python3-numpy python3-scipy time
+      - name: Build only from an extracted source archive
+        run: |
+          set -eu
+          autoreconf -vfi
+          ./configure FC="$FC" FCFLAGS="$FCFLAGS"
+          make -j2
+          make dist
+          root="$RUNNER_TEMP/ed2-second-order"
+          mkdir -p "$root/src" "$root/build"
+          tgz=$(find "$GITHUB_WORKSPACE" -maxdepth 1 -name '*.tar.gz' -print -quit)
+          test -n "$tgz"
+          tar -xzf "$tgz" -C "$root/src"
+          src=$(find "$root/src" -mindepth 1 -maxdepth 1 -type d -print -quit)
+          test -f "$src/tests/cpc_ultranarrow_second_order_validate.py"
+          printf '%s\n' "$src" > "$root/source-path"
+          cd "$root/build"
+          "$src/configure" FC="$FC" FCFLAGS="$FCFLAGS"
+          make -j2
+      - name: Independently validate gaps, edge moments, native doublet traces
+        run: |
+          set -eu
+          src=$(cat "$RUNNER_TEMP/ed2-second-order/source-path")
+          python3 "$src/tests/cpc_ultranarrow_second_order_validate.py" \
+            --exe "$RUNNER_TEMP/ed2-second-order/build/source/QS3ED2" \
+            --omp "${{ matrix.omp }}" --requested-residual 1e-12 \
+            --output "$RUNNER_TEMP/cpc-second-order-omp${{ matrix.omp }}"
+          python3 - "$RUNNER_TEMP/cpc-second-order-omp${{ matrix.omp }}/report.json" <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1],encoding="utf-8"))
+          assert d["pass_complete"],d["violations"]
+          assert d["passed"]==d["expected"]==6
+          assert all(r["max_direct_residual"]<=1e-12 for r in d["raw"])
+          assert all(r["two_state_trace_corr_error"]<=1e-5 for r in d["raw"])
+          print("CPC ED2 SECOND-ORDER CROSSCHECK",d["passed"],"/",d["expected"])
+          PY
+      - name: Archive native ED2 output, eigenvectors and all independent reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cpc-second-order-native-omp${{ matrix.omp }}
+          path: ${{ runner.temp }}/cpc-second-order-omp${{ matrix.omp }}/
+          retention-days: 21
+          if-no-files-found: warn
