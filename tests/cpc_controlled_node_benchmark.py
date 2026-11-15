@@ -87,7 +87,8 @@ def command_output(cmd):
         return dict(error=str(err))
 
 
-def record_environment(binary,attestation,selected,allowed,threads,params):
+def record_environment(binary,attestation,selected,allowed,threads,params,
+                       source_revision=None,source_archive=None):
     return dict(
         schema=1,utc_epoch_time=time.time(),
         python=sys.version,platform=platform.platform(),
@@ -117,6 +118,9 @@ def record_environment(binary,attestation,selected,allowed,threads,params):
         git_revision=command_output(["git","-C",str(HERE.parent),"rev-parse","HEAD"]),
         executable_path=str(binary),executable_sha256=sha256(binary),
         benchmark_script_sha256=sha256(BENCH),
+        source_revision=source_revision,
+        source_archive_path=str(source_archive) if source_archive else None,
+        source_archive_sha256=sha256(source_archive) if source_archive else None,
         wrapper_sha256=sha256(Path(__file__).resolve()),
         parameters=params,
         caution=("Operator exclusivity is self-attested, not verified by code. "
@@ -139,6 +143,9 @@ def main():
     p.add_argument("--keep",type=int,default=2)
     p.add_argument("--capacity",type=int,default=16)
     p.add_argument("--residual-atol",type=float,default=1e-8)
+    p.add_argument("--source-revision",help="Full 40- or 64-digit source revision SHA")
+    p.add_argument("--source-archive",type=Path,
+                   help="Exact source tarball used for the executable build")
     mode=p.add_mutually_exclusive_group(required=True)
     mode.add_argument("--exclusive-allocation-verified",action="store_true",
                       help="Operator attests to a real exclusive node reservation")
@@ -158,6 +165,13 @@ def main():
             raise ValueError("Invalid number of measurements or warmups")
         if not 1<a.keep<a.capacity<=512:
             raise ValueError("Invalid ALG2 restart workspace")
+        if a.source_revision and not re.fullmatch(r"[0-9a-fA-F]{40}([0-9a-fA-F]{24})?",a.source_revision):
+            raise ValueError("Source revision must be a full 40/64-hex SHA")
+        if a.exclusive_allocation_verified and not (a.source_revision or a.source_archive):
+            raise ValueError("Publication-mode runs require a source SHA or source archive")
+        source_archive=(a.source_archive.resolve(strict=True) if a.source_archive else None)
+        if source_archive is not None and not source_archive.is_file():
+            raise ValueError("Source archive not a regular file")
         if not hasattr(os,"sched_getaffinity") or not hasattr(os,"sched_setaffinity"):
             raise ValueError("Linux sched_getaffinity/setaffinity required for controlled CPU pinning")
         allowed=sorted(os.sched_getaffinity(0))
@@ -183,7 +197,9 @@ def main():
                 keep=a.keep,capacity=a.capacity,
                 residual_atol=a.residual_atol)
     metadata=record_environment(exe,a.exclusive_allocation_verified,
-                                cpus,allowed,threads,params)
+                                cpus,allowed,threads,params,
+                                source_revision=a.source_revision,
+                                source_archive=source_archive)
     (output/"environment.json").write_text(json.dumps(metadata,indent=2)+"\n")
     tasks=[]
     for omp in threads:
@@ -217,7 +233,19 @@ def main():
             print("NODE BENCH FAILED",omp,str(exc),flush=True)
     good=len(tasks)==len(threads) and all(
         x.get("exit_code")==0 and x.get("pass_complete") for x in tasks)
+    manifest=[]
+    for folder in sorted(output.glob("paired-omp*")):
+        for name in ("input.dat","bonds.dat","fields.dat","spins.dat",
+                     "caps.dat","pairs.dat","initial-vector.txt"):
+            for item in sorted(folder.rglob(name)):
+                manifest.append(dict(relative_path=str(item.relative_to(output)),
+                                     sha256=sha256(item),size_bytes=item.stat().st_size))
+    (output/"input-manifest.json").write_text(json.dumps(manifest,indent=2)+"\n")
+    if good and not manifest:
+        good=False
     summary=dict(schema=1,metadata_sha256=sha256(output/"environment.json"),
+                 input_manifest_sha256=sha256(output/"input-manifest.json"),
+                 input_file_count=len(manifest),
                  mode=metadata["benchmark_mode"],
                  raw_measurements="paired-omp*/report.json contains all raw cases",
                  tasks=tasks,pass_complete=good)
