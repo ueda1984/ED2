@@ -98,7 +98,28 @@ close to the predicted 50.279 MiB cache difference.
 ALG=2 has different H-application counts across these
 cache policies: equal input and requested residual do
 **not** guarantee an identical iterative trajectory.
-L=12 OMP=1 evidence must be reviewed separately before adding it.
+The companion L=12 OMP=1 job also passed **8/8** (hence **16/16**
+L=12 cache trials across OMP=1/2). The OMP=1 two-run medians were:
+
+| ALG | Cache | H applications | Median wall s | Peak RSS KiB |
+| --- | --- | ---: | ---: | ---: |
+| 1 | half | 140 | 22.146180 | 67,980 |
+| 1 | full | 140 | 1.954102 | 119,468 |
+| 2 (2/16) | half | 459 | 71.937797 | 97,458 |
+| 2 (2/16) | full | 442 | 6.528770 | 148,904 |
+
+At OMP=1, the full-minus-half RSS difference in ALG=1
+is **51,488 KiB**, matching the theoretical half-cache array
+allocation (50.279 MiB) to within normal process overhead.
+The observed full/half wall-time ratios are 11.33
+(ALG=1) and 11.02 (ALG=2) on this particular CI runner.
+The achieved solver workload for ALG=2 can change with
+cache policy or OpenMP settings. These figures are not
+dedicated-node speedup estimates.
+
+**Combined cache validation:** 36/36 L=8/10 trials plus
+16/16 L=12 trials = **52/52** successful independent
+physical and residual checks, including all warm-ups.
 
 ## Two-lowest-eigenpair ALG=2 workload
 
