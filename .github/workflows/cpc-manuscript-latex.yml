@@ -7,6 +7,7 @@ on:
     paths:
       - ".github/workflows/cpc-manuscript-latex.yml"
       - "paper/**"
+      - "docs/development/cpc-stationary-dm-reference.csv"
   workflow_dispatch:
 
 permissions:
@@ -27,6 +28,11 @@ jobs:
           sudo apt-get install -y --no-install-recommends \
             texlive-latex-base texlive-latex-recommended texlive-publishers texlive-pictures \
             poppler-utils
+      - name: Reject DM-response figure/source CSV mismatches
+        run: |
+          python3 -S paper/check_dm_figure.py \
+            --csv docs/development/cpc-stationary-dm-reference.csv \
+            --tex paper/cpc_ed2_main.tex
       - name: Compile source-pinned manuscript PDF
         run: |
           set -eu
