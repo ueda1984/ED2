@@ -34,6 +34,20 @@ The compiled PDF is a draft proof. All numerical values have independent
 source-linked evidence; the PDF is not a substitute for the tested code
 archive or the data files.
 
+## Author-review checkpoint
+
+The [multi-angle 82/100 internal draft assessment](../docs/development/cpc-author-review-20261116.md)
+identifies the scientific evidence, novelty reservations and remaining
+release/benchmark blockers. **82/100 means ready for author review,
+not CPC submission readiness or likely acceptance.**
+
+A separate [small-system physics reference audit](audit_reference_small_systems.py)
+reconstructs 15 L=4,6,8 parameter points without calling ED2, and checks
+three Hellmann--Feynman/susceptibility identities. See the
+[independent physics CI workflow](https://github.com/ueda1984/ED2/actions/workflows/cpc-independent-physics-audit.yml).
+This is separate from the paper's coordinate integrity checker and the
+earlier full L=4--12 numerical comparisons.
+
 ## Scientific evidence matrix
 
 | Manuscript part | Regeneration / verification evidence |
@@ -57,7 +71,7 @@ natively reproduced by the current ED2 executable. Do not describe
 ED2 as automatically backward-compatible or the whole output feature
 set as a superset.
 
-Three `pgfplots` scientific figures now show the DM-response curves,
+Three `pgfplots` scientific figures (plus a TikZ program-flow schematic) now show the DM-response curves,
 finite-size excitation gaps and D=0 chiral susceptibilities. Their 55
 plotted ordinates and five rounded table values must pass the independent
 CSV transcription gate in CI, including four corruption-rejection probes.
