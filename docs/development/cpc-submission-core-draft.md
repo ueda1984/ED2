@@ -241,8 +241,7 @@ difference \(2.89\times10^{-15}\) and maximum
 ED2-to-independent difference
 \(3.44\times10^{-15}\).
 The [32-row frozen spectrum](cpc-qs3-ed-ed2-32level-extended-ci.csv)
-and the [full original/modern source comparison]
-(cpc-qs3-ed-to-ed2-scope-matrix.md)
+and the [full original/modern source comparison](cpc-qs3-ed-to-ed2-scope-matrix.md)
 document both the original
 near-saturation regime and the
 more populated conserved sector.
