@@ -1,0 +1,401 @@
+# CPC manuscript: scientific first draft (for author review)
+
+> **Working draft, 15 November 2026.** Not submitted, accepted or associated
+> with a software DOI. Author list, article category, program summary and
+> release/version information are to be approved. The main 60/60 DM response
+> results and the auxiliary 12/12 literature-Hamiltonian plus 36/36
+> resource-characterization trials have archived independent validation.
+> Repeated controlled-node performance and a public installed library
+> interface have **not** been established.
+
+## Provisional title
+
+**ED2: Exact diagonalization of generalized quantum spin Hamiltonians with mixed local spins and anisotropic nonconserving interactions**
+
+## Abstract
+
+We present ED2, a Fortran exact-diagonalization program for lattice
+quantum-spin Hamiltonians with site-dependent spin magnitudes,
+anisotropic exchange, Dzyaloshinskii–Moriya interactions, symmetric
+off-diagonal exchange and magnetic fields. Extending the model
+coverage of the published near-saturation QS³ solver, ED2 provides
+full Hilbert-space calculations, user-selected symmetry representations
+and optional occupation-number restrictions. We distinguish exact
+symmetry reductions from projections that need not commute with
+the Hamiltonian. Dense and iterative eigensolvers, local magnetic
+moments and Cartesian two-spin correlations are verified using
+independently constructed Hamiltonians, with numerical diagnostics
+that distinguish convergence from ground-state inclusion. As a
+reproducible scientific application we compute the response to a
+staggered directed DM interaction in an alternating spin-1/2 and
+spin-1 chain containing XYZ, symmetric off-diagonal and transverse
+field terms. For 4–12 sites, ground energies and all nearest-neighbor
+correlations agree with independent references, and the DM-conjugate
+vector chirality satisfies Hellmann–Feynman and finite-size
+susceptibility identities. A separate test reproduces the finite-size
+Hamiltonian of a published XYZ-DM spin-1/2 chain, including periodic
+bond orientation and Pauli-to-spin conversion. We characterize the
+memory and Hamiltonian-application cost of matched one-eigenpair
+calculations, while reserving definitive performance comparisons
+for controlled-node measurements.
+
+**Abstract revision required before submission:** replace the
+general last sentence with a quantitative controlled-node result
+once it is available. Avoid an unsupported claim of performance
+superiority, universal accuracy or new chiral phases.
+
+## 1. Introduction
+
+Exact diagonalization remains a reference method for studying finite
+quantum many-body systems. In quantum-spin models, exploiting exact
+conservation laws and spatial symmetries can reduce the working
+Hilbert space, but interactions with spin-orbit character, unequal
+local spin magnitudes and transverse magnetic fields challenge
+special-purpose sector decompositions. These features are especially
+relevant when the desired outputs are physical observables sensitive
+to the wave function, not only ground-state energies.
+
+The QS³ program, published in *Computer Physics Communications*
+in 2022 [1], addresses near-saturation quantum-spin calculations
+and already provides iterative eigensolvers, observables and OpenMP
+parallelism. ED2 must therefore be positioned as an extension
+in the supported local Hilbert spaces and interaction structures,
+rather than as the invention of Lanczos, restarted Krylov iteration
+or parallel exact diagonalization. In particular, ED2's generalized
+exchange and field inputs can represent Hamiltonians in which
+total \(S^z\) is not conserved.
+
+A challenge in assessing generalized spin software is to establish
+that independent definitions of the Hamiltonian, symmetry,
+spectrum and observables agree. A directed
+Dzyaloshinskii–Moriya (DM) interaction supplies an exact and
+sensitive diagnostic: differentiation of the ground-state energy
+with respect to the DM coefficient gives a vector-chirality
+expectation value. This identity tests both an oriented
+spin operator and the component order of the program's
+two-body correlation output.
+
+The spin-chain literature provides relevant physical context.
+Lahiri and Pati [2] discuss alternating spin-1/2 and spin-1
+chains with competing exchanges and DM couplings; Yi and
+colleagues [3] examine XYZ anisotropy, magnetic field and DM
+exchange for spin-1/2 chains. Our main mixed-spin demonstrator
+uses newly selected, size-stationary coefficients and is not a
+reproduction of their phases or data. Separately, we verify
+ED2 against the precisely defined periodic XYZ-DM Hamiltonian
+of Ref. [3]. The work is thus a software-model and
+observable-validation study, not a claim of new chiral physics.
+
+## 2. Supported models and basis representation
+
+ED2 accepts local spin values \(S_i\) and two-site records with
+Cartesian exchange \(J_{ij}^{x,y,z}\), DM exchange
+\(\boldsymbol D_{ij}\), and symmetric off-diagonal
+\(\Gamma^\mu_{ij}\) terms. One representative Hamiltonian is
+
+\[
+H=\sum_{(i,j)}\Big[
+\sum_{\mu=x,y,z}J_{ij}^\mu S_i^\mu S_j^\mu
++\boldsymbol D_{ij}\cdot(\boldsymbol S_i\times\boldsymbol S_j)
++\Gamma^x_{ij}(S_i^yS_j^z+S_i^zS_j^y)
++\Gamma^y_{ij}(S_i^zS_j^x+S_i^xS_j^z)
++\Gamma^z_{ij}(S_i^xS_j^y+S_i^yS_j^x)
+\Big]+\sum_i\boldsymbol h_i\cdot\boldsymbol S_i.
+\]
+
+The input field term is **positive**: the conventional
+physical Zeeman term \(-\boldsymbol B_i\cdot\boldsymbol S_i\)
+requires \(\boldsymbol h_i=-\boldsymbol B_i\).
+The DM term requires a directed pair; reversing its
+orientation also reverses the oriented DM coefficient.
+
+With local spin \(S_i\), the complete product-space dimension is
+\(\mathcal D=\prod_i(2S_i+1)\). Occupation-number limits
+restrict the represented basis, but such a restriction need
+not be a symmetry. For a Hamiltonian without the required
+\(U(1)\) invariance, it defines \(PHP\), generally an
+approximation to the unrestricted problem rather than a true
+invariant sector. This distinction is explicit in the
+validation and user-facing numerical documentation.
+Likewise, arbitrary site-permutation inputs do not establish
+that the Hamiltonian commutes with the requested operation:
+compatible symmetry representations require checking the
+full set of local and bond coefficients.
+
+## 3. Implementation and numerical acceptance
+
+The existing executable provides reconstructed-vector
+Lanczos (ALG=1), restarted Hermitian iteration (ALG=2),
+and dense LAPACK diagonalization (ALG=3). Fortran
+source-distribution validation, residual reporting,
+explicit starting vectors, deterministic-seed controls and
+diagnostic sidecars support reproducible scientific
+verification. These engineering features are not presented
+as distinct new eigensolver theories.
+
+For an approximate eigenpair \((E_n,\psi_n)\),
+the direct residual \(r_n=\|H\psi_n-E_n\psi_n\|\)
+measures satisfaction of the eigenvalue equation.
+A small \(r_n\) does not alone certify that the global
+ground state has been found, and it does not ensure
+accurate individual observables when the low-energy
+spectrum is nearly degenerate. Therefore the acceptance
+tests compare the target eigenvalues and physical
+observables with independently assembled dense or
+sparse reference Hamiltonians. Actual nonconvergence
+and invalid solver-output states are recorded separately
+from successful numerical validations.
+
+## 4. Scientific application: staggered DM vector chirality
+
+Consider an open chain with
+\(S_i=1/2,1,1/2,1,\ldots\), with zero-based
+site and bond-start indices and \(\eta_i=(-1)^i\).
+We examine
+
+\[
+\begin{aligned}
+H(D)=&\sum_{i=0}^{L-2}\big[
+J_i^x S_i^xS_{i+1}^x+
+J_i^y S_i^yS_{i+1}^y+
+J_i^z S_i^zS_{i+1}^z\\
+&\quad+\Gamma_i^z(S_i^xS_{i+1}^y+S_i^yS_{i+1}^x)
++D\eta_i(S_i^xS_{i+1}^y-S_i^yS_{i+1}^x)\big]\\
+&+\sum_{i=0}^{L-1}(h_i^x S_i^x+h_i^z S_i^z).
+\end{aligned}
+\]
+
+The local coefficients are fixed by a two-site rule,
+independently of \(L\):
+
+\[
+\begin{aligned}
+J_i^x&=0.77+0.05\eta_i, & J_i^y&=0.63+0.03\eta_i,\\
+J_i^z&=1.09-0.04\eta_i, & \Gamma_i^z&=0.065+0.015\eta_i,\\
+h_i^x&=0.15(0.4\eta_i+0.1), &
+h_i^z&=0.17+0.035\eta_i .
+\end{aligned}
+\]
+
+The presence of unequal XYZ exchange, nonzero
+\(\Gamma^z\) and transverse fields makes this
+a genuine non-\(U(1)\) calculation. The full
+Hilbert space has dimension \(6^{L/2}\).
+The parameters specify a reproducible illustrative
+test model, not a material Hamiltonian inferred
+from experiment.
+
+Defining
+\[
+\widehat K=\sum_{i=0}^{L-2}\eta_i
+(S_i^xS_{i+1}^y-S_i^yS_{i+1}^x),
+\]
+the Hellmann–Feynman identity for a differentiable
+nondegenerate ground state is
+\[
+\frac{\partial E_0}{\partial D}
+=\langle\widehat K\rangle,\qquad
+\bar\kappa_{\rm stag}=\langle\widehat K\rangle/(L-1).
+\]
+The corresponding finite-size susceptibility is
+\[
+\chi_\kappa(L)=
+-\frac{1}{L-1}\left.\frac{\partial^2E_0}{\partial D^2}\right|_{D=0}
+=-\frac{1}{L-1}\left.
+\frac{\partial\langle\widehat K\rangle}{\partial D}\right|_{D=0}.
+\]
+For the finite nondegenerate ground state it can
+also be written as a spectral sum,
+\[
+\chi_\kappa(L)=\frac{2}{L-1}\sum_{m>0}
+\frac{|\langle m|\widehat K|0\rangle|^2}{E_m-E_0}.
+\]
+This third route is evaluated for \(L=4,6\).
+The ground energy, as the minimum of affine
+functions of \(D\), is concave, so the conjugate
+chirality must be nonincreasing with \(D\) where
+the derivative exists.
+
+### 4.1 Results and interpretation
+
+| L | Full dimension | Ground-to-first gap at D=0 | Chiral mean at D=0 | Chiral susceptibility |
+| ---: | ---: | ---: | ---: | ---: |
+| 4 | 36 | 0.17235306 | +0.000383416 | 0.63431120 |
+| 6 | 216 | 0.22526115 | +0.000218011 | 0.56873293 |
+| 8 | 1,296 | 0.28340937 | +0.000156291 | 0.53735526 |
+| 10 | 7,776 | 0.32938732 | +0.000133476 | 0.51970132 |
+| 12 | 46,656 | 0.35158094 | +0.000123044 | 0.50850099 |
+
+For \(D=-0.24,-0.12,0,+0.12,+0.24\),
+the ED2 low spectrum, local magnetization and
+all nine Cartesian nearest-neighbor correlations
+are checked against an independent sparse
+Hamiltonian; dense references are also used at
+four and six sites. All 60 trials (five lengths,
+two OMP settings, five DM values plus a
+two-eigenpair check at \(D=0\)) passed,
+with the greatest eigenenergy error below
+\(1.4\times10^{-13}\) and the total staggered
+chirality difference below \(1.5\times10^{-9}\).
+The energy finite-difference derivative agreed
+with the independent chirality expectation
+to within \(2.5\times10^{-10}\) at \(D=0\).
+
+The unusual Cartesian output order after the
+two site labels is
+\((xx,yx,zx,xy,yy,zy,xz,yz,zz)\).
+Explicit verification of both oriented
+off-diagonal components is therefore crucial.
+The mean chirality varies smoothly along the
+tested finite-size parameter cut, and the
+susceptibility decreases as the chain length
+grows through twelve sites. Neither observation
+establishes a thermodynamic extrapolation,
+spontaneous order or a phase transition. In
+particular, small nonzero \(D=0\) chirality
+is compatible with the explicit anisotropy,
+site parity and finite boundaries of this model.
+
+## 5. Independent comparison with a published XYZ-DM Hamiltonian
+
+As a complementary model-level test we implement
+the periodic spin-1/2 Hamiltonian of Yi *et al.*
+[3], with Pauli matrices \(\sigma^\mu\):
+\[
+H_{\rm Yi}=J\sum_i\left[
+\frac{1+\gamma}{2}\sigma_i^x\sigma_{i+1}^x+
+\frac{1-\gamma}{2}\sigma_i^y\sigma_{i+1}^y+
+\Delta\sigma_i^z\sigma_{i+1}^z\right]
++D\sum_i(\sigma_i^x\sigma_{i+1}^y-\sigma_i^y\sigma_{i+1}^x)
+-h\sum_i\sigma_i^z.
+\]
+The exact conversion to ED2's \(S=\sigma/2\)
+and positive input-field conventions is
+\[
+J_x=2J(1+\gamma),\quad
+J_y=2J(1-\gamma),\quad
+J_z=4J\Delta,\quad D_z=4D,\quad h_z=-2h .
+\]
+For independently chosen control parameters
+\(J=1,\gamma=0.37,\Delta=0.41,h=0.58\),
+\(D=0,0.19\), and \(L=4,6,8\), the
+independently assembled Pauli matrix gives
+the full spectrum and physically oriented
+two-site correlations. All 12 ED2 comparisons,
+including both OMP=1/2, passed. Maximum
+full-spectrum differences were below
+\(3\times10^{-14}\), while magnetization
+and correlation differences were below
+\(10^{-14}\). The periodic closing bond
+tests the directed DM sign and the output
+correlation-order convention.
+
+This is a reproduction of a **published
+Hamiltonian definition** at selected finite
+sizes, not a numerical reproduction of its
+reported bulk phase diagram or Wigner–Yanase
+coherence quantities. The main scientific
+application remains the mixed-spin
+nonconserving model in Sec. 4.
+
+## 6. Matched-target resource characterization
+
+A comparison of two algorithms can be misleading
+when one requests one state while the other
+requests two, or when their numerical acceptance
+criteria differ. We therefore request one
+lowest eigenpair from both ALG=1 and ALG=2,
+with an identical explicit complex initial
+vector, the same fixed RNG seed, full
+representation, physical observables and
+absolute residual requirement \(10^{-8}\).
+The ALG=2 restart dimensions (NOK,NOM) are
+recorded as separate choices. We use
+one uncounted warm-up and two interleaved
+measurement repetitions for each condition.
+
+On the stationary alternating-spin model
+at \(D=0.12\), the following data were
+measured on Ubuntu 24.04 GitHub-hosted
+CI with GNU Fortran 13, -O2 -fopenmp and
+single-thread BLAS. The full 36-run
+acceptance suite passed independently
+for both OMP=1 and OMP=2.
+
+| L | OMP | Solver | Median H applications | Median wall time (s) | Median RSS (KiB) |
+| ---: | ---: | --- | ---: | ---: | ---: |
+| 8 | 1 | ALG=1 | 120 | 0.030616 | 8,454 |
+| 8 | 1 | ALG=2 NOK=2,NOM=16 | 306 | 0.075426 | 10,160 |
+| 8 | 1 | ALG=2 NOK=4,NOM=24 | 475 | 0.123207 | 10,716 |
+| 10 | 1 | ALG=1 | 200 | 0.285188 | 22,128 |
+| 10 | 1 | ALG=2 NOK=2,NOM=16 | 340 | 0.547111 | 27,850 |
+| 10 | 1 | ALG=2 NOK=4,NOM=24 | 550 | 0.930786 | 30,800 |
+
+The ALG=2 workspace strongly influences the
+observed resource cost; the listed ALG=1
+measurements use fewer Hamiltonian applications
+for this one-ground-state task. We draw no
+general algorithmic ranking or strong-scaling
+conclusion from these shared-runner,
+two-repeat measurements. The performance
+section must be augmented with repeated
+isolated-node timings, compiler/BLAS,
+CPU/cache and affinity records, cache-policy
+comparisons and at least one additional
+spectral workload before submission.
+
+## 7. Conclusion and limitations
+
+ED2 provides a generalized exact-diagonalization
+setting for unequal spins and anisotropic,
+nonconserving interactions beyond the
+published near-saturation QS³ model scope.
+Its physically meaningful validation
+combines low spectral levels with local and
+Cartesian correlations, a parameter-conjugate
+operator identity and multiple independent
+susceptibility formulations. The literature
+Hamiltonian check adds an independently
+verified spin-convention and oriented
+periodic-boundary test.
+
+These finite-size results demonstrate
+software correctness and model coverage,
+not novel chiral order, exact bulk
+properties or a universally advantageous
+eigensolver. The full Hilbert-space
+dimension remains exponential; finite
+small gaps, truncation conventions,
+public API scope, compiler portability
+and controlled-node performance require
+careful documentation.
+
+## References and evidence links
+
+[1] H. Ueda, S. Yunoki, T. Shimokawa,
+*Computer Physics Communications* **277**,
+108369 (2022). DOI: 10.1016/j.cpc.2022.108369.
+
+[2] A. Lahiri and S. K. Pati,
+*Journal of Physics: Condensed Matter* (2022).
+DOI: 10.1088/1361-648X/ac4aab.
+
+[3] T.-C. Yi, W.-L. You, N. Wu and A. M. Oleś,
+*Physical Review B* **100**, 024423 (2019).
+DOI: 10.1103/PhysRevB.100.024423.
+
+Primary independent DM response:
+https://github.com/ueda1984/ED2/actions/runs/43690041312
+
+Literature and matched-resource validation:
+https://github.com/ueda1984/ED2/actions/runs/43702189530
+
+Related development reports:
+docs/development/cpc-stationary-dm-application.md
+and docs/development/cpc-literature-matched-benchmark.md.
+
+**Unresolved editorial items:** agree author list,
+CPC CPiP versus CP category, program release,
+source DOI/archive and licensing provenance;
+run isolated-node benchmarks and perform
+full technical copy-edit before submission.
