@@ -1,7 +1,11 @@
 # CPC manuscript: scientific first draft (for author review)
 
-> **Working draft, 15 November 2026.** Not submitted, accepted or associated
-> with a software DOI. Author list, article category, program summary and
+> **Working draft, 15 November 2026.** The first proposed ED2
+> journal-program article (its source is public, but ED2 has
+> not yet been reported in a journal program paper).
+> The previous CPC program is QS³, with original
+> source [QS-Cube/ED](https://github.com/QS-Cube/ED).
+> Not submitted, accepted or associated with a software DOI. Author list, article category, program summary and
 > release/version information are to be approved. The main 60/60 DM response
 > results and the auxiliary 12/12 literature-Hamiltonian plus 36/36
 > resource-characterization trials, 52/52 cache-policy trials,
@@ -16,8 +20,10 @@
 
 ## Abstract
 
-We present ED2, a Fortran exact-diagonalization program for lattice
-quantum-spin Hamiltonians with site-dependent spin magnitudes,
+We present the first journal-program description of ED2,
+the generalized successor to the published QS³/ED
+spin solver, for lattice quantum-spin Hamiltonians
+with site-dependent spin magnitudes,
 anisotropic exchange, Dzyaloshinskii–Moriya interactions, symmetric
 off-diagonal exchange and magnetic fields. Extending the model
 coverage of the published near-saturation QS³ solver, ED2 provides
@@ -27,7 +33,11 @@ symmetry reductions from projections that need not commute with
 the Hamiltonian. Dense and iterative eigensolvers, local magnetic
 moments and Cartesian two-spin correlations are verified using
 independently constructed Hamiltonians, with numerical diagnostics
-that distinguish convergence from ground-state inclusion. As a
+that distinguish convergence from ground-state inclusion.
+For the common spin-1/2 XXZ limit, all six levels of a four-site
+invariant magnetization sector agree between the original
+QS³/ED executable, ED2 and an independent Hamiltonian
+to absolute differences below \(3\times10^{-15}\). As a
 reproducible scientific application we compute the response to a
 staggered directed DM interaction in an alternating spin-1/2 and
 spin-1 chain containing XYZ, symmetric off-diagonal and transverse
@@ -63,14 +73,30 @@ relevant when the desired outputs are physical observables sensitive
 to the wave function, not only ground-state energies.
 
 The QS³ program, published in *Computer Physics Communications*
-in 2022 [1], addresses near-saturation quantum-spin calculations
-and already provides iterative eigensolvers, observables and OpenMP
-parallelism. ED2 must therefore be positioned as an extension
-in the supported local Hilbert spaces and interaction structures,
-rather than as the invention of Lanczos, restarted Krylov iteration
-or parallel exact diagonalization. In particular, ED2's generalized
-exchange and field inputs can represent Hamiltonians in which
-total \(S^z\) is not conserved.
+in 2022 [1], corresponds to [QS-Cube/ED](https://github.com/QS-Cube/ED).
+That code computes spin-1/2 XXZ-type Hamiltonians at fixed
+\(N_\downarrow\), optionally with momentum reduction, using
+dense and iterative solvers. It also includes a dedicated
+dynamical-structure-factor workflow. These are valuable existing
+features and **are not claimed as new ED2 algorithms**.
+
+ED2 has a public [QS-Cube/ED2](https://github.com/QS-Cube/ED2)
+repository but has **not yet been described by a journal
+ED2 software program article**. The present manuscript is its
+first formal program description, not an incremental paper
+written after ED2 was already published in CPC. Its primary
+new scientific-computing scope relative to the *published*
+QS³ is mixed local spins, three-axis site fields,
+anisotropic XYZ/DM/Gamma interactions, full-space
+nonconserving calculations and full Cartesian static
+spin correlations. The ED2 executable is not claimed
+to carry over the original QS³ dynamic structure
+factor as a fully supported native pathway.
+The later fork maintenance further adds numerical
+stability, field-index correctness and reproducible
+validation; it is not the origin of the generalized
+Hamiltonian input already present in public ED2.
+See the [code-level comparison against QS-Cube/ED](cpc-qs3-ed-to-ed2-scope-matrix.md).
 
 Other exact-diagonalization frameworks, including QuSpin [4],
 already offer general spin-model Hamiltonians and
@@ -162,6 +188,39 @@ observables with independently assembled dense or
 sparse reference Hamiltonians. Actual nonconvergence
 and invalid solver-output states are recorded separately
 from successful numerical validations.
+
+### 3.0 Preserving the common QS³/ED XXZ limit
+
+We compiled the original published-code
+QS-Cube/ED QS3_only_u1 executable at
+commit `a3b09934bba5f966bfb564718528de8778c2b46c`,
+and ED2 at commit
+`88c72032c26e52e507bc1217ec030479ada486fc`.
+In a four-site OBC spin-1/2 XXZ chain
+at \(N_\downarrow=2\), \(J_{xy}=0.8\),
+\(J_z=1.1\), each executable represents
+the same **six-dimensional invariant sector**.
+Using ALG=3 (dense LAPACK) in both
+programs, we compared all six levels
+with a separately assembled NumPy
+product-state Hamiltonian. The maximum
+deviations are \(3.33\times10^{-16}\)
+(original to reference),
+\(2.66\times10^{-15}\) (ED2 to
+reference) and \(2.89\times10^{-15}\)
+(old to new). This is an explicit
+scientific continuity test, rather
+than a performance comparison or
+a claim that old dynamical output
+formats are reproduced.
+
+The [frozen six-state spectrum](cpc-qs3-ed-ed2-shared-xxz-spectrum-ci.csv),
+[pinned CI comparison](https://github.com/ueda1984/ED2/actions/runs/43712076117)
+and [model/feature scope matrix](cpc-qs3-ed-to-ed2-scope-matrix.md)
+retain original-source provenance.
+The nonconserving mixed-spin
+response in Section 4 illustrates
+the distinct extended Hamiltonian scope.
 
 ### 3.1 Near-degenerate spectral subspaces
 
@@ -1018,10 +1077,15 @@ with statistical uncertainty assessment.
 
 ## 7. Conclusion and limitations
 
-ED2 provides a generalized exact-diagonalization
-setting for unequal spins and anisotropic,
+This first ED2 program paper describes
+generalized exact diagonalization for
+unequal spins and anisotropic,
 nonconserving interactions beyond the
-published near-saturation QS³ model scope.
+published near-saturation QS³/ED scope.
+A direct three-way XXZ-sector comparison
+establishes the common-limit continuity
+without asserting the preservation
+of every original QS³ dynamical feature.
 Its physically meaningful validation
 combines low spectral levels with local and
 Cartesian correlations, a parameter-conjugate
