@@ -1,8 +1,10 @@
 % ED2 first journal-program article: authorship and version are NOT finalized.
 % Primary published predecessor: QS-Cube/ED (QS^3, CPC 277 (2022) 108369).
 % Never assign a CPC accession, software DOI, or credit unconfirmed authors.
-\documentclass[preprint,12pt]{elsarticle}
+\documentclass[preprint,12pt,nopreprintline]{elsarticle}
 \usepackage{amsmath,amssymb,bm,booktabs,hyperref}
+\hypersetup{colorlinks=true,linkcolor=black,citecolor=blue,urlcolor=blue}
+\emergencystretch=2em
 \journal{Computer Physics Communications}
 \newcommand{\EDtwo}{ED2}
 \newcommand{\QSthree}{QS$^{3}$}
@@ -42,7 +44,7 @@ Dzyaloshinskii--Moriya interaction \sep Lanczos method \sep reproducible softwar
 \end{frontmatter}
 
 \section*{Program summary (provisional; not release metadata)}
-\begin{description}
+\begin{description}\sloppy
 \item[Program title:] ED2 (QS$^3$--ED2).
 \item[Program version:] To be assigned after integration and release review.
 \item[Program repository:] \url{https://github.com/QS-Cube/ED2};
@@ -166,8 +168,9 @@ We therefore compare energy levels, residuals and physical
 observables against independently assembled Hamiltonians.
 
 \subsection{Continuity with the published QS$^3$ executable}
-The original \QSthree{} source was checked out at immutable commit
-\texttt{a3b09934bba5f966bfb564718528de8778c2b46c} and compiled
+The original \QSthree{} source was checked out at
+commit \texttt{a3b09934bba5} (full SHA preserved in
+the archived verification inputs) and compiled
 without modifying its production Fortran. In shared spin-$1/2$,
 open-boundary XXZ limits ($J_{xy}=0.8$, $J_z=1.1$),
 all 32 eigenvalues across the three invariant sectors
@@ -191,21 +194,26 @@ The displayed energies are from the independently referenced
 first source-archived execution. Iterations are not matched-start
 performance observations.}
 \label{tab:continuity}
+{\small
 \begin{tabular}{rrrrr}
 \toprule
-$L$ & $\binom{L}{2}$ & Independent $E_0$
-& Old \QSthree{} $E_0$ & ED2 $E_0$\\
+$L$ & $\binom{L}{2}$ & $E_0$ (reference)
+& $|\delta E_{\mathrm{QS^3}}|$ & $|\delta E_{\mathrm{ED2}}|$\\
 \midrule
-12 & 66 & -0.622563133745496 & -0.622563133745496 & -0.622563133745496\\
-18 & 153 & 0.940644373074134 & 0.940644373074154 & 0.940644373074136\\
-24 & 276 & 2.561293057049088 & 2.561293057049099 & 2.561293057049087\\
+12 & 66 & -0.62256313375 & $1.11\times10^{-16}$ & 0\\
+18 & 153 & 0.94064437307 & $1.99\times10^{-14}$ & $2.11\times10^{-15}$\\
+24 & 276 & 2.56129305705 & $1.11\times10^{-14}$ & $8.88\times10^{-16}$\\
 \bottomrule
 \end{tabular}
+}
 \end{table}
 
-On a periodic six-site XXZ ring, an independent projector
-$P_m=L^{-1}\sum_{r=0}^{L-1}\exp(-2\pi imr/L)T^r$
-resolves the fixed-$\updn=2$ space into six translation
+On a periodic six-site XXZ ring, we independently construct
+the translation projector
+\begin{equation}
+P_m=\frac{1}{L}\sum_{r=0}^{L-1}e^{-2\pi i m r/L}\,T^r.
+\end{equation}
+It resolves the fixed-$\updn=2$ space into six translation
 sectors. Their dimensions are $3,2,3,2,3,2$.
 The original \QSthree{} and ED2 executables reproduce
 all 15 sector-resolved eigenvalues, with maximum
