@@ -93,9 +93,11 @@ A [source-level and capability comparison](docs/development/cpc-qs3-ed-to-ed2-sc
 documents the spin-model generalization and records the
 historical dynamical structure-factor functions not
 currently demonstrated by the new ED2 executable.
-The [pinned original-program XXZ cross-check](docs/development/cpc-qs3-ed-ed2-shared-xxz-spectrum-ci.csv)
-reproduces six common-sector levels with a maximum
-original-to-ED2 difference below 3e-15.
+The [pinned original-program XXZ cross-check](docs/development/cpc-qs3-ed-to-ed2-scope-matrix.md)
+now reproduces **32 levels across three four-/six-site U(1)
+sectors**, including the original near-saturation (N_\downarrow=1)
+regime. The [frozen 32-level spectrum](docs/development/cpc-qs3-ed-ed2-32level-extended-ci.csv)
+shows a maximum original-to-ED2 difference below 3e-15.
 
 The [CPC submission-focused draft](docs/development/cpc-submission-core-draft.md)
 and [upstream-versus-development contribution audit](docs/development/cpc-software-provenance-contribution-audit.md)
