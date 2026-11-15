@@ -115,6 +115,49 @@ match the cache-array allocation formula; shared-runner
 timings are characterized, but dedicated-node performance
 claims remain pending.
 
+## Submission-focused source and reproducibility checks (November 2026)
+
+The [source contribution audit](cpc-software-provenance-contribution-audit.md)
+now distinguishes the **published 2022 QS³ program**,
+the **already-generalized upstream ED2 repository**,
+and the **Phase 1 development-fork numerical maintenance**.
+It confirms that the fork's `main` and upstream are at
+the same observed SHA `49941dc4b437a8fb6c2b5c8dac7d621866731d7c`,
+while the working branch changes **eight** production
+`source/` entries relative to that main SHA. These
+changes are mainly typed BLAS/LAPACK interfaces, repaired
+field indexing, Lanczos/Krylov correctness and reporting,
+rather than new DM operators or a newly invented solver.
+Recent physics verification did not modify the Fortran
+kernels further.
+
+A compact [submission-focused main-text draft](cpc-submission-core-draft.md)
+reduces the emphasis on adversarial edge-spin numerical
+cases in the detailed working document, making the
+paper's argument **generalized software, science
+reproduction, independent acceptance and cache
+resource characteristics**, not repeated assertions
+of a new numerical algorithm.
+
+A [portable scientific worked example](cpc-portable-dm-quickstart.md)
+runs the fully non-U(1) mixed-spin connected chain
+at \(L=4,6\), scanning \(D=-2\times10^{-4},0,+2\times10^{-4}\).
+After the compiled Fortran program is available, its
+driver needs **only Python's standard library**, not
+SciPy/NumPy. The four clean source-distribution
+OMP/length CI configurations complete twelve
+solver invocations with absolute direct residual,
+Hellmann–Feynman and frozen independent chirality /
+susceptibility acceptance.
+
+The [pinned-node postprocessor](cpc-controlled-node-protocol.md#strict-post-run-numerical-and-resource-audit)
+recomputes numerical-acceptance and input-integrity checks,
+factorial completeness and wall/RSS median–MAD summaries,
+and **rejects** an attempted publication-gated audit of
+shared CI data. Actual dedicated-node measurements are
+still **not available**, and the human operator must verify
+allocation exclusivity.
+
 ## Verified software status and open release decisions
 
 At the time of this draft:
