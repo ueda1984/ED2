@@ -44,27 +44,50 @@ E_TOL=3e-7
 OBS_TOL=8e-6
 HF_TOL=3e-5
 
-CSV_FIELDS=("sites","dimension","D","E0","E0_per_site",
+CSV_FIELDS=("profile","sites","dimension","D","E0","E0_per_site",
             "first_gap","staggered_kappa","staggered_kappa_per_bond",
             "mean_abs_bond_kappa","mean_Sx","mean_Sz",
-            "hf_central_difference","hf_error","max_reference_residual")
+            "hf_central_difference","hf_error","chi_from_kappa_per_bond",
+            "chi_from_curvature_per_bond","chi_spectral_per_bond",
+            "chi_selfconsistency_error","max_reference_residual")
 
 
-def create_model(n,D):
+def create_model(n,D,profile="diagnostic"):
     spins=[.5,1.]*(n//2)
-    bonds,fields=dense.couplings(n,.15)
-    prepared=[]
-    for i,j,c in bonds:
-        if j!=i+1 or len(c)!=9:
-            raise AssertionError("Unexpected bond ordering/coupling record")
-        cc=list(c)
-        cc[5]=float(((-1)**i)*D)
-        prepared.append((i,j,cc))
-    return spins,prepared,fields
+    if profile=="diagnostic":
+        # Historical regression model; J/Gamma/field drift with absolute
+        # site index, so DO NOT extrapolate it to the thermodynamic limit.
+        bonds,fields=dense.couplings(n,.15)
+        prepared=[]
+        for i,j,c in bonds:
+            if j!=i+1 or len(c)!=9:
+                raise AssertionError("Unexpected bond ordering/coupling record")
+            cc=list(c)
+            cc[5]=float(((-1)**i)*D)
+            prepared.append((i,j,cc))
+        return spins,prepared,fields
+    if profile!="stationary":
+        raise ValueError("Unknown physical model profile "+str(profile))
+
+    # Exactly the same two-site-periodic local rules for every size:
+    # alternating S=1/2,1 and two alternating oriented bond types.
+    # All model coefficients remain bounded as L grows.
+    bonds=[]
+    for i in range(n-1):
+        eta=(-1)**i
+        c=[.77+.05*eta,.63+.03*eta,1.09-.04*eta,
+           0.,0.,D*eta,
+           0.,0.,.065+.015*eta]
+        bonds.append((i,i+1,c))
+    fields=[]
+    for i in range(n):
+        eta=(-1)**i
+        fields.append([.15*(.4*eta+.1),0.,.17+.035*eta])
+    return spins,bonds,fields
 
 
-def reference(n,D,check_dense=False):
-    spins,bonds,fields=create_model(n,D)
+def reference(n,D,check_dense=False,profile="diagnostic"):
+    spins,bonds,fields=create_model(n,D,profile)
     started=time.perf_counter()
     H,ops=construct_sparse_hamiltonian(spins,bonds,fields)
     build_seconds=time.perf_counter()-started
@@ -100,28 +123,44 @@ def reference(n,D,check_dense=False):
     if abs(full_kappa-staggered)>1e-10:
         raise AssertionError("Component-wise chirality disagrees with direct operator")
     if D==0.0:
-        eplus=eigsh(H+FD_STEP*K,k=1,which="SA",v0=v0,tol=1e-12,
-                    ncv=min(80,dim-1),maxiter=30000,
-                    return_eigenvectors=False)[0]
-        eminus=eigsh(H-FD_STEP*K,k=1,which="SA",v0=v0,tol=1e-12,
-                     ncv=min(80,dim-1),maxiter=30000,
-                     return_eigenvectors=False)[0]
+        # First derivative from two independent energy solves.
+        ep,vp=eigsh(H+FD_STEP*K,k=1,which="SA",v0=v0,tol=1e-12,
+                    ncv=min(80,dim-1),maxiter=30000)
+        em,vm=eigsh(H-FD_STEP*K,k=1,which="SA",v0=v0,tol=1e-12,
+                    ncv=min(80,dim-1),maxiter=30000)
+        eplus=float(ep[0])
+        eminus=float(em[0])
         derivative=float((eplus-eminus)/(2*FD_STEP))
         hf_err=abs(derivative-staggered)
         if hf_err>HF_TOL:
             raise AssertionError("Independent HF mismatch "+
                                  str((n,derivative,staggered,hf_err)))
+        # Second derivative via TWO independent routes:
+        # 1. curvature of the ground-state energy,
+        # 2. derivative of the DM-conjugate observable.
+        kp=expectation(vp[:,0],K)
+        km=expectation(vm[:,0],K)
+        chi_from_k=float(-(kp-km)/(2*FD_STEP*(n-1)))
+        chi_from_energy=float(-(eplus-2*E[0]+eminus)/(FD_STEP**2*(n-1)))
+        chi_self_error=abs(chi_from_k-chi_from_energy)
+        if chi_from_k< -1e-8 or chi_from_energy< -1e-6 or chi_self_error>2e-4:
+            raise AssertionError("Concavity/chiral susceptibility consistency failed "+
+                                 str((n,chi_from_k,chi_from_energy,chi_self_error)))
     else:
         derivative=None
         hf_err=None
+        chi_from_k=None
+        chi_from_energy=None
+        chi_self_error=None
 
     dense_err=None
     dense_eigs_err=None
+    chi_from_spectrum=None
     if check_dense:
         full_ops,_=dense.product_operators(spins)
         Hd=dense.dense_hamiltonian(full_ops,bonds,fields)
         dense_err=float(np.max(np.abs(H.toarray()-Hd)))
-        dense_eigs=np.linalg.eigvalsh(Hd)
+        dense_eigs,dense_vectors=np.linalg.eigh(Hd)
         dense_eigs_err=float(np.max(np.abs(dense_eigs[:2]-E)))
         if dense_err>5e-13 or dense_eigs_err>5e-10:
             raise AssertionError("Dense and sparse constructions disagree "+
@@ -129,8 +168,16 @@ def reference(n,D,check_dense=False):
         # Independent finite difference of actual Hamiltonian input
         # coefficients checks the D parameter and its directed sign.
         if D==0.:
-            _,plus_bonds,_=create_model(n,+FD_STEP)
-            _,minus_bonds,_=create_model(n,-FD_STEP)
+            # Third, direct spectral route for the susceptibility,
+            # exact within the small-system dense diagonalization.
+            matrix_K=K.toarray()
+            amplitudes=dense_vectors[:,1:].conj().T @ (matrix_K @ dense_vectors[:,0])
+            chi_from_spectrum=float(2*np.sum(
+                np.abs(amplitudes)**2/(dense_eigs[1:]-dense_eigs[0]))/(n-1))
+            if abs(chi_from_spectrum-chi_from_k)>5e-5:
+                raise AssertionError("Dense spectral susceptibility does not match finite difference")
+            _,plus_bonds,_=create_model(n,+FD_STEP,profile)
+            _,minus_bonds,_=create_model(n,-FD_STEP,profile)
             dense_K=(dense.dense_hamiltonian(full_ops,plus_bonds,fields)-
                      dense.dense_hamiltonian(full_ops,minus_bonds,fields))/(2*FD_STEP)
             operator_err=float(np.max(np.abs(dense_K-K.toarray())))
@@ -144,13 +191,17 @@ def reference(n,D,check_dense=False):
         raise AssertionError("Physical model unexpectedly conserves total Sz")
 
     return dict(
-        n_sites=n,D=float(D),dimension=dim,spins=spins,bonds=bonds,fields=fields,pairs=pairs,
+        profile=profile,n_sites=n,D=float(D),dimension=dim,spins=spins,bonds=bonds,fields=fields,pairs=pairs,
         H_nonzeros=int(H.nnz),energies=E.tolist(),E0=float(E[0]),
         gap=float(E[1]-E[0]),reference_residual=residual,
         lm=lm,corr=corr,bond_kappa=bond_kappa,staggered_kappa=staggered,
         mean_abs_kappa=float(np.mean(np.abs(bond_kappa))),
         mean_Sx=float(np.mean(lm[:,0])),mean_Sz=float(np.mean(lm[:,2])),
         derivative=derivative,hellmann_feynman_error=hf_err,
+        chi_from_kappa_per_bond=chi_from_k,
+        chi_from_curvature_per_bond=chi_from_energy,
+        chi_spectral_per_bond=chi_from_spectrum,
+        chi_selfconsistency_error=chi_self_error,
         reference_build_seconds=build_seconds,reference_solve_seconds=solve_seconds,
         dense_matrix_error=dense_err,dense_eigenvalue_error=dense_eigs_err,
         nonU1_commutator_relative=comm_ratio,
@@ -195,7 +246,7 @@ def run_ed2(exe,root,r,alg,threads):
     n=r["n_sites"]
     D=r["D"]
     sign="zero" if D==0 else f"{D:+.2f}".replace("+","p").replace("-","m")
-    tag=f"n{n}-D{sign}-alg{alg}-omp{threads}"
+    tag=f"{r['profile']}-n{n}-D{sign}-alg{alg}-omp{threads}"
     work=root/tag
     work.mkdir(exist_ok=False)
     write_inputs(work,r,alg)
@@ -308,6 +359,7 @@ def main():
     p.add_argument("--sizes",default="4,6,8,10",
                    help="Subset of 4,6,8,10,12 (comma separated)")
     p.add_argument("--omp",default=1,type=int,choices=(1,2))
+    p.add_argument("--profile",default="diagnostic",choices=("diagnostic","stationary"))
     args=p.parse_args()
     sizes=tuple(int(s.strip()) for s in args.sizes.split(","))
     if not sizes or any(n not in ALL_SIZES for n in sizes) or len(set(sizes))!=len(sizes):
@@ -321,10 +373,10 @@ def main():
     summary=[]
     for n in sizes:
         for D in D_VALUES:
-            ref=reference(n,D,check_dense=(n<=6))
+            ref=reference(n,D,check_dense=(n<=6),profile=args.profile)
             records.append(ref)
             summary.append(dict(
-                sites=n,dimension=ref["dimension"],D=D,E0=ref["E0"],
+                profile=args.profile,sites=n,dimension=ref["dimension"],D=D,E0=ref["E0"],
                 E0_per_site=ref["E0"]/n,first_gap=ref["gap"],
                 staggered_kappa=ref["staggered_kappa"],
                 staggered_kappa_per_bond=ref["staggered_kappa"]/(n-1),
@@ -332,6 +384,10 @@ def main():
                 mean_Sx=ref["mean_Sx"],mean_Sz=ref["mean_Sz"],
                 hf_central_difference=ref["derivative"],
                 hf_error=ref["hellmann_feynman_error"],
+                chi_from_kappa_per_bond=ref["chi_from_kappa_per_bond"],
+                chi_from_curvature_per_bond=ref["chi_from_curvature_per_bond"],
+                chi_spectral_per_bond=ref["chi_spectral_per_bond"],
+                chi_selfconsistency_error=ref["chi_selfconsistency_error"],
                 max_reference_residual=max(ref["reference_residual"])
             ))
             print(f"DM REFERENCE n={n} D={D:+.2f} dim={ref['dimension']} "
@@ -339,7 +395,15 @@ def main():
                   f"Kst={ref['staggered_kappa']:+.10g} "
                   f"Kst_per_bond={ref['staggered_kappa']/(n-1):+.10g} "
                   f"HF_error={ref['hellmann_feynman_error']} "
+                  f"chi_per_bond={ref['chi_from_kappa_per_bond']} "
+                  f"chi_spectrum={ref['chi_spectral_per_bond']} "
                   f"max_ref_r={max(ref['reference_residual']):.3e}",flush=True)
+    # Variational concavity: E0(D) is the minimum of functions
+    # linear in D, hence it is concave and K(D)=dE0/dD is nonincreasing.
+    for n in sizes:
+        ordered=[ref["staggered_kappa"] for ref in records if ref["n_sites"]==n]
+        if any(ordered[j+1]>ordered[j]+1e-7 for j in range(len(ordered)-1)):
+            raise AssertionError("Monotonicity of DM-conjugate ground chirality violated")
     for ref in records:
         n=ref["n_sites"]
         D=ref["D"]
@@ -364,7 +428,8 @@ def main():
         writer=csv.DictWriter(fp,fieldnames=CSV_FIELDS)
         writer.writeheader()
         writer.writerows(summary)
-    machine=dict(schema=1,source_sha=os.environ.get("GITHUB_SHA","provide from CI"),
+    machine=dict(schema=2,source_sha=os.environ.get("GITHUB_SHA","provide from CI"),
+                 profile=args.profile,
                  model="non-U1 open alternating S=1/2,1 chain with staggered oriented Dz",
                  DM_values=list(D_VALUES),sizes=sizes,omp=args.omp,
                  calibration="dE0/dD equals staggered vector chirality, full Cartesian NN correlators",
