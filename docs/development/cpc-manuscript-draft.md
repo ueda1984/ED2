@@ -204,6 +204,100 @@ physical nor certifies global ground-state inclusion
 from a small residual. The complete setup and outputs
 are archived in the [eight-site doublet report](cpc-stationary-sparse-doublet.md).
 
+### 3.2 Interacting near-degenerate eight-site validation
+
+The preceding rank-two test admits an exactly
+factorized detached-edge Hamiltonian, so it is not
+sufficient evidence that low-subspace observables
+remain accurate for *interacting* near-degenerate
+states. We therefore retain the same seven-site
+non-\(U(1)\) XYZ/Gamma/staggered-DM core but couple
+its edge site to an additional spin-1/2 through
+
+\[
+H_{\rm edge}=\delta S_1^z+
+\varepsilon(S_1^x S_2^x+0.6 S_1^yS_2^y).
+\]
+
+This is explicitly a modified *stress Hamiltonian*,
+not the connected, uniform-rule physical DM
+demonstrator of Sec. 4. Independent SciPy sparse
+diagonalization of the full 1296-dimensional
+matrix computes the three lowest energies,
+their direct eigenpair residuals, edge-spin
+entanglement and the two-dimensional low
+spectral projector. The XY bond generates
+a genuinely entangled ground state; at
+\(\varepsilon=0.02,\delta=0\), its edge
+linear entropy is approximately
+\(2.19\times10^{-4}\).
+
+Five parameter combinations yield a first
+gap between \(1.07\times10^{-4}\) and
+\(4.84\times10^{-3}\), while the external
+separation \(E_2-E_1\) stays between
+approximately 0.333 and 0.339.
+For each Hamiltonian the two ED2 low
+native eigenvectors are verified with
+NOK/NOM=2/16 and 4/24 at OMP=1/2.
+Both vectors are passed through the actual
+ED2 observable output path, using
+native-basis second-state readback for
+the latter. The equal-weight local
+magnetizations (24 components) and
+Cartesian correlations (252 components)
+are compared against the independently
+constructed interacting rank-two projector.
+**20/20 tests passed**, with the largest
+trace-observable difference
+\(3.7433\times10^{-10}\) and maximum
+direct residual \(2.676\times10^{-9}\)
+under a \(10^{-8}\) request.
+
+This supplies an interacting complement
+to the detached-edge doublet experiment,
+rather than relying on a tensor-product
+identity alone. A residual-controlled
+Ritz pair does not, by itself, certify
+global lowest-state inclusion. If
+the exact external third level \(E_2\)
+is independently known, the low-doublet
+projector admits a conditional leakage
+estimate:
+for orthonormal Ritz vectors \(u_j\)
+with \(\lambda_j<E_2\) and
+\(r_j=\|(H-\lambda_j)u_j\|\),
+
+\[
+\|(I-P_{\mathcal C})u_j\|
+\le\frac{r_j}{E_2-\lambda_j}.
+\]
+
+It follows from the spectral decomposition
+and the rank-two projector norm inequalities
+that for \(\|O\|_{\rm op}\le1\),
+
+\[
+\left|\frac12\operatorname{Tr}[(Q-P_{\mathcal C})O]\right|
+\le\sqrt2\left[
+\sum_{j=0}^1
+\frac{r_j^2}{(E_2-\lambda_j)^2}
+\right]^{1/2},
+\]
+
+where \(Q\) is the returned orthonormal
+rank-two projector. This bound uses the
+**external** gap, not the small inner
+doublet gap, and does not constitute
+a self-contained ED2 ground-state
+certificate. Finite floating-point
+orthogonality and reference-level
+accuracy must be controlled separately.
+The [interacting sparse validation report](cpc-interacting-8site-sparse-doublet.md)
+and [frozen 20-case source data](cpc-interacting-8site-raw-ci.csv)
+document the observed results and
+qualification.
+
 ## 4. Scientific application: staggered DM vector chirality
 
 Consider an open chain with
