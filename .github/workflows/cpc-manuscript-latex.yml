@@ -25,7 +25,7 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends \
-            texlive-latex-base texlive-latex-recommended texlive-publishers \
+            texlive-latex-base texlive-latex-recommended texlive-publishers texlive-pictures \
             poppler-utils
       - name: Compile source-pinned manuscript PDF
         run: |
