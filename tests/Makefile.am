@@ -200,3 +200,6 @@ EXTRA_DIST += plot_cpc_cache_multipair.py
 
 # Optional frozen 72-case MNTE capacity CSV validator and performance plots.
 EXTRA_DIST += plot_cpc_mnte.py
+
+# Optional paired tight-full versus conservative-half cache resource comparison.
+EXTRA_DIST += cpc_stationary_cache_pareto.py
