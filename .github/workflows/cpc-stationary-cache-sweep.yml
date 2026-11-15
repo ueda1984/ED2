@@ -1,0 +1,99 @@
+name: CPC stationary DM cache-policy resource checks
+
+on:
+  push:
+    branches:
+      - codex/ed2-cpc-stationary-dm-scaling
+    paths:
+      - ".github/workflows/cpc-stationary-cache-sweep.yml"
+      - "tests/cpc_stationary_cache_sweep.py"
+      - "tests/mixed_spin_matched_benchmark.py"
+      - "tests/cpc_stationary_resource_benchmark.py"
+      - "tests/mixed_spin_dm_chirality_scan.py"
+      - "tests/Makefile.am"
+      - "source/**"
+      - "configure.ac"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cache-accuracy-and-cost:
+    name: "Cache sweep ${{ matrix.tag }}"
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {tag: "small-omp1", threads: 1, sizes: "8,10", algs: "1", policies: "none,half,full", repeats: 2, warmups: 1}
+          - {tag: "small-omp2", threads: 2, sizes: "8,10", algs: "1", policies: "none,half,full", repeats: 2, warmups: 1}
+          - {tag: "large-omp1", threads: 1, sizes: "12", algs: "1,2", policies: "half,full", repeats: 2, warmups: 0}
+          - {tag: "large-omp2", threads: 2, sizes: "12", algs: "1,2", policies: "half,full", repeats: 2, warmups: 0}
+    env:
+      FC: gfortran-13
+      FCFLAGS: "-O2 -fopenmp"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+      OMP_DYNAMIC: "FALSE"
+    steps:
+      - name: Checkout development branch
+        uses: actions/checkout@v4
+      - name: Install Fortran toolchain and independent references
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends gfortran-13 libopenblas-dev liblapack-dev autoconf automake make python3-numpy python3-scipy time
+      - name: Build from independently extracted distribution
+        run: |
+          set -eu
+          autoreconf -vfi
+          ./configure FC="$FC" FCFLAGS="$FCFLAGS"
+          make -j2
+          make dist
+          tmp="$RUNNER_TEMP/ed2-cpc-cache"
+          mkdir -p "$tmp/src" "$tmp/build"
+          tgz=$(find "$GITHUB_WORKSPACE" -maxdepth 1 -name '*.tar.gz' -print -quit)
+          test -n "$tgz"
+          tar -xzf "$tgz" -C "$tmp/src"
+          src=$(find "$tmp/src" -mindepth 1 -maxdepth 1 -type d -print -quit)
+          test -f "$src/tests/cpc_stationary_cache_sweep.py"
+          printf '%s\n' "$src" > "$tmp/source-path"
+          cd "$tmp/build"
+          "$src/configure" FC="$FC" FCFLAGS="$FCFLAGS"
+          make -j2
+          python3 -c "import numpy, scipy; print('numpy',numpy.__version__,'scipy',scipy.__version__)"
+          git -C "$GITHUB_WORKSPACE" rev-parse HEAD
+      - name: Independently check each cache policy and record resources
+        run: |
+          set -eu
+          tmp="$RUNNER_TEMP/ed2-cpc-cache"
+          src=$(cat "$tmp/source-path")
+          python3 "$src/tests/cpc_stationary_cache_sweep.py" \
+            --exe "$tmp/build/source/QS3ED2" \
+            --sizes "${{ matrix.sizes }}" \
+            --policies "${{ matrix.policies }}" \
+            --algs "${{ matrix.algs }}" \
+            --omp "${{ matrix.threads }}" \
+            --repeats "${{ matrix.repeats }}" \
+            --warmups "${{ matrix.warmups }}" \
+            --D 0.12 --residual-atol 1e-8 \
+            --alg2-keep 2 --alg2-capacity 16 \
+            --timeout-seconds 300 \
+            --output "$RUNNER_TEMP/cpc-cache-${{ matrix.tag }}"
+          python3 - "$RUNNER_TEMP/cpc-cache-${{ matrix.tag }}/report.json" <<'PY'
+          import json,sys
+          data=json.load(open(sys.argv[1],encoding="utf-8"))
+          assert data["pass_complete"],(data["nonconverged"],data["contract_violations"])
+          assert data["completed"]==data["expected"]
+          assert all(x["measurements"]==x["target"] for x in data["summary"])
+          print("CACHE CONTRACT",data["completed"],"/",data["expected"],"SUCCESS")
+          PY
+      - name: Archive inputs, solver outputs, and complete machine report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cpc-cache-${{ matrix.tag }}
+          path: ${{ runner.temp }}/cpc-cache-${{ matrix.tag }}/
+          retention-days: 21
+          if-no-files-found: warn
