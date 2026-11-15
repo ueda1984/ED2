@@ -76,6 +76,8 @@ jobs:
           assert d["classified"]==d["expected"]==12
           assert d["accepted"]+d["honest_nonconvergence"]==12
           assert d["scenarios_with_accepted_pair"]
+          assert all(x["effective_low_gap_error"] is not None and
+                     x["effective_low_gap_error"]<1e-9 for x in d["source_references"])
           for r in d["raw"]:
               if r["status"]==0:
                   assert r["direct_residuals"]
