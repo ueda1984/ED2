@@ -153,7 +153,7 @@ relations.
 - Do **not** claim identical status counts or random bitstreams
   across compilers.
 
-### 5. Scientific application and performance (small and intermediate validation complete; physics application pending)
+### 5. Scientific application and performance (physics demonstration verified; publication benchmark pending)
 
 **Recommended compact demonstrator:**
 an alternating mixed-spin chain
@@ -179,9 +179,40 @@ two-low-eigenpair runs with independent physical references.
 
 These are **verified implementation and resource-characterization
 results**, not yet a claim of new physics or a universal
-performance advantage. The tested lowest-pair gaps are about
-0.18–0.21 in the eight/ten-site cases, so near-degeneracy robustness
-must still be evaluated independently.
+performance advantage. Separate low-gap/ground-inclusion studies now
+test near-degeneracy explicitly; do not confuse those controlled
+numerical stress cases with evidence of a phase transition.
+
+A complementary **size-stationary science application** now scans
+a staggered oriented \(D_z\) coupling in the same alternating
+mixed-spin, non-U(1) chain. The historical regression Hamiltonian's
+fields and bond coefficients varied with absolute site index, so
+those runs were **not** suitable for a thermodynamic size
+extrapolation. The new
+[stationary DM/chirality response study](cpc-stationary-dm-application.md)
+instead fixes a two-site repeat rule for \(J^{x,y,z}\),
+\(\Gamma_{xy}\), \(h_x\) and \(h_z\) for every length.
+
+The conjugate chirality
+\(\sum_j(-1)^j\langle
+S_j^x S_{j+1}^y-S_j^y S_{j+1}^x\rangle\)
+is checked against \(\partial E_0/\partial D\)
+using both an independent sparse Hamiltonian and
+actual ED2 NN correlations. The positive finite-size
+susceptibility \(-\partial^2 E_0/\partial D^2/(L-1)\)
+is checked by energy curvature and direct chiral response;
+four-/six-site models also use the complete spectral sum.
+**54/54 scientific trials passed**, from \(L=4\)
+to \(12\), including OMP=1 and OMP=2 at \(L\le10\).
+
+For the CPC draft, this establishes a **reproducible
+non-U(1) response example with size-stationary local
+rules**, not a new chiral phase, thermodynamic
+extrapolation, performance advantage or material
+parameterization. The [reference CSV](cpc-stationary-dm-reference.csv)
+is committed for figure reproduction.
+Publication-grade resource benchmarks and a literature-grounded
+model choice remain priorities.
 
 For any additional model, begin at small \(L\) with the **complete**
 occupation range \(\text{NODmin}=0,\ \text{NODmax}=\sum_i 2S_i\).
@@ -192,10 +223,13 @@ H-action counts at OMP=1/2 for a single couplings family; it does
 **not** replace a controlled repeated-node benchmark, a cache-policy
 scan (`wk_dim`), or a physically diverse spectral study.
 
-Choose a physically motivated parameter cut and interpret at least
-one nontrivial observable or avoided crossing rather than reporting
-only a performance microbenchmark. Record parameters and figure
-data and retain all runs, including nonconvergent trials.
+The DM-conjugate response is now a **validated illustrative
+parameter cut**; retain its input files, source SHA, figure
+CSV, and honest records of any nonconvergence. To argue
+broader scientific relevance, identify a literature-grounded
+Hamiltonian and explain why its parameter choices matter.
+Do not infer a critical point from five DM values or
+five open-chain sizes.
 
 A second optional example could compare an invariant U(1) sector
 with a **projected** excitation-number truncation after transverse
@@ -212,10 +246,13 @@ compiler portability, algorithmic cost, API scope).
 ## Proposed figure/table inventory
 
 1. Diagram of basis/sector construction and ED2 execution workflow.
-2. Independent dense versus ED2 energies and selected observables for
-   the non-U(1) mixed-spin demonstrator (with error versus system size).
+2. **DM/chirality figure:** staggered NN vector chirality per bond
+   versus oriented DM coefficient, (L=4,6,8,10,12), plus the
+   finite-size (chi_kappa(L)). Include independently checked
+   (dE_0/dD), not just solver agreement.
 3. Performance/peak-memory versus dimension, caching and OpenMP
-   threads for a fixed scientifically motivated Hamiltonian.
+   threads for a **fixed workload and matched eigenpair target**;
+   obtain replicated dedicated-node timings before making speed claims.
 4. Numerical accuracy demonstration separating residual, gap and
    observable errors.
 5. Concise comparison table: published QS³ capabilities, verified
@@ -223,11 +260,14 @@ compiler portability, algorithmic cost, API scope).
 
 ## Preconditions before a full first submission draft
 
-- Turn the already verified **4–12-site mixed-spin demonstrator** into
-  a physically motivated application with interpretable parameter
-  dependence, resource/finite-size scaling and convergence evidence;
-  current CI runs are scientifically verified test cases, not a claim
-  of a new phase or a universal numerical advantage.
+- **Illustrative physics application completed:** the 4–12-site
+  two-site-periodic mixed-spin DM/chirality response is verified
+  against independent finite-difference, sparse/dense and full
+  correlation checks. For submission, strengthen the link to
+  literature-grounded Hamiltonians, verify a larger length/window
+  where feasible, and obtain repeated controlled-node resource
+  benchmarks. No new phase or asymptotic numerical advantage
+  has been established.
 - Agree author/order and distinguish the **2022 QS³** authors
   from the current software's attribution.
 - Choose CPC CPiP or CP route and associated software-archive
@@ -308,6 +348,7 @@ benchmarks remain necessary.
 - [Physical near-degenerate and excited-start controls](cpc-near-degenerate-gaps.md).
 - [Interacting avoided crossings and noncommuting bond physics](cpc-interacting-avoided-crossing.md).
 - [Interacting 8-/10-site sparse spectral and observable checks](cpc-interacting-sparse810.md).
+- [Size-stationary DM/chirality response, susceptibility and figure data](cpc-stationary-dm-application.md).
 
 **No manuscript authorship, official source tag, DOI or journal
 publication is assigned by this planning document.**

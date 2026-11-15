@@ -76,5 +76,6 @@ nav:
       - CPC near-degenerate numerical limits: development/cpc-near-degenerate-gaps.md
       - CPC interacting avoided-crossing verification: development/cpc-interacting-avoided-crossing.md
       - CPC interacting 8-10 site sparse verification: development/cpc-interacting-sparse810.md
+      - CPC stationary mixed-spin DM chirality response: development/cpc-stationary-dm-application.md
   - Reference:
       - Citation & Versioning: reference/citation-versioning.md      

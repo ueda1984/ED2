@@ -247,6 +247,25 @@ python3 tests/mixed_spin_dm_chirality_scan.py \
   --output /new/nonexistent/stationary-dm-n12
 ```
 
+To create reproducible **three separate** SVG/PNG
+figure prototypes from the committed CSV, install
+Matplotlib in the analysis environment and run:
+
+```sh
+python3 tests/plot_cpc_dm_chirality.py \
+  --csv docs/development/cpc-stationary-dm-reference.csv \
+  --outdir /new/nonexistent/cpc-dm-figures
+```
+
+The plotting script produces `dm_chirality_vs_D`,
+`dm_gap_vs_D`, and `dm_chiral_susceptibility_vs_L`
+as **individual** SVG and PNG files without
+assuming or fitting a thermodynamic extrapolation.
+These figures use values rounded in the GitHub
+validation logs; use the full-precision numerical
+CSV in the Actions artifact for manuscript-quality
+quantitative reanalysis.
+
 All inputs, wavefunction-independent observable
 files, solver diagnostic sidecars, independent
 physics CSV and machine-readable
