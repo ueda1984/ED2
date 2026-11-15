@@ -341,6 +341,70 @@ guides, not bulk-limit fits.}
 \label{fig:dm-response}
 \end{figure}
 
+
+The independent first excitation gaps at the same 25 finite-size
+parameter points are displayed in Fig.~\ref{fig:dm-gap}.
+All reported gaps are strictly positive on the sampled finite
+chains, but these data neither establish a bulk spin gap
+nor identify a phase boundary.
+Figure~\ref{fig:dm-susceptibility} shows the five $D=0$
+susceptibilities from Table~\ref{tab:susc}.
+We do not extrapolate them to a thermodynamic limit.
+
+% DATA PROVENANCE: first_gap column, docs/development/cpc-stationary-dm-reference.csv
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+ width=0.88\linewidth, height=6.0cm,
+ xmin=-0.25, xmax=0.25, ymin=0.15, ymax=0.38,
+ xlabel={$D$}, ylabel={$\Delta_1=E_1-E_0$},
+ xtick={-0.24,-0.12,0,0.12,0.24},
+ grid=major,
+ legend columns=3,
+ legend style={at={(0.5,-0.30)},anchor=north,draw=none,font=\small}
+]
+\addplot+[mark=*,mark size=1.8pt,thick] coordinates {(-0.24,0.17429542) (-0.12,0.17310422) (0,0.17235306) (0.12,0.17230144) (0.24,0.17255018)};
+\addlegendentry{$L=4$}
+\addplot+[mark=square*,mark size=1.8pt,thick] coordinates {(-0.24,0.2192335) (-0.12,0.22377147) (0,0.22526115) (0.12,0.22424038) (0.24,0.22000646)};
+\addlegendentry{$L=6$}
+\addplot+[mark=triangle*,mark size=1.8pt,thick] coordinates {(-0.24,0.26569524) (-0.12,0.27894845) (0,0.28340937) (0.12,0.27988068) (0.24,0.26730885)};
+\addlegendentry{$L=8$}
+\addplot+[mark=diamond*,mark size=1.8pt,thick] coordinates {(-0.24,0.30035433) (-0.12,0.32174582) (0,0.32938732) (0.12,0.32272129) (0.24,0.30203398)};
+\addlegendentry{$L=10$}
+\addplot+[mark=pentagon*,mark size=1.8pt,thick] coordinates {(-0.24,0.31946093) (-0.12,0.34321831) (0,0.35158094) (0.12,0.34385254) (0.24,0.32070682)};
+\addlegendentry{$L=12$}
+\end{axis}
+\end{tikzpicture}
+\caption{First excitation gaps of the same alternating-spin
+Hamiltonian at the 25 independently verified finite-size
+parameter points. Connecting lines are visual guides;
+no thermodynamic extrapolation is made.}
+\label{fig:dm-gap}
+\end{figure}
+
+% DATA PROVENANCE: chi_kappa_per_bond at D=0 in the same reference CSV
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}
+\begin{axis}[
+ width=0.78\linewidth, height=5.3cm,
+ xmin=3.5, xmax=12.5, ymin=0.47, ymax=0.67,
+ xlabel={Chain length $L$},
+ ylabel={$\chi_\kappa(L)$ at $D=0$},
+ xtick={4,6,8,10,12},
+ grid=major
+]
+\addplot+[mark=*,mark size=2pt,thick] coordinates {(4,0.6343112017685585) (6,0.5687329253277751) (8,0.5373552578573756) (10,0.5197013169818259) (12,0.5085009862217026)};
+\end{axis}
+\end{tikzpicture}
+\caption{Bond-normalized finite-size staggered-chirality
+susceptibility at $D=0$, Eq.~\eqref{eq:susc}.
+Its length dependence does not establish a bulk value
+or critical exponent.}
+\label{fig:dm-susceptibility}
+\end{figure}
+
 The 60 source-archived, independent OMP=1/2 checks through
 12 sites reproduce ground energies and full nearest-neighbor
 Cartesian correlators. The calculated smooth finite-size response

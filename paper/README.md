@@ -5,8 +5,9 @@ an accepted, submitted or finalized article.
 
 - [Main manuscript](cpc_ed2_main.tex) uses Elsevier's `elsarticle` class.
 - [Paper compilation CI](https://github.com/ueda1984/ED2/actions/workflows/cpc-manuscript-latex.yml)
-  first verifies that **all 25 plotted DM/chirality points** match the
-  committed independent stationary-reference CSV via
+  first verifies **25 DM/chirality points, 25 first-gap points, five
+  susceptibility plot values and five rounded susceptibility table entries**
+  against the committed independent stationary-reference CSV via
   `paper/check_dm_figure.py`. It then compiles the PDF twice,
   checks it with `pdfinfo`/`pdftotext`, and archives a proof artifact
   for visual review. The workflow does not publish the PDF.
@@ -56,12 +57,13 @@ natively reproduced by the current ED2 executable. Do not describe
 ED2 as automatically backward-compatible or the whole output feature
 set as a superset.
 
-The first physical figure (five system sizes, 25 finite-size DM-response
-points) is now embedded directly as a `pgfplots` figure. Its coordinates
-must pass the independent CSV-integrity gate in the build workflow.
-The full scientific figure set (in particular the excitation-gap and
-finite-size susceptibility visualizations) still needs author review
-for main-text versus supplementary placement. The present resource
+Three `pgfplots` scientific figures now show the DM-response curves,
+finite-size excitation gaps and D=0 chiral susceptibilities. Their 55
+plotted ordinates and five rounded table values must pass the independent
+CSV transcription gate in CI, including four corruption-rejection probes.
+These checks cannot prove correctness of the independent reference itself;
+the physical reference has its own separate solver-validation workflows.
+Final main-text versus supplementary figure placement needs author review. The present resource
 numbers are **not** a controlled-node performance study.
 Scientific results and references require final author review before
 external submission.

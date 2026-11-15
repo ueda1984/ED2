@@ -28,11 +28,11 @@ jobs:
           sudo apt-get install -y --no-install-recommends \
             texlive-latex-base texlive-latex-recommended texlive-publishers texlive-pictures \
             poppler-utils
-      - name: Reject DM-response figure/source CSV mismatches
+      - name: Reject scientific figure/CSV mismatches and deliberate corruptions
         run: |
           python3 -S paper/check_dm_figure.py \
             --csv docs/development/cpc-stationary-dm-reference.csv \
-            --tex paper/cpc_ed2_main.tex
+            --tex paper/cpc_ed2_main.tex --self-test
       - name: Compile source-pinned manuscript PDF
         run: |
           set -eu
