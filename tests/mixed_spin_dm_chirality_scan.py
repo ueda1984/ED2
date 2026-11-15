@@ -208,7 +208,7 @@ def reference(n,D,check_dense=False,profile="diagnostic"):
     )
 
 
-def write_inputs(work,r,alg):
+def write_inputs(work,r,alg,keep=4,capacity=24,wk_dim=-1):
     n=r["n_sites"]
     (work/"bonds.dat").write_text(
         "".join(f"{i+1} {j+1} "+" ".join(f"{q:.17g}" for q in c)+"\n"
@@ -224,7 +224,7 @@ def write_inputs(work,r,alg):
 NOS={n}, NODmin=0, NODmax={nodmax}, ALG={alg},
 L1=1, L2=1, L3=1, L4=1, L5=1, L6=1,
 M1=0, M2=0, M3=0, M4=0, M5=0, M6=0,
-NO_one={n}, NO_two={len(r['bonds'])}, wk_dim=-1, MNTE=-1,
+NO_one={n}, NO_two={len(r['bonds'])}, wk_dim={wk_dim}, MNTE=-1,
 FILE_xyz_dm_gamma='bonds.dat', FILE_hvec='fields.dat',
 FILE_spin='spins.dat', FILE_NODmax='caps.dat',
 OUTDIR='./', FILE_wf='./', wr_wf=0, re_wf=0,
@@ -235,21 +235,24 @@ FILE_two_cf='pairs.dat'
 lnc_ene_conv=1d-12, minitr=5, maxitr=1200, itrint=10
 /
 &input_TRLan
-NOE=2, NOK=4, NOM=24, maxitr=320, lnc_ene_conv=1d-12,
+NOE=2, NOK={keep}, NOM={capacity}, maxitr=320, lnc_ene_conv=1d-12,
 i_vec_min=1, i_vec_max=2
 /
 """
     (work/"input.dat").write_text(deck)
 
 
-def run_ed2(exe,root,r,alg,threads):
+def run_ed2(exe,root,r,alg,threads,keep=4,capacity=24,
+            wk_dim=-1,initial_text=None):
     n=r["n_sites"]
     D=r["D"]
     sign="zero" if D==0 else f"{D:+.2f}".replace("+","p").replace("-","m")
     tag=f"{r['profile']}-n{n}-D{sign}-alg{alg}-omp{threads}"
     work=root/tag
     work.mkdir(exist_ok=False)
-    write_inputs(work,r,alg)
+    write_inputs(work,r,alg,keep=keep,capacity=capacity,wk_dim=wk_dim)
+    if initial_text is not None:
+        (work/'initial-vector.txt').write_text(initial_text)
     timelog=work/"gnu-time.txt"
     cmd=[str(exe)]
     if Path("/usr/bin/time").is_file():
@@ -258,6 +261,8 @@ def run_ed2(exe,root,r,alg,threads):
              OPENBLAS_NUM_THREADS="1",MKL_NUM_THREADS="1",
              ED2_RNG_SEED=str(SEED),ED2_RESIDUAL_ATOL=str(RES_TOL),
              ED2_DIAGNOSTICS="diagnostics.txt")
+    if initial_text is not None:
+        env['ED2_INITIAL_VECTOR']=str(work/'initial-vector.txt')
     start=time.perf_counter()
     with (work/"input.dat").open("rb") as inp:
         proc=subprocess.run(cmd,stdin=inp,cwd=work,env=env,
@@ -277,12 +282,20 @@ def run_ed2(exe,root,r,alg,threads):
         raise AssertionError("Unexpected dimension/eigenpair count")
     if diag.get("residual_policy_enabled")!="T" or diag.get("seed_specified")!="T":
         raise AssertionError("Explicit diagnostic contract not activated")
+    if initial_text is not None and diag.get('explicit_initial')!='T':
+        raise AssertionError('Explicit starting vector not honored')
+    if alg==2 and (int(diag['keep'])!=keep or int(diag['capacity'])!=capacity):
+        raise AssertionError('Requested ALG=2 restart workspace not honored')
     rss=None
     if timelog.is_file():
         for line in timelog.read_text().splitlines():
             if line.startswith("MAX_RSS_KIB="): rss=int(line.split("=",1)[1])
     row=dict(case=tag,n_sites=n,D=D,dimension=r["dimension"],
              alg=alg,wanted=wanted,threads=threads,
+             requested_keep=keep if alg==2 else None,
+             requested_capacity=capacity if alg==2 else None,
+             requested_wk_dim=wk_dim,
+             explicit_initial=initial_text is not None,
              status=status,reason=diag["reason"],
              h_applications=int(diag["h_applications"]),
              iterations=int(diag["iterations"]),cycles=int(diag["cycles"]),
