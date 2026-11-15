@@ -84,7 +84,7 @@ The near-constant ratio over a factor of 20 in coupling agrees with the independ
 
 ALG=2 computes two states for three biases \(\delta=-10^{-7},0,+10^{-7}\), two workspaces NOK/NOM=2/16 and 4/24, and OMP=1/2, with requested absolute residual \(10^{-12}\). The complete **12/12** matrix passes the native ED2 observable readback and independently assembled sparse low-projector comparisons.
 
-The largest ED2 versus second-order *dressed* ground edge moment difference is \(1.17\times10^{-8}\), and the maximum doublet-averaged Cartesian correlation difference from the independent low projector is approximately \(2.26\times10^{-9}\). A small residual does not, in isolation, certify globally correct lowest-state inclusion.
+The largest ED2 versus second-order *two-level* ground edge moment difference is \(1.17\times10^{-8}\), (the dressed result differs from this two-level estimate by less than \(10^{-12}\) in these ultraweak cases), and the maximum doublet-averaged Cartesian correlation difference from the independent low projector is approximately \(2.26\times10^{-9}\). A small residual does not, in isolation, certify globally correct lowest-state inclusion.
 
 The [12-row ED2 comparison](cpc-second-order-ed2-new-ci.csv) and [6-row model reference comparison](cpc-second-order-reference-new-ci.csv) preserve the job IDs and source SHA; do not merge them with earlier runs as if they were one measurement session.
 
