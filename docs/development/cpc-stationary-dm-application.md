@@ -22,6 +22,46 @@ The earlier 54-trial nonstationary diagnostic is retained separately.
 The size-stationary study forms a more defensible **physics application
 figure**, not a retroactive replacement of prior test evidence.
 
+## Relationship to earlier spin-chain studies
+
+This is an **illustrative, explicitly defined numerical Hamiltonian**,
+not a reproduction or material-specific fit to a published data set.
+It is motivated by the following *distinct* research contexts:
+
+- **Lahiri and Pati**, "Loss of classicality in alternating
+  spin-1/2/spin-1 chain, in the presence of next-neighbor couplings
+  and Dzyaloshinskii-Moriya interactions,"
+  *Journal of Physics: Condensed Matter* (2022),
+  [doi:10.1088/1361-648X/ac4aab](https://doi.org/10.1088/1361-648X/ac4aab).
+  This work studies a mixed-spin chain with NN/NNN antiferromagnetic
+  couplings and a \(D_z\) term using spin-wave theory and DMRG.
+  The present CPC demonstrator **does not use their Hamiltonian
+  parameters or claim their spin phases**.
+- **Yi, You, Wu and Oles**, "Criticality and factorization in
+  the Heisenberg chain with Dzyaloshinskii-Moriya interaction,"
+  *Physical Review B* **100**, 024423 (2019),
+  [doi:10.1103/PhysRevB.100.024423](https://doi.org/10.1103/PhysRevB.100.024423).
+  This provides a separate spin-\(1/2\) anisotropic-XYZ,
+  magnetic-field and DM context, **not** an alternating
+  mixed-spin reference model.
+- **Ueda, Yunoki and Shimokawa**, "Quantum spin solver near
+  saturation: QS³," *Computer Physics Communications* **277**,
+  108369 (2022),
+  [doi:10.1016/j.cpc.2022.108369](https://doi.org/10.1016/j.cpc.2022.108369).
+  QS³'s published scope emphasizes spin-\(1/2\),
+  U(1)-invariant XXZ-type models near saturation.
+  The ED2 demonstration focuses on software capabilities
+  **outside that published model scope**.
+
+Consequently the present response should be described as
+**an independent physical-observable verification of a generalized
+spin solver**. A stronger literature-oriented CPC application
+would reproduce a published limiting model first, then
+test which new interactions ED2 can add and how the
+observable changes. The specific numerical coefficients below
+were selected as reproducible controls, **not sourced
+from a measured material**.
+
 ## Hamiltonian and sign conventions
 
 For an open alternating chain \(S_i=\tfrac12,1,\tfrac12,1,\ldots\),
