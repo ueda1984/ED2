@@ -7,6 +7,8 @@ on:
     paths:
       - ".github/workflows/cpc-stationary-sparse-doublet.yml"
       - "tests/cpc_stationary_low_doublet_trace.py"
+      - "tests/plot_cpc_sparse_doublet.py"
+      - "docs/development/cpc-sparse-doublet-8site-raw-ci.csv"
       - "tests/mixed_spin_near_degenerate.py"
       - "tests/mixed_spin_dm_chirality_scan.py"
       - "tests/mixed_spin_sparse_scale.py"
@@ -87,3 +89,33 @@ jobs:
           path: ${{ runner.temp }}/cpc-sparse-doublet-omp${{ matrix.omp }}/
           retention-days: 21
           if-no-files-found: warn
+
+  frozen-figure-audit:
+    name: "Validate frozen 12/12 doublet trials and render SVG/PNG"
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install plotting dependency
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends python3-matplotlib python3-numpy
+      - name: Strict audit source provenance and conserved doublet trace
+        run: |
+          set -eu
+          python3 tests/plot_cpc_sparse_doublet.py --validate-only
+      - name: Render low-doublet prototype figure pairs
+        run: |
+          set -eu
+          python3 tests/plot_cpc_sparse_doublet.py \
+            --output "$RUNNER_TEMP/cpc-doublet-figures"
+          test "$(find "$RUNNER_TEMP/cpc-doublet-figures" -maxdepth 1 -name '*.svg' | wc -l)" -eq 2
+          test "$(find "$RUNNER_TEMP/cpc-doublet-figures" -maxdepth 1 -name '*.png' | wc -l)" -eq 2
+          sha256sum "$RUNNER_TEMP/cpc-doublet-figures"/*.svg
+      - name: Retain plotted evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: cpc-sparse-doublet-figures
+          path: ${{ runner.temp }}/cpc-doublet-figures/
+          if-no-files-found: error
+          retention-days: 21
