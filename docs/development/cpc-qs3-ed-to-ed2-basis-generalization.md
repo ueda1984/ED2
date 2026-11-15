@@ -116,7 +116,58 @@ The 4- and 6-site full-space dimensions
 are also independently exercised by the
 [portable ED2 DM quickstart](cpc-portable-dm-quickstart.md).
 
-## 4. Crucial physical boundary: invariant versus projected
+## 4. Actual ED2 dimension and spectrum cross-validation
+
+The source-distribution
+[CI #43713235842](https://github.com/ueda1984/ED2/actions/runs/43713235842)
+built the actual generalized ED2 Fortran
+executable from commit
+`fd90968e2d50e251ac3e5ec0e24ad01f02cda0a9`.
+Using **only Python's standard library**
+for the independent reference,
+it enumerated all mixed-spin
+occupations and calculated the
+diagonal spectrum of an anisotropic
+longitudinal-field/ZZ model
+for three occupation windows.
+
+| \(N_{\min},N_{\max}\) | Independent polynomial dimension | ED2 reported dimension | Independently validated eigenvalues | Max absolute spectrum error |
+| --- | ---: | ---: | ---: | ---: |
+| 0, 6 | 36 | 36 | 36 | 1.11e-16 |
+| 3, 3 | 10 | 10 | 10 | 5.55e-17 |
+| 2, 4 | 26 | 26 | 26 | 1.11e-16 |
+
+All **3/3 representations and 72/72
+eigenvalues passed**, without relying on
+an automatically assumed fixed-\(S^z\)
+sector. The test directly verifies
+ED2's full/partial
+limited-repetition representation and
+numerical matrix construction at a
+fixed physical Hamiltonian.
+
+The code and tests are in
+[`tests/cpc_mixed_spin_bounded_basis.py`](https://github.com/ueda1984/ED2/blob/codex/ed2-cpc-stationary-dm-scaling/tests/cpc_mixed_spin_bounded_basis.py).
+The
+[CI artifact](https://github.com/ueda1984/ED2/actions/runs/43713235842)
+contains the complete eigenvalues,
+independently enumerated reference,
+input records and source/binary
+SHA256 metadata. It is temporarily
+retained by GitHub Actions; the
+tracked validation script permits
+independent regeneration later.
+
+The Hamiltonian in this **basis-counting
+verification** is longitudinal and
+conserves \(N_\downarrow\), so the
+restricted windows here are exact
+invariant collections. Do **not**
+generalize that statement to the
+paper's separate non-\(U(1)\)
+XYZ/Gamma/DM demonstration.
+
+## 5. Crucial physical boundary: invariant versus projected
 
 The global total occupation operator
 \(N_\downarrow=\sum_i(S_i-S_i^z)\)
@@ -158,7 +209,7 @@ is 46,656, not the artificially
 smaller 7,780-dimensional
 fixed-\(N_\downarrow=9\) projection.
 
-## 5. CPC Methods use
+## 6. CPC Methods use
 
 The generalized occupation-counting
 method and its exact QS³ binomial limit
