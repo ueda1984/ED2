@@ -77,5 +77,7 @@ nav:
       - CPC interacting avoided-crossing verification: development/cpc-interacting-avoided-crossing.md
       - CPC interacting 8-10 site sparse verification: development/cpc-interacting-sparse810.md
       - CPC stationary mixed-spin DM chirality response: development/cpc-stationary-dm-application.md
+      - CPC published XYZ-DM and matched benchmark: development/cpc-literature-matched-benchmark.md
+      - CPC manuscript scientific first draft: development/cpc-manuscript-draft.md
   - Reference:
       - Citation & Versioning: reference/citation-versioning.md      
