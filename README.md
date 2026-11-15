@@ -83,6 +83,20 @@ No PATH dependency is assumed for the ED2 executable.
 
 ## CPC development and reproducible worked example
 
+**Publication status:** this is the first proposed ED2 software-program
+journal paper. ED2 source was publicly available before this manuscript,
+but ED2 has **not** previously appeared as a CPC program paper.
+The already-published predecessor is QS³
+([QS-Cube/ED](https://github.com/QS-Cube/ED),
+*CPC* **277**, 108369, 2022), not this ED2 repository.
+A [source-level and capability comparison](docs/development/cpc-qs3-ed-to-ed2-scope-matrix.md)
+documents the spin-model generalization and records the
+historical dynamical structure-factor functions not
+currently demonstrated by the new ED2 executable.
+The [pinned original-program XXZ cross-check](docs/development/cpc-qs3-ed-ed2-shared-xxz-spectrum-ci.csv)
+reproduces six common-sector levels with a maximum
+original-to-ED2 difference below 3e-15.
+
 The [CPC submission-focused draft](docs/development/cpc-submission-core-draft.md)
 and [upstream-versus-development contribution audit](docs/development/cpc-software-provenance-contribution-audit.md)
 are **development documents, not a submitted article or official release**.
