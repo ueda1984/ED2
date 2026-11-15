@@ -286,8 +286,12 @@ compiler portability, algorithmic cost, API scope).
   finite-size check and a preliminary matched-target resource
   study have been verified; see the [follow-up report](cpc-literature-matched-benchmark.md).
   For submission, verify a larger length/window where feasible
-  and obtain repeated isolated-node resource benchmarks. No new
-  phase or asymptotic numerical advantage has been established.
+  and obtain repeated isolated-node resource benchmarks. A new
+  [cache and two-eigenpair study](cpc-cache-multipair-evaluation.md)
+  verifies 52/52 cache-policy trials and 36/36 two-lowest-state
+  trials with independent physical checks, but shared-runner times
+  do not establish publication-grade speedups. No new phase or
+  asymptotic numerical advantage has been established.
 - Agree author/order and distinguish the **2022 QS³** authors
   from the current software's attribution.
 - Choose CPC CPiP or CP route and associated software-archive
@@ -370,6 +374,7 @@ benchmarks remain necessary.
 - [Interacting 8-/10-site sparse spectral and observable checks](cpc-interacting-sparse810.md).
 - [Size-stationary DM/chirality response, susceptibility and figure data](cpc-stationary-dm-application.md).
 - [Published XYZ-DM Hamiltonian and matched-target resource verification (12+36 cases)](cpc-literature-matched-benchmark.md).
+- [Cache-policy sweep and ALG=2 two-eigenpair robustness (52+36 trials)](cpc-cache-multipair-evaluation.md).
 - [Working CPC manuscript prose draft](cpc-manuscript-draft.md).
 
 **No manuscript authorship, official source tag, DOI or journal
