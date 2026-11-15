@@ -39,6 +39,20 @@ on the fork. A new scientific result about Hellmann–Feynman
 or a universally optimal `wk_dim`/`MNTE` setting is **not**
 being claimed.
 
+**Broader ED software landscape:** ED2 is not the only general
+exact-diagonalization framework. For example, QuSpin provides
+spin-model ED and quantum dynamics with general symmetries,
+while its standard `spin_basis_general` interface takes one
+spin magnitude `S` for the basis and its advanced `user_basis`
+can express customized representations. This underscores that
+the contribution should be framed as a *documented, compact
+Fortran implementation with verified mixed-local-spin input
+and explicit numerical contracts*, rather than asserting that
+mixed spins or nonconserving interactions are impossible in
+other existing software. See
+https://quspin.github.io/QuSpin/generated/quspin.basis.spin_basis_general.html
+and https://quspin.github.io/QuSpin/tutorials/user_basis.html .
+
 ## Draft Program Summary fields
 
 | Item | Provisional content | Release review |
