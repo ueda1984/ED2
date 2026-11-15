@@ -89,8 +89,10 @@ def audit(scalingpath,referencepath,ed2path):
             raise ValueError("Incorrect sparse reference Hamiltonian")
         key=(o,v["delta"])
         if key in ref:raise ValueError("Duplicated independent reference")
-        if abs(v["gap_2nd"]-v["gap_sparse"])-v["err_gap_2nd"]>1e-18:
+        if abs(abs(v["gap_2nd"]-v["gap_sparse"])-v["err_gap_2nd"])>1e-18:
             raise ValueError("Reference gap error arithmetic inconsistent")
+        if abs(v["Sz_1st"]+v["delta"]/(2*v["gap_1st"]))>1e-9:
+            raise ValueError("First-order two-level edge magnetization inconsistent")
         if v["err_gap_2nd"]>1e-10:
             raise ValueError("Second-order reference gap rejected")
         ref[key]=v
