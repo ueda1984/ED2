@@ -42,7 +42,10 @@ description**, showing the real computational extensions
 from the published QS³/ED code.
 
 The [code-level comparison](cpc-qs3-ed-to-ed2-scope-matrix.md)
-documents the transition from uniform spin-1/2,
+now includes a **32/32-level** original-2022-QS³-versus-ED2
+three-sector numerical test, with the [frozen 32-level data](cpc-qs3-ed-ed2-32level-extended-ci.csv)
+and maximum old-to-new difference (2.89\times10^{-15}).
+It documents the transition from uniform spin-1/2,
 fixed-(N_{\downarrow}) XXZ/translation calculations
 to mixed local spins, three-component site fields,
 XYZ/DM/Gamma operators, full-space non-U(1)
