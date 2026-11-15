@@ -8,6 +8,8 @@ on:
       - ".github/workflows/cpc-resource-figures.yml"
       - "tests/plot_cpc_cache_multipair.py"
       - "tests/plot_cpc_mnte.py"
+      - "tests/plot_cpc_pareto.py"
+      - "docs/development/cpc-cache-pareto-raw-ci.csv"
       - "docs/development/cpc-mnte-capacity-raw-ci.csv"
       - "docs/development/cpc-cache-sweep-raw-ci.csv"
       - "docs/development/cpc-multipair-raw-ci.csv"
@@ -33,6 +35,7 @@ jobs:
           set -eu
           python3 tests/plot_cpc_cache_multipair.py --validate-only
           python3 tests/plot_cpc_mnte.py --validate-only
+          python3 tests/plot_cpc_pareto.py --validate-only
       - name: Generate three publication prototype figures
         run: |
           set -eu
@@ -45,6 +48,10 @@ jobs:
           test "$(find "$RUNNER_TEMP/cpc-mnte-figures" -maxdepth 1 -name '*.svg' | wc -l)" -eq 3
           test "$(find "$RUNNER_TEMP/cpc-mnte-figures" -maxdepth 1 -name '*.png' | wc -l)" -eq 3
           test -s "$RUNNER_TEMP/cpc-mnte-figures/cpc-mnte-summary.csv"
+          python3 tests/plot_cpc_pareto.py --outdir "$RUNNER_TEMP/cpc-pareto-figures"
+          test "$(find "$RUNNER_TEMP/cpc-pareto-figures" -maxdepth 1 -name '*.svg' | wc -l)" -eq 2
+          test "$(find "$RUNNER_TEMP/cpc-pareto-figures" -maxdepth 1 -name '*.png' | wc -l)" -eq 2
+          test -s "$RUNNER_TEMP/cpc-pareto-figures/cpc-pareto-summary.csv"
           sha256sum "$RUNNER_TEMP/cpc-resource-figures"/*.svg \
             "$RUNNER_TEMP/cpc-resource-figures/cpc-resource-summary.csv"
       - name: Preserve figures and machine-recomputed medians
@@ -54,5 +61,6 @@ jobs:
           path: |
             ${{ runner.temp }}/cpc-resource-figures/
             ${{ runner.temp }}/cpc-mnte-figures/
+            ${{ runner.temp }}/cpc-pareto-figures/
           retention-days: 21
           if-no-files-found: error
