@@ -215,3 +215,6 @@ EXTRA_DIST += cpc_controlled_node_benchmark.py
 
 # Optional frozen eight-site doublet evidence audit and SVG/PNG plots.
 EXTRA_DIST += plot_cpc_sparse_doublet.py
+
+# Independent eight-site interacting sparse-reference near-doublet validation.
+EXTRA_DIST += cpc_stationary_interacting_sparse_doublet.py
