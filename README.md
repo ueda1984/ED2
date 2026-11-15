@@ -95,7 +95,7 @@ historical dynamical structure-factor functions not
 currently demonstrated by the new ED2 executable.
 The [pinned original-program XXZ cross-check](docs/development/cpc-qs3-ed-to-ed2-scope-matrix.md)
 now reproduces **32 levels across three four-/six-site U(1)
-sectors**, including the original near-saturation (N_\downarrow=1)
+sectors**, including the original near-saturation \(N_\downarrow=1\)
 regime. The [frozen 32-level spectrum](docs/development/cpc-qs3-ed-ed2-32level-extended-ci.csv)
 shows a maximum original-to-ED2 difference below 3e-15.
 
