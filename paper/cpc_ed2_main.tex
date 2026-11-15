@@ -483,6 +483,55 @@ but the coefficients in Eq.~\eqref{eq:coefficients}
 were chosen as a software-validation example
 rather than copied from that literature.
 
+
+\subsection{Hamiltonian-level reproduction of a published XYZ--DM model}
+A second, spin-$1/2$ validation reconstructs the periodic
+XYZ--DM Hamiltonian of Yi \emph{et al.}~\cite{yi2019},
+written there in terms of Pauli matrices
+$\sigma^\alpha=2S^\alpha$. The exact coefficient
+conversion to ED2 is
+\begin{equation}
+\begin{split}
+J_x&=2J(1+\gamma),\quad J_y=2J(1-\gamma),
+\quad J_z=4J\Delta,\\
+D_z&=4D_{\rm Y},\qquad h_z=-2h.
+\end{split}
+\label{eq:pauli-conversion}
+\end{equation}
+The periodic closing bond must also retain its directed
+DM orientation. For $J=1$, $\gamma=0.37$,
+$\Delta=0.41$, and $h=0.58$, the six independent
+reference values in Table~\ref{tab:literature}
+are reproduced by ED2 with one and two OpenMP threads.
+The complete spectrum matches independent Pauli
+construction within $3\times10^{-14}$.
+Cartesian correlators and the DM-conjugate expectation
+also agree within $10^{-14}$. These are
+\emph{finite-size Hamiltonian-level} consistency
+checks at chosen test parameters, not a reproduction
+of numerical points or phase boundaries in Ref.~\cite{yi2019}.
+
+\begin{table}[t]
+\centering
+\caption{Independent ground energies and first excitation gaps
+for the published periodic spin-$1/2$ XYZ--DM Hamiltonian.
+Here $D_{\rm Y}$ denotes the Pauli-matrix DM coefficient.}
+\label{tab:literature}
+\small
+\begin{tabular}{rrrr}
+\toprule
+$L$ & $D_{\rm Y}$ & $E_0$ & $E_1-E_0$\\
+\midrule
+4 & 0.00 & -3.854733105562 & 0.478797061\\
+4 & 0.19 & -3.854733105562 & 0.478797061\\
+6 & 0.00 & -5.466704725748 & 0.006836479\\
+6 & 0.19 & -5.468567485505 & 0.008699239\\
+8 & 0.00 & -7.368761434736 & 0.172597665\\
+8 & 0.19 & -7.369394757989 & 0.170241793\\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \section{Cache storage and performance limitations}
 The existing ED2 cache controls \texttt{wk\_dim} and \texttt{MNTE}
 trade stored Hamiltonian transitions against on-demand work.
@@ -511,6 +560,35 @@ The full/tight cache can therefore store all rows while
 using less cache-array memory than half/generic for this model.
 This row bound is not asserted for arbitrary Hamiltonians.
 
+
+Table~\ref{tab:cache-resource} compares the analytic
+cache-array allocation with measured peak resident memory
+for the same $L=12$, ALG=1, one-thread workload at
+$D=0.12$. Every configuration uses 140 Hamiltonian
+applications and passes the independent energy,
+correlator and residual checks. The RSS numbers are
+observations from a shared GitHub Actions runner;
+they are \emph{not} claimed as portable performance bounds.
+
+\begin{table}[t]
+\centering
+\caption{Model-specific $L=12$ cache-array allocation
+and exploratory peak RSS. The analytic allocation
+excludes vectors, runtime and allocator overhead.
+Measured RSS is not a dedicated-node benchmark.}
+\label{tab:cache-resource}
+\small
+\begin{tabular}{lrr}
+\toprule
+Cache policy & Cache arrays (MiB) & Peak RSS (KiB) \\
+\midrule
+Half / generic & 50.279 & 67,970\\
+Full / tight & 37.375 & 54,886\\
+Full / generic & 100.558 & 119,516\\
+\bottomrule
+\end{tabular}
+\end{table}
+
 The accompanying CI-based resource tests independently check
 energies, observables and direct residuals across cache policies,
 including observed peak RSS and Hamiltonian applications.
@@ -519,6 +597,52 @@ publication benchmark requires exclusive-node,
 CPU-pinned, repeated measurements and operator
 verification of hardware exclusivity. No general speedup
 or parallel efficiency is claimed here.
+
+
+\section{User workflow and reproducibility}
+ED2 is currently distributed as a Fortran executable
+\texttt{source/QS3ED2}, not as a stable installed library.
+For the examples in this article the input records specify
+on-site spins, oriented bonds with their couplings, fields
+and requested Cartesian correlations. The output includes
+low energies, magnetizations and nine component-resolved
+two-site correlators. The ordering in
+\texttt{two\_body\_cf\_xyz.dat} is
+$(xx,yx,zx,xy,yy,zy,xz,yz,zz)$ rather than
+the usual row-major ordering; the operator-conjugate
+$xy-yx$ check is designed to catch an inadvertent swap.
+
+For a Linux environment with GNU Fortran, GNU Autotools
+and BLAS/LAPACK, the $L=4$ physical example can be
+regenerated from a reviewed checkout with the following
+commands (all output paths must be fresh):
+\begin{verbatim}
+autoreconf -vfi
+./configure FC=gfortran FCFLAGS="-O2 -fopenmp"
+make -j2
+export OPENBLAS_NUM_THREADS=1
+python3 -S tests/cpc_portable_dm_quickstart.py \
+  --exe "$(pwd)/source/QS3ED2" \
+  --size 4 --omp 1 \
+  --output "$(pwd)/ed2-reproduction-l4"
+\end{verbatim}
+This driver constructs the input decks, runs ED2
+at three nearby DM strengths and checks the native
+correlation-derived chirality and finite-difference
+susceptibility against frozen independent references.
+It uses only the Python standard library \emph{after}
+building the Fortran executable. The full independent
+physics tests instead require NumPy/SciPy to construct
+separate dense/sparse spin Hamiltonians.
+The source archive and development repository retain
+the input recipes, reference CSV and workflow definitions.
+
+The final CPC program package must replace the moving
+branch with a full immutable source SHA or release tag,
+author-approved version and source archive, compiler
+and numerical-library provenance, and representative
+input/output files. The software DOI and Program Library
+accession are not assigned in this draft.
 
 \section{Availability and limitations}
 The public source lineage is
