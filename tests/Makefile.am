@@ -194,3 +194,6 @@ EXTRA_DIST += cpc_stationary_multipair_benchmark.py
 
 # Optional independent full-cache MNTE row-capacity calibration and performance study.
 EXTRA_DIST += cpc_stationary_mnte_capacity.py
+
+# Optional paper plot/reproducibility pipeline for frozen cache and multipair CI CSVs.
+EXTRA_DIST += plot_cpc_cache_multipair.py
