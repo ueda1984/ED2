@@ -154,7 +154,36 @@ The DM term requires a directed pair; reversing its
 orientation also reverses the oriented DM coefficient.
 
 With local spin \(S_i\), the complete product-space dimension is
-\(\mathcal D=\prod_i(2S_i+1)\). Occupation-number limits
+\(\mathcal D=\prod_i(2S_i+1)\).
+ED2 replaces the old QS³ fixed-down-spin
+binomial basis counts \(\binom{L}{N_\downarrow}\)
+with bounded-repetition state counts. For each
+local maximum \(m_i\le 2S_i\), define
+\(P_L(x)=\prod_i(1+x+\cdots+x^{m_i})\).
+The number of basis states in a selected
+occupation window is then
+
+\[
+\mathcal D_{\rm window}=
+\sum_{n=N_{\min}}^{N_{\max}}
+[x^n]P_L(x),
+\]
+
+before spatial symmetry projection.
+The bounded-coefficient recurrence
+\(a_i(n)=\sum_{k=0}^{m_i}a_{i-1}(n-k)\)
+is implemented through the generalized
+limited-repetition tables in
+`source/state_lists.f90`.
+Setting all \(m_i=1\) and choosing
+\(N_{\min}=N_{\max}=N_\downarrow\)
+recovers exactly the original
+\(\binom{L}{N_\downarrow}\)
+count. The [code-audited mathematical derivation](cpc-qs3-ed-to-ed2-basis-generalization.md)
+also documents the crucial distinction
+between a genuine \(U(1)\)-invariant
+sector and a nonconserving \(PHP\)
+projection. Occupation-number limits
 restrict the represented basis, but such a restriction need
 not be a symmetry. For a Hamiltonian without the required
 \(U(1)\) invariance, it defines \(PHP\), generally an
