@@ -94,6 +94,7 @@ def reference(n,epsilon,delta):
         ground_gap=gap,outer_gap=outer,
         reference_residuals=residuals,
         edge_sz=float(local[0,2]),edge_linear_entropy=linent,
+        connected_edge_xx=float(corr[pairs.index((0,1)),0] - local[0,0]*local[1,0]),
         mag=local,corr=corr,trace_mag=trace_mag,trace_corr=trace_corr,
         nonu1_commutator=relative_comm
     )
