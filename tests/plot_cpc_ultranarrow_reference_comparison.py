@@ -4,8 +4,10 @@
 These CSVs are observations from independently accepted CI jobs, not
 certified arbitrary-precision ground-state data. This audit checks all
 physical configuration cells, source SHA/job provenance, internal
-arithmetic of the reported differences, and consistency of the
-reference values reused across two independent CI runs.
+arithmetic of the reported differences, while treating sparse
+iterative eigenvectors from *different CI runs* as separate
+numerical observations. Near-degenerate eigenvectors are not
+required to agree bitwise or within a fixed tiny tolerance.
 
 Plots show the signed difference from the *approximate second-order*
 effective spin reference, NOT true unknown exact-solution error bars.
@@ -25,7 +27,9 @@ DENSE_FIELDS=("workflow_run_id","job_id","source_sha","n_sites",
               "epsilon","delta","driver","lowest_gap","edge_z",
               "edge_vs_second_order_abs_error",
               "edge_vs_sparse_eigsh_abs_error",
-              "trace_correlations_vs_sparse_error")
+              "trace_correlations_vs_sparse_error",
+              "same_run_sparse_eigsh_edge_z",
+              "same_run_second_order_edge_z")
 ED2_FIELDS=("workflow_run_id","job_id","source_sha","delta",
             "OMP","NOK","NOM","residual_atol","ed2_edge_z",
             "sparse_eigsh_edge_z","second_order_edge_z",
@@ -122,12 +126,24 @@ def audit(dense_path,ed2_path):
             raise ValueError("Physical reference differs across requested ED2 workloads")
         sparse=next(iter(sparse_vals))
         eff=next(iter(eff_vals))
+        dense_sparse=dg[d]["evr"]["same_run_sparse_eigsh_edge_z"]
         for drv,row in dg[d].items():
-            approximately(row["edge_vs_sparse_eigsh_abs_error"],abs(row["edge_z"]-sparse))
+            approximately(row["same_run_sparse_eigsh_edge_z"],dense_sparse)
+            approximately(row["same_run_second_order_edge_z"],eff)
+            approximately(row["edge_vs_sparse_eigsh_abs_error"],abs(row["edge_z"]-dense_sparse))
             approximately(row["edge_vs_second_order_abs_error"],abs(row["edge_z"]-eff))
+        # Separate sparse eigsh jobs can give different individual
+        # nearly-degenerate eigenvectors despite correct low eigenvalues
+        # and residuals. Check the disparity is finite and record it,
+        # rather than falsely demanding identical ground Sz.
+        crossrun=abs(sparse-dense_sparse)
+        if crossrun>1e-6:
+            raise ValueError("Cross-run eigsh reference unexpectedly far apart")
         vals=[x["ed2_edge_z"] for x in eg[d]]
         summary.append(dict(
             delta=d,epsilon=5e-7,old_sparse_eigsh_z=sparse,
+            dense_run_sparse_eigsh_z=dense_sparse,
+            crossrun_sparse_eigsh_abs_difference=crossrun,
             dense_evr_z=dg[d]["evr"]["edge_z"],
             dense_evd_z=dg[d]["evd"]["edge_z"],
             second_order_z=eff,
@@ -135,6 +151,7 @@ def audit(dense_path,ed2_path):
             ed2_edge_z_min=min(vals),
             ed2_edge_z_max=max(vals),
             sparse_vs_second_abs=abs(sparse-eff),
+            dense_run_sparse_vs_second_abs=abs(dense_sparse-eff),
             evr_vs_second_abs=dg[d]["evr"]["edge_vs_second_order_abs_error"],
             evd_vs_second_abs=dg[d]["evd"]["edge_vs_second_order_abs_error"],
             ed2_vs_second_max=max(x["ed2_vs_second_order_abs_error"] for x in eg[d]),
@@ -159,7 +176,8 @@ def charts(summary,out):
         plt.close(fig)
     x=[r["delta"]/1e-7 for r in summary]
     fig,ax=plt.subplots(figsize=(6.2,3.9),layout="constrained")
-    for k,label in (("old_sparse_eigsh_z","SciPy sparse eigsh"),
+    for k,label in (("old_sparse_eigsh_z","Sparse eigsh (ED2 run)"),
+                    ("dense_run_sparse_eigsh_z","Sparse eigsh (LAPACK run)"),
                     ("dense_evr_z","Dense LAPACK ZHEEVR"),
                     ("dense_evd_z","Dense LAPACK ZHEEVD"),
                     ("ed2_edge_z_median","ED2, 8 solver settings")):
@@ -172,7 +190,8 @@ def charts(summary,out):
     ax.legend(fontsize=8)
     save(fig,"ultra_edge_reference_offsets")
     fig,ax=plt.subplots(figsize=(6.2,3.9),layout="constrained")
-    for k,label in (("sparse_vs_second_abs","SciPy sparse eigsh"),
+    for k,label in (("sparse_vs_second_abs","Sparse eigsh (ED2 run)"),
+                    ("dense_run_sparse_vs_second_abs","Sparse eigsh (LAPACK run)"),
                     ("evr_vs_second_abs","Dense ZHEEVR"),
                     ("evd_vs_second_abs","Dense ZHEEVD"),
                     ("ed2_vs_second_max","Max ED2, eight settings")):
