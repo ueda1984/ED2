@@ -7,6 +7,7 @@ on:
     paths:
       - ".github/workflows/cpc-stationary-dm.yml"
       - "tests/mixed_spin_dm_chirality_scan.py"
+      - "tests/plot_cpc_dm_chirality.py"
       - "tests/Makefile.am"
       - "source/**"
       - "configure.ac"
@@ -99,4 +100,32 @@ jobs:
           name: stationary-dm-chirality-${{ matrix.tag }}
           path: ${{ runner.temp }}/ed2-chirality/results-${{ matrix.tag }}/
           if-no-files-found: warn
+          retention-days: 21
+
+  figure-ready-plots:
+    name: CPC finite-chain DM figures
+    needs: chirality-physics
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Checkout same verified source
+        uses: actions/checkout@v4
+      - name: Install headless Matplotlib for optional figures
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends python3-matplotlib python3-numpy
+      - name: Generate and validate three separate physical figures
+        run: |
+          set -eu
+          python3 tests/plot_cpc_dm_chirality.py \
+            --csv docs/development/cpc-stationary-dm-reference.csv \
+            --outdir "$RUNNER_TEMP/cpc-dm-figures"
+          test "$(find "$RUNNER_TEMP/cpc-dm-figures" -maxdepth 1 -name '*.svg' | wc -l)" -eq 3
+          test "$(find "$RUNNER_TEMP/cpc-dm-figures" -maxdepth 1 -name '*.png' | wc -l)" -eq 3
+      - name: Retain figure-ready SVG and PNG assets
+        uses: actions/upload-artifact@v4
+        with:
+          name: cpc-stationary-dm-figure-prototypes
+          path: ${{ runner.temp }}/cpc-dm-figures/
+          if-no-files-found: error
           retention-days: 21
