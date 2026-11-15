@@ -123,8 +123,9 @@ At the time of this draft:
   cases, 36 initial matched-resource trials, 52 cache-policy
   trials, 36 two-eigenpair restart trials and 72 full-cache
   row-capacity trials, 108 paired-cache frontier trials
-  and an additional 12 eight-site sparse-doublet
-  projector/observable checks. **Do not add these counts blindly:**
+  and an additional 12 detached-edge sparse-doublet
+  projector/observable checks, plus 20 independent
+  interacting eight-site sparse low-doublet trials. **Do not add these counts blindly:**
   some categories reuse models or runs but test different
   properties and source commits.
 - Archived GNU Fortran 11 and 13 source-package verification
@@ -139,6 +140,14 @@ The [eight-site sparse low-doublet verification](cpc-stationary-sparse-doublet.m
 checks two native ED2 wavefunctions against independently
 computed two-dimensional projector traces, without claiming
 state-specific observables are unique at degeneracy.
+The [eight-site interacting near-doublet test](cpc-interacting-8site-sparse-doublet.md)
+independently assembles a 1,296-dimensional sparse XYZ/Gamma/DM
+Hamiltonian with a weak XY edge bond and checks both native ED2
+wavefunction outputs and their rank-two observable traces.
+All 20/20 cases passed, with maximum trace-observable error
+below 3.75e-10. The model is explicitly a numerical stress
+probe and is not substituted for the connected DM-response
+scientific application.
 The [CPU-pinned measurement protocol](cpc-controlled-node-protocol.md)
 has passed a **shared-hosted-runner functional smoke** including
 source and input checksum capture. An actual dedicated-node
