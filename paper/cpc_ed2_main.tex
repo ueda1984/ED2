@@ -373,7 +373,7 @@ cannot automatically be regarded as exact.
 These are numerical robustness tests, not claims
 of arbitrary-precision state certification.
 
-\section{Scientific example: staggered vector chirality}
+\section{Scientific example: staggered vector chirality}\label{sec:chirality}
 Consider an open, alternating spin-$1/2$/spin-$1$ chain
 with $S_{2i-1}=1/2$ and $S_{2i}=1$.
 For zero-based site/bond index $j$ let
@@ -608,7 +608,7 @@ $L$ & $D_{\rm Y}$ & $E_0$ & $E_1-E_0$\\
 \section{Cache storage and performance limitations}
 The existing ED2 cache controls \texttt{wk\_dim} and \texttt{MNTE}
 trade stored Hamiltonian transitions against on-demand work.
-For the stationary alternating chain in Sec.~5,
+For the stationary alternating chain in Sec.~\ref{sec:chirality},
 the independently checked exact maximum number of nontrivial
 entries per row is $\mathrm{MNTE}=7L/2-1$.
 The default broad capacity is $10L-7$ \emph{allocated}
