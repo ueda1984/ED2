@@ -218,3 +218,6 @@ EXTRA_DIST += plot_cpc_sparse_doublet.py
 
 # Independent eight-site interacting sparse-reference near-doublet validation.
 EXTRA_DIST += cpc_stationary_interacting_sparse_doublet.py
+
+# Frozen interacting eight-site low-doublet CI audit and SVG/PNG figure generation.
+EXTRA_DIST += plot_cpc_interacting_sparse_doublet.py
