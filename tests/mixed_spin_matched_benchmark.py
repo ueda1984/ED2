@@ -81,7 +81,7 @@ i_vec_min=1, i_vec_max=1
     (work/"input.dat").write_text(deck)
 
 
-def run_one(exe,root,n,alg,eps,rep,model,initial,keep=10,capacity=64):
+def run_one(exe,root,n,alg,eps,rep,model,initial,keep=10,capacity=64,threads=1):
     tag=f"n{n}-alg{alg}-tol{eps:.0e}-repeat{rep}".replace("-","m",1)
     work=root/tag
     work.mkdir(exist_ok=False)
@@ -93,7 +93,8 @@ def run_one(exe,root,n,alg,eps,rep,model,initial,keep=10,capacity=64):
             raise AssertionError("Ambiguous TRLan workspace template")
         deck=deck.replace(marker,f"NOE=1, NOK={keep}, NOM={capacity}")
         (work/"input.dat").write_text(deck)
-    env=dict(os.environ,OMP_NUM_THREADS="1",OPENBLAS_NUM_THREADS="1",
+    env=dict(os.environ,OMP_NUM_THREADS=str(threads),OMP_DYNAMIC="FALSE",
+             OPENBLAS_NUM_THREADS="1",
              MKL_NUM_THREADS="1",ED2_RNG_SEED=str(SEED),
              ED2_INITIAL_VECTOR=str(work/"initial-vector.txt"),
              ED2_DIAGNOSTICS="diagnostics.txt",ED2_RESIDUAL_ATOL=str(eps))
@@ -124,7 +125,7 @@ def run_one(exe,root,n,alg,eps,rep,model,initial,keep=10,capacity=64):
     if alg==2 and (int(diag["keep"])!=keep or int(diag["capacity"])!=capacity):
         raise AssertionError("Krylov workspace not equal to requested values")
     results=dict(case=tag,n_sites=n,dimension=model["dimension"],
-                 alg=alg,wanted=1,requested_keep=keep if alg==2 else None,
+                 alg=alg,wanted=1,threads=threads,requested_keep=keep if alg==2 else None,
                  requested_capacity=capacity if alg==2 else None,
                  initial_sha256=hashlib.sha256(initial.encode()).hexdigest(),
                  seed=SEED,residual_atol=eps,repeat=rep,
