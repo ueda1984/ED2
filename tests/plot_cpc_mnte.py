@@ -87,11 +87,10 @@ def audit(path):
     for n in (8,10,12):
         for omp in (1,2):
             for alg in (1,2):
-                num_hcalls={int(r["h_applications"]) for r in rows
-                            for rows in []} if False else {
+                num_hcalls={
                     int(r["h_applications"])
-                    for p in ("default","calibrated")
-                    for r in grouped[(n,omp,alg,p)]
+                    for policy in ("default","calibrated")
+                    for r in grouped[(n,omp,alg,policy)]
                 }
                 if len(num_hcalls)!=1:
                     raise ValueError("MNTE setting changed Krylov action count: "+
