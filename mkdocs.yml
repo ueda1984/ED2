@@ -87,6 +87,7 @@ nav:
       - CPC low-doublet sparse-reference precision diagnosis: development/cpc-ultranarrow-reference-diagnosis.md
       - CPC portable mixed-spin DM reproduction (stdlib only): development/cpc-portable-dm-quickstart.md
       - CPC provenance and contribution audit: development/cpc-software-provenance-contribution-audit.md
+      - CPC published QS3 ED to unpublished ED2 scope and exact XXZ benchmark: development/cpc-qs3-ed-to-ed2-scope-matrix.md
       - CPC submission-focused manuscript core: development/cpc-submission-core-draft.md
       - CPC exact edge sign symmetry and second-order polarization scaling: development/cpc-weak-edge-polarization-scaling.md
       - CPC dedicated-node performance protocol: development/cpc-controlled-node-protocol.md
