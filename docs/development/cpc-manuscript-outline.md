@@ -380,6 +380,7 @@ benchmarks remain necessary.
 - [CPC CPiP positioning and draft program-summary fields](cpc-cpip-program-summary.md).
 - [Eight-site sparse-reference low-doublet native-readback validation (12/12)](cpc-stationary-sparse-doublet.md).
 - [Interacting eight-site XY-edge sparse low-doublet and projector verification (20/20)](cpc-interacting-8site-sparse-doublet.md).
+- [Ultra-narrow interacting doublet classification (24/24), with reference-precision cautions](cpc-interacting-ultranarrow.md).
 - [Dedicated-node CPU affinity, source checksum and statistical measurement protocol](cpc-controlled-node-protocol.md).
 - [Working CPC manuscript prose draft](cpc-manuscript-draft.md).
 
