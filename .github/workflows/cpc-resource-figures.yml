@@ -1,0 +1,49 @@
+name: CPC frozen CI resource data and figures
+
+on:
+  push:
+    branches:
+      - codex/ed2-cpc-stationary-dm-scaling
+    paths:
+      - ".github/workflows/cpc-resource-figures.yml"
+      - "tests/plot_cpc_cache_multipair.py"
+      - "docs/development/cpc-cache-sweep-raw-ci.csv"
+      - "docs/development/cpc-multipair-raw-ci.csv"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  data-integrity-and-figures:
+    name: Audit immutable CI trials and render SVG/PNG
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout frozen source data
+        uses: actions/checkout@v4
+      - name: Install headless plotting environment
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends python3-matplotlib python3-numpy
+      - name: Validate trial counts, statuses, precision and provenance
+        run: |
+          set -eu
+          python3 tests/plot_cpc_cache_multipair.py --validate-only
+      - name: Generate three publication prototype figures
+        run: |
+          set -eu
+          python3 tests/plot_cpc_cache_multipair.py \
+            --outdir "$RUNNER_TEMP/cpc-resource-figures"
+          test "$(find "$RUNNER_TEMP/cpc-resource-figures" -maxdepth 1 -name '*.svg' | wc -l)" -eq 3
+          test "$(find "$RUNNER_TEMP/cpc-resource-figures" -maxdepth 1 -name '*.png' | wc -l)" -eq 3
+          test -s "$RUNNER_TEMP/cpc-resource-figures/cpc-resource-summary.csv"
+          sha256sum "$RUNNER_TEMP/cpc-resource-figures"/*.svg \
+            "$RUNNER_TEMP/cpc-resource-figures/cpc-resource-summary.csv"
+      - name: Preserve figures and machine-recomputed medians
+        uses: actions/upload-artifact@v4
+        with:
+          name: cpc-cache-multipair-figure-prototypes
+          path: ${{ runner.temp }}/cpc-resource-figures/
+          retention-days: 21
+          if-no-files-found: error
