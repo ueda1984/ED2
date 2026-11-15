@@ -58,6 +58,10 @@ development verification: \url{https://github.com/ueda1984/ED2}.
 against the final distributed release.
 \item[Language and dependencies:] Fortran, BLAS/LAPACK, GNU Autotools;
 OpenMP is used for shared-memory parallelism.
+\item[Unusual features:] Site-dependent mixed spins, oriented
+DM and symmetric off-diagonal exchange, complete Cartesian
+static correlators, optional Hamiltonian-transition caching
+and reproducible numerical-acceptance diagnostics.
 \item[Nature of problem:] Finite-size spectra and static spin observables
 of spin models with unequal local spins and general bilinear couplings.
 \item[Solution method:] Bounded-occupation basis construction,
@@ -100,6 +104,35 @@ combination of generalized mixed-spin operators, compact Fortran
 execution, flexible Hilbert-space representations, independently
 verified physical observables and reproducible numerical contracts,
 rather than exclusivity of XYZ/DM models.
+
+
+Table~\ref{tab:program-scope} summarizes scientific scope relative
+to the \emph{published} \QSthree{} program, not to the already-public
+ED2 repository. The original code retains a dynamical structure-factor
+path that has not been verified as a native ED2 capability.
+No binary or file-format backward compatibility is asserted.
+
+\begin{table}[t]
+\centering
+\caption{Main program differences relative to the CPC-published
+QS$^3$/ED executable. Neither the underlying eigensolvers nor
+the generalized spin-model category are claimed to be exclusive.}
+\label{tab:program-scope}
+\small
+\begin{tabular}{p{0.23\linewidth}p{0.30\linewidth}p{0.34\linewidth}}
+\toprule
+Capability & QS$^3$/ED (2022) & ED2 \\
+\midrule
+Local spins & Uniform $S=1/2$ & Site-dependent $S_i$; mixed spins \\
+Bond couplings & XXZ-type & XYZ, directed DM, symmetric $\Gamma$ \\
+Site fields & Restricted input & Site-dependent Cartesian fields \\
+Basis & Fixed $N_\downarrow$ and momentum & Bounded occupations, full space, compatible symmetries \\
+Static output & Selected spin channels & Nine Cartesian pair components \\
+Dynamic spectra & Dedicated dynamic path & Equivalent native path unverified \\
+Solvers & Dense, Lanczos, restarted & Inherited families; revised diagnostics \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \section{Hamiltonians and Hilbert-space representation}
 \subsection{General local operators}
@@ -234,6 +267,38 @@ The actual ED2 dense solver reproduces all
 72 independently enumerated levels across these three
 representations, with maximum absolute difference
 $1.11\times10^{-16}$.
+
+
+\subsection{Independent verification coverage}
+The source-pinned tests cover both exact spectra and
+computed observables (Table~\ref{tab:validation}).
+These numbers establish correctness for the displayed
+Hamiltonians and environments, not an exhaustive
+verification over arbitrary coupling and boundary inputs.
+A small direct residual is necessary for eigenpair
+acceptance but cannot by itself identify the global
+ground state in a near-degenerate problem.
+
+\begin{table}[t]
+\centering
+\caption{Verified comparisons to the published executable
+or to independently assembled reference Hamiltonians.
+Reported maxima refer to different numerical observables.}
+\label{tab:validation}
+\small
+\begin{tabular}{p{0.37\linewidth}r p{0.35\linewidth}}
+\toprule
+Validation family & Cases & Maximum reported discrepancy \\
+\midrule
+Original QS$^3$ XXZ spectrum & 32 levels & $2.89\times10^{-15}$ old/new \\
+QS$^3$ momentum sectors & 15 levels & $3.11\times10^{-15}$ old/new \\
+Mixed-spin bounded basis & 72 levels & $1.11\times10^{-16}$ to reference \\
+Staggered-DM response & 60 runs & $<1.4\times10^{-13}$ in $E_0$;
+$<1.5\times10^{-9}$ in $K$ \\
+Published XYZ--DM conventions & 12 runs & $<3\times10^{-14}$ in spectrum \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 \section{Scientific example: staggered vector chirality}
 Consider an open, alternating spin-$1/2$/spin-$1$ chain
@@ -499,7 +564,10 @@ Phys. Rev. B \textbf{100}, 024423 (2019).
 \href{https://doi.org/10.1103/PhysRevB.100.024423}{doi:10.1103/PhysRevB.100.024423}.
 \bibitem{lahiri2022}
 A. Lahiri and S. K. Pati,
-J. Phys.: Condens. Matter (2022),
+Loss of classicality in alternating spin-$1/2$/spin-$1$ chain
+in the presence of next-neighbor couplings and
+Dzyaloshinskii--Moriya interactions,
+J. Phys.: Condens. Matter \textbf{34}, 175802 (2022).
 \href{https://doi.org/10.1088/1361-648X/ac4aab}{doi:10.1088/1361-648X/ac4aab}.
 \bibitem{weinberg2017}
 P. Weinberg and M. Bukov,
