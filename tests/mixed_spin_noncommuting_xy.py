@@ -20,7 +20,7 @@ import numpy as np
 from mixed_spin_interacting_avoided_crossing import (
     physical_reference, run_case, hermitian_expectation,
 )
-from mixed_spin_nonu1_demo import product_operators, dense_hamiltonian
+from mixed_spin_nonu1_demo import couplings, product_operators, dense_hamiltonian
 from mixed_spin_near_degenerate import load_fortran_vector
 
 FRACTION_Y=.6
@@ -108,6 +108,52 @@ def estimate_shifted_crossing():
     return result
 
 
+def first_order_doublet_projection(models):
+    """Check weak-bond gaps against independent first-order doublet physics.
+
+    For the decoupled active-chain ground state |g>, projecting
+    epsilon*(S1x S2x + eta*S1y S2y) gives
+    H_eff=e0 I+(delta*sigma_z+epsilon*mx*sigma_x+
+                  epsilon*eta*my*sigma_y)/2,
+    where mx=<g|S2x|g>, my=<g|S2y|g>.
+    Thus the delta=0 gap is first-order
+    epsilon*sqrt(mx^2+eta^2*my^2).
+    """
+    results=[]
+    for n in SIZES:
+        spins=[.5,1.]*(n//2)
+        bonds,fields=couplings(n,.15)
+        if bonds[0][:2]!=(0,1):
+            raise AssertionError("Unexpected active bond orientation")
+        reduced_spins=spins[1:]
+        ob,_=product_operators(reduced_spins)
+        Hact=dense_hamiltonian(ob,[
+            (i-1,j-1,c) for i,j,c in bonds if i>0 and j>0
+        ],fields[1:])
+        E,V=np.linalg.eigh(Hact)
+        q=V[:,0]
+        mx=hermitian_expectation(q,ob[0][0])
+        my=hermitian_expectation(q,ob[0][1])
+        for eps in EPSILONS:
+            g=next(x["ground_gap"] for x in models
+                   if x["n_sites"]==n and x["epsilon"]==eps and x["delta"]==0.)
+            perturbative=eps*np.sqrt(mx**2+(FRACTION_Y*my)**2)
+            relerr=float(abs(g-perturbative)/perturbative)
+            threshold=.01 if eps==.02 else 5e-5
+            if relerr>threshold:
+                raise AssertionError("Independent doublet projection failed "+
+                                     str((n,eps,perturbative,g,relerr)))
+            item=dict(n_sites=n,epsilon=eps,
+                      active_spin2_mx=mx,active_spin2_my=my,
+                      predicted_first_order_gap=float(perturbative),
+                      observed_exact_gap=float(g),
+                      relative_gap_difference=relerr,
+                      active_chain_gap=float(E[1]-E[0]))
+            results.append(item)
+            print("FIRST ORDER DOUBLET PROJECTION",item,flush=True)
+    return results
+
+
 def excited_start_check(exe,root,omp,model):
     work=root/"explicit-interacting-excited"
     work.mkdir(exist_ok=False)
@@ -165,6 +211,7 @@ def main():
                       f"edge-comms={model['edge_commutator_norms']}",flush=True)
     check_geometry(models)
     crossing_minima=estimate_shifted_crossing()
+    perturbative_checks=first_order_doublet_projection(models)
     for model in models:
         runs=[(1,0,0,ABS_RESIDUAL),
               (2,2,16,ABS_RESIDUAL),
@@ -203,6 +250,7 @@ def main():
                 model="anisotropic noncommuting XY edge bond plus active XYZ/DM/Gamma",
                 edge_y_over_x=FRACTION_Y,
                 shifted_gap_minima=crossing_minima,
+                first_order_doublet_projection=perturbative_checks,
                 omp=args.omp,independent_models=[
                     dict(n_sites=m["n_sites"],epsilon=m["epsilon"],delta=m["delta"],
                          ground_e=m["ground_e"],lowest_three=m["low_e"],
