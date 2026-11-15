@@ -209,3 +209,6 @@ EXTRA_DIST += plot_cpc_pareto.py
 
 # Optional independent eight-site low-doublet projector and native ED2 readback.
 EXTRA_DIST += cpc_stationary_low_doublet_trace.py
+
+# Optional pinned-node benchmark orchestrator (shared-runner smoke or operator-attested exclusive run).
+EXTRA_DIST += cpc_controlled_node_benchmark.py
