@@ -13,6 +13,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import subprocess
 import time
@@ -47,9 +48,11 @@ def initial_vector_text(dim):
     return "".join(f"{a:.17g} {b:.17g}\n" for a,b in zip(re,im))
 
 
-def setup_input(work,n,alg,model,initial_text,wk_dim=-1):
+def setup_input(work,n,alg,model,initial_text,wk_dim=-1,mnte=-1):
     if not (wk_dim==-1 or 0<=wk_dim<=model['dimension']):
         raise ValueError('wk_dim must be -1 or a valid number of cached basis states')
+    if not (mnte==-1 or 1<=mnte<=10000):
+        raise ValueError('mnte must be -1 or a positive, bounded work-array count')
     bonds,fields,spins,pairs=(model[x] for x in ("bonds","fields","spin","pairs"))
     (work/"bonds.dat").write_text("".join(
         f"{i+1} {j+1} "+" ".join(f"{x:.17g}" for x in c)+"\n"
@@ -66,7 +69,7 @@ def setup_input(work,n,alg,model,initial_text,wk_dim=-1):
 NOS={n}, NODmin=0, NODmax={nodmax}, ALG={alg},
 L1=1, L2=1, L3=1, L4=1, L5=1, L6=1,
 M1=0, M2=0, M3=0, M4=0, M5=0, M6=0,
-NO_one={n}, NO_two={len(bonds)}, wk_dim={wk_dim}, MNTE=-1,
+NO_one={n}, NO_two={len(bonds)}, wk_dim={wk_dim}, MNTE={mnte},
 FILE_xyz_dm_gamma='bonds.dat', FILE_hvec='fields.dat',
 FILE_spin='spins.dat', FILE_NODmax='caps.dat',
 OUTDIR='./', FILE_wf='./', wr_wf=0, re_wf=0,
@@ -84,11 +87,11 @@ i_vec_min=1, i_vec_max=1
 
 
 def run_one(exe,root,n,alg,eps,rep,model,initial,keep=10,capacity=64,threads=1,
-            wk_dim=-1,timeout_seconds=260):
+            wk_dim=-1,timeout_seconds=260,mnte=-1):
     tag=f"n{n}-alg{alg}-tol{eps:.0e}-repeat{rep}".replace("-","m",1)
     work=root/tag
     work.mkdir(exist_ok=False)
-    setup_input(work,n,alg,model,initial,wk_dim=wk_dim)
+    setup_input(work,n,alg,model,initial,wk_dim=wk_dim,mnte=mnte)
     if alg==2:
         deck=(work/"input.dat").read_text()
         marker="NOE=1, NOK=10, NOM=64"
@@ -112,6 +115,17 @@ def run_one(exe,root,n,alg,eps,rep,model,initial,keep=10,capacity=64,threads=1,
                             timeout=timeout_seconds)
     elapsed=time.perf_counter()-begin
     (work/"stdout.log").write_bytes(proc.stdout)
+    output=proc.stdout.decode(errors='replace')
+    observed_current=re.search(r'Current MNTE\s*=\s*(\d+)',output)
+    observed_optimal=re.search(r'Optimal MNTE\s*=\s*(\d+)',output)
+    if not observed_current or not observed_optimal:
+        raise AssertionError('ED2 did not report Current/Optimal MNTE')
+    current_mnte=int(observed_current.group(1))
+    optimal_mnte=int(observed_optimal.group(1))
+    expected_current=(2*n+8*len(model['bonds'])) if mnte<0 else mnte
+    if current_mnte!=expected_current or optimal_mnte>current_mnte:
+        raise AssertionError('Inconsistent allocation/observed MNTE: '+
+                             str((current_mnte,expected_current,optimal_mnte)))
     diagfile=work/"diagnostics.txt"
     if not diagfile.is_file():
         raise AssertionError("Missing diagnostic sidecar: "+proc.stdout.decode(errors="replace")[-1500:])
@@ -131,6 +145,8 @@ def run_one(exe,root,n,alg,eps,rep,model,initial,keep=10,capacity=64,threads=1,
                  alg=alg,wanted=1,threads=threads,
                  requested_wk_dim=wk_dim,
                  effective_wk_dim=model['dimension'] if wk_dim<0 else wk_dim,
+                 requested_mnte=mnte,reported_current_mnte=current_mnte,
+                 reported_optimal_mnte=optimal_mnte,
                  requested_keep=keep if alg==2 else None,
                  requested_capacity=capacity if alg==2 else None,
                  initial_sha256=hashlib.sha256(initial.encode()).hexdigest(),
