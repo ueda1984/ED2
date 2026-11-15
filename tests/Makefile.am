@@ -164,3 +164,6 @@ EXTRA_DIST += mixed_spin_excited_start_probe.py
 
 # Test-only native-wavefunction two-state projector/trace comparison.
 EXTRA_DIST += mixed_spin_doublet_trace.py
+
+# Scientific/test-only interacting avoided-crossing verification (NumPy required).
+EXTRA_DIST += mixed_spin_interacting_avoided_crossing.py
