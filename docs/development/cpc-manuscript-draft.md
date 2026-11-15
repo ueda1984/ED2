@@ -36,8 +36,10 @@ susceptibility identities. A separate test reproduces the finite-size
 Hamiltonian of a published XYZ-DM spin-1/2 chain, including periodic
 bond orientation and Pauli-to-spin conversion. We characterize the
 memory and Hamiltonian-application cost of matched one-eigenpair
-calculations, while reserving definitive performance comparisons
-for controlled-node measurements.
+calculations, quantify cache storage against source-level allocation,
+and independently verify two-lowest-eigenpair restart workspaces.
+Definitive timing and parallel-speed comparisons are reserved for
+controlled-node measurements.
 
 **Abstract revision required before submission:** replace the
 general last sentence with a quantitative controlled-node result
@@ -339,10 +341,132 @@ general algorithmic ranking or strong-scaling
 conclusion from these shared-runner,
 two-repeat measurements. The performance
 section must be augmented with repeated
-isolated-node timings, compiler/BLAS,
-CPU/cache and affinity records, cache-policy
-comparisons and at least one additional
-spectral workload before submission.
+isolated-node timings and pinned compiler/BLAS,
+CPU/cache and affinity records before submission.
+A separate cache-policy scan and two-lowest-state
+workspace study have now been independently
+verified and are summarized below.
+
+### 6.1 Cache policy and the memory-time tradeoff
+
+The ED2 Hamiltonian-action kernel can store matrix elements
+for a chosen prefix of representative states. Holding the
+physical model, eigenpair target, explicit starting vector
+and requested residual fixed, we compare no cached rows
+(`wk_dim=0`), half of the rows and all rows
+(`wk_dim=-1`). At \(D=0.12\), the 8- and 10-site
+full-space ALG=1 runs have the same H-application
+counts across cache settings, providing a controlled
+test of caching rather than one that conflates
+performance with the number of Krylov iterations.
+
+| L | OMP | Cache | H applications | Wall time (s) | Peak RSS (KiB) |
+| ---: | ---: | --- | ---: | ---: | ---: |
+| 8 | 1 | none | 120 | 0.529700 | 6,646 |
+| 8 | 1 | half | 120 | 0.278283 | 7,700 |
+| 8 | 1 | full | 120 | 0.024038 | 8,604 |
+| 10 | 1 | none | 200 | 7.511783 | 8,082 |
+| 10 | 1 | half | 200 | 3.916686 | 15,218 |
+| 10 | 1 | full | 200 | 0.230234 | 22,278 |
+
+All 36 small-system cache trials across OMP=1/2
+passed independent lowest-energy, ground-observable
+and direct-residual checks, including the warm-ups.
+At L=12 we compare half and full caching for
+both ALG=1 and ALG=2 (NOK=2,NOM=16), again
+at OMP=1 and 2. All 16 additional trials
+also passed the physical acceptance criteria.
+For example, at L=12 and OMP=1, ALG=1 takes
+22.146 s with half caching versus 1.954 s
+with full caching, with median peak RSS of
+67,980 versus 119,468 KiB. These ratios
+are **observations on shared CI hosts**, not
+portably reproducible speedups.
+
+The expected cache memory follows directly
+from the two Fortran work arrays of shape
+\((M,\mathrm{wk\_dim})\), with
+\[
+M=2\,\mathrm{NO\_one}+8\,\mathrm{NO\_two}+1.
+\]
+For the open chain this is \(M=10L-7\).
+With a 4-byte default integer and 16-byte
+`complex(8)` on the tested compiler, the two
+work arrays have nominal allocation
+\[
+B_{\rm cache}=20(10L-7)\,\mathrm{wk\_dim}
+\quad\text{bytes}.
+\]
+At L=12, full cache alone requires
+100.558 MiB, compared with 50.279 MiB
+for half cache. The observed OMP=1 ALG=1
+median peak RSS difference, 51,488 KiB,
+is in close agreement with this expected
+allocation difference. The overall RSS
+includes additional solver vectors, basis
+tables and runtime overhead.
+
+The combined **52/52 cache-policy validations**
+therefore provide both independent physical
+correctness and a mechanistic accounting
+of memory cost. The full raw CI measurements,
+including warm-ups, are preserved in
+[the cache CSV](cpc-cache-sweep-raw-ci.csv)
+and interpreted in the
+[resource report](cpc-cache-multipair-evaluation.md).
+The cache fraction refers to a prefix of
+representatives rather than a random subset,
+so its intermediate performance is not
+necessarily a universal linear function.
+
+### 6.2 Two-lowest-state restart robustness
+
+A restart policy that is efficient for one
+ground state is not automatically appropriate
+for multiple eigenpairs. We separately
+request the two lowest eigenpairs with
+ALG=2, an identical explicit ED2-basis
+starting vector, fixed seed, full sector
+and the same residual threshold.
+For L=8 and 10 at D=0 and 0.12,
+two repetitions were made for OMP=1/2.
+L=12 at D=0.12 was also examined at
+both thread counts. The **36/36 trials**
+passed independent checks of both lowest
+energies, both reported direct residuals,
+and ground-state local/NN observables.
+
+At L=12, D=0.12, OMP=1, the
+NOK/NOM=2/16 restart uses 540 H
+applications with its largest direct
+residual \(4.19\times10^{-9}\),
+whereas 4/24 uses 754 H applications
+with a residual \(2.52\times10^{-11}\).
+Both satisfy the \(10^{-8}\) requirement.
+At L=10 the smaller workspace produces
+a residual as high as \(8.62\times10^{-9}\),
+close to the acceptance boundary.
+Consequently, the lowest H-application
+count need not imply a desirable
+numerical safety margin across more
+demanding spectra. The
+[two-eigenpair source CSV](cpc-multipair-raw-ci.csv)
+preserves per-run measured costs and
+residuals. These finite-gap data
+do **not** validate arbitrary near-degenerate
+multiplets or NOE>2.
+
+**Figure planned:** a two-part performance
+figure showing wall time and RSS versus
+cached fraction with markers for L and
+OMP, and a separate restart-workspace
+cost-versus-achieved-residual plot for
+two lowest eigenpairs. Plot data and
+captions must distinguish the shared
+CI runner from future controlled-node
+timing evidence. No universal
+performance comparison with QS³ follows
+from these observations.
 
 ## 7. Conclusion and limitations
 
@@ -393,6 +517,9 @@ https://github.com/ueda1984/ED2/actions/runs/43702189530
 Related development reports:
 docs/development/cpc-stationary-dm-application.md
 and docs/development/cpc-literature-matched-benchmark.md.
+The cache/multipair evaluation is documented in
+`docs/development/cpc-cache-multipair-evaluation.md`.
+
 
 **Unresolved editorial items:** agree author list,
 CPC CPiP versus CP category, program release,
