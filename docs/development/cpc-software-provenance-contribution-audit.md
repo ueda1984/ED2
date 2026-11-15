@@ -33,18 +33,17 @@ published QS³/ED code**, not merely
 the Phase 1 code-hygiene changes made
 to ED2 after it had appeared on GitHub.
 
-The [old-to-new source and feature matrix]
-(cpc-qs3-ed-to-ed2-scope-matrix.md)
+The [old-to-new source and feature matrix](cpc-qs3-ed-to-ed2-scope-matrix.md)
 directly checks the two repositories.
 A [32-level same-physics suite](cpc-qs3-ed-ed2-32level-extended-ci.csv)
 builds and runs the historical QS³ and
 modern ED2 executables in three
 matched invariant XXZ sectors, including
-the near-saturation (N_\downarrow=1)
+the near-saturation \(N_\downarrow=1\)
 case, each independently diagonalized
 by a third product-state reference.
 The largest cross-program difference
-is (2.89\times10^{-15}).
+is \(2.89\times10^{-15}\).
 This makes the progression from
 published QS³ to generalized ED2 a
 **checked mathematical and source-level
