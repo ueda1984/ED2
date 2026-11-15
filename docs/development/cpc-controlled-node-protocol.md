@@ -153,6 +153,55 @@ flags, BLAS/LAPACK, affinity, working
 precision, cache allocation, and source
 plus binary checksums.
 
+### Strict post-run numerical and resource audit
+
+After the launcher finishes, use the independent
+**standard-library-only** postprocessor:
+
+```bash
+python3 tests/cpc_controlled_node_analyze.py \
+  --root /path/to/cpc-node-results \
+  --output /new/nonexistent/cpc-node-audit \
+  --require-publication
+```
+
+The `--require-publication` flag **refuses** shared/exclusivity-unverified
+runs and fewer than five measured repetitions. The checker rehashes
+every original input file, validates the source/binary provenance,
+checks that each requested OMP, size, algorithm, cache policy,
+measurement repeat and warmup exists exactly once, and re-evaluates
+numerical acceptance (direct residual, independent energy,
+all local magnetic moments and all Cartesian nearest-neighbor
+correlations). It recomputes cache allocation formulas and confirms
+the same explicit starting vector, seed, requested numerical target
+and cache policy along each matched comparison.
+
+Successful output is `audit.json` and
+`paired-policy-stats.csv` with trial counts,
+per-policy **wall-time medians and median absolute deviations**,
+peak process RSS medians/MAD, Hamiltonian-application counts,
+nominal cache array sizes and matched half-generic/full-tight
+ratios. Do not quote only the ratios: retain all
+observations, source/inputs and the full CPU/environment log.
+
+For **shared CI testing**, omit `--require-publication`.
+The report is labelled
+`exploratory_shared_or_insufficient_repeats`;
+the gate for publication-quality results remains **false**.
+The [smoke workflow](https://github.com/ueda1984/ED2/actions/workflows/cpc-controlled-node-protocol.yml)
+explicitly checks that its shared-runner input
+**is rejected** if `--require-publication` is requested,
+while the exploratory audit still succeeds.
+
+**Human review remains mandatory.** The recorded operator attestation
+is not machine-verifiable proof of exclusive scheduling;
+the postprocessor also cannot independently establish
+stable CPU frequency, NUMA placement, thermal/load conditions,
+or statistical representativeness of a single node allocation.
+Its `publication_gate_passed` Boolean represents a
+**minimum data-completeness screening**, not editorial approval
+or a hardware-independent performance guarantee.
+
 ### Important limitations
 
 The current launcher runs each thread count
