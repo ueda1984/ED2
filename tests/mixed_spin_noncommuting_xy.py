@@ -69,6 +69,45 @@ def check_geometry(models):
     return True
 
 
+def estimate_shifted_crossing():
+    """Bracket the avoided-gap minimum using HF derivatives and a parabola.
+
+    This is a reproducible independent finite-size characterization,
+    not an exact symbolic solution or a proof of global monotonicity.
+    """
+    result=[]
+    for n in SIZES:
+        eps=.02
+        a=5e-4
+        left=ensure_interacting(n,-a,eps)
+        centre=ensure_interacting(n,0.,eps)
+        right=ensure_interacting(n,+a,eps)
+        gminus=left["ground_gap"]
+        gzero=centre["ground_gap"]
+        gplus=right["ground_gap"]
+        denominator=2*(gminus-2*gzero+gplus)
+        if denominator<=0:
+            raise AssertionError("Local gap curvature is not positive")
+        delta_est=a*(gminus-gplus)/denominator
+        minref=ensure_interacting(n,delta_est,eps)
+        # d(E1-E0)/d(delta) = <S1z>_1 - <S1z>_0.
+        slope0=centre["excited_edge_sz"]-centre["edge_sz"]
+        slopeplus=right["excited_edge_sz"]-right["edge_sz"]
+        if not (0<delta_est<a and slope0<0 and slopeplus>0
+                and minref["ground_gap"]<gzero):
+            raise AssertionError("Could not establish a shifted local avoided minimum")
+        item=dict(n_sites=n,epsilon=eps,jy_over_jx=FRACTION_Y,
+                  left_offset=-a,right_offset=a,
+                  gap_at_negative_offset=gminus,gap_at_zero=gzero,
+                  gap_at_positive_offset=gplus,
+                  slope_at_zero=slope0,slope_at_positive_offset=slopeplus,
+                  parabolic_delta_estimate=delta_est,
+                  gap_at_parabolic_estimate=minref["ground_gap"])
+        result.append(item)
+        print("SHIFTED CROSSING ESTIMATE",item,flush=True)
+    return result
+
+
 def excited_start_check(exe,root,omp,model):
     work=root/"explicit-interacting-excited"
     work.mkdir(exist_ok=False)
@@ -125,6 +164,7 @@ def main():
                       f"edge-entropy={model['edge_linear_entropy']:.4g} "
                       f"edge-comms={model['edge_commutator_norms']}",flush=True)
     check_geometry(models)
+    crossing_minima=estimate_shifted_crossing()
     for model in models:
         runs=[(1,0,0,ABS_RESIDUAL),
               (2,2,16,ABS_RESIDUAL),
@@ -162,6 +202,7 @@ def main():
     report=dict(schema=1,source_sha=os.environ.get("GITHUB_SHA","see CI"),
                 model="anisotropic noncommuting XY edge bond plus active XYZ/DM/Gamma",
                 edge_y_over_x=FRACTION_Y,
+                shifted_gap_minima=crossing_minima,
                 omp=args.omp,independent_models=[
                     dict(n_sites=m["n_sites"],epsilon=m["epsilon"],delta=m["delta"],
                          ground_e=m["ground_e"],lowest_three=m["low_e"],
