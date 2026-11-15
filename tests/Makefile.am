@@ -253,6 +253,6 @@ EXTRA_DIST += cpc_portable_dm_quickstart.py
 EXTRA_DIST += cpc_controlled_node_analyze.py
 
 # Legacy QS3-ED CPC-era direct physical-limit comparison against generalized ED2.
-EXTRA_DIST += cpc_qs3_ed_shared_xxz_crosscheck.py cpc_qs3_ed_shared_xxz_extended.py
+EXTRA_DIST += cpc_qs3_ed_shared_xxz_crosscheck.py cpc_qs3_ed_shared_xxz_extended.py cpc_qs3_ed_iterative_xxz.py
 # Binomial limiting case and site-cap bounded-occupation basis/spectrum checks.
 EXTRA_DIST += cpc_mixed_spin_bounded_basis.py
