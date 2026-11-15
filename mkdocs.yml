@@ -83,6 +83,7 @@ nav:
       - CPC paired cache memory and time frontier: development/cpc-cache-pareto-evaluation.md
       - CPC eight-site sparse low-doublet trace: development/cpc-stationary-sparse-doublet.md
       - CPC interacting eight-site sparse low doublet: development/cpc-interacting-8site-sparse-doublet.md
+      - CPC ultra-narrow interacting low-doublet test: development/cpc-interacting-ultranarrow.md
       - CPC dedicated-node performance protocol: development/cpc-controlled-node-protocol.md
       - CPC CPiP program summary and submission scope: development/cpc-cpip-program-summary.md
       - CPC manuscript scientific first draft: development/cpc-manuscript-draft.md
