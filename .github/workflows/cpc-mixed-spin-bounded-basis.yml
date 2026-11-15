@@ -1,0 +1,81 @@
+name: CPC generalized mixed-spin bounded-occupation numerical validation
+
+on:
+  push:
+    branches:
+      - codex/ed2-cpc-stationary-dm-scaling
+    paths:
+      - ".github/workflows/cpc-mixed-spin-bounded-basis.yml"
+      - "tests/cpc_mixed_spin_bounded_basis.py"
+      - "tests/Makefile.am"
+      - "source/**"
+      - "configure.ac"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  mixed-basis-polynomial:
+    name: Verify ED2 mixed-spin full and bounded bases using independent spectra
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      FC: gfortran-13
+      FCFLAGS: "-O2 -fopenmp"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+      OMP_DYNAMIC: "FALSE"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Fortran compiler, BLAS/LAPACK and Python standard runtime
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends gfortran-13 \
+            libopenblas-dev liblapack-dev autoconf automake make python3
+      - name: Build separate extracted ED2 source distribution
+        run: |
+          set -eu
+          autoreconf -vfi
+          ./configure FC="$FC" FCFLAGS="$FCFLAGS"
+          make -j2
+          make dist
+          root="$RUNNER_TEMP/cpc-mixed-basis"
+          mkdir -p "$root/src" "$root/build"
+          tgz=$(find "$GITHUB_WORKSPACE" -maxdepth 1 -name '*.tar.gz' -print -quit)
+          test -n "$tgz"
+          sha256sum "$tgz"
+          tar -xzf "$tgz" -C "$root/src"
+          src=$(find "$root/src" -mindepth 1 -maxdepth 1 -type d -print -quit)
+          test -f "$src/tests/cpc_mixed_spin_bounded_basis.py"
+          printf '%s\n' "$src" > "$root/source-path"
+          cd "$root/build"
+          "$src/configure" FC="$FC" FCFLAGS="$FCFLAGS"
+          make -j2
+          test -x source/QS3ED2
+      - name: Verify full and two bounded occupation windows with independent Hamiltonian
+        run: |
+          set -eu
+          src=$(cat "$RUNNER_TEMP/cpc-mixed-basis/source-path")
+          python3 -S "$src/tests/cpc_mixed_spin_bounded_basis.py" \
+            --exe "$RUNNER_TEMP/cpc-mixed-basis/build/source/QS3ED2" \
+            --output "$RUNNER_TEMP/cpc-bounded-basis-results"
+          python3 -S - "$RUNNER_TEMP/cpc-bounded-basis-results/report.json" <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1],encoding="utf-8"))
+          assert d["pass_complete"],d["failures"]
+          assert d["exact_qs3_binomial_limit"]
+          assert d["completed_cases"]==d["expected_cases"]==3
+          assert [x["expected_dimension"] for x in d["results"]]==[36,10,26]
+          assert sum(x["number_of_eigenvalues"] for x in d["results"])==72
+          assert all(x["eigenvalue_error_max"]<5e-12 for x in d["results"])
+          print("CPC GENERALIZED BOUNDED BASIS 3/3 REPRESENTATIONS; 72/72 EIGENVALUES")
+          PY
+      - name: Archive source-identified exact occupancy and numerical outcomes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cpc-mixed-bounded-occupation-spectrum
+          path: ${{ runner.temp }}/cpc-bounded-basis-results/
+          retention-days: 21
+          if-no-files-found: warn
