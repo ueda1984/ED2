@@ -143,6 +143,30 @@ At \(\delta=0\), for example:
   differences ranging from about
   \(1.82\times10^{-9}\) to \(8.95\times10^{-9}\).
 
+The sparse reference itself also shows
+*cross-run numerical variation*: at zero
+bias, the sparse `eigsh` computation
+in the ED2 comparison job returned
+\(9.1074011\times10^{-7}\),
+while a separate sparse `eigsh`
+execution during the dense-LAPACK
+crosscheck returned
+\(9.1755522\times10^{-7}\).
+The absolute difference, approximately
+\(6.82\times10^{-9}\), is visible
+despite identical model couplings.
+These were separate CI jobs and
+source revisions; the tests do
+not claim bitwise-identical
+execution environments.
+
+The [frozen-data crossreference audit](https://github.com/ueda1984/ED2/blob/codex/ed2-cpc-stationary-dm-scaling/tests/plot_cpc_ultranarrow_reference_comparison.py)
+therefore records **each sparse
+reference in its own provenance
+context** rather than silently
+equating distinct numerical
+eigenvector observations.
+
 This pattern is **consistent with an eigenvector
 conditioning problem in the original sparse
 reference**. It does not support labelling
