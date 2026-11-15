@@ -177,7 +177,8 @@ finite boundaries and site-dependent fields.
 
 ## Reproducible numerical results
 
-[GNU Fortran 13 / OpenBLAS / OMP=1,2 scientific validation](https://github.com/ueda1984/ED2/actions/runs/43689548834).
+[GNU Fortran 13 / OpenBLAS / OMP=1,2 extended scientific validation](https://github.com/ueda1984/ED2/actions/runs/43690041312)
+(60 cases including 12-site OMP=2).
 
 The full-size scans were built from a **separately extracted
 source distribution**. The reference uses independent SciPy
@@ -212,9 +213,10 @@ The monotonic reduction of \(K(D)\) with increasing
 \(D\) is consistent with the general variational
 concavity of the ground-state energy.
 
-**54/54 ED2 trials passed** (24 for OMP=1, sizes
-4--10; 24 for OMP=2, sizes 4--10; six additional
-OMP=1 trials at 12 sites): no solver nonconvergence,
+**60/60 ED2 trials passed** (24 cases for OMP=1, sizes
+4--10; 24 for OMP=2, sizes 4--10; and six
+additional cases for **each** thread count at
+12 sites): no solver nonconvergence,
 no residual-contract violations, and independent
 energy, magnetic, all-nine-NN-correlation and chiral
 observable comparisons passed. The largest detected
@@ -226,6 +228,10 @@ derivative/chirality discrepancy was below
 referenced sizes**.
 The exact case-by-case errors and compiler provenance
 are retained in the linked workflow artifacts.
+Three separate figure prototypes were also generated
+by [the validated plotting workflow](https://github.com/ueda1984/ED2/actions/runs/43689804977),
+with SVG/PNG outputs retained as an optional
+GitHub Actions artifact.
 
 At \(D=0\), the two susceptibility finite-difference
 routes agree within a stated \(2\times10^{-4}\)
@@ -250,8 +256,10 @@ case-by-case `report.json`.
   to claim a converged bulk value or a critical exponent.
 - The near-zero \(D=0\) chiral signal is not evidence of
   spontaneous chirality.
-- \(L=12\) is tested at OMP=1; OMP=2 is currently
-  verified up through \(L=10\).
+- **OMP=1 and OMP=2** are both validated up
+  through \(L=12\); portability to other
+  compiler families and CPU architectures has
+  not been established by this application-specific scan.
 - ALG=1 requests one eigenpair, ALG=2 requests two at
   \(D=0\), and achieved residuals are not matched.
   These trials are **not** a fair timing comparison.
