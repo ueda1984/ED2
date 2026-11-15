@@ -38,8 +38,11 @@ For the common spin-1/2 XXZ limit, all 32 levels
 of three four- and six-site invariant magnetization
 sectors agree between the original QS³/ED executable,
 ED2 and an independent Hamiltonian, with a maximum
-cross-code difference of \(2.89\times10^{-15}\). As a
-reproducible scientific application we compute the response to a
+cross-code difference of \(2.89\times10^{-15}\).
+Direct conventional-Lanczos (ALG=1) comparisons
+on larger 12-, 18- and 24-site common-sector
+problems likewise reproduce independent ground
+energies. As a reproducible scientific application we compute the response to a
 staggered directed DM interaction in an alternating spin-1/2 and
 spin-1 chain containing XYZ, symmetric off-diagonal and transverse
 field terms. For 4–12 sites, ground energies and all nearest-neighbor
@@ -266,6 +269,28 @@ in the [32-level benchmark CSV](cpc-qs3-ed-ed2-32level-extended-ci.csv).
 The original static/dynamic output
 formats are not treated as
 automatically compatible with ED2.
+
+We also ran the actual historical
+QS³/ED and generalized ED2 **ALG=1
+Lanczos executables** on spin-1/2
+open XXZ chains at \(N_\downarrow=2\)
+and \(L=12,18,24\), with invariant-sector
+dimensions 66, 153 and 276.
+All three lowest energies agree
+with a separately assembled exact
+Hamiltonian; old-to-new absolute
+differences are \(1.11\times10^{-16}\),
+\(1.78\times10^{-14}\) and
+\(1.20\times10^{-14}\), respectively.
+The [source-pinned iterative comparison](cpc-original-qs3-ed2-iterative-continuity.md)
+records raw energies and source
+provenance. The original random
+starting state is not identical
+to ED2's numerical initialization,
+so iteration counts (35/35,
+45/55 and 60/60, old/new) are
+**not** treated as evidence of
+a matched-start speedup.
 
 The nonconserving mixed-spin
 response in Section 4 illustrates
