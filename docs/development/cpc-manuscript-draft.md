@@ -451,6 +451,94 @@ not a general high-precision individual
 ground-state certificate. See the
 [ultra-small-gap technical report](cpc-interacting-ultranarrow.md).
 
+### 3.4 Exact weak-edge symmetry and a finite-size polarization benchmark
+
+As a complementary test of reference precision,
+we retain the interacting seven-site XYZ/Gamma/DM
+core and use the weak anisotropic edge coupling
+
+\[
+V_\varepsilon=\varepsilon
+(S_1^x S_2^x+0.6S_1^y S_2^y)
+\]
+
+at zero edge field. The local edge-spin
+unitary \(U=2S_1^z\) satisfies the exact
+identity \(H(-\varepsilon)=UH(\varepsilon)U^\dagger\);
+the complete sparse Hamiltonian passes this
+unitary test at all investigated couplings.
+
+Within the doublet consisting of the two
+core-ground-state edge-spin configurations,
+the first-order projected Hamiltonian yields
+\(\langle S_1^z\rangle=0\).
+A second-order Q-space resolvent,
+\(R=Q(H_{\rm core}-e_g)^{-1}Q\),
+introduces the asymmetric self-energies
+\(\Sigma_{\uparrow,\downarrow}\). Setting
+\(a=QS_2^x|g\rangle\),
+\(b=QS_2^y|g\rangle\), and
+\(m_\alpha=\langle g|S_2^\alpha|g\rangle\),
+the difference obeys
+
+\[
+\Sigma_\uparrow-\Sigma_\downarrow
+=0.6\varepsilon^2\operatorname{Im}
+\langle a|R|b\rangle.
+\]
+
+Consequently, the second-order low-energy
+model predicts the finite-size asymptotic
+edge moment
+
+\[
+\langle S_1^z\rangle
+=C|\varepsilon|+O(\varepsilon^2),\quad
+C=-\frac{0.6\,\operatorname{Im}\langle a|R|b\rangle}
+{2\sqrt{m_x^2+0.36m_y^2}}.
+\]
+
+For the chosen core, \(C=1.47477909\).
+The \(|\varepsilon|\) is consistent
+with the exact coupling-sign symmetry
+and the degeneracy at zero coupling,
+**not** evidence of a thermodynamic
+phase transition.
+
+Independent dense LAPACK `ZHEEVR`
+calculations of the full
+1296-dimensional Hamiltonian for
+\(\varepsilon=5\times10^{-7},
+2\times10^{-6},5\times10^{-6},10^{-5}\)
+give
+\(\langle S_1^z\rangle/\varepsilon
+=1.474292,1.474155,1.475053,1.474761\),
+respectively. These are close to the
+core-resolvent coefficient, while the
+absolute differences between the dense
+and second-order low gaps are
+at most \(1.48\times10^{-15}\)
+in the tested double-precision environment.
+This is numerical corroboration,
+**not** a rigorous 15-digit bound on
+individual eigenvectors.
+
+The separate ED2-native comparison of
+three biases, two restart workspaces and
+two OpenMP settings passed **12/12**
+residual and independent observable checks
+at requested direct residual \(10^{-12}\).
+The maximum ED2-to-second-order
+ground edge-moment difference was
+\(1.17\times10^{-8}\).
+The test, [derivation and fixed-source
+measurement tables](cpc-weak-edge-polarization-scaling.md)
+are intentionally presented as an
+**adversarial software-accuracy example**.
+The principal physical demonstration
+remains the connected DM/chirality study
+of the next section.
+
 ## 4. Scientific application: staggered DM vector chirality
 
 Consider an open chain with
