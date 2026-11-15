@@ -1,0 +1,154 @@
+name: CPC literature XYZ-DM and stationary matched resources
+
+on:
+  push:
+    branches:
+      - codex/ed2-cpc-stationary-dm-scaling
+    paths:
+      - ".github/workflows/cpc-literature-matched-bench.yml"
+      - "tests/cpc_literature_yi_xyz_dm.py"
+      - "tests/cpc_stationary_resource_benchmark.py"
+      - "tests/mixed_spin_matched_benchmark.py"
+      - "tests/mixed_spin_dm_chirality_scan.py"
+      - "tests/Makefile.am"
+      - "source/**"
+      - "configure.ac"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  literature:
+    name: "Yi-2019 Eq.1 finite chain OMP=${{ matrix.threads }}"
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        threads: [1, 2]
+    env:
+      FC: gfortran-13
+      FCFLAGS: "-O2 -fopenmp"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+      OMP_DYNAMIC: "FALSE"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install standalone build and independent reference dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends gfortran-13 libopenblas-dev liblapack-dev autoconf automake make python3-numpy python3-scipy time
+      - name: Build from fresh source distribution
+        run: |
+          set -eu
+          autoreconf -vfi
+          ./configure FC="$FC" FCFLAGS="$FCFLAGS"
+          make -j2
+          make dist
+          tmp="$RUNNER_TEMP/ed2-archive"
+          mkdir -p "$tmp/src" "$tmp/build"
+          tgz=$(find "$GITHUB_WORKSPACE" -maxdepth 1 -name '*.tar.gz' -print -quit)
+          test -n "$tgz"
+          tar -xzf "$tgz" -C "$tmp/src"
+          src=$(find "$tmp/src" -mindepth 1 -maxdepth 1 -type d -print -quit)
+          test -f "$src/tests/cpc_literature_yi_xyz_dm.py"
+          printf '%s\n' "$src" > "$tmp/source-path"
+          cd "$tmp/build"
+          "$src/configure" FC="$FC" FCFLAGS="$FCFLAGS"
+          make -j2
+      - name: Check published XYZ-DM formula, PBC direction and ED2 observables
+        run: |
+          set -eu
+          tmp="$RUNNER_TEMP/ed2-archive"
+          src=$(cat "$tmp/source-path")
+          python3 "$src/tests/cpc_literature_yi_xyz_dm.py" \
+            --exe "$tmp/build/source/QS3ED2" \
+            --sizes 4,6,8 \
+            --omp "${{ matrix.threads }}" \
+            --output "$RUNNER_TEMP/literature-${{ matrix.threads }}"
+          python3 - "$RUNNER_TEMP/literature-${{ matrix.threads }}/report.json" <<'PY'
+          import json,sys
+          data=json.load(open(sys.argv[1],encoding="utf-8"))
+          assert data["successful"]==data["expected"]==6
+          assert not data["violations"]
+          print("PUBLISHED HAMILTONIAN CHECK",data["successful"],"/",data["expected"])
+          PY
+      - name: Archive exact inputs, logs and independent comparisons
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cpc-yi2019-omp${{ matrix.threads }}
+          path: ${{ runner.temp }}/literature-${{ matrix.threads }}/
+          retention-days: 21
+          if-no-files-found: warn
+
+  resources:
+    name: "Stationary matched-resource OMP=${{ matrix.threads }}"
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        threads: [1, 2]
+    env:
+      FC: gfortran-13
+      FCFLAGS: "-O2 -fopenmp"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+      OMP_DYNAMIC: "FALSE"
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install standalone build and independent reference dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends gfortran-13 libopenblas-dev liblapack-dev autoconf automake make python3-numpy python3-scipy time
+      - name: Build from fresh source distribution
+        run: |
+          set -eu
+          autoreconf -vfi
+          ./configure FC="$FC" FCFLAGS="$FCFLAGS"
+          make -j2
+          make dist
+          tmp="$RUNNER_TEMP/ed2-archive"
+          mkdir -p "$tmp/src" "$tmp/build"
+          tgz=$(find "$GITHUB_WORKSPACE" -maxdepth 1 -name '*.tar.gz' -print -quit)
+          test -n "$tgz"
+          tar -xzf "$tgz" -C "$tmp/src"
+          src=$(find "$tmp/src" -mindepth 1 -maxdepth 1 -type d -print -quit)
+          test -f "$src/tests/cpc_stationary_resource_benchmark.py"
+          printf '%s\n' "$src" > "$tmp/source-path"
+          cd "$tmp/build"
+          "$src/configure" FC="$FC" FCFLAGS="$FCFLAGS"
+          make -j2
+      - name: Same-target explicit-start residual and resource comparison
+        run: |
+          set -eu
+          tmp="$RUNNER_TEMP/ed2-archive"
+          src=$(cat "$tmp/source-path")
+          python3 "$src/tests/cpc_stationary_resource_benchmark.py" \
+            --exe "$tmp/build/source/QS3ED2" \
+            --sizes 8,10 \
+            --D 0.12 \
+            --omp "${{ matrix.threads }}" \
+            --residual-atol 1e-8 \
+            --repeats 2 --warmups 1 \
+            --workspaces 2:16,4:24 \
+            --output "$RUNNER_TEMP/resources-${{ matrix.threads }}"
+          python3 - "$RUNNER_TEMP/resources-${{ matrix.threads }}/report.json" <<'PY'
+          import json,sys
+          data=json.load(open(sys.argv[1],encoding="utf-8"))
+          assert data["pass_complete"],data["contract_violations"]
+          assert data["completed"]==data["expected_runs"]==18
+          assert len(data["summary"])==6
+          assert all(x["successful_measurements"]==2 for x in data["summary"])
+          print("MATCHED RESOURCES",data["completed"],"/",data["expected_runs"])
+          PY
+      - name: Archive measured runs, timings, RSS and diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cpc-stationary-resource-omp${{ matrix.threads }}
+          path: ${{ runner.temp }}/resources-${{ matrix.threads }}/
+          retention-days: 21
+          if-no-files-found: warn
