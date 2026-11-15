@@ -99,6 +99,17 @@ sectors**, including the original near-saturation \(N_\downarrow=1\)
 regime. The [frozen 32-level spectrum](docs/development/cpc-qs3-ed-ed2-32level-extended-ci.csv)
 shows a maximum original-to-ED2 difference below 3e-15.
 
+The [first LaTeX CPC manuscript](paper/cpc_ed2_main.tex)
+and [build/reproduction notes](paper/README.md) provide an author-review
+journal-format draft. Its [PDF compilation CI](https://github.com/ueda1984/ED2/actions/workflows/cpc-manuscript-latex.yml)
+produces a temporary proof artifact, but no version, authors, CPC Program
+Library accession or software DOI is yet finalized.
+Direct published-program comparisons now include a
+[three-size conventional-Lanczos regression](docs/development/cpc-original-qs3-ed2-iterative-continuity.md)
+and [all six translation sectors of a periodic XXZ chain](docs/development/cpc-qs3-ed-ed2-momentum-15level-ci.csv),
+with actual old and new Fortran executables and independent references.
+These are accuracy checks, not controlled speedups.
+
 The [CPC submission-focused draft](docs/development/cpc-submission-core-draft.md)
 and [upstream-versus-development contribution audit](docs/development/cpc-software-provenance-contribution-audit.md)
 are **development documents, not a submitted article or official release**.
