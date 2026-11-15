@@ -1,0 +1,63 @@
+name: CPC ED2 manuscript LaTeX smoke and archive
+
+on:
+  push:
+    branches:
+      - codex/ed2-cpc-stationary-dm-scaling
+    paths:
+      - ".github/workflows/cpc-manuscript-latex.yml"
+      - "paper/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  compile-elsarticle:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    name: Compile provisional ED2 CPC article twice and check its text/metadata
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install Elsevier document class and required packages
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            texlive-latex-base texlive-latex-recommended texlive-publishers \
+            poppler-utils
+      - name: Compile source-pinned manuscript PDF
+        run: |
+          set -eu
+          mkdir -p "$RUNNER_TEMP/ed2-manuscript"
+          for pass in 1 2; do
+            pdflatex -interaction=nonstopmode -halt-on-error -file-line-error \
+              -output-directory="$RUNNER_TEMP/ed2-manuscript" paper/cpc_ed2_main.tex \
+              > "$RUNNER_TEMP/ed2-manuscript/compile-pass$pass.stdout"
+          done
+          test -s "$RUNNER_TEMP/ed2-manuscript/cpc_ed2_main.pdf"
+          pdfinfo "$RUNNER_TEMP/ed2-manuscript/cpc_ed2_main.pdf" | tee "$RUNNER_TEMP/ed2-manuscript/pdfinfo.txt"
+          pdftotext -layout "$RUNNER_TEMP/ed2-manuscript/cpc_ed2_main.pdf" \
+            "$RUNNER_TEMP/ed2-manuscript/article-text.txt"
+          grep -q 'ED2: Generalized exact diagonalization' \
+            "$RUNNER_TEMP/ed2-manuscript/article-text.txt"
+          grep -q 'Program summary' "$RUNNER_TEMP/ed2-manuscript/article-text.txt"
+          grep -q 'Conclusions' "$RUNNER_TEMP/ed2-manuscript/article-text.txt"
+          sha256sum paper/cpc_ed2_main.tex \
+            "$RUNNER_TEMP/ed2-manuscript/cpc_ed2_main.pdf" \
+            | tee "$RUNNER_TEMP/ed2-manuscript/source-and-pdf-sha256.txt"
+          if grep -E '(^!|LaTeX Error|Undefined control sequence)' \
+            "$RUNNER_TEMP/ed2-manuscript/cpc_ed2_main.log"; then
+            echo "LaTeX errors found in log" >&2
+            exit 1
+          fi
+          echo "CPC MANUSCRIPT: elsarticle compiled twice, valid PDF and extractable scientific content"
+      - name: Archive provisional manuscript for visual review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cpc-ed2-manuscript-provisional-elsarticle
+          path: ${{ runner.temp }}/ed2-manuscript/
+          retention-days: 21
+          if-no-files-found: warn
