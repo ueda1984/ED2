@@ -187,6 +187,39 @@ the orientation of the directed input bond.
 
 The full local product Hilbert space has
 dimension \(\mathcal D=\prod_i(2S_i+1)\).
+The basis construction generalizes the
+original QS³ binomial indexing in a
+precise way. If \(m_i\le 2S_i\) is
+the allowed occupation at site \(i\)
+and \(n_i=0,\ldots,m_i\),
+the unrestricted-spatial-symmetry
+Hilbert dimension for an occupation
+window \([N_{\min},N_{\max}]\) is
+
+\[
+\boxed{
+\mathcal D_{\rm window}=
+\sum_{n=N_{\min}}^{N_{\max}}
+[x^n]\prod_{i=1}^{L}
+(1+x+\cdots+x^{m_i}).
+}
+\]
+
+The coefficients are constructed through
+bounded-repetition dynamic programming,
+as implemented by ED2's
+`ltd_rep_combination` and
+`cum_ltd_rep_combination` tables.
+For \(S_i=1/2\), \(m_i=1\),
+the expression reduces to
+\(\binom{L}{N_\downarrow}\)
+at fixed \(N_\downarrow\),
+recovering the original QS³ basis
+**mathematically**. With full
+occupations and a complete
+global window it gives
+\(\prod_i(2S_i+1)\).
+See the [code-verified derivation](cpc-qs3-ed-to-ed2-basis-generalization.md).
 Selected basis representations may exploit
 compatible symmetries or restrict local/total
 occupation ranges. **A restricted excitation
