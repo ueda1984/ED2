@@ -170,3 +170,6 @@ EXTRA_DIST += mixed_spin_interacting_avoided_crossing.py
 
 # Scientific/test-only anisotropic XY edge bond and excited-start inclusion witness.
 EXTRA_DIST += mixed_spin_noncommuting_xy.py
+
+# Test-only 8/10-site independent sparse interacting avoided-crossing study.
+EXTRA_DIST += mixed_spin_interacting_sparse810.py
