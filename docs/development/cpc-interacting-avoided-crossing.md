@@ -252,13 +252,23 @@ Possible manuscript figures:
    achieved direct residual, with the separate
    excited-state-start counterexample annotated.
 
-The present systems have 36 and 216 basis states.
-This **is numerical validation**, not an 8--12-site
-scaling benchmark or a claim of a physics phase diagram.
-The earlier [sparse scaling study](cpc-sparse-scaling.md)
-addresses larger, differently parameterized spin chains;
-an interacting avoided crossing with a larger active
-core remains a possible next application.
+The primary **fully dense** independent validations have
+36 and 216 basis states. The separately completed
+[8-/10-site interacting sparse reference study](cpc-interacting-sparse810.md)
+extends this very same XY avoided-crossing Hamiltonian
+to **1,296 and 7,776 states**, with 52/52 successful
+OMP=1/2 trials and additional near-(10^{-7}) gaps.
+The largest individual-state differences at tiny gaps are
+about (10^{-7}), while the low-doublet trace comparisons
+are more stable (below (6	imes10^{-9})).
+At tiny gaps, the **independent reference eigenvector**
+also has finite residual and must not be treated as
+mathematically exact.
+
+The original [8--12-site sparse scaling study](cpc-sparse-scaling.md)
+remains a complementary, differently parameterized spin-chain
+benchmark. Neither study establishes a new phase diagram,
+universal ground-state certification, or general solver speedup.
 
 ## Run the two independent tests
 

@@ -278,11 +278,24 @@ A separate explicit interacting first-excited starting vector
 also reproduced an ALG=1 residual near \(10^{-15}\)
 with a first-excited rather than globally lowest energy.
 
-These data are appropriate for a **scientific verification figure**,
+A subsequent [8-/10-site interacting sparse study](cpc-interacting-sparse810.md)
+extends the **same** noncommuting XY avoided-crossing model to
+dimensions 1,296 and 7,776, including independent ARPACK
+references for a ground doublet split by approximately (10^{-7}).
+Across OMP=1/2, **52/52 additional trials passed**.
+Near this tiny gap, the individual ED2/reference observable
+difference can reach (1.4	imes10^{-7}), while the
+independent low-doublet ensemble trace differs by less
+than (6	imes10^{-9}); the reference's own residual-to-gap
+sensitivity must be discussed explicitly.
+
+These data are appropriate for **scientific verification figures**,
 not evidence of a newly discovered phase transition or general
 solver superiority. The existing 8--12-site sparse study validates
-larger Hilbert spaces for a different model; more physics-motivated
-large-system calculations are still necessary.
+a different model, while the present 8/10-site test uses the
+same interacting avoided-crossing Hamiltonian. More
+physics-motivated application and repeated-node performance
+benchmarks remain necessary.
 
 ## Existing reproducibility evidence
 
@@ -294,6 +307,7 @@ large-system calculations are still necessary.
 - [ALG2 workspace and two-pair robustness study](cpc-alg2-workspace.md).
 - [Physical near-degenerate and excited-start controls](cpc-near-degenerate-gaps.md).
 - [Interacting avoided crossings and noncommuting bond physics](cpc-interacting-avoided-crossing.md).
+- [Interacting 8-/10-site sparse spectral and observable checks](cpc-interacting-sparse810.md).
 
 **No manuscript authorship, official source tag, DOI or journal
 publication is assigned by this planning document.**
