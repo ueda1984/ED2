@@ -11,6 +11,7 @@ on:
       - codex/ed2-cpc-alg2-restart-sweep
       - codex/ed2-cpc-alg2-multipair-stress
       - codex/ed2-cpc-near-degenerate-physics
+      - codex/ed2-cpc-interacting-avoided-crossing
     paths:
       - "docs/**"
       - "mkdocs.yml"

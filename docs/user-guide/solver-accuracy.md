@@ -164,6 +164,16 @@ The current `lowest_state_inclusion` diagnostic remains
 `not_assessed` for precisely this reason. No output flag should
 be interpreted as a universal ground-state certificate.
 
+The [interacting avoided-crossing validation](../development/cpc-interacting-avoided-crossing.md)
+now confirms this distinction on an anisotropic XY-coupled
+**entangled** mixed-spin model as well: an accurately verified
+first-excited native ED2 vector is accepted by ALG=1 with
+a residual around (10^{-15}), yet its energy remains
+approximately (4.24	imes10^{-3}) above the ground state.
+Separately, independently validated low-doublet **traces**
+remain accurate even when a particular eigenvector is not a
+reliable indicator of the lowest state.
+
 For published calculations record the full Git SHA, all model inputs,
 compiler/BLAS versions, OpenMP thread settings, initial state/seed,
 the requested and achieved tolerances, and unsuccessful runs.
@@ -175,3 +185,4 @@ the requested and achieved tolerances, and unsuccessful runs.
 - [Phase 1-F diagnostics](../development/phase1f-diagnostics-reproducibility.md)
 - [Phase 1-G residual policy](../development/phase1g-optin-residual-policy.md)
 - [CPC physical near-degenerate and excited-start tests](../development/cpc-near-degenerate-gaps.md)
+- [CPC interacting avoided-crossing tests](../development/cpc-interacting-avoided-crossing.md)

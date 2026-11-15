@@ -74,5 +74,6 @@ nav:
       - CPC matched Krylov precision and cost: development/cpc-matched-krylov.md
       - CPC ALG2 restart workspace study: development/cpc-alg2-workspace.md
       - CPC near-degenerate numerical limits: development/cpc-near-degenerate-gaps.md
+      - CPC interacting avoided-crossing verification: development/cpc-interacting-avoided-crossing.md
   - Reference:
       - Citation & Versioning: reference/citation-versioning.md      

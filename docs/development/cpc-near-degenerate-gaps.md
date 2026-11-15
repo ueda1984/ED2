@@ -234,9 +234,13 @@ The existing ED2 numerical algorithms were not modified.
 2. **Completed:** the equal-weight doublet projector/trace
    observables were independently verified in **16/16** native-basis
    ED2 readback tests, despite large differences among individual states.
-3. Study genuinely *interacting* avoided crossings and
-   near-degenerate clusters (this intentionally decoupled
-   spin is a transparent numerical counterexample).
+3. **Completed for small systems:** the
+   [interacting XX/XY avoided-crossing validation](cpc-interacting-avoided-crossing.md)
+   now tests both a bond with a conserved edge component and a
+   noncommuting XY bond whose central ground state is entangled.
+   Both families passed 108/108 cases across OMP=1/2, and the
+   XY family produced an independent excited-state-start witness.
+   Extension to larger interacting systems remains future work.
 4. Do **not** change ALG=1/2 defaults or promise an automatic
    smallest-eigenvalue certificate without a separately reviewed
    algorithmic design and independent evidence.

@@ -242,21 +242,47 @@ compiler portability, algorithmic cost, API scope).
 
 A new [physical near-degenerate study](cpc-near-degenerate-gaps.md)
 verified an **exactly twofold** or weakly split low-energy doublet
-with an independent dense reference. For (Delta=10^{-10}),
+with an independent dense reference. For \(\Delta=10^{-10}\),
 an ALG=1 result can pass a direct residual `1e-8`
 while the unique ground-state edge-spin observable is inaccurate;
 tightening the residual resolves these particular starts but
 increases Hamiltonian applications.
 
 A controlled first-excited initial vector gives a stronger general
-counterexample: for (Delta=10^{-6}), ALG=1 returned
-a **correct excited eigenpair**, residual (10^{-15}), success
+counterexample: for \(\Delta=10^{-6}\), ALG=1 returned
+a **correct excited eigenpair**, residual \(10^{-15}\), success
 status zero, and the **wrong state to call the global ground**.
 This is mathematical Krylov behavior, not a regression failure.
 The manuscript should explicitly distinguish residual certification,
 low-doublet inclusion, individual-state observable fidelity and
 global ground-state identification. Do **not** advertise an
 unimplemented spectral inclusion guarantee.
+
+### Interacting avoided crossing with independently validated observables
+
+The new [interacting avoided-crossing study](cpc-interacting-avoided-crossing.md)
+extends the prior exactly decoupled low-doublet model with
+\(\varepsilon(S_1^xS_2^x+\eta S_1^yS_2^y)\)
+for \(\eta=0\) and \(0.6\). For \(\eta=0.6\),
+the central ground state is **entangled** and no single edge-spin
+component commutes with the full Hamiltonian, avoiding the
+special product-state structure of the pure XX coupling.
+
+Independent full-matrix validation confirmed the avoided gap,
+edge magnetization reversal, local/correlation observables and
+two-state projector/trace quantities on four and six sites,
+including gaps around \(10^{-7}\). Across the two coupling
+families, OMP=1/2 and several solver configurations, there are
+**216 successfully classified/validated ordinary runs**.
+A separate explicit interacting first-excited starting vector
+also reproduced an ALG=1 residual near \(10^{-15}\)
+with a first-excited rather than globally lowest energy.
+
+These data are appropriate for a **scientific verification figure**,
+not evidence of a newly discovered phase transition or general
+solver superiority. The existing 8--12-site sparse study validates
+larger Hilbert spaces for a different model; more physics-motivated
+large-system calculations are still necessary.
 
 ## Existing reproducibility evidence
 
@@ -267,6 +293,7 @@ unimplemented spectral inclusion guarantee.
 - [Matched one-eigenpair cost and residual](cpc-matched-krylov.md).
 - [ALG2 workspace and two-pair robustness study](cpc-alg2-workspace.md).
 - [Physical near-degenerate and excited-start controls](cpc-near-degenerate-gaps.md).
+- [Interacting avoided crossings and noncommuting bond physics](cpc-interacting-avoided-crossing.md).
 
 **No manuscript authorship, official source tag, DOI or journal
 publication is assigned by this planning document.**
