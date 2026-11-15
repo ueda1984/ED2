@@ -174,6 +174,17 @@ second-state readback and independently computed
 `report.json`, available as short-retention
 CI artifacts in the linked workflow.
 
+The [frozen 12-case CSV](cpc-sparse-doublet-8site-raw-ci.csv)
+retains run IDs, site count, splitting, restart workspace,
+individual edge moments and trace-error measurements beyond
+the artifact-retention period. The independent
+`tests/plot_cpc_sparse_doublet.py` script verifies the
+provenance and generates two SVG/PNG exploratory figures:
+(i) individual edge moments versus doublet mean, and
+(ii) the maximum invariant-trace error versus splitting.
+These are numerical-stability figures, not evidence of a
+new chiral phase.
+
 **Limits:** this is an exactly factorized edge
 stress construction; a physically interacting
 near-degenerate cluster with 8 or more sites,
