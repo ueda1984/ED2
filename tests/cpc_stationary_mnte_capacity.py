@@ -82,9 +82,14 @@ def main():
         if (r["spins"]!=[.5,1.]*(n//2) or len(r["bonds"])!=n-1
                 or any(i+1!=j for i,j,_ in r["bonds"])):
             raise AssertionError("Analytical MNTE formula requires the OBC alternating-spin chain")
+        if r["max_sparse_row_nonzeros"]!=analytical_mnte:
+            raise AssertionError("Independent SciPy CSR maximum sparsity disagrees with derived MNTE "+
+                                 str((n,r["max_sparse_row_nonzeros"],analytical_mnte)))
         refs.append(dict(sites=n,dimension=r["dimension"],D=a.D,
                          ground_energy=r["E0"],first_gap=r["gap"],
                          independent_max_residual=max(r["reference_residual"]),
+                         independent_max_sparse_row_nnz=r["max_sparse_row_nonzeros"],
+                         analytical_mnte=analytical_mnte,
                          explicit_initial_sha256=initial_sha))
         # Always calibrate from the all-representatives cache (not a half
         # prefix). A run with MNTE=-1 covers every generated transition.
