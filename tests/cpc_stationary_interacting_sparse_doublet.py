@@ -97,6 +97,41 @@ def reference(n,epsilon,delta):
     nonu1=float(np.linalg.norm(comm.data)/np.linalg.norm(H.data))
     if nonu1<.01:
         raise AssertionError("Interacting model unexpectedly conserves total Sz")
+    # A separate *first-order low-energy effective Hamiltonian*
+    # checks the ultraweak coupling without relying solely on
+    # eigenvector conditioning in the full near-doublet:
+    # H_eff = e_core*I + (delta*sigmaz + epsilon*mx*sigmax
+    #                    + eta*epsilon*my*sigmay)/2.
+    # The gap prediction is accurate up to O(epsilon^2/external_gap)
+    # for epsilon much smaller than the core excitation gap.
+    effective_gap=None
+    effective_edge_z=None
+    effective_gap_error=None
+    if epsilon<1e-5:
+        core_spin=spins[1:]
+        core_bonds=[(i-1,j-1,c) for i,j,c in bonds if i>0 and j>0]
+        H_core,core_ops=construct_sparse_hamiltonian(
+            core_spin,core_bonds,fields[1:])
+        rng_core=np.random.default_rng(1979)
+        core_guess=rng_core.normal(size=H_core.shape[0])+1j*rng_core.normal(size=H_core.shape[0])
+        core_guess/=np.linalg.norm(core_guess)
+        ecore,vec_core=eigsh(H_core,k=1,which="SA",tol=1e-13,
+                             ncv=min(H_core.shape[0]-1,80),
+                             maxiter=40000,v0=core_guess)
+        phi=vec_core[:,0]
+        core_res=float(np.linalg.norm(H_core@phi-ecore[0]*phi))
+        if core_res>1e-10:
+            raise AssertionError("Effective core ground state is not accurate")
+        mx=float(np.vdot(phi,core_ops[0][0]@phi).real)
+        my=float(np.vdot(phi,core_ops[0][1]@phi).real)
+        effective_gap=float(np.sqrt(delta**2 +
+                             epsilon**2*(mx**2+
+                                           EDGE_Y_FRACTION**2*my**2)))
+        effective_edge_z=float(-delta/(2*effective_gap))
+        effective_gap_error=float(abs(gap-effective_gap))
+        if effective_gap_error>1e-9:
+            raise AssertionError("Ultraweak full sparse gap deviates from independent effective two-state model: "+
+                                 str((gap,effective_gap,effective_gap_error)))
     ground=states[:,0]
     cluster=states[:,:2]
     rho_edge=ground.reshape(2,-1)@ground.reshape(2,-1).conj().T
@@ -143,6 +178,9 @@ def reference(n,epsilon,delta):
         commutator_relative=nonu1,edge_component_commutators=edge_comm,
         reference_residuals=independent_residuals,
         projector_rotation_error=qerror,
+        effective_low_gap=effective_gap,
+        effective_edge_z_firstorder=effective_edge_z,
+        effective_low_gap_error=effective_gap_error,
     )
 
 
