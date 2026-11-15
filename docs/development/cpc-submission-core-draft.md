@@ -1,7 +1,11 @@
 # CPC submission-focused manuscript core — author-review draft
 
 **Working document — not submitted or accepted.** Prepared 15 November
-2026. Authors/order, software version, upstream/fork integration,
+2026. This is the **first proposed journal program paper for ED2**, whose
+source was already publicly available, and not a post-publication ED2
+update. The relevant *published software* comparator is the original
+2022 QS³ code [QS-Cube/ED](https://github.com/QS-Cube/ED).
+Authors/order, software version, upstream/fork integration,
 program archive and CPC article category require confirmation.
 This compact version intentionally separates the *main software
 contribution* from exploratory numerical stress tests in the
@@ -15,14 +19,19 @@ Hamiltonians with anisotropic and nonconserving interactions**
 
 ## Abstract
 
-We describe ED2, a Fortran exact-diagonalization program extending
-the near-saturation QS³ spin solver to Hamiltonians with unequal
+We present the first journal program description of ED2, a Fortran
+exact-diagonalization code extending the published QS³ solver
+([QS-Cube/ED](https://github.com/QS-Cube/ED)) to Hamiltonians with unequal
 on-site spin magnitudes, anisotropic exchange, directed
 Dzyaloshinskii–Moriya interactions, symmetric off-diagonal
 exchange and site-dependent magnetic fields. We document
-the basis and input conventions, dense and iterative
+the generalized basis and input conventions, dense and iterative
 Hermitian eigensolvers, local and Cartesian two-spin
 observables, and numerical acceptance diagnostics.
+The preserved XXZ limit is checked directly against the original
+QS³ executable in a six-dimensional fixed-magnetization sector,
+with all six levels agreeing with an independent matrix to
+within (3\times10^{-15}).
 Independent dense and sparse constructions validate
 fully nonconserving alternating spin-1/2–spin-1 chains
 of up to 12 sites (Hilbert-space dimension 46,656).
@@ -63,24 +72,45 @@ exchange, antisymmetric DM couplings and
 transverse fields, and hence cannot generically
 be described by a conserved total \(S^z\) block.
 
-The published **QS³** program [1] focused on
-near-saturation quantum-spin calculations and
-already incorporated iterative diagonalization,
-observables and shared-memory parallelism.
-**ED2 is not a new Lanczos algorithm.** Its
-program-level contribution relative to that
-published work is the more general
-model representation, including user-specified
-mixed local spins and nonconserving interactions.
-The original upstream ED2 repository
-already implements these generalized input
-capabilities; this manuscript must credit
-that prior work fully. Subsequent
-fork development repaired numerical-library
-interfaces and indexing, characterized
-solver failure/precision conditions, and
-provided a reproducible test and source
-distribution workflow.
+The published **QS³** program [1] and its
+[CPC-era source `QS-Cube/ED`](https://github.com/QS-Cube/ED)
+focused on large, low-down-spin-density,
+spin-1/2 XXZ-type models in a fixed
+(N_\downarrow) sector, exploiting momentum
+blocks when appropriate. In addition to
+Lanczos and static spin observables, the
+original code included a dynamical
+spin-structure-factor pathway. ED2
+**is not a new Lanczos algorithm** and
+does not currently show the same native
+dynamic-response path: it should not
+be described as an unqualified functional
+superset of QS³.
+
+**This is ED2's first proposed journal
+program description**, despite the
+generalized code having been publicly
+accessible in [`QS-Cube/ED2`](https://github.com/QS-Cube/ED2)
+before this work. Relative to the
+*published* QS³, ED2's
+central program advance is its
+new physical operator and basis
+scope: mixed on-site spin values,
+anisotropic Cartesian exchange,
+directed DM, symmetric Gamma terms,
+site-dependent vector fields and
+nonconserving full-space computations.
+The later development fork also
+repaired numerical-library interfaces
+and field indexing and added explicit
+accuracy/failure and reproducibility
+controls. Those maintenance changes
+must be credited, but are not the
+sole new contribution of the first
+ED2 software article. The
+[primary published-program comparison]
+(cpc-qs3-ed-to-ed2-scope-matrix.md)
+identifies these boundaries precisely.
 
 Other packages, including **QuSpin** [4],
 can express a broad range of quantum-spin
@@ -184,6 +214,27 @@ rather than silently converted
 into successful runs.
 
 ## 4. Independent validation strategy
+
+To verify continuity with the **actual published**
+QS³ implementation, we compiled the original
+`QS-Cube/ED` source at the pinned CPC-era SHA
+`a3b09934bba5f966bfb564718528de8778c2b46c`
+and the ED2 source distribution at SHA
+`88c72032c26e52e507bc1217ec030479ada486fc`.
+On a four-site open spin-1/2 XXZ chain
+with (J_{xy}=0.8), (J_z=1.1) and
+(N_\downarrow=2), both executable
+dense solvers represent the same
+six-dimensional invariant sector.
+All six eigenvalues coincide with a
+third independently assembled
+product-state Hamiltonian. The largest
+old-to-new absolute difference is
+(2.89\times10^{-15}).
+The [fully frozen comparison]
+(cpc-qs3-ed-ed2-shared-xxz-spectrum-ci.csv)
+is a shared-physics limit, not a
+speed benchmark.
 
 Small-system dense Hamiltonians
 and independent sparse product-basis
@@ -380,6 +431,16 @@ The Python driver uses the
 NumPy/SciPy are confined to
 the optional independent
 verification tools.
+
+ED2 has not previously been reported in a
+journal program article, although its
+source was public before the present work.
+The earlier published QS³ program and its
+original [`QS-Cube/ED` source](https://github.com/QS-Cube/ED)
+are the paper's principal software lineage.
+The [direct feature and XXZ-spectrum comparison]
+(cpc-qs3-ed-to-ed2-scope-matrix.md)
+is part of this first ED2 submission.
 
 The current development work
 is publicly visible in the
