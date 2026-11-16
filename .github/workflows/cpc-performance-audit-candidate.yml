@@ -1,0 +1,107 @@
+name: CPC isolated performance candidate numerical audit
+on:
+  push:
+    branches: [codex/ed2-cpc-performance-audit-20261116]
+    paths:
+      - tests/performance_audit_20261116.patch
+      - .github/workflows/cpc-performance-audit-candidate.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  numerical-audit:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        profile: [release, checked]
+    env:
+      FC: gfortran-13
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      OMP_DYNAMIC: 'FALSE'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: review
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: 719da7035e66ce884e9de00376e4ded5b3e5c459
+          path: baseline
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: 719da7035e66ce884e9de00376e4ded5b3e5c459
+          path: candidate
+          persist-credentials: false
+      - name: Install test dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends gfortran-13 libopenblas-dev liblapack-dev autoconf automake make python3-numpy python3-scipy time
+      - name: Apply exact tested patch to isolated checkout
+        run: |
+          cd candidate
+          git apply --check ../review/tests/performance_audit_20261116.patch
+          git apply ../review/tests/performance_audit_20261116.patch
+          printf '%s\n' '38032a3faf9f8bdad381b414512591c81e5a963f9e3b2fa2915b481998d18d1d  source/state_lists.f90' '5f2b91a24c8cfa33d58b79a8204ce2cf6b889f5d02554b2dc80f3821c6503356  source/krylov_solvers.f90' | sha256sum -c -
+          git diff --stat
+      - name: Build both source versions and stress drivers
+        run: |
+          set -eu
+          if [ '${{ matrix.profile }}' = checked ]; then
+            flags='-O1 -g -fopenmp -fcheck=all -fsanitize=undefined -fno-sanitize-recover=undefined'
+          else
+            flags='-O2 -fopenmp'
+          fi
+          for engine in baseline candidate; do
+            (cd "$engine"
+             autoreconf -vfi
+             ./configure FC="$FC" FCFLAGS="$flags"
+             make -j1
+             cd source
+             "$FC" $flags -I. ../tests/krylov_stress_driver.f90 blas_lapack_interfaces.o krylov_residual_policy.o krylov_observations.o krylov_solvers.o -llapack -lblas -o krylov_stress_driver)
+          done
+          mkdir -p results
+          "$FC" --version > results/compiler.txt
+          ldd candidate/source/QS3ED2 > results/linked-libraries.txt
+          sha256sum candidate/source/QS3ED2 baseline/source/QS3ED2 > results/binaries.sha256
+      - name: Independent bounded-space and literature Hamiltonian tests
+        run: |
+          python3 candidate/tests/cpc_mixed_spin_bounded_basis.py --exe "$PWD/candidate/source/QS3ED2" --output "$PWD/results/bounded"
+          python3 candidate/tests/cpc_literature_yi_xyz_dm.py --exe "$PWD/candidate/source/QS3ED2" --sizes 4,6,8 --omp 1 --output "$PWD/results/literature"
+      - name: Independent non-U1 mixed-spin observables at one and two threads
+        run: |
+          for threads in 1 2; do
+            python3 candidate/tests/mixed_spin_dm_chirality_scan.py --exe "$PWD/candidate/source/QS3ED2" --sizes 4,6,8 --profile stationary --omp "$threads" --output "$PWD/results/dm-omp$threads"
+          done
+      - name: Existing large-site few-magnon numerical references
+        run: |
+          python3 candidate/tests/cpc_few_magnon_cache_benchmark.py --exe "$PWD/candidate/source/QS3ED2" --cases 1000-n2,216-n3 --policies full_tight --warmups 0 --repeats 1 --timeout 240 --allow-shared --output "$PWD/results/few-magnon"
+      - name: Compare 418 adversarial Krylov conditions, retaining warnings and failures
+        run: |
+          python3 baseline/tests/krylov_stress.py --driver "$PWD/baseline/source/krylov_stress_driver" --output "$PWD/results/stress-baseline"
+          python3 candidate/tests/krylov_stress.py --driver "$PWD/candidate/source/krylov_stress_driver" --output "$PWD/results/stress-candidate"
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          a=json.loads(Path('results/stress-baseline/report.json').read_text())
+          b=json.loads(Path('results/stress-candidate/report.json').read_text())
+          print('baseline summary:', {k:v for k,v in a.items() if not isinstance(v,list)})
+          print('candidate summary:', {k:v for k,v in b.items() if not isinstance(v,list)})
+          def classify(obj):
+              rows=next(v for v in obj.values() if isinstance(v,list) and len(v)>400)
+              keys=('classification','status','iterations','algorithm')
+              return [{k:r.get(k) for k in keys if k in r} for r in rows]
+          assert classify(a)==classify(b), 'Numerical outcome or iteration classifications changed'
+          Path('results/stress-classification-match.json').write_text(json.dumps({'conditions':len(classify(a)),'match':True},indent=2))
+          PY
+      - name: Archive numerical results and source/binary identity
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ed2-performance-candidate-audit-${{ matrix.profile }}
+          path: results/
+          retention-days: 30
+          if-no-files-found: warn
