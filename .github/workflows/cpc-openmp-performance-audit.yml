@@ -5,6 +5,7 @@ on:
     paths:
       - tests/performance_openmp_20261116.patch
       - tests/cpc_openmp_orbit_regression.py
+      - tests/cpc_openmp_krylov_regression.py
       - .github/workflows/cpc-openmp-performance-audit.yml
   workflow_dispatch:
 permissions:
@@ -51,14 +52,11 @@ jobs:
             --baseline "$PWD/baseline" --candidate "$PWD/candidate" \
             --compiler "$FC" --threads 1,2,4 --stress-repeats 4 \
             --output "$PWD/results/basis-regression"
-      - name: Build release baseline and bounds-checked UBSan candidate
+      - name: Build baseline and candidate with identical bounds and UBSan flags
         run: |
           set -eu
+          flags='-O1 -g -fopenmp -fcheck=all -fsanitize=undefined -fno-sanitize-recover=undefined'
           for engine in baseline candidate; do
-            flags='-O2 -fopenmp'
-            if [ "$engine" = candidate ]; then
-              flags='-O1 -g -fopenmp -fcheck=all -fsanitize=undefined -fno-sanitize-recover=undefined'
-            fi
             (cd "$engine"
              autoreconf -vfi
              ./configure FC="$FC" FCFLAGS="$flags"
@@ -121,36 +119,38 @@ jobs:
           (out/'report.json').write_text(json.dumps(rows,indent=2))
           print('Independent non-U1 physics:',len(rows),'passed')
           PY
-      - name: Preserve adversarial Krylov outcomes at one, two and four threads
+      - name: Independent Krylov acceptance at one, two and four threads
         run: |
-          python3 - <<'PY'
-          import json,sys
-          from pathlib import Path
-          root=Path.cwd();sys.path.insert(0,str(root/'candidate/tests'))
-          from krylov_stress import definitions,run
-          records=[]
-          for name in ('baseline','candidate'):(root/'results'/f'krylov-{name}').mkdir()
-          for i,t in enumerate(definitions()):
-            for threads in (1,2,4):
-              a=run(root/'baseline/source/krylov_stress_driver',root/'results/krylov-baseline',t,threads,i)
-              b=run(root/'candidate/source/krylov_stress_driver',root/'results/krylov-candidate',t,threads,i)
-              keys=('classification','solver_status','iterations','h_applications','exit_code')
-              assert all(a.get(k)==b.get(k) for k in keys),(i,threads,a,b)
-              assert b['classification']!='harness_or_runtime_error',b
-              records.append(dict(index=i,threads=threads,baseline=a,candidate=b))
-            if i%40==0:print('Krylov fixtures compared:',i,flush=True)
-          Path('results/krylov-comparison.json').write_text(json.dumps(records,indent=2))
-          print('Krylov comparisons:',len(records),'unchanged outcomes; includes warnings and nonconvergences')
-          PY
-      - name: Archive tested native sources and all evidence
+          python3 review/tests/cpc_openmp_krylov_regression.py \
+            --harness "$PWD/candidate/tests" \
+            --baseline-driver "$PWD/baseline/source/krylov_stress_driver" \
+            --candidate-driver "$PWD/candidate/source/krylov_stress_driver" \
+            --threads 1,2,4 --output "$PWD/results/krylov"
+      - name: Archive source identities and compact reports, including failures
         if: always()
         run: |
-          tar -czf results/tested-native-sources.tar.gz -C candidate source/state_lists.f90 source/krylov_solvers.f90
-          cp review/tests/performance_openmp_20261116.patch results/
+          mkdir -p results-summary
+          tar -czf results-summary/tested-native-sources.tar.gz -C candidate source/state_lists.f90 source/krylov_solvers.f90
+          cp review/tests/performance_openmp_20261116.patch results-summary/
+          cp results/binaries.sha256 results/compiler.txt results/cpu.txt results/libraries.txt results-summary/
+          cp results/basis-regression/report.json results-summary/basis-regression.json
+          cp results/few-magnon.json results-summary/
+          cp results/physics4/report.json results-summary/physics4.json
+          if [ -f results/krylov/summary.json ]; then cp results/krylov/summary.json results-summary/krylov-summary.json; fi
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: ed2-openmp-performance-validation
-          path: results/
+          name: ed2-openmp-validation-summary
+          path: results-summary/
+          retention-days: 30
+          if-no-files-found: error
+      - name: Compress raw evidence
+        if: always()
+        run: tar -czf ed2-openmp-raw-validation.tar.gz results/
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ed2-openmp-validation-raw
+          path: ed2-openmp-raw-validation.tar.gz
           retention-days: 30
           if-no-files-found: error
