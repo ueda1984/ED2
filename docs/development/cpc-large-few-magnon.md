@@ -163,7 +163,7 @@ A publication-grade speed ratio cannot be extracted from this table.
 
 **Verified [CI #43779705931](https://github.com/ueda1984/ED2/actions/runs/43779705931)**.
 The new
-[`tests/cpc_independent_1000site_three_magnon_basis.py`](../../tests/cpc_independent_1000site_three_magnon_basis.py)
+[`tests/cpc_independent_1000site_three_magnon_basis.py`](https://github.com/ueda1984/ED2/blob/codex/ed2-cpc-stationary-dm-scaling/tests/cpc_independent_1000site_three_magnon_basis.py)
 does not run ED2 and does not compute eigenvalues. It constructs the
 periodic 10x10x10, spin-1/2, isotropic nearest-neighbor Heisenberg
 Hamiltonian at Ndown=3 and Gamma **directly from translation-equivalent
