@@ -1,0 +1,339 @@
+--- a/source/state_lists.f90
++++ b/source/state_lists.f90
+@@ -5,8 +5,10 @@
+ contains
+ 
+   subroutine get_cum_ltd_rep_combination(NOS,NODmax,NODmin,m) 
++    use iso_fortran_env, only: int64
+     integer, intent(in) :: NOS, NODmax, NODmin, m(NOS)
+     integer :: i, j, dN
++    integer(int64) :: wide
+     dN = NODmax-NODmin
+     call get_ltd_rep_combination(NOS,NODmax,m)
+     allocate(cum_ltd_rep_combination(0:NOS+1,0:NODmax+1))
+@@ -14,23 +16,29 @@
+     if(NODmin == 0)then
+       j = 0
+       cum_ltd_rep_combination(:,j) = 1
+-      do j = 1, NODmax+1
++      do j = 1, NODmax
+         do i = 0, NOS+1
+-          cum_ltd_rep_combination(i,j) = cum_ltd_rep_combination(i,j-1) + ltd_rep_combination(i,j)
++          wide=int(cum_ltd_rep_combination(i,j-1),int64)+int(ltd_rep_combination(i,j),int64)
++          if(wide>huge(1).or.wide<0)error stop "Hilbert count exceeds supported integer range"
++          cum_ltd_rep_combination(i,j)=int(wide)
+         end do
+       end do
+     else
+       j = 0
+       cum_ltd_rep_combination(:,j) = 1
+-      do j = 1, NODmax+1
++      do j = 1, NODmax
+         if(j <= dN)then
+           do i = 0, NOS+1
+-            cum_ltd_rep_combination(i,j) = cum_ltd_rep_combination(i,j-1) + ltd_rep_combination(i,j)
++            wide=int(cum_ltd_rep_combination(i,j-1),int64)+int(ltd_rep_combination(i,j),int64)
++          if(wide>huge(1).or.wide<0)error stop "Hilbert count exceeds supported integer range"
++          cum_ltd_rep_combination(i,j)=int(wide)
+           end do
+         else
+           do i = 0, NOS+1
+-            cum_ltd_rep_combination(i,j) = cum_ltd_rep_combination(i,j-1) + ltd_rep_combination(i,j) - &
+-              ltd_rep_combination(i,j-dN-1)
++            wide=int(cum_ltd_rep_combination(i,j-1),int64)+int(ltd_rep_combination(i,j),int64) - &
++              int(ltd_rep_combination(i,j-dN-1),int64)
++            if(wide>huge(1).or.wide<0)error stop "Hilbert count exceeds supported integer range"
++            cum_ltd_rep_combination(i,j)=int(wide)
+           end do
+         end if
+       end do      
+@@ -39,20 +47,24 @@
+   end subroutine get_ltd_rep_combination
+ 
+   subroutine get_ltd_rep_combination(NOS,NODmax,m) 
++    use iso_fortran_env, only: int64
+     integer, intent(in) :: NOS, NODmax, m(NOS)
+     integer :: i, j
++    integer(int64) :: wide
+     integer, allocatable :: dp(:,:)
+     allocate(ltd_rep_combination(0:NOS+1,0:NODmax+1))
+     allocate(dp(0:NODmax+1,0:NOS+1))
+     dp(:,:) = 0
+     dp(0,:) = 1
+     do i = 1, NOS
+-      do j = 1, NODmax+1
++      do j = 1, NODmax
+         if(j-1-m(i) >= 0)then
+-          dp(j,i) = dp(j-1,i) + dp(j,i-1) - dp(j-1-m(i),i-1)
++          wide=int(dp(j-1,i),int64)+int(dp(j,i-1),int64)-int(dp(j-1-m(i),i-1),int64)
+         else
+-          dp(j,i) = dp(j-1,i) + dp(j,i-1)
++          wide=int(dp(j-1,i),int64)+int(dp(j,i-1),int64)
+         end if
++        if(wide>huge(1).or.wide<0)error stop "Hilbert count exceeds supported integer range"
++        dp(j,i)=int(wide)
+       end do
+     end do
+     ltd_rep_combination = transpose(dp)
+@@ -179,12 +191,15 @@
+       L1,L2,L3,L4,L5,L6
+     use omp_lib
+     integer :: dim, a, i, j
++    logical :: orbit_used
+     real(8) :: r
+     integer :: num = 1
+     real(8), allocatable :: tmp_list_r(:)
+     integer, allocatable :: order(:)
+     real(8), allocatable :: tmp_list_r_pre(:)
+     integer, allocatable :: list_s_pre(:)
++    call try_orbit_basis(orbit_used)
++    if(orbit_used)return
+     num = omp_get_max_threads()
+     write(*,*) "********************"
+     write(*,*) "max_threads", num
+@@ -297,26 +312,23 @@
+   end function list_fly
+   !
+   subroutine binary_search(s,list_s,ls,le,b,bmin)
+-    integer, intent(out) :: b, bmin
+-    integer, intent(in) :: s,ls,le
+-    integer, intent(in) :: list_s(ls:le)
++    ! Select the FIRST cumulative count >= s; repeated counts occur with caps=0.
++    integer, intent(out) :: b,bmin
++    integer, intent(in) :: s,ls,le,list_s(ls:le)
+     integer :: bmax
+-    bmin = ls; bmax = le
+-    do
+-       b = bmin + (bmax-bmin)/2
+-       if(s<list_s(b))then
+-          bmax = b-1
+-       else if(list_s(b)<s)then
+-          bmin = b+1
+-       else
+-          bmin = b
+-          return
+-       end if
+-       if(bmin>bmax)then
+-          b = -1
+-          return
+-       end if
+-    end do
++    bmin=ls;bmax=le+1
++    do while(bmin<bmax)
++      b=bmin+(bmax-bmin)/2
++      if(list_s(b)<s)then
++        bmin=b+1
++      else
++        bmax=b
++      end if
++    end do
++    b=-1
++    if(bmin<=le)then
++      if(list_s(bmin)==s)b=bmin
++    end if
+   end subroutine binary_search
+ 
+   function a_down_spin(i,n,NODmax) result(nd) 
+@@ -412,6 +424,13 @@
+     integer, intent(out) :: b
+     integer, intent(in) :: s, m, list_s(m)
+     integer :: bmin, bmax 
++    if(m>0)then
++      if(list_s(1)==1.and.list_s(m)==m)then
++        b=-1
++        if(s>=1.and.s<=m)b=s
++        return
++      end if
++    end if
+     bmin = 1; bmax = m
+     do
+       b = bmin + (bmax-bmin)/2
+@@ -435,6 +454,11 @@
+     integer,intent(out) :: t, ell(6)
+     integer :: i1,i2,i3,i4,i5,i6,l
+     integer, allocatable :: nd(:)
++    if(all([L1,L2,L3,L4,L5,L6]==1))then
++      t=inv_list(n,NODmax)
++      ell=1
++      return
++    end if
+     allocate(nd(NODmax))
+     ell = (/L1,L2,L3,L4,L5,L6/)
+     nd = n
+@@ -476,5 +500,132 @@
+     t = inv_list(n,NODmax)
+   end subroutine representative_SQ
+   !
++  ! Audit candidate: enumerate each orbit once, preserving legacy rank order.
++  ! Restrict to one OpenMP thread and verified commuting, basis-preserving maps.
++  subroutine try_orbit_basis(used)
++    use iso_fortran_env, only: int64
++    use input_param, only: NOS,NODmin,NODmax,THS,local_NODmax,local_spin, &
++      L1,L2,L3,L4,L5,L6,rk1,rk2,rk3,rk4,rk5,rk6, &
++      shift_1,shift_2,shift_3,shift_4,shift_5,shift_6,list_s,list_r
++    use omp_lib, only: omp_get_max_threads
++    logical, intent(out) :: used
++    integer :: periods(6),i,j,a,b,cur,cycle_len,s,count,rank,word,bit,dim,capacity,nrep
++    integer :: i1,i2,i3,i4,i5,i6
++    integer(int64) :: group_order,nwords
++    integer, allocatable :: maps(:,:),states(:),ns(:),np(:),grown_s(:)
++    integer(int64), allocatable :: visited(:)
++    logical, allocatable :: seen(:)
++    real(8), allocatable :: norms(:),grown_r(:)
++    real(8) :: p1,p2,p3,p4,p5,ro
++    complex(8) :: coef
++    used=.false.
++    periods=[L1,L2,L3,L4,L5,L6]
++    if(any(periods<1).or.THS<1) return
++    group_order=1_int64
++    do i=1,6
++      if(group_order>huge(1_int64)/periods(i))return
++      group_order=group_order*periods(i)
++    end do
++    if(group_order==1_int64)then
++      allocate(list_s(THS),list_r(THS))
++      !$omp parallel do private(i)
++      do i=1,THS
++        list_s(i)=i
++        list_r(i)=1d0
++      end do
++      used=.true.
++      return
++    end if
++    if(omp_get_max_threads()/=1)return
++    if(group_order>int(huge(1),int64))return
++    nwords=(int(THS,int64)+63_int64)/64_int64
++    if(nwords>16777216_int64)return ! <=128 MiB temporary visited bitmap
++    allocate(maps(0:NOS,6),seen(NOS))
++    maps(:,1)=shift_1;maps(:,2)=shift_2;maps(:,3)=shift_3
++    maps(:,4)=shift_4;maps(:,5)=shift_5;maps(:,6)=shift_6
++    if(any(maps(0,:)/=0))return
++    do a=1,6
++      if(any(maps(1:,a)<1).or.any(maps(1:,a)>NOS))return
++      seen=.false.
++      do i=1,NOS
++        j=maps(i,a)
++        if(seen(j))return
++        seen(j)=.true.
++        if(local_NODmax(i)/=local_NODmax(j))return
++        if(local_spin(i)/=local_spin(j))return
++      end do
++      seen=.false.
++      do i=1,NOS
++        if(seen(i))cycle
++        cur=i;cycle_len=0
++        do
++          seen(cur)=.true.;cycle_len=cycle_len+1
++          cur=maps(cur,a)
++          if(cur==i)exit
++        end do
++        if(mod(periods(a),cycle_len)/=0)return
++      end do
++      do b=1,a-1
++        do i=1,NOS
++          if(maps(maps(i,a),b)/=maps(maps(i,b),a))return
++        end do
++      end do
++    end do
++    deallocate(seen,maps)
++    dim=THS
++    capacity=int(min(int(dim,int64),max(10000_int64,2_int64*dim/group_order)))
++    allocate(visited(nwords),states(capacity),norms(capacity),ns(NODmax),np(NODmax))
++    visited=0_int64;nrep=0
++    do s=1,dim
++      word=(s-1)/64+1;bit=mod(s-1,64)
++      if(btest(visited(word),bit))cycle
++      ns=list_fly(s,NODmax,NODmin,NOS)
++      if(inv_list(ns,NODmax)/=s)return
++      np=ns;count=0;coef=(0d0,0d0)
++      do i6=1,L6
++        np=shift_6(np);p5=rk6*dble(i6)
++        do i5=1,L5
++          np=shift_5(np);p4=rk5*dble(i5)+p5
++          do i4=1,L4
++            np=shift_4(np);p3=rk4*dble(i4)+p4
++            do i3=1,L3
++              np=shift_3(np);p2=rk3*dble(i3)+p3
++              do i2=1,L2
++                np=shift_2(np);p1=rk2*dble(i2)+p2
++                do i1=1,L1
++                  np=shift_1(np)
++                  call insertion_sort(np,NODmax)
++                  rank=inv_list(np,NODmax)
++                  if(rank<s.or.rank>dim) error stop 'orbit rank inconsistent with legacy ordering'
++                  word=(rank-1)/64+1;bit=mod(rank-1,64)
++                  visited(word)=ibset(visited(word),bit)
++                  if(rank==s)then
++                    coef=coef+exp((0d0,-1d0)*(rk1*dble(i1)+p1))
++                    count=count+1
++                  end if
++                end do
++              end do
++            end do
++          end do
++        end do
++      end do
++      if(count<1) error stop 'orbit missing identity'
++      ro=(abs(coef)**2)*dble(group_order)/dble(count)
++      if(ro>1d-15)then
++        if(nrep==capacity)then
++          capacity=int(min(int(dim,int64),2_int64*capacity))
++          allocate(grown_s(capacity),grown_r(capacity))
++          grown_s(:nrep)=states(:nrep);grown_r(:nrep)=norms(:nrep)
++          call move_alloc(grown_s,states);call move_alloc(grown_r,norms)
++        end if
++        nrep=nrep+1;states(nrep)=s;norms(nrep)=sqrt(ro)
++      end if
++    end do
++    if(nrep==0)stop 'THS = 0.'
++    allocate(list_s(nrep),list_r(nrep))
++    list_s=states(:nrep);list_r=norms(:nrep);THS=nrep
++    used=.true.
++  end subroutine try_orbit_basis
++
+ end module state_lists
+ 
+--- a/source/krylov_solvers.f90
++++ b/source/krylov_solvers.f90
+@@ -418,7 +418,7 @@
+     if(size(values)<cap .or. (retained==cap .and. cap<n))then
+       status=-1;reason='no expansion space for thick restart';return
+     end if
+-    allocate(q(n,cap),hq(n,cap),t(cap,cap),z(cap,cap),ritz(n,cap),x(n), &
++    allocate(q(n,cap),hq(n,cap),t(cap,cap),z(cap,cap),ritz(n,retained),x(n), &
+              eig(cap),support(2*cap),previous(retained))
+     m=0;scale=0d0;have_previous=.false.;flag=0
+     ! A block of wanted independent starts is necessary to resolve multiplicity:
+@@ -531,7 +531,7 @@
+       if(m<wanted)then
+         status=2;reason='insufficient independent Ritz vectors';return
+       end if
+-      call zgemm('N','N',n,m,m,(1d0,0d0),q,n,z,cap,(0d0,0d0),ritz,n)
++      call zgemm('N','N',n,min(retained,m),m,(1d0,0d0),q,n,z,cap,(0d0,0d0),ritz,n)
+       values(1:m)=eig(1:m)
+       vectors=ritz(:,1:wanted)
+       certified=.true.;requested_all=.true.
+@@ -579,12 +579,17 @@
+       end if
+       write(*,'("tritr, ene(NOK), max_conv, flag: ",i5,es25.15,es11.1,i5)') cycle,eig(min(retained,m)),change,flag
+       ! Check closure of the entire computed subspace, not just one beta.
+-      closure=0d0
+-      do j=1,m
+-        x=hq(:,j)
+-        call orthogonalize(x,q,m)
+-        closure=max(closure,dznrm2(n,x,1))
+-      end do
++      ! Closure cannot accept a Ritz pair that failed residual certification.
++      ! Retain exact final telemetry on successful or budget-exhausted exits.
++      closure=huge(1d0)
++      if(certified.or.cycle==maxcycles)then
++        closure=0d0
++        do j=1,m
++          x=hq(:,j)
++          call orthogonalize(x,q,m)
++          closure=max(closure,dznrm2(n,x,1))
++        end do
++      end if
+       if(present(diagnostics)) diagnostics%closure=closure
+       if(certified .and. (flag>=2 .or. m==n .or. closure<=near_limit(scale)))then
+         status=0
