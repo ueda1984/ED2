@@ -1,0 +1,156 @@
+name: CPC OpenMP-compatible performance improvement validation
+on:
+  push:
+    branches: [codex/ed2-cpc-performance-audit-20261116]
+    paths:
+      - tests/performance_openmp_20261116.patch
+      - tests/cpc_openmp_orbit_regression.py
+      - .github/workflows/cpc-openmp-performance-audit.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  multithread-checked:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      FC: gfortran-13
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      OMP_DYNAMIC: 'FALSE'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: review
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: 719da7035e66ce884e9de00376e4ded5b3e5c459
+          path: baseline
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: 719da7035e66ce884e9de00376e4ded5b3e5c459
+          path: candidate
+          persist-credentials: false
+      - name: Install build and independent-reference prerequisites
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends gfortran-13 libopenblas-dev liblapack-dev autoconf automake make python3-numpy python3-scipy time
+      - name: Apply standalone combined patch and verify exact source bytes
+        run: |
+          mkdir -p results
+          cd candidate
+          git apply --check ../review/tests/performance_openmp_20261116.patch
+          git apply ../review/tests/performance_openmp_20261116.patch
+          printf '%s\n' '52d2484a8e878edb4905058ab2bcc74b2164722b8f728f827a85b6ba2a24eabb  source/state_lists.f90' '5f2b91a24c8cfa33d58b79a8204ce2cf6b889f5d02554b2dc80f3821c6503356  source/krylov_solvers.f90' | sha256sum -c -
+          git diff --binary > ../results/applied.patch
+      - name: Independent 379 fixtures and repeated multiword orbit race stress
+        run: |
+          python3 review/tests/cpc_openmp_orbit_regression.py \
+            --baseline "$PWD/baseline" --candidate "$PWD/candidate" \
+            --compiler "$FC" --threads 1,2,4 --stress-repeats 4 \
+            --output "$PWD/results/basis-regression"
+      - name: Build release baseline and bounds-checked UBSan candidate
+        run: |
+          set -eu
+          for engine in baseline candidate; do
+            flags='-O2 -fopenmp'
+            if [ "$engine" = candidate ]; then
+              flags='-O1 -g -fopenmp -fcheck=all -fsanitize=undefined -fno-sanitize-recover=undefined'
+            fi
+            (cd "$engine"
+             autoreconf -vfi
+             ./configure FC="$FC" FCFLAGS="$flags"
+             make -j1
+             cd source
+             "$FC" $flags -I. ../tests/krylov_stress_driver.f90 blas_lapack_interfaces.o krylov_residual_policy.o krylov_observations.o krylov_solvers.o -llapack -lblas -o krylov_stress_driver)
+          done
+          "$FC" --version > results/compiler.txt
+          lscpu > results/cpu.txt
+          ldd candidate/source/QS3ED2 > results/libraries.txt
+          sha256sum candidate/source/QS3ED2 baseline/source/QS3ED2 > results/binaries.sha256
+      - name: Native full-cache few-magnon eigenpairs with two and four threads
+        run: |
+          python3 - <<'PY'
+          import json,os,subprocess,sys
+          from pathlib import Path
+          root=Path.cwd()
+          sys.path.insert(0,str(root/'candidate/tests'))
+          from cpc_qs3_ed_large_few_magnon import create,sector_dim
+          from mixed_spin_matched_benchmark import initial_vector_text
+          rows=[]
+          for size,n,E in [(6,3,148.56489075771222),(10,2,738.0067742722034)]:
+            for threads in (2,4):
+              work=root/'results'/f'cube{size}-n{n}-omp{threads}'
+              create(work,(size,)*3,n,(0,0,0),False)
+              p=work/'input.dat'
+              p.write_text(p.read_text().replace('wk_dim=0,MNTE=-1',f'wk_dim=-1,MNTE={6*n+1}'))
+              (work/'initial.txt').write_text(initial_vector_text(sector_dim((size,)*3,n,(0,0,0))))
+              env=dict(os.environ,OMP_NUM_THREADS=str(threads),ED2_RNG_SEED='1984',ED2_INITIAL_VECTOR=str(work/'initial.txt'),ED2_DIAGNOSTICS='diagnostics.txt',ED2_RESIDUAL_ATOL='1e-8')
+              with p.open('rb') as inp,(work/'stdout.log').open('wb') as log:
+                subprocess.run([str(root/'candidate/source/QS3ED2')],cwd=work,stdin=inp,stdout=log,stderr=subprocess.STDOUT,env=env,timeout=180,check=True)
+              out=(work/'stdout.log').read_text()
+              assert f'Basis builder: atomic-orbits, threads={threads}' in out
+              d=dict(x.split('=',1) for x in (work/'diagnostics.txt').read_text().splitlines() if '=' in x)
+              assert d['configured_max_threads']==str(threads)
+              assert d['status']=='0' and d['all_requested_residuals_met']=='T'
+              energy=float((work/'eigenvalues.dat').read_text().splitlines()[0].split()[-1])
+              assert abs(energy-E)<2e-7
+              rows.append(dict(sites=size**3,n_down=n,threads=threads,energy=energy,error=abs(energy-E),h_calls=int(d['h_applications'])))
+          Path('results/few-magnon.json').write_text(json.dumps(rows,indent=2))
+          print('Native multithread few-magnon:',rows)
+          PY
+      - name: Non-U1 independent energy and Cartesian observables at four threads
+        run: |
+          python3 - <<'PY'
+          import json,sys
+          from pathlib import Path
+          root=Path.cwd();sys.path.insert(0,str(root/'candidate/tests'))
+          from mixed_spin_dm_chirality_scan import reference,run_ed2
+          from mixed_spin_matched_benchmark import initial_vector_text
+          out=root/'results/physics4';out.mkdir();rows=[]
+          for n in (4,6,8):
+            for d in (-.12,0.,.12):
+              ref=reference(n,d,check_dense=n<=6,profile='stationary')
+              for alg in (1,2):
+                row=run_ed2(root/'candidate/source/QS3ED2',out,ref,alg,4,initial_text=initial_vector_text(ref['dimension']))
+                assert row['classification']=='passed',row
+                assert 'configured_max_threads=4' in (out/row['case']/'diagnostics.txt').read_text()
+                rows.append(row)
+          (out/'report.json').write_text(json.dumps(rows,indent=2))
+          print('Independent non-U1 physics:',len(rows),'passed')
+          PY
+      - name: Preserve adversarial Krylov outcomes at one, two and four threads
+        run: |
+          python3 - <<'PY'
+          import json,sys
+          from pathlib import Path
+          root=Path.cwd();sys.path.insert(0,str(root/'candidate/tests'))
+          from krylov_stress import definitions,run
+          records=[]
+          for name in ('baseline','candidate'):(root/'results'/f'krylov-{name}').mkdir()
+          for i,t in enumerate(definitions()):
+            for threads in (1,2,4):
+              a=run(root/'baseline/source/krylov_stress_driver',root/'results/krylov-baseline',t,threads,i)
+              b=run(root/'candidate/source/krylov_stress_driver',root/'results/krylov-candidate',t,threads,i)
+              keys=('classification','solver_status','iterations','h_applications','exit_code')
+              assert all(a.get(k)==b.get(k) for k in keys),(i,threads,a,b)
+              assert b['classification']!='harness_or_runtime_error',b
+              records.append(dict(index=i,threads=threads,baseline=a,candidate=b))
+            if i%40==0:print('Krylov fixtures compared:',i,flush=True)
+          Path('results/krylov-comparison.json').write_text(json.dumps(records,indent=2))
+          print('Krylov comparisons:',len(records),'unchanged outcomes; includes warnings and nonconvergences')
+          PY
+      - name: Archive tested native sources and all evidence
+        if: always()
+        run: |
+          tar -czf results/tested-native-sources.tar.gz -C candidate source/state_lists.f90 source/krylov_solvers.f90
+          cp review/tests/performance_openmp_20261116.patch results/
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ed2-openmp-performance-validation
+          path: results/
+          retention-days: 30
+          if-no-files-found: error
