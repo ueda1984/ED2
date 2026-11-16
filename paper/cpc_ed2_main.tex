@@ -340,7 +340,7 @@ displacements gives $E_0=738.006774272205$.
 This independent reference does not reuse either
 Fortran Hamiltonian-vector implementation.
 An additional QuSpin 1.0.1 calculation in the same
-$Gamma$ sector yields $E_0=738.006774272202$
+$\Gamma$ sector yields $E_0=738.006774272202$
 and independently reproduces the 503-dimensional
 symmetry basis. Thus the physical sector is supported
 by multiple general and specialized implementations;
@@ -350,6 +350,28 @@ These finite-size results verify inheritance of
 a genuinely large-\emph{site}-count capability,
 not an improved asymptotic algorithm or bulk
 magnetic physics.
+
+
+To test a nontrivial three-magnon sector, we additionally
+diagonalize the periodic $6\times6\times6$ spin-$1/2$
+Heisenberg lattice ($L=216$, $J_x=J_y=J_z=1$)
+with $N_\downarrow=3$ at $\Gamma$.
+The unreduced dimension is $\binom{216}{3}=1{,}656{,}360$,
+whereas independent character-weighted counting gives
+7,677 momentum-adapted states. Conventional Lanczos in
+the original QS$^3$ and ED2 gives respectively
+$E_0=148.564890757782$ and $148.564890757744$;
+an independently implemented QuSpin 1.0.1 calculation
+gives $148.564890757712$. All three results agree within
+$7.1\times10^{-11}$ on this sampled sector.
+QuSpin also reproduces the 1000-site two-magnon
+$\Gamma$ energy within $1.1\times10^{-10}$ of the
+two source-pinned Fortran calculations. The independently
+constructed two-magnon relative-displacement reference,
+however, remains the distinct fourth check for that
+particular 1000-site test. These comparisons demonstrate
+numerical continuity and reproducibility, not unique
+model support or solver superiority.
 
 At 1000 sites with three magnons, the unprojected
 dimension grows to $\binom{1000}{3}=166{,}167{,}000$
@@ -802,8 +824,9 @@ spin-$1/2$ XXZ computational setting to mixed local
 spins and nonconserving anisotropic bilinear operators.
 Direct original-code comparisons establish continuity
 in both conserved subspaces and translation sectors,
-including a 1000-site two-magnon test independently
-confirmed by relative-coordinate diagonalization and QuSpin,
+including 216-site three-magnon and 1000-site two-magnon
+examples independently checked with QuSpin and, for the
+latter, a separate relative-coordinate construction,
 while independent physical-response and numerical
 acceptance tests demonstrate the broader executable
 model/observable interface. The software remains

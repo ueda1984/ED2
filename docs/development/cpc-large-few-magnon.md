@@ -78,8 +78,8 @@ This validates both the symmetry basis size and a nontrivial
 two-magnon interaction energy at 1000 sites.
 
 **QuSpin 1.0.1 is not absent from this physics regime.**
-Using \`spin_basis_general\` with \`Nup=L-Ndown\`, explicit
-translation maps, \`pauli=0\` and matching XXZ operators,
+Using `spin_basis_general` with `Nup=L-Ndown`, explicit
+translation maps, `pauli=0` and matching XXZ operators,
 all **7/7** small-sector benchmark cases reproduced
 the original QS3 and ED2 energies. Including a 1000-site
 one-magnon R-sector calculation, the maximum absolute
@@ -93,25 +93,68 @@ as journal speedup evidence.
 
 ### Historical Lanczos boundary (not an ED2 regression)
 
-The first smoke attempt at [run 43778009408]
-(https://github.com/ueda1984/ED2/actions/runs/43778009408)
+The first smoke attempt at [run 43778009408](https://github.com/ueda1984/ED2/actions/runs/43778009408)
 triggered three original QS3 ALG=1 SIGSEGV failures on
 small reduced sectors. Source audit shows the historical loop
-sets \`mitr=min(maxitr,dim)\` and may finish at \`mitr\` without
+sets `mitr=min(maxitr,dim)` and may finish at `mitr` without
 the ordinary convergence exit. An eigenvector coefficient
-array \`z\` can then be deallocated before it is accessed.
+array `z` can then be deallocated before it is accessed.
 The reproducible workaround for the scientific overlap is
 dense diagonalization (ALG=3) in both codes for reduced
 dimensions <=100; we have **not patched** the original
 source. This is a software-correctness observation, not a
 new physical phase or a generic Lanczos convergence theorem.
 
+### Three-way 216-site / 1000-site stress results
+
+**Verified [run 43778708860](https://github.com/ueda1984/ED2/actions/runs/43778708860)**:
+both source-pinned Fortran executables and independent QuSpin 1.0.1
+accepted all seven smaller momentum sectors, then two more
+conventional-Lanczos stress cases. The stress results are:
+
+| Lattice | Ndown | Gamma dimension | Original QS3 E0 | ED2 E0 | QuSpin E0 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 6x6x6 | 3 | 7,677 | 148.5648907577822 | 148.5648907577438 | 148.5648907577122 |
+| 10x10x10 | 2 | 503 | 738.0067742722275 | 738.0067742723085 | 738.0067742722047 |
+
+The 216-site three-magnon unsymmetrized Hilbert space contains
+**1,656,360** states, and the maximum tested old-to-QuSpin
+energy discrepancy is **7.0e-11**. The 1000-site two-magnon
+sector is independently validated by the relative-displacement
+Hamiltonian described above, with maximum three-program
+discrepancy in this stress run **1.1e-10**.
+All these are *finite-size, same-Hamiltonian checks*, not
+evidence that the two software stacks have identical runtime costs.
+
+The exploratory metrics from one **shared CI host** for the
+stress cases are listed only to aid future controlled benchmarking;
+they cannot support speedup claims:
+
+| Case | Engine | Basis and Hamiltonian construction | Solver plus setup / execution | Peak process RSS |
+| --- | --- | --- | --- | --- |
+| 216, 3 magnons | Original QS3 | included in total | 40.33 s total | 7,204 KiB |
+| 216, 3 magnons | ED2 | included in total | 43.82 s total | 8,044 KiB |
+| 216, 3 magnons | QuSpin | 5.83 s basis + 28.28 s operator | 0.067 s eigensolver | 232,600 KiB |
+| 1000, 2 magnons | Original QS3 | included in total | 4.22 s total | 6,724 KiB |
+| 1000, 2 magnons | ED2 | included in total | 3.78 s total | 6,868 KiB |
+| 1000, 2 magnons | QuSpin | 2.90 s basis + 9.37 s operator | 0.003 s eigensolver | 227,816 KiB |
+
+The underlying measurements are **not methodologically symmetric**:
+the Fortran timings include native setup and eigenvalue work, while
+QuSpin times are segmented Python calls and exclude import/startup
+overheads. QuSpin's RSS includes Python and its imported scientific
+stack, while the Fortran process has none of those costs. All cases
+have unpinned CPU affinity, no exclusive-node attestation, one
+measurement per engine, and unmatched Lanczos initial states.
+A publication-grade speed ratio cannot be extracted from this table.
+
 ### Pending
 
-- Source-pinned 216-site 3-magnon Gamma continuity and 1000-site
-  two-magnon QuSpin performance/physical matching are in the
-  enlarged stress workflow; results must be inspected and recorded.
-- Original published 1000-site **three**-magnon result in ED2
-  is *not yet validated*: Gamma-space count 166167 is combinatorial.
-- No controlled-node study, library release/tag, or official CPC
-  software archive is implied by the successful GitHub CI.
+- **1000-site three-magnon** QS3-to-ED2 numerical reproduction
+  is not verified; the 166,167 Gamma-space dimension is only
+  independently predicted by symmetry counting.
+- Repeated pinned-node benchmark with controlled environment,
+  explicit BLAS/OpenMP affinity, numerical tolerances and
+  setup/solver separation is not complete.
+- No software release/tag, official CPC Program Library archive
+  or assigned DOI is implied by these CI validations.

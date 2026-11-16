@@ -48,6 +48,18 @@ three Hellmann--Feynman/susceptibility identities. See the
 This is separate from the paper's coordinate integrity checker and the
 earlier full L=4--12 numerical comparisons.
 
+## Large-site near-saturation continuity
+
+The [source-pinned large-site comparison](../docs/development/cpc-large-few-magnon.md)
+now verifies the scientific continuity of old QS³/ED and generalized ED2
+on seven momentum sectors and two further large few-magnon stress
+cases: **216 sites / 3 magnons / dimension 7,677** and
+**1000 sites / 2 magnons / dimension 503**. QuSpin 1.0.1 independently
+reproduces both models; the 1000-site two-magnon energy is further
+checked with an independent relative-displacement Hamiltonian.
+The 1000-site **three**-magnon numerical claim remains unverified.
+Shared-runner timings are not controlled performance comparisons.
+
 ## Scientific evidence matrix
 
 | Manuscript part | Regeneration / verification evidence |
