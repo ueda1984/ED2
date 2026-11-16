@@ -30,3 +30,88 @@ initialization. Energy agreement does not imply matched
 iteration histories; observed times are exploratory and not speedups.
 A QuSpin comparison must use the same Hamiltonian, conservation
 sector, momentum, hardware and accuracy criteria.
+
+
+## First verified results (2026-11-16)
+
+Source-pinned experiment:
+[run 43778530930](https://github.com/ueda1984/ED2/actions/runs/43778530930),
+full script and archived inputs in the Actions artifact. The seven
+regular test cases passed all momentum-sector size and energy checks
+between **two actual Fortran executables**.
+
+| Lattice | Ndown | Momentum | Independent dimension | Original and ED2 agree |
+| --- | ---: | --- | ---: | --- |
+| 12-site ring | 2 | 0 | 6 | yes |
+| 24-site ring | 3 | 0 | 85 | yes |
+| 48-site ring | 2 | 2pi/48 | 23 | yes |
+| 96-site ring | 2 | 0 | 48 | yes |
+| 3x3x3 cube | 2 | Gamma | 13 | yes |
+| 4x4x4 cube | 2 | Gamma | 35 | yes |
+| 10x10x10 cube | 1 | R=(pi,pi,pi) | 1 | yes, analytic E=744 |
+
+For these small momentum-reduced sectors, we use ALG=3 in both codes.
+The original unmodified ALG=1 sometimes segfaults when the number of
+Lanczos steps reaches the reduced dimension without satisfying
+the convergence exit condition (see next section).
+We do **not** silently equate the small-sector dense solver checks
+with Lanczos performance. The original and ED2 model inputs and
+Fortran compiler provenance are separately archived.
+
+In a distinct **10x10x10, 1000-site, Ndown=2, Gamma** run both
+unmodified QS3 and ED2 executed **ALG=1** successfully.
+The full fixed-Ndown dimension is 499500; Burnside gives 503
+momentum representatives. Energies in the run were
+
+- original QS3: E=738.006774272212,
+- ED2: E=738.006774272203 (observed difference approximately 1e-11).
+
+This is corroborated by a third, physically equivalent but
+algorithmically independent construction using *relative magnon
+displacements modulo inversion*, not the QS3/ED2 basis routines.
+Its 503x503 sparse real-symmetric Hamiltonian has 3497 nonzeros,
+ground energy **738.0067742722034**, first gap
+**0.37531313226088514**, and residual
+**9.42e-13**. Verified independently in
+[run 43778483902](https://github.com/ueda1984/ED2/actions/runs/43778483902).
+This validates both the symmetry basis size and a nontrivial
+two-magnon interaction energy at 1000 sites.
+
+**QuSpin 1.0.1 is not absent from this physics regime.**
+Using \`spin_basis_general\` with \`Nup=L-Ndown\`, explicit
+translation maps, \`pauli=0\` and matching XXZ operators,
+all **7/7** small-sector benchmark cases reproduced
+the original QS3 and ED2 energies. Including a 1000-site
+one-magnon R-sector calculation, the maximum absolute
+QuSpin-versus-Fortran energy discrepancy was below 6e-14.
+This explicitly rejects any claim that QS3 is the only
+software supporting very large site counts or momentum sectors.
+A fair *numerical performance* comparison needs CPU-pinned
+exclusive runs, separate basis-construction timing and matched
+solver accuracy; these shared-runner wall times cannot be used
+as journal speedup evidence.
+
+### Historical Lanczos boundary (not an ED2 regression)
+
+The first smoke attempt at [run 43778009408]
+(https://github.com/ueda1984/ED2/actions/runs/43778009408)
+triggered three original QS3 ALG=1 SIGSEGV failures on
+small reduced sectors. Source audit shows the historical loop
+sets \`mitr=min(maxitr,dim)\` and may finish at \`mitr\` without
+the ordinary convergence exit. An eigenvector coefficient
+array \`z\` can then be deallocated before it is accessed.
+The reproducible workaround for the scientific overlap is
+dense diagonalization (ALG=3) in both codes for reduced
+dimensions <=100; we have **not patched** the original
+source. This is a software-correctness observation, not a
+new physical phase or a generic Lanczos convergence theorem.
+
+### Pending
+
+- Source-pinned 216-site 3-magnon Gamma continuity and 1000-site
+  two-magnon QuSpin performance/physical matching are in the
+  enlarged stress workflow; results must be inspected and recorded.
+- Original published 1000-site **three**-magnon result in ED2
+  is *not yet validated*: Gamma-space count 166167 is combinatorial.
+- No controlled-node study, library release/tag, or official CPC
+  software archive is implied by the successful GitHub CI.
