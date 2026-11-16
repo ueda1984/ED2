@@ -1,0 +1,55 @@
+name: CPC few-magnon cache ON/OFF pilot
+
+on:
+  push:
+    branches:
+      - codex/ed2-cpc-stationary-dm-scaling
+    paths:
+      - "tests/cpc_few_magnon_cache_benchmark.py"
+      - ".github/workflows/cpc-few-magnon-cache-benchmark.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pilot:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 27
+    env:
+      FC: gfortran-13
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      OMP_DYNAMIC: "FALSE"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install compiler and libraries
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends             gfortran-13 libopenblas-dev liblapack-dev autoconf automake make time
+      - name: Build exact ED2 checkout
+        run: |
+          set -eu
+          autoreconf -vfi
+          ./configure FC="$FC" FCFLAGS="-O2 -fopenmp"
+          make -j1
+          test -x source/QS3ED2
+      - name: Pilot 1000-site two-magnon cache comparison
+        run: |
+          python3 tests/cpc_few_magnon_cache_benchmark.py             --exe "$GITHUB_WORKSPACE/source/QS3ED2"             --cases 1000-n2             --policies none,half_tight,full_tight             --warmups 0 --repeats 1 --timeout 200 --allow-shared             --output "$RUNNER_TEMP/few-magnon-cache-1000"
+      - name: Pilot 216-site three-magnon cache comparison
+        continue-on-error: true
+        run: |
+          python3 tests/cpc_few_magnon_cache_benchmark.py             --exe "$GITHUB_WORKSPACE/source/QS3ED2"             --cases 216-n3             --policies none,half_tight,full_tight             --warmups 0 --repeats 1 --timeout 360 --allow-shared             --output "$RUNNER_TEMP/few-magnon-cache-216"
+      - name: Preserve all raw inputs, reports and failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cpc-few-magnon-cache-onoff-pilot
+          path: |
+            ${{ runner.temp }}/few-magnon-cache-1000/
+            ${{ runner.temp }}/few-magnon-cache-216/
+          retention-days: 30
+          if-no-files-found: warn
