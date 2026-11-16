@@ -48,7 +48,7 @@
          end if
        end do      
 @@ -39,20 +47,24 @@
-   end subroutine get_ltd_rep_combination
+   end subroutine get_cum_ltd_rep_combination
  
    subroutine get_ltd_rep_combination(NOS,NODmax,m) 
 +    use iso_fortran_env, only: int64
