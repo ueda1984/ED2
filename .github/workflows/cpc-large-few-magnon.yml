@@ -82,6 +82,12 @@ jobs:
             --new "$GITHUB_WORKSPACE/modern/source/QS3ED2" \
             --old-sha a3b09934bba5f966bfb564718528de8778c2b46c \
             --output "$RUNNER_TEMP/qs3-large-stress" --tier stress --timeout 330
+      - name: QuSpin 1000-site two-magnon Gamma (non-gating)
+        continue-on-error: true
+        run: |
+          python3 "$GITHUB_WORKSPACE/modern/tests/cpc_quspin_few_magnon_comparison.py" \
+            --reference "$RUNNER_TEMP/qs3-large-stress/report.json" \
+            --output "$RUNNER_TEMP/qs3-large-quspin-stress" --tier stress --timeout 200
       - name: Preserve all raw input decks, outputs, timing and failures
         if: always()
         uses: actions/upload-artifact@v4
@@ -91,5 +97,6 @@ jobs:
             ${{ runner.temp }}/qs3-large-smoke
             ${{ runner.temp }}/qs3-large-stress
             ${{ runner.temp }}/qs3-large-quspin
+            ${{ runner.temp }}/qs3-large-quspin-stress
           if-no-files-found: warn
           retention-days: 30
