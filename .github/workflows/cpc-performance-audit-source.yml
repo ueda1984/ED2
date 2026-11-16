@@ -13,11 +13,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: 719da7035e66ce884e9de00376e4ded5b3e5c459
           persist-credentials: false
       - name: Archive reviewed baseline and source identities
         run: |
           git rev-parse HEAD > audit-checkout-sha.txt
-          git archive --format=tar.gz --prefix=ed2-audit-baseline/ 719da7035e66ce884e9de00376e4ded5b3e5c459 > ed2-audit-baseline.tar.gz
+          git archive --format=tar.gz --prefix=ed2-audit-baseline/ HEAD > ed2-audit-baseline.tar.gz
           sha256sum ed2-audit-baseline.tar.gz > audit-source-sha256.txt
       - uses: actions/upload-artifact@v4
         with:
