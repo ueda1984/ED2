@@ -29,7 +29,9 @@ dense and iterative eigensolvers, and Cartesian spin observables.
 Physical continuity with the original QS$^3$ executable is verified
 through 32 fixed-magnetization eigenvalues, 15 momentum-resolved levels,
 and independently referenced conventional-Lanczos calculations for
-12--24 sites. In a genuinely non-$U(1)$ alternating spin-$1/2$/spin-$1$
+12--24 sites. Large-site continuity is independently confirmed in a
+1000-site two-magnon, translation-reduced sector against an exact
+relative-displacement reference and QuSpin. In a genuinely non-$U(1)$ alternating spin-$1/2$/spin-$1$
 chain, independent Hamiltonian constructions validate calculations
 through 12 sites (full Hilbert dimension 46,656).
 The staggered vector-chirality response to an oriented DM interaction
@@ -337,6 +339,13 @@ of translation-equivalent relative two-magnon
 displacements gives $E_0=738.006774272205$.
 This independent reference does not reuse either
 Fortran Hamiltonian-vector implementation.
+An additional QuSpin 1.0.1 calculation in the same
+$Gamma$ sector yields $E_0=738.006774272202$
+and independently reproduces the 503-dimensional
+symmetry basis. Thus the physical sector is supported
+by multiple general and specialized implementations;
+our result is not a claim that QuSpin lacks the
+capability to treat 1000-site systems.
 These finite-size results verify inheritance of
 a genuinely large-\emph{site}-count capability,
 not an improved asymptotic algorithm or bulk
@@ -392,6 +401,7 @@ Mixed-spin bounded basis & 72 levels & $1.11\times10^{-16}$ to reference \\
 Staggered-DM response & 60 runs & $<1.4\times10^{-13}$ in $E_0$;
 $<1.5\times10^{-9}$ in $K$ \\
 Published XYZ--DM conventions & 12 runs & $<3\times10^{-14}$ in spectrum \\
+1000-site two magnons & 1 sector & Old QS$^3$, ED2, independent orbit ED and QuSpin agree within $10^{-10}$ \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -792,6 +802,8 @@ spin-$1/2$ XXZ computational setting to mixed local
 spins and nonconserving anisotropic bilinear operators.
 Direct original-code comparisons establish continuity
 in both conserved subspaces and translation sectors,
+including a 1000-site two-magnon test independently
+confirmed by relative-coordinate diagonalization and QuSpin,
 while independent physical-response and numerical
 acceptance tests demonstrate the broader executable
 model/observable interface. The software remains
