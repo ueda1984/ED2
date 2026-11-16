@@ -16,8 +16,12 @@ The generic `MNTE=-1` setting uses `M=2*NO_one+8*NO_two+1`.
 For periodic cubic spin-1/2 NN Heisenberg with all longitudinal site
 fields zero, `NO_one=L` and `NO_two=3L`, giving `M=26L+1`.
 The current benchmark's **model-specific, not general** safe row width
-is `M=6*Ndown+1`: there is one diagonal term and at most
-six directed NN spin-flip moves per down spin. Off-diagonal
+is `M=6*Ndown+2`: there is one diagonal term and at most
+six directed NN spin-flip moves per down spin, plus a diagonal term
+and one extra slot required by the historical `jd` sentinel index.
+This extra slot is essential: CI explicitly observed `Optimal MNTE=13`
+for Ndown=2 when `MNTE=12` had been requested, and rejected the run.
+Off-diagonal
 matrix entries related by symmetry may coalesce and only decrease this
 maximum. This bound must NOT be reused for XY anisotropy,
 non-U(1) interactions, long-range exchanges or general mixed-spin models
@@ -25,8 +29,8 @@ without a fresh derivation and a test of `Optimal MNTE`.
 
 | Lattice | Ndown | Reduced D | full/generic (MiB) | full/tight (MiB) |
 | --- | ---: | ---: | ---: | ---: |
-| 6x6x6 | 3 | 7677 | 822.6 | 2.78 |
-| 10x10x10 | 2 | 503 | 249.5 | 0.125 |
+| 6x6x6 | 3 | 7677 | 822.48 | 2.93 |
+| 10x10x10 | 2 | 503 | 249.5 | 0.134 |
 
 These are **only nominal cache-array allocations**, not observed RSS.
 
