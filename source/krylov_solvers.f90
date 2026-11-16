@@ -418,7 +418,7 @@ contains
     if(size(values)<cap .or. (retained==cap .and. cap<n))then
       status=-1;reason='no expansion space for thick restart';return
     end if
-    allocate(q(n,cap),hq(n,cap),t(cap,cap),z(cap,cap),ritz(n,cap),x(n), &
+    allocate(q(n,cap),hq(n,cap),t(cap,cap),z(cap,cap),ritz(n,retained),x(n), &
              eig(cap),support(2*cap),previous(retained))
     m=0;scale=0d0;have_previous=.false.;flag=0
     ! A block of wanted independent starts is necessary to resolve multiplicity:
@@ -531,7 +531,7 @@ contains
       if(m<wanted)then
         status=2;reason='insufficient independent Ritz vectors';return
       end if
-      call zgemm('N','N',n,m,m,(1d0,0d0),q,n,z,cap,(0d0,0d0),ritz,n)
+      call zgemm('N','N',n,min(retained,m),m,(1d0,0d0),q,n,z,cap,(0d0,0d0),ritz,n)
       values(1:m)=eig(1:m)
       vectors=ritz(:,1:wanted)
       certified=.true.;requested_all=.true.
@@ -579,12 +579,17 @@ contains
       end if
       write(*,'("tritr, ene(NOK), max_conv, flag: ",i5,es25.15,es11.1,i5)') cycle,eig(min(retained,m)),change,flag
       ! Check closure of the entire computed subspace, not just one beta.
-      closure=0d0
-      do j=1,m
-        x=hq(:,j)
-        call orthogonalize(x,q,m)
-        closure=max(closure,dznrm2(n,x,1))
-      end do
+      ! Closure cannot accept a Ritz pair that failed residual certification.
+      ! Retain exact final telemetry on successful or budget-exhausted exits.
+      closure=huge(1d0)
+      if(certified.or.cycle==maxcycles)then
+        closure=0d0
+        do j=1,m
+          x=hq(:,j)
+          call orthogonalize(x,q,m)
+          closure=max(closure,dznrm2(n,x,1))
+        end do
+      end if
       if(present(diagnostics)) diagnostics%closure=closure
       if(certified .and. (flag>=2 .or. m==n .or. closure<=near_limit(scale)))then
         status=0

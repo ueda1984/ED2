@@ -256,3 +256,6 @@ EXTRA_DIST += cpc_controlled_node_analyze.py
 EXTRA_DIST += cpc_qs3_ed_shared_xxz_crosscheck.py cpc_qs3_ed_shared_xxz_extended.py cpc_qs3_ed_iterative_xxz.py cpc_qs3_ed_translation_sector.py
 # Binomial limiting case and site-cap bounded-occupation basis/spectrum checks.
 EXTRA_DIST += cpc_mixed_spin_bounded_basis.py
+
+# Approved OpenMP regressions and PRESTO few-magnon entrypoints.
+EXTRA_DIST += cpc_openmp_orbit_regression.py cpc_openmp_krylov_regression.py cpc_qs3_ed_large_few_magnon.py cpc_few_magnon_cache_benchmark.py
