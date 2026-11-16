@@ -1,0 +1,83 @@
+name: CPC large-site few-magnon QS3 and ED2 continuity
+
+on:
+  push:
+    branches:
+      - codex/ed2-cpc-stationary-dm-scaling
+    paths:
+      - "tests/cpc_qs3_ed_large_few_magnon.py"
+      - ".github/workflows/cpc-large-few-magnon.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-pinned-large-site:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 27
+    env:
+      FC: gfortran-13
+      OMP_NUM_THREADS: "1"
+      OMP_DYNAMIC: "FALSE"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: modern
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          repository: QS-Cube/ED
+          ref: a3b09934bba5f966bfb564718528de8778c2b46c
+          path: original
+          persist-credentials: false
+      - name: Install compiler, BLAS/LAPACK, and time
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            gfortran-13 libopenblas-dev liblapack-dev autoconf automake make time
+      - name: Build published 2022 QS3 from unchanged source
+        run: |
+          set -eu
+          cd "$GITHUB_WORKSPACE/original"
+          test "$(git rev-parse HEAD)" = a3b09934bba5f966bfb564718528de8778c2b46c
+          autoreconf -vfi
+          ./configure FC="$FC" FCFLAGS="-O2 -fopenmp -fallow-argument-mismatch"
+          make -j2
+          test -x source/QS3
+      - name: Build ED2 from current SHA
+        run: |
+          set -eu
+          cd "$GITHUB_WORKSPACE/modern"
+          git rev-parse HEAD
+          autoreconf -vfi
+          ./configure FC="$FC" FCFLAGS="-O2 -fopenmp"
+          make -j2
+          test -x source/QS3ED2
+      - name: Seven source-pinned few-magnon checks (required)
+        run: |
+          python3 "$GITHUB_WORKSPACE/modern/tests/cpc_qs3_ed_large_few_magnon.py" \
+            --old "$GITHUB_WORKSPACE/original/source/QS3" \
+            --new "$GITHUB_WORKSPACE/modern/source/QS3ED2" \
+            --old-sha a3b09934bba5f966bfb564718528de8778c2b46c \
+            --output "$RUNNER_TEMP/qs3-large-smoke" --tier smoke --timeout 120
+      - name: Exploratory 1000-site 2-magnon Gamma (non-gating)
+        continue-on-error: true
+        run: |
+          python3 "$GITHUB_WORKSPACE/modern/tests/cpc_qs3_ed_large_few_magnon.py" \
+            --old "$GITHUB_WORKSPACE/original/source/QS3" \
+            --new "$GITHUB_WORKSPACE/modern/source/QS3ED2" \
+            --old-sha a3b09934bba5f966bfb564718528de8778c2b46c \
+            --output "$RUNNER_TEMP/qs3-large-stress" --tier stress --timeout 330
+      - name: Preserve all raw input decks, outputs, timing and failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cpc-qs3-ed2-large-few-magnon
+          path: |
+            ${{ runner.temp }}/qs3-large-smoke
+            ${{ runner.temp }}/qs3-large-stress
+          if-no-files-found: warn
+          retention-days: 30
