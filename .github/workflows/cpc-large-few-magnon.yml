@@ -6,6 +6,7 @@ on:
       - codex/ed2-cpc-stationary-dm-scaling
     paths:
       - "tests/cpc_qs3_ed_large_few_magnon.py"
+      - "tests/cpc_quspin_few_magnon_comparison.py"
       - ".github/workflows/cpc-large-few-magnon.yml"
   workflow_dispatch:
 
@@ -15,7 +16,7 @@ permissions:
 jobs:
   source-pinned-large-site:
     runs-on: ubuntu-24.04
-    timeout-minutes: 27
+    timeout-minutes: 35
     env:
       FC: gfortran-13
       OMP_NUM_THREADS: "1"
@@ -63,6 +64,16 @@ jobs:
             --new "$GITHUB_WORKSPACE/modern/source/QS3ED2" \
             --old-sha a3b09934bba5f966bfb564718528de8778c2b46c \
             --output "$RUNNER_TEMP/qs3-large-smoke" --tier smoke --timeout 120
+      - name: QuSpin 1.0.1 installation
+        continue-on-error: true
+        run: |
+          python3 -m pip install --break-system-packages "quspin==1.0.1"
+      - name: Matched QuSpin source-pinned finite-size comparisons
+        continue-on-error: true
+        run: |
+          python3 "$GITHUB_WORKSPACE/modern/tests/cpc_quspin_few_magnon_comparison.py" \
+            --reference "$RUNNER_TEMP/qs3-large-smoke/report.json" \
+            --output "$RUNNER_TEMP/qs3-large-quspin" --tier smoke --timeout 100
       - name: Exploratory 1000-site 2-magnon Gamma (non-gating)
         continue-on-error: true
         run: |
@@ -79,5 +90,6 @@ jobs:
           path: |
             ${{ runner.temp }}/qs3-large-smoke
             ${{ runner.temp }}/qs3-large-stress
+            ${{ runner.temp }}/qs3-large-quspin
           if-no-files-found: warn
           retention-days: 30
