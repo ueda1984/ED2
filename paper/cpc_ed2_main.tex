@@ -300,6 +300,59 @@ This validates inherited \emph{static momentum-sector
 spectra}; the earlier dynamical-response pathway is not
 asserted to have been ported.
 
+
+\subsection{Large-site, dilute-magnon continuity}
+The original QS$^3$ program was specifically designed to
+exploit fixed-down-spin and lattice-translation symmetry
+to treat systems far beyond the usual full-spin Hilbert
+space. We therefore test whether this capability survives
+in ED2, separately from the non-$U(1)$ application below.
+Both executables are built from source, with the CPC-published
+QS$^3$ code pinned at its reviewed historical commit.
+For each test we use exactly the same periodic spin-$1/2$
+XXZ Hamiltonian and momentum. We independently calculate
+the sector dimension by character-weighted orbit counting.
+
+The source-pinned seven-case suite includes 12--96-site
+rings with two or three spin flips, nonzero ring momentum,
+27- and 64-site cubic samples, and a $10\times10\times10$
+1000-site cubic lattice with one spin flip. For these
+relatively small symmetry sectors, dense diagonalization
+avoids a historical Lanczos terminal-iteration fault in
+the old unmodified source. All seven comparisons pass,
+including the analytical one-magnon energy at
+$\bm k=(\pi,\pi,\pi)$ on the 1000-site cube.
+
+A separate 1000-site, \emph{two}-magnon test uses the
+original and modern conventional Lanczos executables
+at $\bm k=\bm0$ for periodic $J_x=J_y=J_z=1$.
+The unsymmetrized fixed-magnetization dimension is
+$\binom{1000}{2}=499{,}500$; the exactly counted
+$\Gamma$-sector dimension is 503.
+The old program gives $E_0=738.006774272212$, while
+ED2 yields $738.006774272203$ in the same sector.
+Crucially, a third, independently constructed
+503-state real-symmetric Hamiltonian in the basis
+of translation-equivalent relative two-magnon
+displacements gives $E_0=738.006774272205$.
+This independent reference does not reuse either
+Fortran Hamiltonian-vector implementation.
+These finite-size results verify inheritance of
+a genuinely large-\emph{site}-count capability,
+not an improved asymptotic algorithm or bulk
+magnetic physics.
+
+At 1000 sites with three magnons, the unprojected
+dimension grows to $\binom{1000}{3}=166{,}167{,}000$
+and the $\Gamma$-sector dimension is 166,167.
+This value is currently established by exact
+symmetry counting only; a corresponding source-pinned
+ED2 three-magnon run has not yet been completed.
+The reported old/new wall times were obtained on
+a shared CI runner with unmatched random Lanczos
+initial vectors and cannot be interpreted as a
+controlled speedup or efficiency comparison.
+
 \subsection{Independent mixed-spin basis checks}
 For $S_i=(1/2,1,1/2,1)$, the polynomial in
 Eq.~\eqref{eq:occupation} is
