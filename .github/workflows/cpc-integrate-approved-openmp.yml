@@ -1,0 +1,140 @@
+name: Integrate approved OpenMP sources into CPC working branch
+on:
+  push:
+    branches: [codex/ed2-cpc-performance-audit-20261116]
+    paths: [.github/workflows/cpc-integrate-approved-openmp.yml]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: ed2-approved-openmp-integration
+  cancel-in-progress: false
+jobs:
+  integrate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      FC: gfortran-13
+      OMP_DYNAMIC: 'FALSE'
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+      BASE: 719da7035e66ce884e9de00376e4ded5b3e5c459
+      TARGET: codex/ed2-cpc-stationary-dm-scaling
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: e042e90a1d985b2c8320f19d9de2e18d779a273e
+          path: review
+          persist-credentials: false
+      - uses: actions/checkout@v4
+        with:
+          ref: codex/ed2-cpc-stationary-dm-scaling
+          path: candidate
+      - uses: actions/checkout@v4
+        with:
+          ref: 719da7035e66ce884e9de00376e4ded5b3e5c459
+          path: baseline
+          persist-credentials: false
+      - name: Require unchanged target and apply exact approved source
+        run: |
+          set -eu
+          test "$(git -C candidate rev-parse HEAD)" = "$BASE"
+          mkdir -p evidence
+          cd candidate
+          git apply --check ../review/tests/performance_openmp_20261116.patch
+          git apply ../review/tests/performance_openmp_20261116.patch
+          printf '%s\n' '52d2484a8e878edb4905058ab2bcc74b2164722b8f728f827a85b6ba2a24eabb  source/state_lists.f90' '5f2b91a24c8cfa33d58b79a8204ce2cf6b889f5d02554b2dc80f3821c6503356  source/krylov_solvers.f90' | sha256sum -c -
+          cp ../review/tests/cpc_openmp_orbit_regression.py tests/
+          cp ../review/tests/cpc_openmp_krylov_regression.py tests/
+          cp ../review/docs/development/cpc-openmp-performance-20261116.md docs/development/
+          printf '\n# Approved OpenMP regressions and PRESTO few-magnon entrypoints.\nEXTRA_DIST += cpc_openmp_orbit_regression.py cpc_openmp_krylov_regression.py cpc_qs3_ed_large_few_magnon.py cpc_few_magnon_cache_benchmark.py\n' >> tests/Makefile.am
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('docs/development/cpc-openmp-performance-20261116.md')
+          text=p.read_text()
+          text=text.replace('This is a tested combined REVIEW PATCH on `codex/ed2-cpc-performance-audit-20261116`, not a production merge. Main, upstream and the manuscript branch remain unchanged.', 'This reviewed implementation is now integrated into the CPC working branch `codex/ed2-cpc-stationary-dm-scaling`. Main and upstream remain unchanged. The review patch below is historical provenance and must not be applied again to integrated sources.')
+          p.write_text(text)
+          Path('docs/development/cpc-presto-integration-20261116.md').write_text('''# OpenMP integration and PRESTO measurement checkpoint\n\nThe approved OpenMP implementation is incorporated into the native source, not applied at runtime.\nBaseline: `719da7035e66ce884e9de00376e4ded5b3e5c459`.\nReview source: `e042e90a1d985b2c8320f19d9de2e18d779a273e`.\nNative source hashes remain exactly those verified by the OpenMP audit.\n\nThis checkpoint freezes the algorithm for the first PRESTO measurements. No further speculative performance changes, reduced precision, relaxed residual tolerance or global thread limit are introduced.\n\nPRESTO stages: (1) read-only queue/environment checks; (2) debug-queue shared four-core smoke, not performance evidence; (3) operator-approved single-host exclusive standard-queue comparison, with physical-core binding, BLAS=1, two warmups and seven measured repeats. Preserve existing jobs, queue policies and fair share. Do not use the closed workq or infer node exclusivity from ncpus alone.\n\nKeep an immutable source archive, compiler/build records, binary and input hashes, full solver diagnostics, individual timing/RSS records and failure records. Compare old/new ED2 with the same full tight cache first; measure the new version's cache fractions separately. External-library timing is a separate, still unfinished experiment.\n\nThe submission manuscript remains provisional: shared-host timings are not exclusive-node publication measurements, 16/32-thread scaling has not yet been established, and no PRESTO job has been submitted by this integration workflow.\n''')
+          PY
+      - name: Install build and reference prerequisites
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends gfortran-13 libopenblas-dev liblapack-dev autoconf automake make python3-numpy python3-scipy time
+      - name: Verify integrated basis across threads
+        run: |
+          python3 candidate/tests/cpc_openmp_orbit_regression.py \
+            --baseline "$PWD/baseline" --candidate "$PWD/candidate" \
+            --compiler "$FC" --threads 1,2,4 --stress-repeats 4 \
+            --output "$PWD/evidence/basis"
+      - name: Build clean native executables and run standard smoke
+        run: |
+          set -eu
+          for engine in baseline candidate; do
+            (cd "$engine"
+             autoreconf -vfi
+             ./configure FC="$FC" FCFLAGS='-O2 -fopenmp'
+             make -j1
+             make check
+             cd source
+             "$FC" -O2 -fopenmp -I. ../tests/krylov_stress_driver.f90 blas_lapack_interfaces.o krylov_residual_policy.o krylov_observations.o krylov_solvers.o -llapack -lblas -o krylov_stress_driver)
+          done
+          "$FC" --version > evidence/compiler.txt
+          sha256sum candidate/source/QS3ED2 baseline/source/QS3ED2 > evidence/binaries.sha256
+      - name: Gate integrated Krylov numerical outcomes
+        run: |
+          python3 candidate/tests/cpc_openmp_krylov_regression.py \
+            --harness "$PWD/candidate/tests" \
+            --baseline-driver "$PWD/baseline/source/krylov_stress_driver" \
+            --candidate-driver "$PWD/candidate/source/krylov_stress_driver" \
+            --threads 1,2,4 --output "$PWD/evidence/krylov"
+      - name: Gate physical reference energies and source distribution
+        run: |
+          python3 candidate/tests/cpc_few_magnon_cache_benchmark.py \
+            --exe "$PWD/candidate/source/QS3ED2" --cases 1000-n2,216-n3 \
+            --policies full_tight --warmups 0 --repeats 1 --timeout 240 \
+            --allow-shared --output "$PWD/evidence/physical"
+          make -C candidate dist
+          tarball=$(find candidate -maxdepth 1 -name '*.tar.gz' -print -quit)
+          test -n "$tarball"
+          tar -tzf "$tarball" | grep '/tests/cpc_openmp_orbit_regression.py$'
+          tar -tzf "$tarball" | grep '/tests/cpc_openmp_krylov_regression.py$'
+      - name: Commit only approved files and fast-forward target without force
+        run: |
+          set -eu
+          cd candidate
+          test "$(git ls-remote origin "refs/heads/$TARGET" | cut -f1)" = "$BASE"
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add source/state_lists.f90 source/krylov_solvers.f90 tests/cpc_openmp_orbit_regression.py tests/cpc_openmp_krylov_regression.py tests/Makefile.am docs/development/cpc-openmp-performance-20261116.md docs/development/cpc-presto-integration-20261116.md
+          git diff --cached --stat
+          git commit -m 'perf: integrate validated OpenMP orbit basis and reduced restarted-solver work'
+          git push origin "HEAD:refs/heads/$TARGET"
+          git rev-parse HEAD > ../evidence/integrated-sha.txt
+          git archive --format=tar.gz HEAD > ../evidence/candidate.tar.gz
+          git -C ../baseline archive --format=tar.gz HEAD > ../evidence/baseline.tar.gz
+          sha256sum ../evidence/candidate.tar.gz ../evidence/baseline.tar.gz > ../evidence/source-archives.sha256
+      - name: Compact integration evidence
+        if: always()
+        run: |
+          mkdir -p integration-summary
+          for f in integrated-sha.txt candidate.tar.gz baseline.tar.gz source-archives.sha256 compiler.txt binaries.sha256; do
+            if [ -f "evidence/$f" ]; then cp "evidence/$f" integration-summary/; fi
+          done
+          for f in basis/report.json krylov/summary.json physical/report.json; do
+            if [ -f "evidence/$f" ]; then cp "evidence/$f" "integration-summary/$(echo "$f" | tr / _)"; fi
+          done
+          tar -czf raw-integration-evidence.tar.gz evidence/basis evidence/krylov evidence/physical 2>/dev/null || true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ed2-approved-openmp-integration
+          path: integration-summary/
+          retention-days: 30
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: ed2-approved-openmp-integration-raw
+          path: raw-integration-evidence.tar.gz
+          retention-days: 30
+          if-no-files-found: warn
