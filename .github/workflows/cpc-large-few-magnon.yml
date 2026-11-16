@@ -46,7 +46,7 @@ jobs:
           test "$(git rev-parse HEAD)" = a3b09934bba5f966bfb564718528de8778c2b46c
           autoreconf -vfi
           ./configure FC="$FC" FCFLAGS="-O2 -fopenmp -fallow-argument-mismatch"
-          make -j2
+          make -j1
           test -x source/QS3
       - name: Build ED2 from current SHA
         run: |
@@ -55,7 +55,7 @@ jobs:
           git rev-parse HEAD
           autoreconf -vfi
           ./configure FC="$FC" FCFLAGS="-O2 -fopenmp"
-          make -j2
+          make -j1
           test -x source/QS3ED2
       - name: Seven source-pinned few-magnon checks (required)
         run: |
