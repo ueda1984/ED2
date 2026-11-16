@@ -158,3 +158,42 @@ A publication-grade speed ratio cannot be extracted from this table.
   setup/solver separation is not complete.
 - No software release/tag, official CPC Program Library archive
   or assigned DOI is implied by these CI validations.
+
+## Independent 1000-site three-magnon matrix construction
+
+**Verified [CI #43779705931](https://github.com/ueda1984/ED2/actions/runs/43779705931)**.
+The new
+[`tests/cpc_independent_1000site_three_magnon_basis.py`](../../tests/cpc_independent_1000site_three_magnon_basis.py)
+does not run ED2 and does not compute eigenvalues. It constructs the
+periodic 10x10x10, spin-1/2, isotropic nearest-neighbor Heisenberg
+Hamiltonian at Ndown=3 and Gamma **directly from translation-equivalent
+relative coordinates**. Its results are independently checked:
+
+- Full fixed-Ndown space: **C(1000,3) = 166,167,000**.
+- Origin-anchored distinct relative pairs: **C(999,2) = 498,501**.
+- Canonical translation representatives: **166,167**, exactly one-third
+  of the anchored pairs, with no order-three translation stabilizers.
+- Resulting 166,167-by-166,167 real-symmetric sparse Hamiltonian:
+  **3,151,137 nonzero entries**; antisymmetric-part error **0**.
+- A compressed sparse matrix (.npz) and machine-readable report are
+  retained as GitHub Actions artifacts. One shared-runner matrix
+  construction took about 9.35 seconds, **not a controlled benchmark**.
+
+This is a constructive validation of the `Ndown=3`, 1000-site
+symmetry-reduced Hamiltonian *representation*. The eigensolver's
+convergence on this large matrix was **not established** in the tested
+workflow: an exploratory local `eigsh(k=2)` attempt did not finish
+within its execution cutoff. No source-pinned ED2 1000-site
+three-magnon energy has been reported or inferred. The matrix may
+serve as a future independent reference once a controlled numerical
+calculation is completed.
+
+### Large-numerical-space engineering limit
+
+The current Fortran basis implementation uses default-width integers
+for cumulative bounded-combination counts. Even though
+C(1000,3)=166,167,000 remains below signed 32-bit maximum,
+C(1000,4)=41,417,124,750 exceeds it substantially.
+A claimed generalization to four or more dilute magnons
+at 1000 sites would therefore require an explicit checked
+64-bit counting/indexing strategy and independent validation.

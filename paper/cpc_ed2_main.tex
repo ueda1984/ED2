@@ -376,9 +376,18 @@ model support or solver superiority.
 At 1000 sites with three magnons, the unprojected
 dimension grows to $\binom{1000}{3}=166{,}167{,}000$
 and the $\Gamma$-sector dimension is 166,167.
-This value is currently established by exact
-symmetry counting only; a corresponding source-pinned
-ED2 three-magnon run has not yet been completed.
+Besides exact character counting, we independently
+enumerated the translation orbits by fixing one magnon
+at the origin and canonically re-rooting each pair of
+relative displacements. This explicitly constructs all
+166,167 representatives without scanning the full
+166-million-state magnetization sector. The resulting
+sparse real-symmetric $\Gamma$-sector Hamiltonian contains
+3,151,137 nonzero matrix entries and passes a direct
+Hermiticity check. This is \emph{structural} validation
+only: neither an ED2 three-magnon run at 1000 sites
+nor an independently converged three-magnon eigenenergy
+is yet available.
 The reported old/new wall times were obtained on
 a shared CI runner with unmatched random Lanczos
 initial vectors and cannot be interpreted as a
