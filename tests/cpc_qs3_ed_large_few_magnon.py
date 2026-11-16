@@ -67,7 +67,7 @@ def create(root,lengths,n,k,old):
         (root/"bonds.dat").write_text("".join(f"{i} {j} {xy:g} {zz:g}\n" for i,j in bonds))
         params=(f"NOS={N},NOD={n},LX={lengths[0]},LY={lengths[1]},LZ={lengths[2]},"
                 f"KX={k[0]},KY={k[1]},KZ={k[2]},NOxxz={len(bonds)},"
-                f"ALG={3 if n==1 else 1},cal_lm=0,cal_cf=0,cal_dsf=0,"
+                f"ALG={3 if sector_dim(lengths,n,k)<=100 else 1},cal_lm=0,cal_cf=0,cal_dsf=0,"
                 "wr_wf=0,re_wf=0,FILExxz='bonds.dat',FILEwf='./',OUTDIR='./'")
         extra=("&input_static\nNOV=1,NOLM=0,NOCF=0,FILElm='unused',FILECF='unused'\n/\n"
                "&input_dynamic\nspsmsz=3,itr_dsf=0,QX=0.,QY=0.,QZ=0.,rfield=0.,FILEpos='unused'\n/\n")
@@ -83,7 +83,7 @@ def create(root,lengths,n,k,old):
         params=(f"NOS={N},NODmin={n},NODmax={n},"
                 f"L1={lengths[0]},L2={lengths[1]},L3={lengths[2]},L4=1,L5=1,L6=1,"
                 f"M1={k[0]},M2={k[1]},M3={k[2]},M4=0,M5=0,M6=0,"
-                f"ALG={3 if n==1 else 1},NO_one={N},NO_two={len(bonds)},"
+                f"ALG={3 if sector_dim(lengths,n,k)<=100 else 1},NO_one={N},NO_two={len(bonds)},"
                 "wk_dim=0,MNTE=-1,FILE_xyz_dm_gamma='bonds.dat',"
                 "FILE_hvec='fields.dat',FILE_spin='spins.dat',FILE_NODmax='caps.dat',"
                 "FILE_S1='shift1.dat',FILE_S2='shift2.dat',FILE_S3='shift3.dat',"
@@ -113,9 +113,9 @@ def run(exe,root,dim,old,timeout):
     dims=re.findall(r"THS\(k\)\s*=\s*(\d+)",stdout,re.I)
     if len(dims)!=1 or int(dims[0])!=dim:
         raise RuntimeError(f"Wrong symmetry dimension {dims}, expected {dim}: {stdout[-1000:]}")
-    if old and dim==1:
+    if old and dim<=100:
         lines=(root/"full_eigenvalues.dat").read_text().splitlines()
-        if len(lines)!=1:raise RuntimeError("Original dense file invalid")
+        if len(lines)!=dim:raise RuntimeError("Original dense file count invalid")
         energy=float(lines[0].split()[-1].replace("D","E"))
     else:
         es=re.findall(r"E_0\s*=\s*([-+]?(?:\d+(?:\.\d*)?|\.\d+)[EeDd][-+]?\d+)",stdout)
