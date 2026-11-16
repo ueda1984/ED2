@@ -60,6 +60,19 @@ checked with an independent relative-displacement Hamiltonian.
 The 1000-site **three**-magnon numerical claim remains unverified.
 Shared-runner timings are not controlled performance comparisons.
 
+## Few-magnon cache performance pilot
+
+The [cache performance protocol and first validated pilot](../docs/development/cpc-few-magnon-cache-benchmark.md)
+compare none/half/full model-specific tight-row caching at 216
+sites (three magnons) and 1000 sites (two magnons).
+All six numerical cases passed residual, independent-energy,
+identical initial-vector and H-application checks. On a
+shared CI runner, *single* observed no/full end-to-end time
+ratios were 110.6 and 8.5 respectively; these are **exploratory**
+and not authorizable publication-level speedup estimates.
+The paper includes a fully labelled pilot table. A dedicated-node
+repeated experiment remains outstanding.
+
 ## Scientific evidence matrix
 
 | Manuscript part | Regeneration / verification evidence |

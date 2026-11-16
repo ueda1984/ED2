@@ -117,3 +117,70 @@ separate from ED2-internal no/half/full toggles.
 
 Scripts: `tests/cpc_few_magnon_cache_benchmark.py`;
 CI: `.github/workflows/cpc-few-magnon-cache-benchmark.yml`.
+
+
+## First validated shared-runner pilot (2026-11-16)
+
+Source pinned to the [CI workflow run 43784564060](https://github.com/ueda1984/ED2/actions/runs/43784564060),
+using GNU Fortran 13, `-O2 -fopenmp`, one OpenMP thread, one
+CPU pinned from the runner's allowed affinity and BLAS=1. This is
+**one measurement per mode, with no warmup, on a shared runner**,
+so all wall-time ratios are preliminary and cannot be promoted to a
+journal-grade, controlled-node speedup.
+
+**All six cache configurations passed independently frozen ground
+energy and the requested direct Ritz residual tolerance 1e-8.**
+Within each physical model, all policies had the same initial-vector
+SHA256 and number of Hamiltonian actions:
+
+| Geometry | Ndown | Cache | Wall seconds | Peak RSS (KiB) | H actions | Direct residual |
+| --- | ---: | --- | ---: | ---: | ---: | ---: |
+| 10×10×10 | 2 | none | 8.487879 | 6,928 | 185 | 3.0812e-9 |
+| 10×10×10 | 2 | half/tight | 4.796797 | 6,888 | 185 | 3.0813e-9 |
+| 10×10×10 | 2 | full/tight | 0.996301 | 6,972 | 185 | 3.0803e-9 |
+| 6×6×6 | 3 | none | 125.467950 | 8,176 | 545 | 2.6323e-9 |
+| 6×6×6 | 3 | half/tight | 64.081302 | 9,716 | 545 | 2.6323e-9 |
+| 6×6×6 | 3 | full/tight | 1.134819 | 11,132 | 545 | 2.6323e-9 |
+
+The observed full-cache vs no-cache end-to-end time ratios were
+**8.52** at 1000 sites/two magnons and **110.56** at 216 sites/three
+magnons. They have **no uncertainty estimate** from one measurement.
+The 216-site ground energy matched
+148.5648907577122, and the 1000-site energy matched
+738.0067742722034 within 2e-7 in every accepted run.
+
+The **model-specific full/tight cache arrays** consumed
+2.929 MiB for 216/3 (7,677 basis states) and 0.134 MiB
+for 1000/2 (503 basis states); these are theoretical allocated
+array sizes, not measured process RSS. The generic full-cache
+allocation would be approximately 822.481 and 249.453 MiB,
+respectively, under the standard integer(4)/complex(8) representation.
+Cache fraction and cache row width must be optimized separately.
+
+An initial pilot requested `MNTE=6*Ndown` and **correctly failed** the
+safety gate because the Fortran-reported optimal row bound was one
+greater: for two magnons `Current MNTE=12` but
+`Optimal MNTE=13`. The corrected bound
+`MNTE=6*Ndown+1` passed all tests. The failure is retained in
+[the initial CI run 43784444333](https://github.com/ueda1984/ED2/actions/runs/43784444333)
+rather than ignored.
+
+### What the pilot cannot establish
+
+1. Stable speedup factors or confidence intervals: there are no
+   independent job allocations and only one observation per mode.
+2. Relative speed against QuSpin/old QS3: this is an ED2 *internal*
+   cache study, and those programs do not share the same cache-policy
+   interface.
+3. Pure (H|\psi\rangle) kernel performance: the reported end-to-end
+   time includes input/basis/cache construction and solver execution.
+   Isolating kernel throughput requires further opt-in timing.
+4. Equal performance at arbitrary momentum, DM coupling or mixed
+   spins: the narrow row bound is **specific** to periodic isotropic
+   NN few-magnon Hamiltonians.
+
+Recommended follow-up: repeat `--warmups 2 --repeats 7` with an
+operator-verified exclusive node, record actual CPU topology and
+scheduler exclusivity, and run at least two separate allocations.
+Inspect outliers, H-call equality, direct residual, independent energy
+and RSS before quoting speedup ratios in a submitted paper.

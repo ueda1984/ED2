@@ -756,6 +756,74 @@ Full / generic & 100.558 & 119,516\\
 \end{tabular}
 \end{table}
 
+
+\subsection{Pilot cache speedup in symmetry-reduced few-magnon sectors}
+The large-site continuity tests also enable a cache-only A/B
+comparison using exactly the same ED2 binary, initial state,
+Lanczos parameters and independently checked ground energy.
+For the periodic cubic nearest-neighbor spin-$1/2$
+Heisenberg model at fixed $N_\downarrow$, at most
+$6N_\downarrow$ one-magnon hops occur from one state.
+Including the diagonal and the code's sentinel-index
+convention, the tested safe bound is
+$\mathrm{MNTE}=6N_\downarrow+1$;
+the two work arrays allocate
+$20(6N_\downarrow+2)\mathcal D$ bytes when all rows
+are cached, assuming default 4-byte integer indices.
+This bound is model-specific; it does not apply
+to arbitrary mixed-spin, anisotropic or long-range
+Hamiltonians.
+
+For $L=216$, $N_\downarrow=3$, the reduced space
+has dimension 7,677, and the nominal full/tight
+cache allocation is 2.929 MiB rather than the
+generic 822.481 MiB. At $L=1000$ and
+$N_\downarrow=2$ the corresponding numbers are
+503, 0.134 MiB and 249.453 MiB.
+Table~\ref{tab:fewmagnon-cache-pilot} gives
+source-archived \emph{exploratory} wall-clock
+times and peak resident sizes. All six runs meet
+the requested direct residual bound $10^{-8}$,
+agree with independent ground-energy references,
+use exactly the same explicit initial state within
+each case, and have identical Hamiltonian application
+counts within each case. The initial unsafe narrow
+row allocation was rejected and enlarged before
+the reported measurements.
+
+\begin{table}[t]
+\centering
+\caption{ED2 internal cache-policy pilot for two
+translation-reduced cubic few-magnon sectors.
+One observation per configuration, zero warmups,
+one thread and a shared CI machine: no confidence
+interval or hardware-portable speedup is claimed.
+Nominal cache allocations exclude other memory.}
+\label{tab:fewmagnon-cache-pilot}
+\small
+\begin{tabular}{rrlrrrr}
+\toprule
+$L$ & $N_\downarrow$ & Cache &
+$\mathcal D$ & $N_H$ & Wall (s) & RSS (MiB)\\
+\midrule
+1000 & 2 & none  & 503 & 185 & 8.488 & 6.77\\
+1000 & 2 & half/tight & 503 & 185 & 4.797 & 6.73\\
+1000 & 2 & full/tight & 503 & 185 & 0.996 & 6.81\\
+216 & 3 & none & 7677 & 545 & 125.468 & 7.98\\
+216 & 3 & half/tight & 7677 & 545 & 64.081 & 9.49\\
+216 & 3 & full/tight & 7677 & 545 & 1.135 & 10.87\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The single-run no-cache/full-cache wall-time ratios
+are 8.5 and 110.6 for these two workloads.
+They demonstrate the possible importance of reusable
+transition caches, but these \emph{cannot} yet be
+reported as established software speedup factors.
+Controlled-node repeated measurements are required
+for that claim.
+
 The accompanying CI-based resource tests independently check
 energies, observables and direct residuals across cache policies,
 including observed peak RSS and Hamiltonian applications.
