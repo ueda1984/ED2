@@ -1,0 +1,30 @@
+name: CPC isolated performance audit source snapshot
+on:
+  push:
+    branches: [codex/ed2-cpc-performance-audit-20261116]
+    paths: [.github/workflows/cpc-performance-audit-source.yml]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  snapshot:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Archive reviewed baseline and source identities
+        run: |
+          git rev-parse HEAD > audit-checkout-sha.txt
+          git archive --format=tar.gz --prefix=ed2-audit-baseline/ 719da7035e66ce884e9de00376e4ded5b3e5c459 > ed2-audit-baseline.tar.gz
+          sha256sum ed2-audit-baseline.tar.gz > audit-source-sha256.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ed2-performance-audit-baseline-source
+          path: |
+            ed2-audit-baseline.tar.gz
+            audit-checkout-sha.txt
+            audit-source-sha256.txt
+          retention-days: 30
+          if-no-files-found: error
