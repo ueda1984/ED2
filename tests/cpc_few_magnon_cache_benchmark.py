@@ -42,7 +42,7 @@ def initial_vector(dim):
                    for i in range(dim))
 
 def settings(policy,dim,nsites,n,nbonds):
-    tight=6*n # One magnon has at most six directed nearest-neighbor hops.
+    tight=6*n+1 # Fortran reports max_jd-1: 6*n hops + diagonal + one spare slot.
     broad=2*nsites+8*nbonds
     if policy=="none":return (0,tight)
     if policy=="half_tight":return (dim//2,tight)
