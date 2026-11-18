@@ -73,6 +73,13 @@ def full_oh():
     return mapping
 
 
+def choose3(n):
+    """Exact C(n,3) with Python 3.6+ (math.comb requires Python 3.8)."""
+    if n < 3:
+        return 0
+    return n * (n - 1) * (n - 2) // 6
+
+
 def index(x, y, z, side):
     return (x % side) + side * ((y % side) + side * (z % side))
 
@@ -177,7 +184,7 @@ def sector_dimensions(side, down=3):
             two = freq[1][axis_index(trans2, side)] - f1
             three = freq[2][axis_index(trans3, side)] - f1
             assert two >= 0 and two % 2 == 0 and three >= 0 and three % 3 == 0
-            fixed_triples = math.comb(f1, 3) + f1 * (two // 2) + (three // 3)
+            fixed_triples = choose3(f1) + f1 * (two // 2) + (three // 3)
             sums["oh-a1g"] += fixed_triples
             sums["oh-a2g"] += (-1) ** (a + b) * fixed_triples
             sums["oh-a1u"] += (-1) ** a * fixed_triples
@@ -190,7 +197,7 @@ def sector_dimensions(side, down=3):
         assert value % group_size == 0, (side, name, value, group_size)
         result[name] = value // group_size
         assert result[name] > 0
-    result["raw_dim"] = math.comb(size, down)
+    result["raw_dim"] = choose3(size)
     return result
 
 
