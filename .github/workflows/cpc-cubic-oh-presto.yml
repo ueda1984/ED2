@@ -29,6 +29,7 @@ on:
       - "tests/cpc_cubic_basis_coordinate_cache_regression.py"
       - "tests/cpc_cubic_basis_coordinate_full_cache_regression.py"
       - "tests/cpc_cubic_basis_pruned_canonical_regression.py"
+      - "tests/cpc_cubic_axis_pruning_oracle.py"
       - "tests/cpc_cubic_local_bond_cache_regression.py"
       - "tests/cpc_cubic_cache_phase_profile_regression.py"
       - "tests/cpc_cubic_direct_hop_table_regression.py"
@@ -68,6 +69,7 @@ on:
       - "tests/cpc_cubic_basis_coordinate_cache_regression.py"
       - "tests/cpc_cubic_basis_coordinate_full_cache_regression.py"
       - "tests/cpc_cubic_basis_pruned_canonical_regression.py"
+      - "tests/cpc_cubic_axis_pruning_oracle.py"
       - "tests/cpc_cubic_local_bond_cache_regression.py"
       - "tests/cpc_cubic_cache_phase_profile_regression.py"
       - "tests/cpc_cubic_direct_hop_table_regression.py"
@@ -139,6 +141,7 @@ jobs:
               "tests/cpc_cubic_basis_coordinate_cache_regression.py",
               "tests/cpc_cubic_basis_coordinate_full_cache_regression.py",
               "tests/cpc_cubic_basis_pruned_canonical_regression.py",
+              "tests/cpc_cubic_axis_pruning_oracle.py",
               "tests/cpc_cubic_local_bond_cache_regression.py",
               "tests/cpc_cubic_cache_phase_profile_regression.py",
               "tests/cpc_cubic_direct_hop_table_regression.py",
@@ -272,6 +275,10 @@ jobs:
             --driver "$PWD/tests/cubic_cache_driver" --exe "$PWD/source/QS3ED2" \
             --sides 10 --threads 1,4,8 --skip-lanczos \
             --output "$RUNNER_TEMP/cubic-coordinate-fullcache-n1000"
+      - name: Independent exhaustive and sampled integer oracle for pruned canonical translations
+        run: |
+          python3 tests/cpc_cubic_axis_pruning_oracle.py \
+            --random-per-side 6000
       - name: Axis-pruned canonical enumeration must preserve full basis, Hamiltonian and Ritz bits
         run: |
           python3 tests/cpc_cubic_basis_pruned_canonical_regression.py \
