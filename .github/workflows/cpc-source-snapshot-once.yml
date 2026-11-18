@@ -1,0 +1,29 @@
+name: One-shot audited source snapshot
+
+on:
+  push:
+    branches: [codex/ed2-cpc-noncommuting-orbits]
+    paths: [".github/workflows/cpc-source-snapshot-once.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-snapshot:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Build pinned tracked-source archive
+        run: |
+          git rev-parse HEAD > "$RUNNER_TEMP/HEAD.txt"
+          git archive --format=tar.gz --output="$RUNNER_TEMP/ed2-source.tar.gz" HEAD
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ed2-source-snapshot
+          path: |
+            ${{ runner.temp }}/ed2-source.tar.gz
+            ${{ runner.temp }}/HEAD.txt
+          retention-days: 7
