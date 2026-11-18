@@ -60,17 +60,14 @@ and only introduces:
   identical generated input SHA256, identical full H*x
   SHA256, exact output vector length and full-cache
   provenance, and checks old standalone TRLan spectra
-  to an appropriately stated numerical tolerance.
-  The original main does not seed TRLan's initial
-  random vector, so a separate test-only
-  `cpc_csr_seeded_solver_driver.f90` calls the unchanged
-  native solver with a **fixed seed**. This avoids
-  false between-process failures (initial random
-  states lead to nonconverged Ritz-level differences)
-  without changing production solver behavior.
-  Only the **per-action output** is required to
-  match bit for bit; final Ritz values are compared
-  at an explicit 5e-10 tolerance.
+  against a separately constructed dense Hamiltonian H for
+  N4/N6, with an absolute complex-vector tolerance of 1e-10.
+  The original TRLan can stop before accurate convergence even
+  when started from the same seed, so *its* final eigenvalues
+  are deliberately not used as the opt-in H*x proof.
+  Every individual native H*x bit is still required to match
+  the legacy cached matvec exactly; the dense reference uses
+  a distinct ED2 full-H construction path.
   Partial cache and malformed/oversized flags are
   independently checked to fail closed.
 - `.github/workflows/main-generic-csr.yml`:
