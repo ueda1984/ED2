@@ -2,7 +2,7 @@ name: ED2 cubic Oh symmetry and PRESTO protocol
 
 on:
   push:
-    branches: [codex/ed2-cpc-cubic-oh-1000-presto, codex/ed2-cubic-cache-mnte-cap-experiment]
+    branches: [codex/ed2-cpc-cubic-oh-1000-presto, codex/ed2-cubic-cache-mnte-cap-experiment, codex/ed2-cubic-anchored-key-oracle]
     paths:
       - "source/state_lists.f90"
       - "tests/Makefile.am"
