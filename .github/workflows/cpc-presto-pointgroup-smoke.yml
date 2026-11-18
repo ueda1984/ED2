@@ -44,6 +44,13 @@ jobs:
           bash -n tools/presto_pointgroup_exclusive.pbs tools/presto_pointgroup_stage.sh
           bash tools/presto_pointgroup_stage.sh "$PWD" "$RUNNER_TEMP/staged-source"
           (cd "$RUNNER_TEMP/staged-source" && sha256sum -c ed2-source.sha256)
+      - name: Ensure PBS script refuses execution without a real allocation
+        run: |
+          if ED2_EXCLUSIVE_CONFIRMED=1 bash tools/presto_pointgroup_exclusive.pbs                > "$RUNNER_TEMP/refused-login.log" 2>&1; then
+            echo "ERROR: PBS script ran outside allocated PBS job" >&2
+            exit 1
+          fi
+          grep -q "Required PBS/ED2 variable missing" "$RUNNER_TEMP/refused-login.log"
       - name: Build and run historical smoke tests
         run: |
           autoreconf -vfi
