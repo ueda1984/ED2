@@ -31,7 +31,7 @@ def examine(repo):
     autotools = parse_version(
         conf, r"AC_INIT\(\[QS3-ED2\],\s*\[([^\]]+)\]", "configure.ac")
     cff = parse_version(
-        citation, r'^version:\s*["' + "'" + r']?([^" ' + "'" + r'\n]+)',
+        citation, r"^version:\s*[\x22\x27]?([0-9A-Za-z._-]+)",
         "CITATION.cff")
     released_date = re.search(r"^date-released:\s*(.+)$",
                               citation, re.MULTILINE)
