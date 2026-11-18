@@ -179,3 +179,41 @@ The GitHub Actions test
 `.github/workflows/cpc-cubic-oh-presto.yml` uses shared runners
 **solely for functional and mathematical verification**. It cannot
 supply PRESTO timing evidence.
+
+## Actual N=1000 native group-path smoke (one magnon, NOT 3 magnons)
+
+The exact 1000-site cube with all 48,000 affine translations and O_h group
+elements has already been exercised locally in the native ED2 executable
+using **only one flipped spin**. The bounded extended validator accepted the
+full normal form; the accelerated atomic-orbit basis was selected; the sector
+dimension was exactly one. This analytically solvable state has
+
+`E = (3N*0.77+6N*0.19)/4 - (6*0.77+12*0.19)/2 + (6+12*0.31)/2 = 863.91`
+
+for `N=1000`, matching ED2 to `~6e-11`, with a directly observed
+Ritz residual `3.43e-13`. Local Fortran phase timing for basis formation
+was `3.46 s` on a shared, non-PRESTO one-thread machine. This **only**
+demonstrates the 1000-site group-validation path and physical labeling.
+It is **not** evidence for 1000-site three-magnon memory, solver scaling,
+throughput or PRESTO performance. The native smoke is reproducible with
+`tests/cpc_cubic_1000_one_magnon_smoke.py`.
+
+## First full 1000-site three-magnon job (one configuration only)
+
+After the small `cubic-pilot` allocation has completed successfully and
+an operator has independently verified the exclusive-node policy, submit
+**one** 1000-site A1g three-magnon calculation (not all 100 main trials),
+using the exact staged cubic source:
+
+```sh
+qsub -v "ED2_STAGE=$HOME/ED2_CUBIC_OH_stage,ED2_RESULTS_ROOT=$HOME/ED2_CUBIC_OH_results,ED2_PRESET=cubic-main,ED2_SIZES=10,ED2_THREADS=1,ED2_SECTORS=oh-a1g,ED2_WARMUPS=0,ED2_REPEATS=1,ED2_TIMEOUT=1800,ED2_EXCLUSIVE_CONFIRMED=1" \
+  tools/presto_cubic_exclusive.pbs
+```
+
+That job creates the real `D=4299` cubic three-magnon basis, performs
+Lanczos, records the direct eigenpair residual and phase timings, and
+passes its raw records through the independent audit (without an
+unearned publication-ready status). The per-trial timeout is 1800 s;
+nonconvergence must be retained as a failed trial, not dropped.
+Only if this succeeds should the larger multi-OMP measurement be
+scheduled. No command in this document has been executed on PRESTO.
