@@ -166,6 +166,7 @@ def execute(exe, out, spec, allocation_info, timeout, mnte):
     before_profile = os.environ.get("ED2_CUBIC_CACHE_PROFILE")
     before_direct = os.environ.get("ED2_CUBIC_DIRECT_HOP_TABLE")
     before_coord_cache = os.environ.get("ED2_CUBIC_BASIS_COORD_CACHE")
+    before_sort3 = os.environ.get("ED2_CUBIC_BASIS_SORT3_NETWORK")
     try:
         if builder == "forced-legacy":
             os.environ["ED2_FORCE_LEGACY_ORBITS"] = "1"
@@ -173,11 +174,16 @@ def execute(exe, out, spec, allocation_info, timeout, mnte):
             os.environ.pop("ED2_CUBIC_CACHE_PROFILE", None)
             os.environ.pop("ED2_CUBIC_DIRECT_HOP_TABLE", None)
             os.environ.pop("ED2_CUBIC_BASIS_COORD_CACHE", None)
+            os.environ.pop("ED2_CUBIC_BASIS_SORT3_NETWORK", None)
         else:
             os.environ.pop("ED2_FORCE_LEGACY_ORBITS", None)
         obs = physics.run_case(exe, work, side ** 3, 3, sector, dimension,
                                threads, "two-stage", timeout)
     finally:
+        if before_sort3 is None:
+            os.environ.pop("ED2_CUBIC_BASIS_SORT3_NETWORK", None)
+        else:
+            os.environ["ED2_CUBIC_BASIS_SORT3_NETWORK"] = before_sort3
         if before_coord_cache is None:
             os.environ.pop("ED2_CUBIC_BASIS_COORD_CACHE", None)
         else:
@@ -216,6 +222,10 @@ def execute(exe, out, spec, allocation_info, timeout, mnte):
     basis_coord_reported = "Basis orbit coordinates: exact precomputed periodic deltas" in output
     if basis_coord_reported != (builder == "fast" and basis_coord_cache):
         raise AssertionError("Native cubic basis coordinate optimization provenance mismatch")
+    basis_sort3_network = os.environ.get("ED2_CUBIC_BASIS_SORT3_NETWORK", "") == "1"
+    sort3_reported = "Basis canonical sorter: exact-three-site-network" in output
+    if sort3_reported != (builder == "fast" and basis_sort3_network):
+        raise AssertionError("Native cubic three-site sorter provenance mismatch")
     atomic = "Basis builder: atomic-orbits" in output
     if atomic and anchored_basis_used:
         raise AssertionError("Two incompatible basis builders were logged")
@@ -246,7 +256,7 @@ def execute(exe, out, spec, allocation_info, timeout, mnte):
     obs.update(dict(key=key, side=side, sector=sector, threads=threads,
                     repetition=repeat, period=period, builder=builder,
                     atomic_orbits=atomic, anchored_basis=anchored_basis_requested,
-                    basis_coord_cache=basis_coord_cache,
+                    basis_coord_cache=basis_coord_cache, basis_sort3_network=basis_sort3_network,
                     native_basis_builder=("anchored-cubic" if anchored_basis_used else
                                           "atomic-orbits" if atomic else "forced-legacy"),
                     validated_noncommuting_action=normal_form,
@@ -318,6 +328,12 @@ def main():
     basis_coord_cache = coord_setting == "1"
     if basis_coord_cache and not anchored_basis:
         p.error("Basis coordinate cache requires ED2_CUBIC_ANCHORED_BASIS=1")
+    sort3_setting = os.environ.get("ED2_CUBIC_BASIS_SORT3_NETWORK", "0")
+    if sort3_setting not in ("0", "1"):
+        p.error("ED2_CUBIC_BASIS_SORT3_NETWORK must be 0 or 1")
+    basis_sort3_network = sort3_setting == "1"
+    if basis_sort3_network and not basis_coord_cache:
+        p.error("Three-site sorter requires ED2_CUBIC_BASIS_COORD_CACHE=1")
     local_bond_cache = os.environ.get("ED2_CUBIC_LOCAL_BOND_CACHE", "") == "1"
     profile_setting = os.environ.get("ED2_CUBIC_CACHE_PROFILE", "0")
     if profile_setting not in ("0", "1"):
@@ -363,7 +379,8 @@ def main():
                               trial_count=count, mnte=a.mnte,
                                anchored_lookup=anchored, anchored_verify=anchored_verify,
                                fast_group_validation=fast_group, anchored_basis=anchored_basis,
-                   basis_coord_cache=basis_coord_cache, local_bond_cache=local_bond_cache,
+                   basis_coord_cache=basis_coord_cache, basis_sort3_network=basis_sort3_network,
+                   local_bond_cache=local_bond_cache,
                    cache_profile=cache_profile, direct_hop_table=direct_hop_table,
                               source_revision=a.source_revision, archive_sha256=sha(archive)),
                          indent=2))
@@ -388,7 +405,8 @@ def main():
                   repeats=repeats, mnte=a.mnte, anchored_lookup=anchored,
                    anchored_verify=anchored_verify,
                    fast_group_validation=fast_group, anchored_basis=anchored_basis,
-                   basis_coord_cache=basis_coord_cache, local_bond_cache=local_bond_cache,
+                   basis_coord_cache=basis_coord_cache, basis_sort3_network=basis_sort3_network,
+                   local_bond_cache=local_bond_cache,
                    cache_profile=cache_profile, direct_hop_table=direct_hop_table,
                    timeout=a.timeout, time_budget=a.time_budget,
                   seed=a.seed, protocol="preset-specific measured repeats and warmups",
