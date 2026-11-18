@@ -641,7 +641,7 @@ contains
     use iso_fortran_env, only: int64
     use input_param, only: NOS,NODmin,NODmax,THS,local_NODmax,local_spin, &
       L1,L2,L3,L4,L5,L6,shift_1,shift_2,shift_3,shift_4,shift_5,shift_6,list_s,list_r
-    use omp_lib, only: omp_get_max_threads,omp_get_thread_num,omp_get_num_threads
+    use omp_lib, only: omp_get_max_threads,omp_get_thread_num,omp_get_num_threads,omp_get_wtime
     logical, intent(out) :: used
     integer :: periods(6),i,j,a,b,cur,cycle_len,dim,nrep,nt,tid,actual_threads,capacity
     integer :: s,word,bit,g,offset
@@ -653,9 +653,19 @@ contains
     integer :: env_status
     character(len=16) :: force_legacy
     real(8) :: ro
+    ! Optional wall-clock breakdown. This is diagnostic only; physics is untouched.
+    real(8) :: detail_begin,validation_begin,validation_sec,orbit_begin,orbit_finish,detail_finish
+    logical :: detail_timing
+    character(len=16) :: detail_setting
+    integer :: detail_status
     real(8), allocatable :: norms(:)
     type(orbit_buffer), allocatable :: buffers(:)
     used=.false.
+    detail_setting=''
+    call get_environment_variable('ED2_BASIS_DETAIL_TIMING',detail_setting,status=detail_status)
+    detail_timing=detail_status==0.and.trim(adjustl(detail_setting))=='1'
+    if(detail_timing)detail_begin=omp_get_wtime()
+    validation_sec=0d0
     force_legacy=''
     call get_environment_variable('ED2_FORCE_LEGACY_ORBITS',force_legacy,status=env_status)
     if(env_status==0 .and. trim(adjustl(force_legacy))=='1')return
@@ -715,13 +725,16 @@ contains
       end do
     end do
     if(.not.commuting)then
+      if(detail_timing)validation_begin=omp_get_wtime()
       call validate_noncommuting_action(maps,periods,valid_noncommuting)
+      if(detail_timing)validation_sec=omp_get_wtime()-validation_begin
       if(.not.valid_noncommuting)return
       write(*,'(a)') 'Symmetry action: noncommuting normal form and character validated'
     end if
     deallocate(seen,maps)
     dim=THS
     capacity=int(min(int(dim,int64),max(128_int64,2_int64*dim/group_order/int(nt,int64))))
+    if(detail_timing)orbit_begin=omp_get_wtime()
     allocate(visited(nwords),buffers(nt))
     !$omp parallel do private(i)
     do i=1,int(nwords)
@@ -754,6 +767,7 @@ contains
     !$omp end do
     deallocate(ns,np,ranks)
     !$omp end parallel
+    if(detail_timing)orbit_finish=omp_get_wtime()
     total_count=0_int64
     do i=1,nt
       total_count=total_count+int(buffers(i)%count,int64)
@@ -785,6 +799,15 @@ contains
       if(any(list_s(2:)<=list_s(:nrep-1)))error stop 'orbit representatives not strictly ordered'
     end if
     THS=nrep
+    if(detail_timing)then
+      detail_finish=omp_get_wtime()
+      write(*,'(a,es23.15)') 'ED2_BASIS_PHASE preflight_other wall_s=', &
+        orbit_begin-detail_begin-validation_sec
+      write(*,'(a,es23.15)') 'ED2_BASIS_PHASE group_validation wall_s=',validation_sec
+      write(*,'(a,es23.15)') 'ED2_BASIS_PHASE orbit_scan wall_s=',orbit_finish-orbit_begin
+      write(*,'(a,es23.15)') 'ED2_BASIS_PHASE finalize wall_s=',detail_finish-orbit_finish
+      write(*,'(a,es23.15)') 'ED2_BASIS_PHASE total wall_s=',detail_finish-detail_begin
+    end if
     write(*,'(a,i0)') 'Basis builder: atomic-orbits, threads=',actual_threads
     used=.true.
   end subroutine try_orbit_basis
