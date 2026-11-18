@@ -218,9 +218,9 @@ contains
       L1,L2,L3,L4,L5,L6,M1,M2,M3,M4,M5,M6,list_s,NO_one,NO_two,Jint
     use state_lists, only: list_fly
     integer, intent(in) :: lv
-    character(len=32) :: setting,check_setting,direct_setting
-    integer :: status,status2,direct_status,i,p,slot,k,sign
-    logical :: direct_requested
+    character(len=32) :: setting,check_setting,direct_setting,skip_hash_setting
+    integer :: status,status2,direct_status,skip_hash_status,i,p,slot,k,sign
+    logical :: direct_requested,skip_hash_requested
     integer :: triple(3)
     integer(int64) :: key
     logical :: conflict
@@ -233,6 +233,16 @@ contains
         error stop 'direct hop: ED2_CUBIC_DIRECT_HOP_TABLE must be 0 or 1'
     end if
     direct_requested=direct_status==0.and.trim(adjustl(direct_setting))=='1'
+    skip_hash_setting=''
+    call get_environment_variable('ED2_CUBIC_SKIP_UNUSED_HASH', &
+      skip_hash_setting,status=skip_hash_status)
+    if(skip_hash_status==0)then
+      if(trim(adjustl(skip_hash_setting))/='0'.and.trim(adjustl(skip_hash_setting))/='1') &
+        error stop 'direct hop: ED2_CUBIC_SKIP_UNUSED_HASH must be 0 or 1'
+    end if
+    skip_hash_requested=skip_hash_status==0.and.trim(adjustl(skip_hash_setting))=='1'
+    if(skip_hash_requested.and..not.direct_requested) &
+      error stop 'direct hop: skipping unused hash requires ED2_CUBIC_DIRECT_HOP_TABLE=1'
     setting=''
     call get_environment_variable('ED2_CUBIC_ANCHORED_REP',setting,status=status)
     if(status/=0.or.trim(adjustl(setting))/='1')then
@@ -265,6 +275,22 @@ contains
     if(lv/=size(list_s))error stop 'anchored: invalid projected basis dimension'
     call verify_cubic_generators()
     call make_point_actions()
+    if(skip_hash_requested)then
+      ! The dense direct pair table is the ONLY lookup used by
+      ! resolve_cached_hop when direct_active is true. Building a
+      ! separate keyed hash with 48 x 3 group/translation searches
+      ! for each basis representative is therefore redundant.
+      ! The dense builder below independently checks duplicate
+      ! representation IDs and incompatible 1D stabilizer characters.
+      call build_cubic_direct_hop_table(lv)
+      if(.not.direct_active)error stop 'direct hop: dense table not active'
+      active=.true.
+      write(*,'(a)') 'Representative lookup: cubic-direct-only-unused-hash-elided'
+      write(*,'(a,i0,a,l1)') &
+        'Representative lookup: cubic-anchored-orbits, basis=',lv, &
+        ', O_h operations=48, per-hop legacy verification=',verify
+      return
+    end if
     table_size=2*lv+1
     allocate(keys(table_size),indices(table_size),rep_characters(table_size))
     keys=-1_int64

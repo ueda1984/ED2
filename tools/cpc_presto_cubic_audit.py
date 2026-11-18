@@ -90,6 +90,10 @@ def main():
     assert isinstance(basis_pruned_canon, bool)
     if basis_pruned_canon:
         assert basis_coord_cache
+    skip_unused_hash = summary.get("skip_unused_hash", False)
+    assert isinstance(skip_unused_hash, bool)
+    if skip_unused_hash:
+        assert summary["direct_hop_table"]
     if summary["direct_hop_table"]:
         assert summary["local_bond_cache"] and summary["anchored_lookup"]
         assert summary["anchored_basis"] and summary["fast_group_validation"]
@@ -152,6 +156,7 @@ def main():
         assert record["direct_hop_table"] is summary["direct_hop_table"]
         assert record.get("basis_coord_cache", False) is basis_coord_cache
         assert record.get("basis_pruned_canon", False) is basis_pruned_canon
+        assert record.get("skip_unused_hash", False) is skip_unused_hash
         raw_input = (root / "trials" / record["key"] / "input.dat").read_text()
         match = re.search(r"\bMNTE\s*=\s*(-?\d+)", raw_input, flags=re.IGNORECASE)
         assert match and int(match.group(1)) == summary["mnte"]
@@ -196,6 +201,7 @@ def main():
         assert record["native_cache_builder"] == expected_cache
         expected_direct = summary["direct_hop_table"] and record["builder"] == "fast"
         assert ("Representative lookup: cubic-direct-hop-pairs" in log) is expected_direct
+        assert ("Representative lookup: cubic-direct-only-unused-hash-elided" in log) is (skip_unused_hash and record["builder"] == "fast")
         expect_profile = summary["cache_profile"] and record["builder"] == "fast"
         assert ("Cubic cache profile: representative_key_setup_wall_s=" in log) is expect_profile
         assert ("Cubic cache profile: resolver_calls=" in log) is expect_profile
@@ -287,6 +293,7 @@ def main():
                   direct_hop_table=summary["direct_hop_table"],
                   basis_coord_cache=basis_coord_cache,
                   basis_pruned_canon=basis_pruned_canon,
+                  skip_unused_hash=skip_unused_hash,
                   operator_attestation_present=attested,
                   review_eligible=eligible,
                   caution="Operator claim is not independent scheduler proof, and review gate is not publication approval.",
