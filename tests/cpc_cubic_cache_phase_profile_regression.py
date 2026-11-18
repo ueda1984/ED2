@@ -67,7 +67,7 @@ def produce(driver, root, side, sector, threads, profiling, timeout):
                       r"Cubic cache profile: ")
             r = re.search(
                 prefix + re.escape(key) +
-                r"=\s*([+-.0-9eEdD]+)", log)
+                r"=\s*([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eEdD][+-]?\d+)?)", log)
             assert r, (key, dest)
             x = float(r.group(1).replace("D", "E"))
             assert math.isfinite(x) and x >= 0, (key, x)
