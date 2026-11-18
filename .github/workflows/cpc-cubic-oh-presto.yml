@@ -11,6 +11,7 @@ on:
       - "tests/Makefile.am"
       - "docs/development/cpc-cubic-oh-1000-presto-20261118.md"
       - "docs/development/cpc-cubic-cache-mnte-study-20261118.md"
+      - "docs/development/cpc-cubic-native-anchored-lookup-20261118.md"
       - "tests/cpc_cubic_pointgroup.py"
       - "tests/cpc_cubic_anchored_orbit_key_oracle.py"
       - "tests/cpc_cubic_native_anchored_regression.py"
@@ -30,6 +31,7 @@ on:
       - "tests/Makefile.am"
       - "docs/development/cpc-cubic-oh-1000-presto-20261118.md"
       - "docs/development/cpc-cubic-cache-mnte-study-20261118.md"
+      - "docs/development/cpc-cubic-native-anchored-lookup-20261118.md"
       - "tests/cpc_cubic_pointgroup.py"
       - "tests/cpc_cubic_anchored_orbit_key_oracle.py"
       - "tests/cpc_cubic_native_anchored_regression.py"
@@ -151,6 +153,11 @@ jobs:
             --sizes 4,6 --threads 1 --verify-hops --output "$RUNNER_TEMP/cubic-anchored-hops"
           python3 tests/cpc_cubic_native_anchored_regression.py --exe "$PWD/source/QS3ED2" \
             --sizes 4,6 --threads 4 --output "$RUNNER_TEMP/cubic-anchored-omp4"
+      - name: Native anchored lookup under the historical orbit-basis fallback
+        run: |
+          ED2_FORCE_LEGACY_ORBITS=1 python3 tests/cpc_cubic_native_anchored_regression.py \
+            --exe "$PWD/source/QS3ED2" --sizes 4 --threads 1 --verify-hops \
+            --output "$RUNNER_TEMP/cubic-anchored-legacy-basis"
       - name: Native anchored fast path fails closed on translation-only sector
         run: |
           if ED2_CUBIC_ANCHORED_REP=1 python3 tools/cpc_presto_cubic_benchmark.py \
@@ -251,5 +258,6 @@ jobs:
             ${{ runner.temp }}/audit-216-mnte64/
             ${{ runner.temp }}/cubic-anchored-hops/
             ${{ runner.temp }}/cubic-anchored-omp4/
+            ${{ runner.temp }}/cubic-anchored-legacy-basis/
           if-no-files-found: warn
           retention-days: 30
