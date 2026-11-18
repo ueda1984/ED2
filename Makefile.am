@@ -62,6 +62,12 @@ check-pointgroup:
 	$(AM_V_at)$(MAKE) -C source all
 	$(AM_V_at)$(MAKE) -C tests check-pointgroup POINTGROUP_OUTPUT="$(POINTGROUP_OUTPUT)"
 
+# Opt-in end-to-end timings for translation/point-group sectors.
+.PHONY: check-pointgroup-profile
+check-pointgroup-profile:
+	$(AM_V_at)$(MAKE) -C source all
+	$(AM_V_at)$(MAKE) -C tests check-pointgroup-profile PGPROFILE_OUTPUT="$(PGPROFILE_OUTPUT)" PGPROFILE_FLAGS="$(PGPROFILE_FLAGS)"
+
 # Include reference fixtures, example templates and user documentation in
 # source archives used outside the Git repository.
 EXTRA_DIST = input/input.dat examples/ref_data docs tools CITATION.cff LICENSE mkdocs.yml .readthedocs.yaml
