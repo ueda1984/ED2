@@ -287,6 +287,13 @@ check-noncommuting-guard:
 	  --source "$(abs_top_srcdir)" --compiler "$(FC)" \
 	  $(if $(NONCOMMUTING_OUTPUT),--output "$(NONCOMMUTING_OUTPUT)",)
 
+# Independent cubic O_h three-magnon physical verification.
+# The dense reference needs NumPy; the group/Burnside oracle is stdlib-only.
+EXTRA_DIST += cpc_cubic_pointgroup.py cpc_cubic_pointgroup_regression.py
+.PHONY: check-cubic-oh
+check-cubic-oh:
+	$(PYTHON) $(srcdir)/cpc_cubic_pointgroup.py --sizes 4,6,8,10
+
 # Translation / point-group physical sector validation: optional and NumPy test-only.
 EXTRA_DIST += cpc_pointgroup_translation_crosscheck.py
 .PHONY: check-pointgroup
