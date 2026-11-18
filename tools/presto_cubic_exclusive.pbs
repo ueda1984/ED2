@@ -106,6 +106,8 @@ args=(--exe "$exe" --output "$run_dir/measurements"
   --source-archive "$stage/ed2-source.tar.gz"
   --preset "$preset" --require-pbs-exclusive
   --timeout 1200 --time-budget 36000)
+# Optional storage-only experiment. Keep default -1 for comparable baseline.
+if [[ -n ${ED2_MNTE:-} ]]; then args+=(--mnte "$ED2_MNTE"); fi
 if [[ -n ${ED2_THREADS:-} ]]; then args+=(--threads "$ED2_THREADS"); fi
 if [[ -n ${ED2_SIZES:-} ]]; then args+=(--sizes "$ED2_SIZES"); fi
 if [[ -n ${ED2_SECTORS:-} ]]; then args+=(--sectors "$ED2_SECTORS"); fi

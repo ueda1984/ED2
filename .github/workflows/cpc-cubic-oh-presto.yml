@@ -2,11 +2,12 @@ name: ED2 cubic Oh symmetry and PRESTO protocol
 
 on:
   push:
-    branches: [codex/ed2-cpc-cubic-oh-1000-presto]
+    branches: [codex/ed2-cpc-cubic-oh-1000-presto, codex/ed2-cubic-cache-mnte-cap-experiment]
     paths:
       - "source/state_lists.f90"
       - "tests/Makefile.am"
       - "docs/development/cpc-cubic-oh-1000-presto-20261118.md"
+      - "docs/development/cpc-cubic-cache-mnte-study-20261118.md"
       - "tests/cpc_cubic_pointgroup.py"
       - "tests/cpc_cubic_pointgroup_regression.py"
       - "tests/cpc_cubic_1000_one_magnon_smoke.py"
@@ -20,6 +21,7 @@ on:
       - "source/state_lists.f90"
       - "tests/Makefile.am"
       - "docs/development/cpc-cubic-oh-1000-presto-20261118.md"
+      - "docs/development/cpc-cubic-cache-mnte-study-20261118.md"
       - "tests/cpc_cubic_pointgroup.py"
       - "tests/cpc_cubic_pointgroup_regression.py"
       - "tests/cpc_cubic_1000_one_magnon_smoke.py"
@@ -147,6 +149,42 @@ jobs:
             --output "$RUNNER_TEMP/audit-216" \
             --source-archive "$RUNNER_TEMP/staged-source/ed2-source.tar.gz" \
             --exe "$PWD/source/QS3ED2"
+      - name: Cache capacity 64 versus original 8*bonds cache with identical Hamiltonian
+        run: |
+          python3 tools/cpc_presto_cubic_benchmark.py --exe "$PWD/source/QS3ED2" \
+            --output "$RUNNER_TEMP/cubic-216-mnte64" --source-revision "$(git rev-parse HEAD)" \
+            --source-archive "$RUNNER_TEMP/staged-source/ed2-source.tar.gz" \
+            --preset cubic-pilot --sizes 6 --sectors oh-a1g,oh-a2g --mnte 64 \
+            --threads 1 --warmups 0 --repeats 1 --allow-shared --timeout 180 --time-budget 2400
+          python3 tools/cpc_presto_cubic_audit.py --root "$RUNNER_TEMP/cubic-216-mnte64" \
+            --output "$RUNNER_TEMP/audit-216-mnte64" \
+            --source-archive "$RUNNER_TEMP/staged-source/ed2-source.tar.gz" \
+            --exe "$PWD/source/QS3ED2"
+          python3 - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+
+          root = Path(os.environ['RUNNER_TEMP'])
+          def load_trials(path):
+              return {x['sector']:x for line in path.read_text().splitlines() for x in [json.loads(line)]}
+          base=load_trials(root/'cubic-216'/'trials.jsonl')
+          tuned=load_trials(root/'cubic-216-mnte64'/'trials.jsonl')
+          assert set(base) == set(tuned) == {'oh-a1g','oh-a2g'}
+          for sector in sorted(base):
+              x=base[sector]; y=tuned[sector]
+              assert x['mnte'] == -1 and y['mnte'] == 64
+              assert x['dimension'] == y['dimension']
+              assert abs(x['energy']-y['energy']) < 1e-8, sector
+              assert x['residual'] <= 1e-8 and y['residual'] <= 1e-8
+              assert x['h_applications'] == y['h_applications']
+              print('CACHE_CAP_PHYSICS_PASS', sector,
+                    'E=',y['energy'],
+                    'base_RSS_KiB=',x['peak_rss_kib'],
+                    'mnte64_RSS_KiB=',y['peak_rss_kib'],
+                    'base_cache_s=',x['phase_wall_s']['operator_cache'],
+                    'mnte64_cache_s=',y['phase_wall_s']['operator_cache'])
+          PY
       - name: Shared data cannot pass publication gate or altered input audit
         run: |
           if python3 tools/cpc_presto_cubic_audit.py --root "$RUNNER_TEMP/cubic-64" \
@@ -177,5 +215,7 @@ jobs:
             ${{ runner.temp }}/audit-64/
             ${{ runner.temp }}/cubic-216/
             ${{ runner.temp }}/audit-216/
+            ${{ runner.temp }}/cubic-216-mnte64/
+            ${{ runner.temp }}/audit-216-mnte64/
           if-no-files-found: warn
           retention-days: 30

@@ -73,6 +73,8 @@ def main():
     summary = load(root / "summary.json")
     assert summary["status"] == "complete"
     assert summary["geometry"] == "3D_simple_cubic"
+    assert isinstance(summary["mnte"], int)
+    assert summary["mnte"] == -1 or summary["mnte"] >= 54
     assert summary["cubic_oracle_sha256"] == sha(cubic.__file__)
     assert env["source_revision"] == summary["source_revision"]
     assert env["binary_sha256"] == summary["binary_sha256"]
@@ -109,6 +111,10 @@ def main():
         assert record["archive_sha256"] == summary["archive_sha256"]
         assert record["binary_sha256"] == summary["binary_sha256"]
         assert record["mode"] == "two-stage"
+        assert record["mnte"] == summary["mnte"]
+        raw_input = (root / "trials" / record["key"] / "input.dat").read_text()
+        match = re.search(r"\bMNTE\s*=\s*(-?\d+)", raw_input, flags=re.IGNORECASE)
+        assert match and int(match.group(1)) == summary["mnte"]
         assert record["n_sites"] == record["side"] ** 3
         assert record["dimension"] == cubic.sector_dimensions(record["side"])[record["sector"]]
         assert record["residual"] <= 1.01e-8
@@ -206,7 +212,7 @@ def main():
                   job_id=env["environment"]["pbs_jobid"],
                   host=env["environment"]["host"],
                   pbs_mode=env["environment"]["mode"],
-                  geometry=summary["geometry"], sectors=sectors,
+                  geometry=summary["geometry"], sectors=sectors, mnte=summary["mnte"],
                   operator_attestation_present=attested,
                   review_eligible=eligible,
                   caution="Operator claim is not independent scheduler proof, and review gate is not publication approval.",
