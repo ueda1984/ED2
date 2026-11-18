@@ -1,0 +1,54 @@
+name: Large-site C4v validation capacity preflight
+on:
+  push:
+    branches: [codex/ed2-cpc-1024-site-preflight]
+  pull_request:
+    paths:
+      - source/state_lists.f90
+      - tools/cpc_large_sector_preflight.py
+      - .github/workflows/cpc-1024-capacity.yml
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  capacity-and-regression:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends gfortran libblas-dev liblapack-dev autoconf automake make python3
+      - name: Verify bounds and independently computed large-sector dimensions
+        run: |
+          python3 tools/cpc_large_sector_preflight.py --sizes 26,32 --independent-projector > capacity.jsonl
+          cat capacity.jsonl
+          python3 - <<'PY'
+          from pathlib import Path
+          s=Path("source/state_lists.f90").read_text()
+          assert "if(nwide>8192_int64)return" in s
+          assert "if(nwide>12000000_int64/int(NOS+1,int64))return" in s
+          import json
+          a=[json.loads(x) for x in Path("capacity.jsonl").read_text().splitlines()]
+          assert all(x["eligible_by_validation_caps"] for x in a)
+          assert a[-1]["c4v_group_elements"] == 8192
+          assert a[-1]["site_image_entries"] == 8396800
+          print("1024-site capacity and independent Burnside preflight PASS")
+          PY
+      - name: Build and regression-test unchanged smaller physics
+        run: |
+          autoreconf -vfi
+          ./configure FC=gfortran FCFLAGS="-O2 -fopenmp"
+          make -j2
+          make check
+          make check-pointgroup
+      - name: Archive non-benchmark preflight
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: large-sector-capacity-preflight
+          path: capacity.jsonl
+          if-no-files-found: warn
+          retention-days: 14
