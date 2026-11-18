@@ -6,26 +6,50 @@ module ham2vec
   complex(8), allocatable :: wk_ele(:,:)
   ! Explicit opt-in: only full cached operators with exactly real entries.
   logical, save :: real_cached_matvec=.false.
+  logical, save :: packed_real_cache=.false.
+  ! Optional separate compact real array trades memory for faster H actions.
+  real(8), allocatable, save :: wk_ele_real(:,:)
   !
 contains
 
   subroutine enable_real_cached_matvec(lv)
     use input_param, only: wk_dim
     integer, intent(in) :: lv
-    integer :: status
-    character(len=16) :: setting
+    integer :: status,packed_status,alloc_status
+    character(len=16) :: setting,packed_setting
     setting=''
     call get_environment_variable('ED2_REAL_CACHED_MATVEC',setting,status=status)
     if(status==0)then
       if(trim(adjustl(setting))/='0'.and.trim(adjustl(setting))/='1') &
         error stop 'ED2_REAL_CACHED_MATVEC must be 0 or 1'
+    else if(status/=1)then
+      error stop 'ED2_REAL_CACHED_MATVEC flag is too long or invalid'
     end if
     real_cached_matvec=status==0.and.trim(adjustl(setting))=='1'
+    packed_setting=''
+    call get_environment_variable('ED2_PACKED_REAL_CACHE',packed_setting,status=packed_status)
+    if(packed_status==0)then
+      if(trim(adjustl(packed_setting))/='0'.and.trim(adjustl(packed_setting))/='1') &
+        error stop 'ED2_PACKED_REAL_CACHE must be 0 or 1'
+    else if(packed_status/=1)then
+      error stop 'ED2_PACKED_REAL_CACHE flag is too long or invalid'
+    end if
+    packed_real_cache=packed_status==0.and.trim(adjustl(packed_setting))=='1'
+    if(packed_real_cache.and..not.real_cached_matvec) &
+      error stop 'ED2_PACKED_REAL_CACHE requires ED2_REAL_CACHED_MATVEC=1'
+    if(allocated(wk_ele_real))deallocate(wk_ele_real)
     if(.not.real_cached_matvec)return
     if(wk_dim/=lv)error stop 'ED2_REAL_CACHED_MATVEC requires fully cached matrix'
     if(any(aimag(wk_ele)/=0d0)) &
       error stop 'ED2_REAL_CACHED_MATVEC requires exactly real matrix elements'
     write(*,'(a)') 'Hamiltonian action: strictly-real cached coefficients'
+    if(packed_real_cache)then
+      allocate(wk_ele_real(size(wk_ele,1),size(wk_ele,2)),stat=alloc_status)
+      if(alloc_status/=0)error stop 'ED2_PACKED_REAL_CACHE allocation failed'
+      wk_ele_real=real(wk_ele,8)
+      write(*,'(a,i0)') 'Hamiltonian action: compact-real cache extra_bytes=', &
+        8*int(size(wk_ele_real),kind=8)
+    end if
   end subroutine enable_real_cached_matvec
 
   subroutine make_wk_loc_and_ele(lv)
@@ -756,15 +780,26 @@ contains
 
     if(real_cached_matvec)then
       ! Coefficients are proved exactly real ONCE during cache setup.
-      ! Keep the original row and term accumulation order unchanged.
-      !$omp parallel do private(i,j)
-      do i = 1, wk_dim
-        v0(i) = 0.0d0
-        do j = 1, wk_dim1
-          if(wk_loc(j,i) == 0) exit
-          v0(i) = v0(i) + dble(wk_ele(j,i)) * v1(wk_loc(j,i))
+      ! Both opt-in paths retain the historical term accumulation order.
+      if(packed_real_cache)then
+        !$omp parallel do private(i,j)
+        do i = 1, wk_dim
+          v0(i) = 0.0d0
+          do j = 1, wk_dim1
+            if(wk_loc(j,i) == 0) exit
+            v0(i) = v0(i) + wk_ele_real(j,i) * v1(wk_loc(j,i))
+          end do
         end do
-      end do
+      else
+        !$omp parallel do private(i,j)
+        do i = 1, wk_dim
+          v0(i) = 0.0d0
+          do j = 1, wk_dim1
+            if(wk_loc(j,i) == 0) exit
+            v0(i) = v0(i) + dble(wk_ele(j,i)) * v1(wk_loc(j,i))
+          end do
+        end do
+      end if
     else
       !$omp parallel do private(i,j)
       do i = 1, wk_dim
