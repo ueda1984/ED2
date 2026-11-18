@@ -39,8 +39,11 @@ def stat(data):
 
 def checked_pair(lines):
     assert sum(line.startswith("pair_columns=") for line in lines) == 1
-    rows = [fields for line in lines if (fields := line.split())
-            and len(fields) == 8 and fields[0] == "1" and fields[1] in ("T", "F")]
+    rows = []
+    for line in lines:
+        fields = line.split()
+        if len(fields) == 8 and fields[0] == "1" and fields[1] in ("T", "F"):
+            rows.append(fields)
     assert len(rows) == 1, "Missing native Ritz pair"
     fields = rows[0]
     assert fields[1:3] == ["T", "T"], "Uncertified Ritz pair"
