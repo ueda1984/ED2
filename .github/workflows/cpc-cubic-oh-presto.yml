@@ -2,7 +2,7 @@ name: ED2 cubic Oh symmetry and PRESTO protocol
 
 on:
   push:
-    branches: [codex/ed2-cpc-cubic-oh-1000-presto, codex/ed2-cubic-cache-mnte-cap-experiment, codex/ed2-cubic-anchored-key-oracle, codex/ed2-cubic-native-anchored-representatives, codex/ed2-cubic-basis-phase-instrumentation, codex/ed2-cubic-fast-oh-group-certificate]
+    branches: [codex/ed2-cpc-cubic-oh-1000-presto, codex/ed2-cubic-cache-mnte-cap-experiment, codex/ed2-cubic-anchored-key-oracle, codex/ed2-cubic-native-anchored-representatives, codex/ed2-cubic-basis-phase-instrumentation, codex/ed2-cubic-fast-oh-group-certificate, codex/ed2-cubic-anchored-basis-builder]
     paths:
       - "source/state_lists.f90"
       - "source/cubic_anchored_lookup.f90"
@@ -19,6 +19,8 @@ on:
       - "tests/cpc_cubic_native_anchored_regression.py"
       - "tests/cpc_cubic_basis_timing_regression.py"
       - "tests/cpc_cubic_fast_group_certificate_regression.py"
+      - "tests/cpc_cubic_anchored_basis_regression.py"
+      - "tests/cubic_basis_driver.f90"
       - "tests/cpc_cubic_pointgroup_regression.py"
       - "tests/cpc_cubic_1000_one_magnon_smoke.py"
       - "tests/cpc_pointgroup_profile.py"
@@ -43,6 +45,8 @@ on:
       - "tests/cpc_cubic_native_anchored_regression.py"
       - "tests/cpc_cubic_basis_timing_regression.py"
       - "tests/cpc_cubic_fast_group_certificate_regression.py"
+      - "tests/cpc_cubic_anchored_basis_regression.py"
+      - "tests/cubic_basis_driver.f90"
       - "tests/cpc_cubic_pointgroup_regression.py"
       - "tests/cpc_cubic_1000_one_magnon_smoke.py"
       - "tests/cpc_pointgroup_profile.py"
@@ -105,6 +109,7 @@ jobs:
               "tests/cpc_cubic_native_anchored_regression.py",
               "tests/cpc_cubic_basis_timing_regression.py",
               "tests/cpc_cubic_fast_group_certificate_regression.py",
+              "tests/cpc_cubic_anchored_basis_regression.py",
               "tests/cpc_cubic_pointgroup_regression.py",
               "tests/cpc_cubic_1000_one_magnon_smoke.py",
               "tests/cpc_pointgroup_profile.py",
@@ -204,6 +209,38 @@ jobs:
           fi
           grep -q 'Fast cubic group certificate requires a noncommuting 1D O_h sector' \
             "$RUNNER_TEMP/group-refusal.log"
+      - name: Exact anchored cubic basis and normalizations versus old 166-million-state enumerator
+        run: |
+          python3 tests/cpc_cubic_anchored_basis_regression.py \
+            --driver "$PWD/tests/cubic_basis_driver" --exe "$PWD/source/QS3ED2" \
+            --sides 4,6 --threads 1,4 --output "$RUNNER_TEMP/cubic-anchored-basis-small"
+          python3 tests/cpc_cubic_anchored_basis_regression.py \
+            --driver "$PWD/tests/cubic_basis_driver" --exe "$PWD/source/QS3ED2" \
+            --sides 8,10 --threads 1 --skip-lanczos \
+            --output "$RUNNER_TEMP/cubic-anchored-basis-large"
+          python3 tests/cpc_cubic_anchored_basis_regression.py \
+            --driver "$PWD/tests/cubic_basis_driver" --exe "$PWD/source/QS3ED2" \
+            --sides 10 --threads 4,8 --sectors oh-a1g --skip-lanczos \
+            --output "$RUNNER_TEMP/cubic-anchored-basis-parallel"
+      - name: Anchored cubic basis must fail closed on mismatched source geometry and symmetry
+        run: |
+          if ED2_CUBIC_ANCHORED_BASIS=1 ED2_CUBIC_FAST_GROUP_VALIDATION=1 \
+              tests/test_ex1.sh > "$RUNNER_TEMP/reject-basis-chain.log" 2>&1; then
+            echo "ERROR: anchored cubic basis accepted general spin chain" >&2
+            exit 1
+          fi
+          grep -q 'Anchored cubic basis requires exactly three down spins' \
+            "$RUNNER_TEMP/reject-basis-chain.log"
+          if ED2_CUBIC_ANCHORED_BASIS=1 ED2_CUBIC_FAST_GROUP_VALIDATION=1 \
+              python3 tools/cpc_presto_cubic_benchmark.py \
+                --source-revision "$(git rev-parse HEAD)" \
+                --source-archive "$RUNNER_TEMP/staged-source/ed2-source.tar.gz" \
+                --preset cubic-smoke --allow-shared --sizes 4 --sectors gamma-t --plan-only \
+                --output "$RUNNER_TEMP/anchored-basis-invalid" > "$RUNNER_TEMP/anchored-basis-invalid.log" 2>&1; then
+            echo "ERROR: anchored cubic basis accepted translation-only symmetry" >&2
+            exit 1
+          fi
+          grep -q 'Anchored cubic basis requires a 1D O_h sector' "$RUNNER_TEMP/anchored-basis-invalid.log"
       - name: Exhaustive anchored-key orbit census and O_h character equivariance
         run: |
           python3 tests/cpc_cubic_anchored_orbit_key_oracle.py --side 4 --samples 250
@@ -252,6 +289,20 @@ jobs:
             --threads 1 --warmups 0 --repeats 1 --allow-shared --timeout 180 --time-budget 2400
           python3 tools/cpc_presto_cubic_audit.py --root "$RUNNER_TEMP/cubic-216" \
             --output "$RUNNER_TEMP/audit-216" \
+            --source-archive "$RUNNER_TEMP/staged-source/ed2-source.tar.gz" \
+            --exe "$PWD/source/QS3ED2"
+      - name: Audit real native anchored cubic basis fast/forced-legacy modes
+        run: |
+          ED2_CUBIC_ANCHORED_BASIS=1 ED2_CUBIC_FAST_GROUP_VALIDATION=1 \
+            ED2_CUBIC_ANCHORED_REP=1 python3 tools/cpc_presto_cubic_benchmark.py \
+              --exe "$PWD/source/QS3ED2" \
+              --output "$RUNNER_TEMP/cubic-new-basis-audit" \
+              --source-revision "$(git rev-parse HEAD)" \
+              --source-archive "$RUNNER_TEMP/staged-source/ed2-source.tar.gz" \
+              --preset cubic-smoke --allow-shared --sizes 4 --sectors oh-a1g \
+              --threads 1 --mnte 64 --timeout 180 --time-budget 2400
+          python3 tools/cpc_presto_cubic_audit.py --root "$RUNNER_TEMP/cubic-new-basis-audit" \
+            --output "$RUNNER_TEMP/audit-cubic-new-basis" \
             --source-archive "$RUNNER_TEMP/staged-source/ed2-source.tar.gz" \
             --exe "$PWD/source/QS3ED2"
       - name: Cache capacity 64 versus original 8*bonds cache with identical Hamiltonian
@@ -328,5 +379,10 @@ jobs:
             ${{ runner.temp }}/cubic-basis-breakdown/
             ${{ runner.temp }}/cubic-group-certificate-small/
             ${{ runner.temp }}/cubic-group-certificate-n1000/
+            ${{ runner.temp }}/cubic-anchored-basis-small/
+            ${{ runner.temp }}/cubic-anchored-basis-large/
+            ${{ runner.temp }}/cubic-anchored-basis-parallel/
+            ${{ runner.temp }}/cubic-new-basis-audit/
+            ${{ runner.temp }}/audit-cubic-new-basis/
           if-no-files-found: warn
           retention-days: 30
