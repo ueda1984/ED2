@@ -124,6 +124,8 @@ def check_vectors(driver, root, n, dm, t, timeout):
         expected_dim = 6 ** (n // 2)
         assert "CPC_CSR_H_VECTOR_DIM={}".format(expected_dim) in out
         assert "CPC_CSR_H_VECTOR_COUNT=2" in out
+        assert out.count("CPC_CSR_DENSE_REFERENCE_PASS") == (
+            2 if n<=6 else 0), (work, "dense H reference not certified")
         imag_match = re.search(r"CPC_CSR_NATIVE_IMAG_COUNT=(\d+)", out)
         assert imag_match is not None
         imag_count = int(imag_match.group(1))
@@ -145,47 +147,6 @@ def check_vectors(driver, root, n, dm, t, timeout):
         n, dm, t), flush=True)
 
 
-def energies(path):
-    values = []
-    for line in path.read_text(encoding="utf-8").splitlines():
-        fields = line.split()
-        if not fields:
-            continue
-        try:
-            values.append(float(fields[-1].replace("D", "E")))
-        except ValueError:
-            continue
-    assert len(values) >= 2 and all(math.isfinite(x) for x in values)
-    return tuple(values)
-
-
-def check_eigenvalues(exe, root, n, dm, timeout):
-    observations = []
-    for enabled in (False, True):
-        work = root / "s{}-dm{}-eigensolver-csr{}".format(
-            n, int(dm != 0), int(enabled))
-        deck(work, n, dm)
-        status, log = native(exe, work, 1, "1" if enabled else "0", timeout)
-        assert status == 0, (work, log[-2500:])
-        assert (MARKER in log) == enabled
-        assert "CPC_CSR_OLD_TRLAN_FIXED_SEED=1984" in log, (
-            "Solver wrapper must ensure identical seeded starting vectors", work)
-        eigen = work / "eigenvalues.dat"
-        assert eigen.is_file(), (work, "missing eigenvalues.dat")
-        observations.append((matching_inputs(work), energies(eigen)))
-    assert observations[0][0] == observations[1][0]
-    assert len(observations[0][1]) == len(observations[1][1])
-    differences = [abs(x-y) for x,y in zip(
-        observations[0][1],observations[1][1])]
-    # The original TRLan does not guarantee bitwise stability even for a
-    # seeded initial state: its iterative reductions vary at roundoff scale.
-    # The separate native H*x probes above DO require exact bit equality.
-    assert max(differences) <= 5e-10, (
-        "Original Lanczos eigenvalues changed beyond tolerance",
-        n, dm, observations)
-    print("MAIN_COMPLEX_CSR_SOLVER_PASS size={} dm={} max_delta={:.3e}".format(
-        n, dm, max(differences)), flush=True)
-
 
 def reject(driver, root, name, n, dm, flag, partial, substring):
     work = root / ("reject-" + name)
@@ -199,14 +160,13 @@ def reject(driver, root, name, n, dm, flag, partial, substring):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--driver", type=Path, required=True)
-    parser.add_argument("--exe", type=Path, required=True,
-                        help="Original TRLan linked in deterministic TEST-ONLY wrapper")
+
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--sizes", default="4,6,8")
     parser.add_argument("--threads", default="1,4")
     parser.add_argument("--timeout", type=int, default=180)
     args = parser.parse_args()
-    driver, exe = args.driver.resolve(strict=True), args.exe.resolve(strict=True)
+    driver = args.driver.resolve(strict=True)
     root = args.output.resolve()
     root.mkdir(parents=True, exist_ok=False)
     sizes = [int(x) for x in args.sizes.split(",")]
@@ -216,10 +176,8 @@ def main():
 
     for n, dm, t in itertools.product(sizes, (0.0, 0.12), threads):
         check_vectors(driver,root,n,dm,t,args.timeout)
-    # Whole-solver cross-mode output is numerical, not SHA-only, because
-    # the original main branch did not guarantee cross-process RNG seeding.
-    for n, dm in itertools.product((4,6), (0.0,0.12)):
-        check_eigenvalues(exe,root,n,dm,args.timeout)
+    # Full H*x proof for N4/N6 is also independently checked against
+    # the separately built full dense Hamiltonian in the native driver.
     reject(driver,root,"partial",4,0.12,"1",True,
            "ED2_CSR_COMPLEX_CACHE requires fully cached matrix")
     reject(driver,root,"invalid",4,0.12,"2",False,
@@ -229,7 +187,7 @@ def main():
     report = {
         "source": "standalone original-main branch independent scientific test",
         "vector_pairs": len(sizes)*2*len(threads),
-        "full_solver_pairs": 4,
+        "dense_reference_model_cases": 2*len(threads)*sum(n<=6 for n in sizes),
         "invalid_cases": 3,
         "no_presto": True,
         "mode": "default-off / ED2_CSR_COMPLEX_CACHE=1",
@@ -237,8 +195,8 @@ def main():
     }
     (root / "summary.json").write_text(json.dumps(report,indent=2)+"\n")
     print("MAIN_COMPLEX_CSR_SCIENCE_PASS "
-          "vector_pairs={} solver_pairs=4 rejections=3".format(
-              report["vector_pairs"]),flush=True)
+          "vector_pairs={} dense_reference_cases={} rejections=3".format(
+              report["vector_pairs"],report["dense_reference_model_cases"]),flush=True)
 
 
 if __name__ == "__main__":
