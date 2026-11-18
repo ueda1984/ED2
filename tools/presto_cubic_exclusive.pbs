@@ -19,6 +19,14 @@ case "${ED2_CUBIC_ANCHORED_REP:-0}" in
   0|1) ;;
   *) echo "Invalid ED2_CUBIC_ANCHORED_REP (only 0 or 1)" >&2; exit 2 ;;
 esac
+case "${ED2_CUBIC_ANCHORED_BASIS:-0}" in
+  0|1) ;;
+  *) echo "Invalid ED2_CUBIC_ANCHORED_BASIS (only 0 or 1)" >&2; exit 2 ;;
+esac
+if [[ ${ED2_CUBIC_ANCHORED_BASIS:-0} == 1 && ${ED2_CUBIC_FAST_GROUP_VALIDATION:-0} != 1 ]]; then
+  echo "ED2_CUBIC_ANCHORED_BASIS requires ED2_CUBIC_FAST_GROUP_VALIDATION=1" >&2
+  exit 2
+fi
 case "${ED2_CUBIC_FAST_GROUP_VALIDATION:-0}" in
   0|1) ;;
   *) echo "Invalid ED2_CUBIC_FAST_GROUP_VALIDATION (only 0 or 1)" >&2; exit 2 ;;
@@ -68,6 +76,7 @@ python3 -m py_compile \
   echo "CUBIC_ANCHORED_VERIFY=${ED2_CUBIC_ANCHORED_VERIFY:-0}"
   echo "BASIS_DETAIL_TIMING=${ED2_BASIS_DETAIL_TIMING:-0}"
   echo "FAST_GROUP_VALIDATION=${ED2_CUBIC_FAST_GROUP_VALIDATION:-0}"
+  echo "ANCHORED_BASIS=${ED2_CUBIC_ANCHORED_BASIS:-0}"
   date -Is
   command -v gfortran
   gfortran --version | head -1
@@ -93,7 +102,7 @@ export ED2_RNG_SEED=1984
   # the anchored path deliberately errors on noncubic Hamiltonians.
   # Unsetting inside this subshell leaves the parent PBS environment intact,
   # so the requested native lookup remains enabled for the real benchmark.
-  unset ED2_CUBIC_ANCHORED_REP ED2_CUBIC_ANCHORED_VERIFY ED2_BASIS_DETAIL_TIMING ED2_CUBIC_FAST_GROUP_VALIDATION
+  unset ED2_CUBIC_ANCHORED_REP ED2_CUBIC_ANCHORED_VERIFY ED2_BASIS_DETAIL_TIMING ED2_CUBIC_FAST_GROUP_VALIDATION ED2_CUBIC_ANCHORED_BASIS
   autoreconf -vfi
   # PRESTO provides libopenblas.so.0, but the unversioned development
   # linker names may be missing. Set private links only inside this
