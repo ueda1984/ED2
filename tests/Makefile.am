@@ -270,6 +270,15 @@ EXTRA_DIST += cpc_mixed_spin_bounded_basis.py
 # Approved OpenMP regressions and PRESTO few-magnon entrypoints.
 EXTRA_DIST += cpc_openmp_orbit_regression.py cpc_openmp_krylov_regression.py cpc_qs3_ed_large_few_magnon.py cpc_few_magnon_cache_benchmark.py
 
+# Phase-resolved performance characterization, not a pass/fail speed assertion.
+EXTRA_DIST += cpc_pointgroup_profile.py
+.PHONY: check-pointgroup-profile
+check-pointgroup-profile:
+	$(PYTHON) $(srcdir)/cpc_pointgroup_profile.py \
+	  --exe "$(abs_top_builddir)/source/QS3ED2" \
+	  $(if $(PGPROFILE_OUTPUT),--output "$(PGPROFILE_OUTPUT)",) \
+	  $(PGPROFILE_FLAGS)
+
 # Translation / point-group physical sector validation: optional and NumPy test-only.
 EXTRA_DIST += cpc_pointgroup_translation_crosscheck.py
 .PHONY: check-pointgroup
