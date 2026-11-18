@@ -80,6 +80,10 @@ def main():
     assert isinstance(summary["anchored_basis"], bool)
     assert isinstance(summary["local_bond_cache"], bool)
     assert isinstance(summary["cache_profile"], bool)
+    assert isinstance(summary["direct_hop_table"], bool)
+    if summary["direct_hop_table"]:
+        assert summary["local_bond_cache"] and summary["anchored_lookup"]
+        assert summary["anchored_basis"] and summary["fast_group_validation"]
     assert not summary["cache_profile"] or summary["local_bond_cache"]
     if summary["local_bond_cache"]:
         assert summary["anchored_lookup"] and summary["anchored_basis"] and summary["fast_group_validation"]
@@ -136,6 +140,7 @@ def main():
         assert record["anchored_basis"] is summary["anchored_basis"]
         assert record["local_bond_cache"] is summary["local_bond_cache"]
         assert record["cache_profile"] is summary["cache_profile"]
+        assert record["direct_hop_table"] is summary["direct_hop_table"]
         raw_input = (root / "trials" / record["key"] / "input.dat").read_text()
         match = re.search(r"\bMNTE\s*=\s*(-?\d+)", raw_input, flags=re.IGNORECASE)
         assert match and int(match.group(1)) == summary["mnte"]
@@ -174,6 +179,8 @@ def main():
         assert ("Cubic cache builder: local-bond-sparse" in log) is expected_sparse_cache
         expected_cache = "local-bond-sparse" if expected_sparse_cache else "full-bond-scan"
         assert record["native_cache_builder"] == expected_cache
+        expected_direct = summary["direct_hop_table"] and record["builder"] == "fast"
+        assert ("Representative lookup: cubic-direct-hop-pairs" in log) is expected_direct
         expect_profile = summary["cache_profile"] and record["builder"] == "fast"
         assert ("Cubic cache profile: representative_key_setup_wall_s=" in log) is expect_profile
         assert ("Cubic cache profile: resolver_calls=" in log) is expect_profile
@@ -262,6 +269,7 @@ def main():
                   anchored_basis=summary["anchored_basis"],
                   local_bond_cache=summary["local_bond_cache"],
                   cache_profile=summary["cache_profile"],
+                  direct_hop_table=summary["direct_hop_table"],
                   operator_attestation_present=attested,
                   review_eligible=eligible,
                   caution="Operator claim is not independent scheduler proof, and review gate is not publication approval.",
