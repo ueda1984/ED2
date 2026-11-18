@@ -162,14 +162,20 @@ def execute(exe, out, spec, allocation_info, timeout, mnte):
     dimension = cubic.sector_dimensions(side)[sector]
     cubic.write_input(work, side, 3, generators, bonds, 2000, -1, mnte=mnte)
     before = os.environ.get("ED2_FORCE_LEGACY_ORBITS")
+    before_local = os.environ.get("ED2_CUBIC_LOCAL_BOND_CACHE")
     try:
         if builder == "forced-legacy":
             os.environ["ED2_FORCE_LEGACY_ORBITS"] = "1"
+            os.environ.pop("ED2_CUBIC_LOCAL_BOND_CACHE", None)
         else:
             os.environ.pop("ED2_FORCE_LEGACY_ORBITS", None)
         obs = physics.run_case(exe, work, side ** 3, 3, sector, dimension,
                                threads, "two-stage", timeout)
     finally:
+        if before_local is None:
+            os.environ.pop("ED2_CUBIC_LOCAL_BOND_CACHE", None)
+        else:
+            os.environ["ED2_CUBIC_LOCAL_BOND_CACHE"] = before_local
         if before is None:
             os.environ.pop("ED2_FORCE_LEGACY_ORBITS", None)
         else:
@@ -193,6 +199,10 @@ def execute(exe, out, spec, allocation_info, timeout, mnte):
         raise AssertionError("Two incompatible basis builders were logged")
     if anchored_basis_used != (builder == "fast" and anchored_basis_requested):
         raise AssertionError("Requested anchored cubic basis not used exactly for fast variant")
+    local_bond_cache = os.environ.get("ED2_CUBIC_LOCAL_BOND_CACHE", "") == "1"
+    local_cache_reported = "Cubic cache builder: local-bond-sparse" in output
+    if local_cache_reported != (local_bond_cache and builder == "fast"):
+        raise AssertionError("Native local-bond cache builder disagrees with requested fast variant")
     normal_form = "Symmetry action: noncommuting normal form and character validated" in output
     if builder == "forced-legacy" and atomic:
         raise AssertionError("Forced-legacy run unexpectedly used atomic orbit basis")
@@ -206,6 +216,8 @@ def execute(exe, out, spec, allocation_info, timeout, mnte):
                     native_basis_builder=("anchored-cubic" if anchored_basis_used else
                                           "atomic-orbits" if atomic else "forced-legacy"),
                     validated_noncommuting_action=normal_form,
+                    local_bond_cache=local_bond_cache,
+                    native_cache_builder=("local-bond-sparse" if local_cache_reported else "full-bond-scan"),
                     mnte=mnte, anchored_lookup=anchored,
                      fast_group_validation=fast_group,
                      anchored_verify=anchor_verified, sample_utc=now(), status="PASS",
@@ -265,6 +277,13 @@ def main():
         p.error("ED2_CUBIC_ANCHORED_VERIFY requires ED2_CUBIC_ANCHORED_REP=1")
     fast_group = os.environ.get("ED2_CUBIC_FAST_GROUP_VALIDATION", "") == "1"
     anchored_basis = os.environ.get("ED2_CUBIC_ANCHORED_BASIS", "") == "1"
+    local_bond_cache = os.environ.get("ED2_CUBIC_LOCAL_BOND_CACHE", "") == "1"
+    if local_bond_cache and not (anchored and fast_group and anchored_basis):
+        p.error("Local cubic cache requires anchored representative, fast group and anchored basis")
+    if local_bond_cache and "gamma-t" in sectors:
+        p.error("Local cubic cache requires a 1D O_h sector")
+    if local_bond_cache and any(side not in (4, 6, 8, 10) for side in sizes):
+        p.error("Local cubic cache requires cubic side 4, 6, 8 or 10")
     if anchored_basis and not fast_group:
         p.error("Anchored cubic basis requires ED2_CUBIC_FAST_GROUP_VALIDATION=1")
     if anchored_basis and "gamma-t" in sectors:
@@ -290,6 +309,7 @@ def main():
                               trial_count=count, mnte=a.mnte,
                                anchored_lookup=anchored, anchored_verify=anchored_verify,
                                fast_group_validation=fast_group, anchored_basis=anchored_basis,
+                   local_bond_cache=local_bond_cache,
                               source_revision=a.source_revision, archive_sha256=sha(archive)),
                          indent=2))
         return
@@ -313,6 +333,7 @@ def main():
                   repeats=repeats, mnte=a.mnte, anchored_lookup=anchored,
                    anchored_verify=anchored_verify,
                    fast_group_validation=fast_group, anchored_basis=anchored_basis,
+                   local_bond_cache=local_bond_cache,
                    timeout=a.timeout, time_budget=a.time_budget,
                   seed=a.seed, protocol="preset-specific measured repeats and warmups",
                   publication_ready=False,
