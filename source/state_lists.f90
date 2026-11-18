@@ -531,10 +531,13 @@ contains
       if(nwide>huge(nwide)/int(periods(a),int64))return
       nwide=nwide*int(periods(a),int64)
     end do
-    ! Cap one-time validation memory: <=4 million integer site images and
-    ! <=8192 group elements. Larger noncommuting groups use the legacy path.
+    ! Bound temporary permutation storage to 12 million integer site images
+    ! (about 48 MiB with default 32-bit integers), plus hash/character arrays.
+    ! This admits 32x32 C4v: 8192*(1024+1)=8,396,800 images.
+    ! Keep the independent 8192-element group bound. Resource failures
+    ! beyond these caps retain the legacy path.
     if(nwide>8192_int64)return
-    if(nwide>4000000_int64/int(NOS+1,int64))return
+    if(nwide>12000000_int64/int(NOS+1,int64))return
     ng=int(nwide)
     table_size=2*ng+1
     allocate(elements(0:NOS,ng),composition(0:NOS),slots(table_size))
