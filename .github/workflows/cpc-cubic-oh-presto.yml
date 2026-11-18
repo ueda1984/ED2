@@ -2,7 +2,7 @@ name: ED2 cubic Oh symmetry and PRESTO protocol
 
 on:
   push:
-    branches: [codex/ed2-cpc-cubic-oh-1000-presto, codex/ed2-cubic-cache-mnte-cap-experiment, codex/ed2-cubic-anchored-key-oracle, codex/ed2-cubic-native-anchored-representatives]
+    branches: [codex/ed2-cpc-cubic-oh-1000-presto, codex/ed2-cubic-cache-mnte-cap-experiment, codex/ed2-cubic-anchored-key-oracle, codex/ed2-cubic-native-anchored-representatives, codex/ed2-cubic-basis-phase-instrumentation]
     paths:
       - "source/state_lists.f90"
       - "source/cubic_anchored_lookup.f90"
@@ -15,6 +15,7 @@ on:
       - "tests/cpc_cubic_pointgroup.py"
       - "tests/cpc_cubic_anchored_orbit_key_oracle.py"
       - "tests/cpc_cubic_native_anchored_regression.py"
+      - "tests/cpc_cubic_basis_timing_regression.py"
       - "tests/cpc_cubic_pointgroup_regression.py"
       - "tests/cpc_cubic_1000_one_magnon_smoke.py"
       - "tests/cpc_pointgroup_profile.py"
@@ -35,6 +36,7 @@ on:
       - "tests/cpc_cubic_pointgroup.py"
       - "tests/cpc_cubic_anchored_orbit_key_oracle.py"
       - "tests/cpc_cubic_native_anchored_regression.py"
+      - "tests/cpc_cubic_basis_timing_regression.py"
       - "tests/cpc_cubic_pointgroup_regression.py"
       - "tests/cpc_cubic_1000_one_magnon_smoke.py"
       - "tests/cpc_pointgroup_profile.py"
@@ -95,6 +97,7 @@ jobs:
               "tests/cpc_cubic_pointgroup.py",
               "tests/cpc_cubic_anchored_orbit_key_oracle.py",
               "tests/cpc_cubic_native_anchored_regression.py",
+              "tests/cpc_cubic_basis_timing_regression.py",
               "tests/cpc_cubic_pointgroup_regression.py",
               "tests/cpc_cubic_1000_one_magnon_smoke.py",
               "tests/cpc_pointgroup_profile.py",
@@ -164,6 +167,10 @@ jobs:
           assert all(x['checked_bond_invariance'] for x in d['results'])
           print('CUBIC OH N64/216/512/1000 GROUP PASS')
           PY
+      - name: Diagnose basis subphases without changing the scientific path
+        run: |
+          python3 tests/cpc_cubic_basis_timing_regression.py --exe "$PWD/source/QS3ED2" \
+            --sides 4,6 --threads 1,4 --output "$RUNNER_TEMP/cubic-basis-breakdown"
       - name: Exhaustive anchored-key orbit census and O_h character equivariance
         run: |
           python3 tests/cpc_cubic_anchored_orbit_key_oracle.py --side 4 --samples 250
@@ -285,5 +292,6 @@ jobs:
             ${{ runner.temp }}/cubic-anchored-hops/
             ${{ runner.temp }}/cubic-anchored-omp4/
             ${{ runner.temp }}/cubic-anchored-legacy-basis/
+            ${{ runner.temp }}/cubic-basis-breakdown/
           if-no-files-found: warn
           retention-days: 30
