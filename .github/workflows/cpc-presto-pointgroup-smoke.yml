@@ -76,6 +76,23 @@ jobs:
             echo "ERROR: shared smoke unexpectedly passed publication gate" >&2
             exit 1
           fi
+      - name: Prove that an altered input deck cannot pass audit
+        run: |
+          cp -a "$RUNNER_TEMP/pg-shared-smoke" "$RUNNER_TEMP/tampered-smoke"
+          printf 'tamper\n' >> "$RUNNER_TEMP/tampered-smoke/trials/s4-gamma-a1-t1-measure0-fast/input.dat"
+          if python3 tools/cpc_presto_pointgroup_audit.py \
+             --root "$RUNNER_TEMP/tampered-smoke" --output "$RUNNER_TEMP/tampered-must-not-pass" \
+             --source-archive "$RUNNER_TEMP/staged-source/ed2-source.tar.gz" \
+             --exe "$PWD/source/QS3ED2"; then
+            echo "ERROR: modified physical input was not detected" >&2
+            exit 1
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: immutable-presto-source-stage
+          path: ${{ runner.temp }}/staged-source/
+          if-no-files-found: error
+          retention-days: 14
       - uses: actions/upload-artifact@v4
         if: always()
         with:
