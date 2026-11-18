@@ -53,16 +53,10 @@ jobs:
             tests/cpc_csr_matvec_driver.f90 \
             source/input_param.o source/state_lists.o source/ham2vec.o \
             -llapack -lopenblas
-          gfortran-${{ matrix.gnu }} -O2 -fopenmp -I source \
-            -o "$RUNNER_TEMP/cpc-csr-seeded-solver" \
-            tests/cpc_csr_seeded_solver_driver.f90 \
-            source/input_param.o source/state_lists.o source/ham2vec.o \
-            source/eigen_solver.o -llapack -lopenblas
-      - name: Compare FULL native H*x bits on genuinely complex DM and real non-U1 models
+      - name: Compare full H*x bits plus direct dense-H reference on real and complex non-U1 models
         run: |
           python3 -B tests/cpc_csr_main_regression.py \
             --driver "$RUNNER_TEMP/cpc-csr-driver" \
-            --exe "$RUNNER_TEMP/cpc-csr-seeded-solver" \
             --output "$RUNNER_TEMP/csr-main-proof" \
             --sizes 4,6,8 --threads 1,4 --timeout 180
           test -s "$RUNNER_TEMP/csr-main-proof/summary.json"
