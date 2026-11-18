@@ -39,6 +39,7 @@ on:
       - "tests/cpc_cubic_skip_unused_hash_regression.py"
       - "tests/cpc_real_cached_matvec_regression.py"
       - "tests/cpc_packed_real_cache_regression.py"
+      - "tests/cpc_generic_real_cache_pilot.py"
       - "tests/cubic_cache_driver.f90"
       - "tests/cubic_basis_driver.f90"
       - "tests/cpc_cubic_pointgroup_regression.py"
@@ -85,6 +86,7 @@ on:
       - "tests/cpc_cubic_skip_unused_hash_regression.py"
       - "tests/cpc_real_cached_matvec_regression.py"
       - "tests/cpc_packed_real_cache_regression.py"
+      - "tests/cpc_generic_real_cache_pilot.py"
       - "tests/cubic_cache_driver.f90"
       - "tests/cubic_basis_driver.f90"
       - "tests/cpc_cubic_pointgroup_regression.py"
@@ -156,6 +158,7 @@ jobs:
               "tests/cpc_cubic_skip_unused_hash_regression.py",
               "tests/cpc_real_cached_matvec_regression.py",
               "tests/cpc_packed_real_cache_regression.py",
+              "tests/cpc_generic_real_cache_pilot.py",
               "tests/cpc_cubic_axis_pruning_oracle.py",
               "tests/cpc_cubic_local_bond_cache_regression.py",
               "tests/cpc_cubic_cache_phase_profile_regression.py",
@@ -544,6 +547,22 @@ jobs:
             --exe "$PWD/source/QS3ED2" \
             --sides 10 --threads 8 --skip-generic \
             --output "$RUNNER_TEMP/packed-real-t8"
+      - name: Mixed-spin non-U1 real operator pilot must preserve three-mode native outputs
+        run: |
+          python3 tests/cpc_generic_real_cache_pilot.py \
+            --exe "$PWD/source/QS3ED2" \
+            --output "$RUNNER_TEMP/generic-real-pilot" \
+            --sizes 4,6 --threads 1 --warmups 0 --repeats 1 --timeout 120
+          python3 - <<'PY'
+          import json,os
+          from pathlib import Path
+          root=Path(os.environ['RUNNER_TEMP'])/'generic-real-pilot'
+          summary=json.loads((root/'summary.json').read_text())
+          assert summary['status']=='complete_shared_unattested_pilot'
+          assert summary['operator_attested'] is False
+          assert len((root/'trials.jsonl').read_text().splitlines())==6
+          print('GENERIC_REAL_PACKING_PILOT_CI_PASS')
+          PY
       - name: Local cubic cache must reject general chains and incompatible non-XXZ bonds
         run: |
           if ED2_CUBIC_LOCAL_BOND_CACHE=1 tests/test_ex1.sh \
