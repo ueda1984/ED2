@@ -78,6 +78,9 @@ jobs:
           assert all(x['checked_bond_invariance'] for x in d['results'])
           print('CUBIC OH N64/216/512/1000 GROUP PASS')
           PY
+      - name: Native 1000-site one-magnon Oh geometry and direct residual smoke
+        run: |
+          python3 tests/cpc_cubic_1000_one_magnon_smoke.py --exe "$PWD/source/QS3ED2" --output "$RUNNER_TEMP/cubic-1000-n1"
       - name: Independent physical projected Hamiltonians for all Oh 1D irreps
         run: |
           python3 tests/cpc_cubic_pointgroup_regression.py --exe "$PWD/source/QS3ED2" --output "$RUNNER_TEMP/cubic-physics" --threads 1
@@ -125,6 +128,7 @@ jobs:
             ${{ runner.temp }}/staged-source/
             ${{ runner.temp }}/cubic-dim.json
             ${{ runner.temp }}/cubic-physics/
+            ${{ runner.temp }}/cubic-1000-n1/
             ${{ runner.temp }}/cubic-64/
             ${{ runner.temp }}/audit-64/
             ${{ runner.temp }}/cubic-216/
