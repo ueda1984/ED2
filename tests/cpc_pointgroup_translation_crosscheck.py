@@ -233,8 +233,6 @@ def execute(exe, root, expected, alg=3, mode="legacy", threads=1):
     assert len(values) == (expected["dimension"] if alg == 3 else 1), (root, len(values))
     target = expected["energies"] if alg == 3 else expected["energies"][:1]
     assert np.allclose(values, target, atol=5e-9, rtol=0), (root, values, target)
-    if alg == 3:
-        assert ("Basis builder: atomic-orbits" in output) == (len(root.glob("nope")) > 0) if False else True
     return dict(energy=values[0], dimension=expected["dimension"], alg=alg, mode=mode,
                 threads=threads, input_sha256=hashlib.sha256((root / "input.dat").read_bytes()).hexdigest(),
                 atomic_orbits="Basis builder: atomic-orbits" in output)
@@ -341,10 +339,10 @@ def main():
     if args.output:
         output.mkdir(parents=True, exist_ok=False)
     results = []
-    # Explicitly refuse to identify C4 with a symmetry of the X sector.
+    # A generic momentum must not be treated as having the full C4v little group.
+    assert len(generators("square", 4, (2, 0), (0, 0))) == 4
     try:
-        generators("square", 4, (2, 0), (0, 0))  # legal: C2v only
-        generators("square", 4, (1, 0), (0, 0))  # unsupported, never run ED2
+        generators("square", 4, (1, 0), (0, 0))
     except ValueError:
         pass
     else:
