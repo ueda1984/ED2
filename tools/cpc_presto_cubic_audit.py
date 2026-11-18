@@ -76,6 +76,9 @@ def main():
     assert isinstance(summary["mnte"], int)
     assert isinstance(summary["anchored_lookup"], bool)
     assert isinstance(summary["anchored_verify"], bool)
+    assert isinstance(summary["fast_group_validation"], bool)
+    if summary["fast_group_validation"]:
+        assert "gamma-t" not in summary["sectors"]
     assert not summary["anchored_verify"] or summary["anchored_lookup"]
     if summary["anchored_lookup"]:
         assert "gamma-t" not in summary["sectors"]
@@ -119,6 +122,7 @@ def main():
         assert record["mnte"] == summary["mnte"]
         assert record["anchored_lookup"] is summary["anchored_lookup"]
         assert record["anchored_verify"] is summary["anchored_verify"]
+        assert record["fast_group_validation"] is summary["fast_group_validation"]
         raw_input = (root / "trials" / record["key"] / "input.dat").read_text()
         match = re.search(r"\bMNTE\s*=\s*(-?\d+)", raw_input, flags=re.IGNORECASE)
         assert match and int(match.group(1)) == summary["mnte"]
@@ -143,6 +147,7 @@ def main():
         assert len(values) == 1 and abs(values[0] - energy) < 1e-8
         log = (path / "stdout.log").read_text(errors="replace")
         assert ("Representative lookup: cubic-anchored-orbits" in log) is summary["anchored_lookup"]
+        assert ("Symmetry certificate: canonical cubic O_h semidirect product verified" in log) is summary["fast_group_validation"]
         if summary["anchored_verify"]:
             assert "per-hop legacy verification=T" in log
         atomic = "Basis builder: atomic-orbits" in log
@@ -226,6 +231,7 @@ def main():
                   geometry=summary["geometry"], sectors=sectors, mnte=summary["mnte"],
                   anchored_lookup=summary["anchored_lookup"],
                   anchored_verify=summary["anchored_verify"],
+                  fast_group_validation=summary["fast_group_validation"],
                   operator_attestation_present=attested,
                   review_eligible=eligible,
                   caution="Operator claim is not independent scheduler proof, and review gate is not publication approval.",

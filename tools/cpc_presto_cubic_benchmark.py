@@ -177,6 +177,10 @@ def execute(exe, out, spec, allocation_info, timeout, mnte):
     output = (work / "stdout.log").read_text(errors="replace")
     anchored = os.environ.get("ED2_CUBIC_ANCHORED_REP", "") == "1"
     anchor_verified = os.environ.get("ED2_CUBIC_ANCHORED_VERIFY", "") == "1"
+    fast_group = os.environ.get("ED2_CUBIC_FAST_GROUP_VALIDATION", "") == "1"
+    fast_group_reported = "Symmetry certificate: canonical cubic O_h semidirect product verified" in output
+    if fast_group_reported != fast_group:
+        raise AssertionError("Requested fast cubic group certificate disagrees with native stdout")
     anchored_reported = "Representative lookup: cubic-anchored-orbits" in output
     if anchored_reported != anchored:
         raise AssertionError("Requested anchored lookup disagrees with native stdout")
@@ -194,6 +198,7 @@ def execute(exe, out, spec, allocation_info, timeout, mnte):
                     repetition=repeat, period=period, builder=builder,
                     atomic_orbits=atomic, validated_noncommuting_action=normal_form,
                     mnte=mnte, anchored_lookup=anchored,
+                     fast_group_validation=fast_group,
                      anchored_verify=anchor_verified, sample_utc=now(), status="PASS",
                     all_input_sha256={f.name: sha(f) for f in work.iterdir()
                                       if f.suffix == ".dat" and f.name not in
@@ -249,6 +254,9 @@ def main():
     anchored_verify = os.environ.get("ED2_CUBIC_ANCHORED_VERIFY", "") == "1"
     if anchored_verify and not anchored:
         p.error("ED2_CUBIC_ANCHORED_VERIFY requires ED2_CUBIC_ANCHORED_REP=1")
+    fast_group = os.environ.get("ED2_CUBIC_FAST_GROUP_VALIDATION", "") == "1"
+    if fast_group and "gamma-t" in sectors:
+        p.error("Fast cubic group certificate requires a noncommuting 1D O_h sector")
     if anchored and "gamma-t" in sectors:
         p.error("Anchored cubic representatives require a 1D O_h sector")
     if a.mnte != -1 and a.mnte < 54:
@@ -265,6 +273,7 @@ def main():
         print(json.dumps(dict(sizes=sizes, threads=threads, sectors=sectors, warmups=warmups, repeats=repeats,
                               trial_count=count, mnte=a.mnte,
                                anchored_lookup=anchored, anchored_verify=anchored_verify,
+                               fast_group_validation=fast_group,
                               source_revision=a.source_revision, archive_sha256=sha(archive)),
                          indent=2))
         return
@@ -287,6 +296,7 @@ def main():
                   preset=a.preset, sizes=sizes, threads=threads, sectors=sectors, warmups=warmups,
                   repeats=repeats, mnte=a.mnte, anchored_lookup=anchored,
                    anchored_verify=anchored_verify,
+                   fast_group_validation=fast_group,
                    timeout=a.timeout, time_budget=a.time_budget,
                   seed=a.seed, protocol="preset-specific measured repeats and warmups",
                   publication_ready=False,

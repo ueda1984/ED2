@@ -307,3 +307,6 @@ EXTRA_DIST += cpc_cubic_native_anchored_regression.py
 
 # Optional diagnostic-only cubic basis phase timing validation.
 EXTRA_DIST += cpc_cubic_basis_timing_regression.py
+
+# Optional bit-for-bit cubic O_h fast group certificate regression.
+EXTRA_DIST += cpc_cubic_fast_group_certificate_regression.py

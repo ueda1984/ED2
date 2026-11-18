@@ -632,6 +632,140 @@ contains
     end subroutine hash_permutation
   end subroutine validate_noncommuting_action
 
+  ! Exact, small certificate for the *canonical* spin-1/2 cubic Gamma/O_h
+  ! normal form, enabled only by ED2_CUBIC_FAST_GROUP_VALIDATION=1.
+  !
+  ! The six site permutations are checked on EVERY lattice site against
+  ! (Tx, Ty, Tz, A, B, C), where
+  !   A: (x,y,z) -> (-x,z,-y)   (improper order four)
+  !   B: (x,y,z) -> (y,-x,z)   (proper order four)
+  !   C: (x,y,z) -> (z,x,y)    (proper order three).
+  !
+  ! Since A/B/C fix the origin and are signed coordinate permutations,
+  ! 48 distinct products A^a B^b C^c constitute all of O_h (48 elements).
+  ! The translations act freely on the origin and comprise Z_L^3, giving
+  ! a UNIQUE full affine normal form T_x^i T_y^j T_z^k A^a B^b C^c.
+  ! At Gamma every translation has character +1. Explicitly checking
+  ! chi(PQ)=chi(P)chi(Q) for all 48^2 point-element pairs certifies that
+  ! the ED2 phases are an honest one-dimensional full-group character.
+  !
+  ! Unlike the generic validator, no 48*L^3 full-site maps are materialized.
+  ! General noncommuting groups still use validate_noncommuting_action.
+  pure function cubic_compose_signed(left,right) result(out)
+    integer, intent(in) :: left(3),right(3)
+    integer :: out(3),axis,i
+    do i=1,3
+      axis=abs(right(i))
+      if(right(i)>0)then
+        out(i)=left(axis)
+      else
+        out(i)=-left(axis)
+      end if
+    end do
+  end function cubic_compose_signed
+
+  subroutine validate_cubic_oh_gamma_certificate(maps,periods,valid)
+    use iso_fortran_env, only: int64,real64
+    use input_param, only: NOS,NODmin,NODmax,M1,M2,M3,M4,M5,M6, &
+      local_NODmax,local_spin,explist
+    integer, intent(in) :: maps(0:NOS,6),periods(6)
+    logical, intent(out) :: valid
+    integer, parameter :: ident(3)=[1,2,3]
+    integer, parameter :: ag(3)=[-1,-3,2]
+    integer, parameter :: bg(3)=[-2,1,3]
+    integer, parameter :: cg(3)=[2,3,1]
+    integer :: aside(3,0:4),bside(3,0:4),cside(3,0:3)
+    integer :: point(3,48),product(3)
+    complex(real64) :: character(48)
+    integer :: side,site,coords(3),target(3),a,b,c,g,h,j,k,x,y,z
+    valid=.false.
+    side=nint(real(NOS,real64)**(1.0_real64/3.0_real64))
+    if(side<4.or.side>10.or.mod(side,2)/=0)return
+    if(int(side,int64)**3/=int(NOS,int64))return
+    if(any(periods/=[side,side,side,4,4,3]))return
+    if(NODmin/=3.or.NODmax/=3)return
+    if(any(local_NODmax/=1))return
+    if(any(abs(local_spin-0.5_real64)>1.0e-12_real64))return
+    if(any([M1,M2,M3]/=0).or.M6/=0)return
+    if(.not.((M4==0.or.M4==2).and.(M5==0.or.M5==2)))return
+    if(any(maps(0,:)/=0))return
+
+    ! Check the supplied *runtime* maps exactly, not a substitute model.
+    ! All modulo operations are mathematically defined for negative signs.
+    do site=1,NOS
+      x=mod(site-1,side)
+      y=mod((site-1)/side,side)
+      z=(site-1)/(side*side)
+      coords=[x,y,z]
+      do a=1,6
+        select case(a)
+        case(1:3)
+          target=coords
+          target(a)=target(a)+1
+        case(4)
+          target=[-x,z,-y]
+        case(5)
+          target=[y,-x,z]
+        case(6)
+          target=[z,x,y]
+        end select
+        j=1+modulo(target(1),side)+side*(modulo(target(2),side)+ &
+          side*modulo(target(3),side))
+        if(maps(site,a)/=j)return
+      end do
+    end do
+
+    aside(:,0)=ident
+    bside(:,0)=ident
+    cside(:,0)=ident
+    do a=1,4
+      aside(:,a)=cubic_compose_signed(ag,aside(:,a-1))
+      bside(:,a)=cubic_compose_signed(bg,bside(:,a-1))
+      if(a<=3)cside(:,a)=cubic_compose_signed(cg,cside(:,a-1))
+    end do
+    if(any(aside(:,4)/=ident).or.any(bside(:,4)/=ident))return
+    if(any(cside(:,3)/=ident))return
+
+    g=0
+    do c=1,3
+      do b=1,4
+        do a=1,4
+          g=g+1
+          point(:,g)=cubic_compose_signed( &
+            cubic_compose_signed(aside(:,a),bside(:,b)),cside(:,c))
+          ! Gamma translation identity: indices 1:3 equal their periods.
+          character(g)=explist(side,side,side,a,b,c)
+          if(abs(aimag(character(g)))>1.0e-10_real64)return
+          if(abs(abs(real(character(g),real64))-1.0_real64)>1.0e-10_real64)return
+          do h=1,g-1
+            if(all(point(:,h)==point(:,g)))return
+          end do
+        end do
+      end do
+    end do
+    if(g/=48)return
+    if(any(point(:,48)/=ident))return
+    if(abs(character(48)-(1.0_real64,0.0_real64))>1.0e-10_real64)return
+
+    ! A composition must land in the 48-element normal-form table with
+    ! the product character. Repeated or missing elements fail closed.
+    do g=1,48
+      do h=1,48
+        product=cubic_compose_signed(point(:,g),point(:,h))
+        k=0
+        do j=1,48
+          if(all(product==point(:,j)))then
+            k=j
+            exit
+          end if
+        end do
+        if(k==0)return
+        if(abs(character(k)-character(g)*character(h))>1.0e-10_real64)return
+      end do
+    end do
+    valid=.true.
+  end subroutine validate_cubic_oh_gamma_certificate
+
   ! Only a globally minimal representative may mark its entire orbit visited.
   ! Atomic bitset accesses are required even when different bits share a word.
   ! Canonicality is decided BEFORE publication, so a later-ranked worker can
@@ -656,8 +790,9 @@ contains
     ! Optional wall-clock breakdown. This is diagnostic only; physics is untouched.
     real(8) :: detail_begin,validation_begin,validation_sec,orbit_begin,orbit_finish,detail_finish
     logical :: detail_timing
-    character(len=16) :: detail_setting
-    integer :: detail_status
+    character(len=16) :: detail_setting,group_cert_setting,basis_dump_setting
+    integer :: detail_status,group_cert_status,basis_dump_status,basis_unit,basis_i,basis_ios
+    logical :: fast_cubic_certificate
     real(8), allocatable :: norms(:)
     type(orbit_buffer), allocatable :: buffers(:)
     used=.false.
@@ -665,6 +800,10 @@ contains
     call get_environment_variable('ED2_BASIS_DETAIL_TIMING',detail_setting,status=detail_status)
     detail_timing=detail_status==0.and.trim(adjustl(detail_setting))=='1'
     if(detail_timing)detail_begin=omp_get_wtime()
+    group_cert_setting=''
+    call get_environment_variable('ED2_CUBIC_FAST_GROUP_VALIDATION', &
+      group_cert_setting,status=group_cert_status)
+    fast_cubic_certificate=group_cert_status==0.and.trim(adjustl(group_cert_setting))=='1'
     validation_sec=0d0
     force_legacy=''
     call get_environment_variable('ED2_FORCE_LEGACY_ORBITS',force_legacy,status=env_status)
@@ -724,12 +863,22 @@ contains
         end do
       end do
     end do
+    if(fast_cubic_certificate.and.commuting) &
+      error stop 'Fast cubic group certificate requires noncommuting full O_h'
     if(.not.commuting)then
       if(detail_timing)validation_begin=omp_get_wtime()
-      call validate_noncommuting_action(maps,periods,valid_noncommuting)
+      if(fast_cubic_certificate)then
+        call validate_cubic_oh_gamma_certificate(maps,periods,valid_noncommuting)
+        if(.not.valid_noncommuting) &
+          error stop 'Fast cubic group certificate rejected noncanonical geometry or character'
+      else
+        call validate_noncommuting_action(maps,periods,valid_noncommuting)
+      end if
       if(detail_timing)validation_sec=omp_get_wtime()-validation_begin
       if(.not.valid_noncommuting)return
       write(*,'(a)') 'Symmetry action: noncommuting normal form and character validated'
+      if(fast_cubic_certificate) &
+        write(*,'(a)') 'Symmetry certificate: canonical cubic O_h semidirect product verified'
     end if
     deallocate(seen,maps)
     dim=THS
@@ -799,6 +948,22 @@ contains
       if(any(list_s(2:)<=list_s(:nrep-1)))error stop 'orbit representatives not strictly ordered'
     end if
     THS=nrep
+    basis_dump_setting=''
+    call get_environment_variable('ED2_CUBIC_BASIS_PROOF_DUMP', &
+      basis_dump_setting,status=basis_dump_status)
+    if(basis_dump_status==0.and.trim(adjustl(basis_dump_setting))=='1')then
+      open(newunit=basis_unit,file='cubic_basis_proof_dump.txt', &
+        status='replace',action='write',iostat=basis_ios)
+      if(basis_ios/=0)error stop 'Failed to open cubic basis proof dump'
+      do basis_i=1,nrep
+        write(basis_unit,'(i0,1x,z16.16)',iostat=basis_ios) &
+          list_s(basis_i),transfer(list_r(basis_i),0_int64)
+        if(basis_ios/=0)error stop 'Failed to write cubic basis proof dump'
+      end do
+      close(basis_unit,iostat=basis_ios)
+      if(basis_ios/=0)error stop 'Failed to close cubic basis proof dump'
+      write(*,'(a,i0)') 'Basis proof dump: exactly ranked states and bitwise norms=',nrep
+    end if
     if(detail_timing)then
       detail_finish=omp_get_wtime()
       write(*,'(a,es23.15)') 'ED2_BASIS_PHASE preflight_other wall_s=', &
