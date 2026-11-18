@@ -60,12 +60,38 @@ export ED2_RNG_SEED=1984
 (
   cd -- "$run_dir/source"
   autoreconf -vfi
-  ./configure FC=gfortran FCFLAGS="-O2 -fopenmp"
+  # PRESTO provides libopenblas.so.0, but the unversioned development
+  # linker names may be missing. Set private links only inside this
+  # immutable job's build directory; never modify shared system paths.
+  openblas=''
+  for candidate in /usr/lib64/libopenblas.so.0 /lib64/libopenblas.so.0; do
+    if [[ -r "$candidate" ]]; then
+      openblas="$candidate"
+      break
+    fi
+  done
+  if [[ -n "$openblas" ]]; then
+    mkdir -p .ed2-local-libs
+    ln -s "$openblas" .ed2-local-libs/libopenblas.so
+    ln -s "$openblas" .ed2-local-libs/liblapack.so
+    echo "Private BLAS/LAPACK development-link workaround: $openblas"
+    LDFLAGS="-L$PWD/.ed2-local-libs" ./configure FC=gfortran FCFLAGS="-O2 -fopenmp"
+  else
+    echo "No PRESTO OpenBLAS .so.0 path detected; trying standard linker configuration"
+    ./configure FC=gfortran FCFLAGS="-O2 -fopenmp"
+  fi
   make -j4
   make check
 ) > "$run_dir/build-and-baseline-check.log" 2>&1
 exe="$run_dir/source/source/QS3ED2"
 test -x "$exe"
+# Before expensive cubic checks, fail immediately on unsupported Python
+# syntax; CI checks the same scripts against an older-Python grammar.
+python3 -m py_compile \
+  "$run_dir/source/tests/cpc_cubic_pointgroup.py" \
+  "$run_dir/source/tests/cpc_pointgroup_profile.py" \
+  "$run_dir/source/tools/cpc_presto_cubic_benchmark.py" \
+  "$run_dir/source/tools/cpc_presto_cubic_audit.py"
 python3 "$run_dir/source/tests/cpc_cubic_pointgroup.py" --sizes 4,6,10 --output "$run_dir/cubic-independent-symmetry.json"
 sha256sum "$exe" > "$run_dir/binary-sha256.txt"
 # Phase profiling is opt-in and does not affect numerical defaults otherwise.
