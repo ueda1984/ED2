@@ -328,3 +328,4 @@ cubic_cache_driver_LDADD = $(top_builddir)/source/ham2vec.o $(top_builddir)/sour
 EXTRA_DIST += cpc_cubic_local_bond_cache_regression.py
 EXTRA_DIST += cpc_cubic_cache_phase_profile_regression.py
 EXTRA_DIST += cpc_cubic_direct_hop_table_regression.py
+EXTRA_DIST += cpc_cubic_skip_unused_hash_regression.py
