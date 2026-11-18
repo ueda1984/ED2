@@ -2,7 +2,7 @@ name: ED2 cubic Oh symmetry and PRESTO protocol
 
 on:
   push:
-    branches: [codex/ed2-cpc-cubic-oh-1000-presto, codex/ed2-cubic-cache-mnte-cap-experiment, codex/ed2-cubic-anchored-key-oracle, codex/ed2-cubic-native-anchored-representatives, codex/ed2-cubic-basis-phase-instrumentation, codex/ed2-cubic-fast-oh-group-certificate, codex/ed2-cubic-anchored-basis-builder]
+    branches: [codex/ed2-cpc-cubic-oh-1000-presto, codex/ed2-cubic-cache-mnte-cap-experiment, codex/ed2-cubic-anchored-key-oracle, codex/ed2-cubic-native-anchored-representatives, codex/ed2-cubic-basis-phase-instrumentation, codex/ed2-cubic-fast-oh-group-certificate, codex/ed2-cubic-anchored-basis-builder, codex/ed2-cubic-local-bond-cache]
     paths:
       - "source/state_lists.f90"
       - "source/cubic_anchored_lookup.f90"
@@ -15,12 +15,15 @@ on:
       - "docs/development/cpc-cubic-basis-bottleneck-timing-20261118.md"
       - "docs/development/cpc-cubic-fast-group-certificate-20261118.md"
       - "docs/development/cpc-cubic-anchored-basis-20261118.md"
+      - "docs/development/cpc-cubic-local-bond-cache-20261118.md"
       - "tests/cpc_cubic_pointgroup.py"
       - "tests/cpc_cubic_anchored_orbit_key_oracle.py"
       - "tests/cpc_cubic_native_anchored_regression.py"
       - "tests/cpc_cubic_basis_timing_regression.py"
       - "tests/cpc_cubic_fast_group_certificate_regression.py"
       - "tests/cpc_cubic_anchored_basis_regression.py"
+      - "tests/cpc_cubic_local_bond_cache_regression.py"
+      - "tests/cubic_cache_driver.f90"
       - "tests/cubic_basis_driver.f90"
       - "tests/cpc_cubic_pointgroup_regression.py"
       - "tests/cpc_cubic_1000_one_magnon_smoke.py"
@@ -42,12 +45,15 @@ on:
       - "docs/development/cpc-cubic-basis-bottleneck-timing-20261118.md"
       - "docs/development/cpc-cubic-fast-group-certificate-20261118.md"
       - "docs/development/cpc-cubic-anchored-basis-20261118.md"
+      - "docs/development/cpc-cubic-local-bond-cache-20261118.md"
       - "tests/cpc_cubic_pointgroup.py"
       - "tests/cpc_cubic_anchored_orbit_key_oracle.py"
       - "tests/cpc_cubic_native_anchored_regression.py"
       - "tests/cpc_cubic_basis_timing_regression.py"
       - "tests/cpc_cubic_fast_group_certificate_regression.py"
       - "tests/cpc_cubic_anchored_basis_regression.py"
+      - "tests/cpc_cubic_local_bond_cache_regression.py"
+      - "tests/cubic_cache_driver.f90"
       - "tests/cubic_basis_driver.f90"
       - "tests/cpc_cubic_pointgroup_regression.py"
       - "tests/cpc_cubic_1000_one_magnon_smoke.py"
@@ -112,6 +118,7 @@ jobs:
               "tests/cpc_cubic_basis_timing_regression.py",
               "tests/cpc_cubic_fast_group_certificate_regression.py",
               "tests/cpc_cubic_anchored_basis_regression.py",
+              "tests/cpc_cubic_local_bond_cache_regression.py",
               "tests/cpc_cubic_pointgroup_regression.py",
               "tests/cpc_cubic_1000_one_magnon_smoke.py",
               "tests/cpc_pointgroup_profile.py",
@@ -243,6 +250,57 @@ jobs:
             exit 1
           fi
           grep -q 'Anchored cubic basis requires a 1D O_h sector' "$RUNNER_TEMP/anchored-basis-invalid.log"
+      - name: Every local sparse cubic Hamiltonian offdiagonal equals original cache bit-for-bit
+        run: |
+          python3 tests/cpc_cubic_local_bond_cache_regression.py \
+            --driver "$PWD/tests/cubic_cache_driver" --exe "$PWD/source/QS3ED2" \
+            --sides 4,6 --threads 1,4 --output "$RUNNER_TEMP/cubic-local-cache-small"
+          python3 tests/cpc_cubic_local_bond_cache_regression.py \
+            --driver "$PWD/tests/cubic_cache_driver" --exe "$PWD/source/QS3ED2" \
+            --sides 10 --threads 1 --skip-lanczos \
+            --output "$RUNNER_TEMP/cubic-local-cache-n1000"
+      - name: Local cubic cache must reject general chains and incompatible non-XXZ bonds
+        run: |
+          if ED2_CUBIC_LOCAL_BOND_CACHE=1 tests/test_ex1.sh \
+            > "$RUNNER_TEMP/reject-local-cache-chain.log" 2>&1; then
+            echo "ERROR: general spin chain accepted local cubic cache" >&2
+            exit 1
+          fi
+          grep -q 'Local cubic cache requires validated ED2_CUBIC_ANCHORED_REP' \
+            "$RUNNER_TEMP/reject-local-cache-chain.log"
+          python3 - <<'PY'
+          import os
+          import subprocess
+          import tempfile
+          from pathlib import Path
+          import sys
+          sys.path.insert(0, 'tests')
+          import cpc_cubic_pointgroup as oracle
+          with tempfile.TemporaryDirectory() as folder:
+              work=Path(folder)/'bad-xxz'
+              sector='oh-a1g'
+              oracle.write_input(work,4,3,oracle.symmetry_generators(4,sector),
+                                 oracle.canonical_bonds(4),mnte=64)
+              bond_file=work/'bonds.dat'
+              rows=bond_file.read_text().splitlines()
+              entry=rows[0].split()
+              entry[3]='0.999'
+              rows[0]=' '.join(entry)
+              bond_file.write_text('\n'.join(rows)+'\n')
+              env=dict(os.environ, ED2_CUBIC_ANCHORED_REP='1',
+                       ED2_CUBIC_FAST_GROUP_VALIDATION='1',
+                       ED2_CUBIC_ANCHORED_BASIS='1',
+                       ED2_CUBIC_LOCAL_BOND_CACHE='1',
+                       OPENBLAS_NUM_THREADS='1', OMP_NUM_THREADS='1')
+              with (work/'input.dat').open('rb') as inp:
+                  cp=subprocess.run([str(Path('tests/cubic_cache_driver').resolve())],
+                                    stdin=inp,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,
+                                    cwd=work,env=env,check=False)
+              assert cp.returncode!=0
+              assert b'anchored: requires conserving real XXZ' in cp.stdout or \
+                     b'Local cubic cache requires exactly real XXZ bonds' in cp.stdout
+          print('CUBIC_LOCAL_BOND_CACHE_REJECTION_PASS')
+          PY
       - name: Exhaustive anchored-key orbit census and O_h character equivariance
         run: |
           python3 tests/cpc_cubic_anchored_orbit_key_oracle.py --side 4 --samples 250
@@ -386,5 +444,7 @@ jobs:
             ${{ runner.temp }}/cubic-anchored-basis-parallel/
             ${{ runner.temp }}/cubic-new-basis-audit/
             ${{ runner.temp }}/audit-cubic-new-basis/
+            ${{ runner.temp }}/cubic-local-cache-small/summary.json
+            ${{ runner.temp }}/cubic-local-cache-n1000/summary.json
           if-no-files-found: warn
           retention-days: 30

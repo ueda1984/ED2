@@ -317,3 +317,8 @@ EXTRA_DIST += cpc_cubic_anchored_basis_regression.py
 
 # Optional bit-for-bit cubic O_h fast group certificate regression.
 EXTRA_DIST += cpc_cubic_fast_group_certificate_regression.py
+# Experimental spin-half cubic Hamiltonian cache reference oracle.
+check_PROGRAMS += cubic_cache_driver
+cubic_cache_driver_SOURCES = cubic_cache_driver.f90
+cubic_cache_driver_LDADD = $(top_builddir)/source/ham2vec.o $(top_builddir)/source/cubic_anchored_lookup.o $(top_builddir)/source/state_lists.o $(top_builddir)/source/input_param.o
+EXTRA_DIST += cpc_cubic_local_bond_cache_regression.py
