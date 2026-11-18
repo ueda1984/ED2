@@ -1,0 +1,68 @@
+name: CPC QS-Cube Lanczos restoration regression
+
+on:
+  push:
+    branches:
+      - codex/ed2-cpc-qscube-lanczos-restoration
+    paths:
+      - ".github/workflows/cpc-qscube-lanczos-restoration.yml"
+      - "source/krylov_solvers.f90"
+      - "source/krylov_observations.f90"
+      - "tests/cpc_qscube_lanczos_regression.py"
+      - "tests/Makefile.am"
+      - "Makefile.am"
+  pull_request:
+    paths:
+      - "source/krylov_solvers.f90"
+      - "source/krylov_observations.f90"
+      - "tests/cpc_qscube_lanczos_regression.py"
+      - "tests/Makefile.am"
+      - "Makefile.am"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  qscube-two-stage-regression:
+    name: QS-Cube solver continuity, gfortran-13
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      FC: gfortran-13
+      FCFLAGS: -O2 -fopenmp
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install numerical test dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends gfortran-13 libblas-dev liblapack-dev autoconf automake make python3-numpy
+      - name: Rebuild Autotools configuration and production executable
+        run: |
+          autoreconf -vfi
+          ./configure FC="$FC" FCFLAGS="$FCFLAGS"
+          make -j2
+          make check
+      - name: Run historical QS-Cube continuity and direct-residual regression
+        run: |
+          make check-qscube-lanczos QSCUBE_OUTPUT="$RUNNER_TEMP/qscube-two-stage-regression"
+          python3 - "$RUNNER_TEMP/qscube-two-stage-regression/report.json" <<'PY'
+          import json,sys
+          p=json.load(open(sys.argv[1],encoding='utf-8'))
+          assert p['passed'] and len(p['records'])==46 and len(p['physical'])==4
+          assert p['n_fixtures']==11 and len(p['threads'])==2
+          print('QS-CUBE TWO-STAGE REGRESSION PASS: 46 driver and 4 physical runs')
+          PY
+      - name: Archive complete numerical records
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qscube-lanczos-restoration-regression
+          path: ${{ runner.temp }}/qscube-two-stage-regression/
+          if-no-files-found: warn
+          retention-days: 30

@@ -13,6 +13,12 @@ module krylov_observations
     integer :: algorithm=0,dimension=0,wanted=0,status=-1,iterations=0,cycles=0
     integer :: requested_budget=0,effective_budget=0,miniter=0,interval=0,keep=0,capacity=0
     integer :: energy_consecutive_checks=0
+    character(24) :: lanczos_mode='legacy'
+    integer :: vector_reconstructions=0
+    real(8) :: last_projected_residual=0d0
+    logical :: projected_residual_available=.false.
+    real(8) :: centered_variance=0d0
+    logical :: centered_variance_available=.false.
     logical :: energy_gate_satisfied=.false.
     character(120) :: candidate_role='none observed'
     integer :: exact_closures=0,near_closures=0,random_vectors=0,max_threads=1,rng_active_threads=0
@@ -252,6 +258,14 @@ contains
     write(unit,'(a,i0)') 'iterations=',d%iterations
     write(unit,'(a,i0)') 'cycles=',d%cycles
     write(unit,'(a,i0)') 'h_applications=',d%h_applications
+    write(unit,'(a,a)') 'lanczos_mode=',trim(d%lanczos_mode)
+    write(unit,'(a,i0)') 'vector_reconstructions=',d%vector_reconstructions
+    write(unit,'(a,l1)') 'centered_variance_available=',d%centered_variance_available
+    if(d%centered_variance_available) &
+      write(unit,'(a,es26.16e3)') 'centered_variance=',d%centered_variance
+    write(unit,'(a,l1)') 'projected_residual_available=',d%projected_residual_available
+    if(d%projected_residual_available) &
+      write(unit,'(a,es26.16e3)') 'last_projected_residual=',d%last_projected_residual
     write(unit,'(a,i0)') 'requested_budget=',d%requested_budget
     write(unit,'(a,i0)') 'effective_budget=',d%effective_budget
     write(unit,'(a,i0)') 'miniter=',d%miniter
