@@ -78,6 +78,12 @@ export ED2_RNG_SEED=1984
 # Freeze a clean, exact compiled source snapshot inside the allocated node.
 (
   cd -- "$run_dir/source"
+  # These opt-in variables are intended ONLY for the cubic benchmark below.
+  # Never pass them to the generic 100-site spin-chain test in "make check":
+  # the anchored path deliberately errors on noncubic Hamiltonians.
+  # Unsetting inside this subshell leaves the parent PBS environment intact,
+  # so the requested native lookup remains enabled for the real benchmark.
+  unset ED2_CUBIC_ANCHORED_REP ED2_CUBIC_ANCHORED_VERIFY
   autoreconf -vfi
   # PRESTO provides libopenblas.so.0, but the unversioned development
   # linker names may be missing. Set private links only inside this
