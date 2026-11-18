@@ -1,0 +1,96 @@
+#!/usr/bin/env bash
+#PBS -N ED2_PG_BENCH
+#PBS -q standard
+#PBS -l select=1:ncpus=96:mem=64gb
+#PBS -l place=exclhost
+#PBS -l walltime=12:00:00
+#PBS -j oe
+# PRESTO: single-host OpenMP and explicitly exclusive PBS placement.
+# DO NOT execute from the login node. Submit manually only after operator
+# confirms site's exclhost semantics and the read-only qstat preflight.
+set -euo pipefail
+umask 077
+if [[ ${ED2_EXCLUSIVE_CONFIRMED:-0} != 1 ]]; then
+  echo "Refusing: set ED2_EXCLUSIVE_CONFIRMED=1 only after operator site-policy check" >&2
+  exit 2
+fi
+for variable in PBS_JOBID PBS_O_WORKDIR PBS_NODEFILE ED2_STAGE ED2_RESULTS_ROOT; do
+  if [[ ! -v $variable || -z ${!variable} ]]; then
+    echo "Required PBS/ED2 variable missing: $variable" >&2
+    exit 2
+  fi
+done
+stage=$(cd -- "$ED2_STAGE" && pwd -P)
+cd -- "$PBS_O_WORKDIR"
+(cd -- "$stage" && sha256sum -c ed2-source.sha256)
+source_sha=$(cat "$stage/source-commit.txt")
+[[ "$source_sha" =~ ^[0-9a-f]{40}$ ]] || { echo "Bad pinned source SHA"; exit 2; }
+run_dir="$ED2_RESULTS_ROOT/$PBS_JOBID"
+mkdir -- "$run_dir" # fail closed if a previous allocation already used this path
+run_dir=$(cd -- "$run_dir" && pwd -P)
+mkdir -- "$run_dir/source"
+cp -- "$stage/source-commit.txt" "$stage/ed2-source.sha256" "$run_dir/"
+sha256sum "$stage/ed2-source.tar.gz" > "$run_dir/archive-path-sha256.txt"
+tar -xzf "$stage/ed2-source.tar.gz" -C "$run_dir/source"
+{
+  echo "ED2_PRESTO_JOB=$PBS_JOBID"
+  echo "HOST=$(hostname)"
+  echo "SOURCE_SHA=$source_sha"
+  echo "STAGE=$stage"
+  echo "OUTPUT=$run_dir"
+  echo "SCHEDULER_PLACE=exclhost (requested; not an operator attestation)"
+  date -Is
+  command -v gfortran
+  gfortran --version | head -1
+  command -v python3
+  python3 --version
+  lscpu
+  free -h
+  taskset -pc "$$"
+  cat "$PBS_NODEFILE"
+  qstat -f "$PBS_JOBID"
+  pbsnodes -av
+} > "$run_dir/allocation-preflight.txt" 2>&1
+# Freeze a clean, exact compiled source snapshot inside the allocated node.
+(
+  cd -- "$run_dir/source"
+  autoreconf -vfi
+  ./configure FC=gfortran FCFLAGS="-O2 -fopenmp"
+  make -j4
+  make check
+) > "$run_dir/build-and-baseline-check.log" 2>&1
+exe="$run_dir/source/source/QS3ED2"
+test -x "$exe"
+sha256sum "$exe" > "$run_dir/binary-sha256.txt"
+# Phase profiling is opt-in and does not affect numerical defaults otherwise.
+export OMP_DYNAMIC=FALSE OMP_PROC_BIND=close OMP_PLACES=cores
+export OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 BLIS_NUM_THREADS=1
+export VECLIB_MAXIMUM_THREADS=1 NUMEXPR_NUM_THREADS=1 GOTO_NUM_THREADS=1
+export ED2_RNG_SEED=1984
+preset=${ED2_PRESET:-main}
+case "$preset" in
+  main|extended) ;;
+  *) echo "Invalid ED2_PRESET: $preset" >&2; exit 2;;
+esac
+args=(--exe "$exe" --output "$run_dir/measurements"
+  --source-revision "$source_sha"
+  --source-archive "$stage/ed2-source.tar.gz"
+  --preset "$preset" --require-pbs-exclusive
+  --timeout 600 --time-budget 36000)
+if [[ -n ${ED2_THREADS:-} ]]; then args+=(--threads "$ED2_THREADS"); fi
+if [[ -n ${ED2_SIZES:-} ]]; then args+=(--sizes "$ED2_SIZES"); fi
+if [[ -n ${ED2_CPU_LIST:-} ]]; then args+=(--cpu-list "$ED2_CPU_LIST"); fi
+python3 "$run_dir/source/tools/cpc_presto_pointgroup_benchmark.py" \
+  "${args[@]}" > "$run_dir/benchmark-console.log" 2>&1
+python3 "$run_dir/source/tools/cpc_presto_pointgroup_audit.py" \
+  --root "$run_dir/measurements" --output "$run_dir/audit" \
+  --source-archive "$stage/ed2-source.tar.gz" --exe "$exe" \
+  > "$run_dir/audit-console.log" 2>&1
+{
+  date -Is
+  qstat -f "$PBS_JOBID" || true
+  pbsnodes -av || true
+  taskset -pc "$$"
+} > "$run_dir/allocation-postflight.txt" 2>&1
+printf 'PRESTO measurement complete. Audit: %s/audit/audit.json\n' "$run_dir"
+printf 'IMPORTANT: operator confirmation of exclusivity is STILL PENDING.\n'
