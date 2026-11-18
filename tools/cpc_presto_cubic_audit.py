@@ -78,6 +78,10 @@ def main():
     assert isinstance(summary["anchored_verify"], bool)
     assert isinstance(summary["fast_group_validation"], bool)
     assert isinstance(summary["anchored_basis"], bool)
+    assert isinstance(summary["local_bond_cache"], bool)
+    if summary["local_bond_cache"]:
+        assert summary["anchored_lookup"] and summary["anchored_basis"] and summary["fast_group_validation"]
+        assert "gamma-t" not in summary["sectors"]
     assert not summary["anchored_basis"] or summary["fast_group_validation"]
     if summary["anchored_basis"]:
         assert "gamma-t" not in summary["sectors"]
@@ -128,6 +132,7 @@ def main():
         assert record["anchored_verify"] is summary["anchored_verify"]
         assert record["fast_group_validation"] is summary["fast_group_validation"]
         assert record["anchored_basis"] is summary["anchored_basis"]
+        assert record["local_bond_cache"] is summary["local_bond_cache"]
         raw_input = (root / "trials" / record["key"] / "input.dat").read_text()
         match = re.search(r"\bMNTE\s*=\s*(-?\d+)", raw_input, flags=re.IGNORECASE)
         assert match and int(match.group(1)) == summary["mnte"]
@@ -162,6 +167,10 @@ def main():
         assert anchored_basis_used == expected_anchored
         assert atomic == record["atomic_orbits"]
         assert atomic == (record["builder"] == "fast" and not summary["anchored_basis"])
+        expected_sparse_cache = summary["local_bond_cache"] and record["builder"] == "fast"
+        assert ("Cubic cache builder: local-bond-sparse" in log) is expected_sparse_cache
+        expected_cache = "local-bond-sparse" if expected_sparse_cache else "full-bond-scan"
+        assert record["native_cache_builder"] == expected_cache
         expected_builder = ("anchored-cubic" if expected_anchored else
                             "atomic-orbits" if atomic else "forced-legacy")
         assert record["native_basis_builder"] == expected_builder
@@ -245,6 +254,7 @@ def main():
                   anchored_verify=summary["anchored_verify"],
                   fast_group_validation=summary["fast_group_validation"],
                   anchored_basis=summary["anchored_basis"],
+                  local_bond_cache=summary["local_bond_cache"],
                   operator_attestation_present=attested,
                   review_eligible=eligible,
                   caution="Operator claim is not independent scheduler proof, and review gate is not publication approval.",
