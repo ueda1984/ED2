@@ -4,8 +4,29 @@ module ham2vec
   real(8), parameter :: eps = 1.0d-15
   integer, allocatable :: wk_loc(:,:)
   complex(8), allocatable :: wk_ele(:,:)
+  ! Explicit opt-in: only full cached operators with exactly real entries.
+  logical, save :: real_cached_matvec=.false.
   !
 contains
+
+  subroutine enable_real_cached_matvec(lv)
+    use input_param, only: wk_dim
+    integer, intent(in) :: lv
+    integer :: status
+    character(len=16) :: setting
+    setting=''
+    call get_environment_variable('ED2_REAL_CACHED_MATVEC',setting,status=status)
+    if(status==0)then
+      if(trim(adjustl(setting))/='0'.and.trim(adjustl(setting))/='1') &
+        error stop 'ED2_REAL_CACHED_MATVEC must be 0 or 1'
+    end if
+    real_cached_matvec=status==0.and.trim(adjustl(setting))=='1'
+    if(.not.real_cached_matvec)return
+    if(wk_dim/=lv)error stop 'ED2_REAL_CACHED_MATVEC requires fully cached matrix'
+    if(any(aimag(wk_ele)/=0d0)) &
+      error stop 'ED2_REAL_CACHED_MATVEC requires exactly real matrix elements'
+    write(*,'(a)') 'Hamiltonian action: strictly-real cached coefficients'
+  end subroutine enable_real_cached_matvec
 
   subroutine make_wk_loc_and_ele(lv)
     use state_lists, only: j_flip_ni, list_fly, a_down_spin, &
@@ -62,6 +83,7 @@ contains
     allocate(wk_ele(wk_dim1,wk_dim))
     if(use_local_bonds)then
       call build_cubic_local_bond_cache(lv,wk_dim1)
+      call enable_real_cached_matvec(lv)
       call dump_cubic_cache_if_requested()
       return
     end if
@@ -261,6 +283,7 @@ contains
     write(*,*) "Current MNTE = ", wk_dim1 - 1
     write(*,*) "Optimal MNTE = ", max_jd - 1
 
+    call enable_real_cached_matvec(lv)
     call dump_cubic_cache_if_requested()
     return
   end subroutine make_wk_loc_and_ele
@@ -731,14 +754,27 @@ contains
 
     wk_dim1= size(wk_ele,1)
 
-    !$omp parallel do private(i,j)
-    do i = 1, wk_dim
-      v0(i) = 0.0d0
-      do j = 1, wk_dim1
-        if(wk_loc(j,i) == 0) exit
-        v0(i) = v0(i) + wk_ele(j,i) * v1(wk_loc(j,i))
+    if(real_cached_matvec)then
+      ! Coefficients are proved exactly real ONCE during cache setup.
+      ! Keep the original row and term accumulation order unchanged.
+      !$omp parallel do private(i,j)
+      do i = 1, wk_dim
+        v0(i) = 0.0d0
+        do j = 1, wk_dim1
+          if(wk_loc(j,i) == 0) exit
+          v0(i) = v0(i) + dble(wk_ele(j,i)) * v1(wk_loc(j,i))
+        end do
       end do
-    end do
+    else
+      !$omp parallel do private(i,j)
+      do i = 1, wk_dim
+        v0(i) = 0.0d0
+        do j = 1, wk_dim1
+          if(wk_loc(j,i) == 0) exit
+          v0(i) = v0(i) + wk_ele(j,i) * v1(wk_loc(j,i))
+        end do
+      end do
+    end if
     !
 
     !$omp parallel do private(n0,n1,n2,i1,i2,s,ni,id,ell,i,j,st_list,c)
