@@ -1,0 +1,24 @@
+name: One-shot code-parity audit snapshot
+on:
+  push:
+    branches: [codex/ed2-cpc-noncommuting-orbits]
+    paths: [".github/workflows/cpc-parity-snapshot-once.yml"]
+permissions:
+  contents: read
+jobs:
+  parity-snapshot:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - run: |
+          sha256sum source/state_lists.f90 source/input_param.f90 tests/cpc_pointgroup_translation_crosscheck.py tests/cpc_noncommuting_orbit_guard.py > "$RUNNER_TEMP/source-sha256.txt"
+          tar -czf "$RUNNER_TEMP/parity-source.tar.gz" source/state_lists.f90 source/input_param.f90 tests/cpc_pointgroup_translation_crosscheck.py tests/cpc_noncommuting_orbit_guard.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: parity-source
+          path: |
+            ${{ runner.temp }}/parity-source.tar.gz
+            ${{ runner.temp }}/source-sha256.txt
+          retention-days: 7
