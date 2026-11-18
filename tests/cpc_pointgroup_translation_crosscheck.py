@@ -266,12 +266,21 @@ def run_case(exe, root, kind, n, ndown, momentum, irrep, label, extra_alg1=False
             make_input(work, kind, n, ndown, gens, bonds, 1)
             data = execute(exe, work, ref, alg=1, mode=mode)
             assert not data["atomic_orbits"]
-            diagnostic = dict(line.split("=", 1) for line in
-                              (work / "diagnostics.txt").read_text().splitlines() if "=" in line)
+            diagnostic_lines = (work / "diagnostics.txt").read_text().splitlines()
+            diagnostic = dict(line.split("=", 1) for line in diagnostic_lines if "=" in line)
             assert diagnostic["lanczos_mode"] == ("two_stage" if mode == "two-stage" else "legacy")
             assert diagnostic["lowest_state_inclusion"].startswith("not_assessed")
-            if "pair_1_residual" in diagnostic:
-                assert float(diagnostic["pair_1_residual"]) < 1.1e-8
+            assert sum(x.startswith("pair_columns=") for x in diagnostic_lines) == 1
+            pair_rows = [tokens for line in diagnostic_lines if (tokens := line.split())
+                         and len(tokens) == 8 and tokens[0] == "1" and tokens[1] in ("T", "F")]
+            assert len(pair_rows) == 1, ("Missing direct residual diagnostic", work)
+            pair = pair_rows[0]
+            assert pair[1] == "T" and pair[2] == "T", ("Uncertified Ritz pair", work, pair)
+            direct = float(pair[5])
+            assert math.isfinite(direct) and direct <= min(1.1e-8, 1.01*float(pair[7]))
+            assert abs(float(pair[3]) - data["energy"]) < 1e-8
+            assert abs(float(pair[6]) - 1.) < 1e-8
+            data["direct_residual"] = direct
             data["h_applications"] = int(diagnostic["h_applications"])
             record["lanczos"].append(data)
     return record
