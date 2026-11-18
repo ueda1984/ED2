@@ -2,14 +2,19 @@ name: ED2 cubic Oh symmetry and PRESTO protocol
 
 on:
   push:
-    branches: [codex/ed2-cpc-cubic-oh-1000-presto, codex/ed2-cubic-cache-mnte-cap-experiment, codex/ed2-cubic-anchored-key-oracle]
+    branches: [codex/ed2-cpc-cubic-oh-1000-presto, codex/ed2-cubic-cache-mnte-cap-experiment, codex/ed2-cubic-anchored-key-oracle, codex/ed2-cubic-native-anchored-representatives]
     paths:
       - "source/state_lists.f90"
+      - "source/cubic_anchored_lookup.f90"
+      - "source/ham2vec.f90"
+      - "source/Makefile.am"
       - "tests/Makefile.am"
       - "docs/development/cpc-cubic-oh-1000-presto-20261118.md"
       - "docs/development/cpc-cubic-cache-mnte-study-20261118.md"
+      - "docs/development/cpc-cubic-native-anchored-lookup-20261118.md"
       - "tests/cpc_cubic_pointgroup.py"
       - "tests/cpc_cubic_anchored_orbit_key_oracle.py"
+      - "tests/cpc_cubic_native_anchored_regression.py"
       - "tests/cpc_cubic_pointgroup_regression.py"
       - "tests/cpc_cubic_1000_one_magnon_smoke.py"
       - "tests/cpc_pointgroup_profile.py"
@@ -20,11 +25,16 @@ on:
   pull_request:
     paths:
       - "source/state_lists.f90"
+      - "source/cubic_anchored_lookup.f90"
+      - "source/ham2vec.f90"
+      - "source/Makefile.am"
       - "tests/Makefile.am"
       - "docs/development/cpc-cubic-oh-1000-presto-20261118.md"
       - "docs/development/cpc-cubic-cache-mnte-study-20261118.md"
+      - "docs/development/cpc-cubic-native-anchored-lookup-20261118.md"
       - "tests/cpc_cubic_pointgroup.py"
       - "tests/cpc_cubic_anchored_orbit_key_oracle.py"
+      - "tests/cpc_cubic_native_anchored_regression.py"
       - "tests/cpc_cubic_pointgroup_regression.py"
       - "tests/cpc_cubic_1000_one_magnon_smoke.py"
       - "tests/cpc_pointgroup_profile.py"
@@ -84,6 +94,7 @@ jobs:
           files = [
               "tests/cpc_cubic_pointgroup.py",
               "tests/cpc_cubic_anchored_orbit_key_oracle.py",
+              "tests/cpc_cubic_native_anchored_regression.py",
               "tests/cpc_cubic_pointgroup_regression.py",
               "tests/cpc_cubic_1000_one_magnon_smoke.py",
               "tests/cpc_pointgroup_profile.py",
@@ -115,6 +126,32 @@ jobs:
           ./configure FC="$FC" FCFLAGS="$FCFLAGS"
           make -j2
           make check
+      - name: Regression - benchmark-only anchored opt-in must not break legacy make check
+        run: |
+          # Reproduce PRESTO job 19602's failure: the native 100-site spin-chain
+          # baseline is intentionally incompatible with the cubic-only fast path.
+          if ED2_CUBIC_ANCHORED_REP=1 ED2_CUBIC_ANCHORED_VERIFY=1 \
+              tests/test_ex1.sh > "$RUNNER_TEMP/leaked-anchored-ex1.log" 2>&1; then
+            echo "ERROR: baseline test unexpectedly accepted cubic-only opt-in" >&2
+            exit 1
+          fi
+          grep -q 'anchored: not a cubic volume' "$RUNNER_TEMP/leaked-anchored-ex1.log"
+          # Match the build subshell in the PBS script: the environment is
+          # restricted to a single child, never altered for the actual run.
+          (
+            export ED2_CUBIC_ANCHORED_REP=1 ED2_CUBIC_ANCHORED_VERIFY=1
+            unset ED2_CUBIC_ANCHORED_REP ED2_CUBIC_ANCHORED_VERIFY
+            tests/test_ex1.sh
+          )
+          python3 - <<'PY'
+          from pathlib import Path
+          script = Path('tools/presto_cubic_exclusive.pbs').read_text()
+          guard = '  unset ED2_CUBIC_ANCHORED_REP ED2_CUBIC_ANCHORED_VERIFY'
+          assert guard in script, 'Cubic opt-in isolation is missing'
+          assert script.index('  cd -- "$run_dir/source"') < script.index(guard) < script.index('  autoreconf -vfi')
+          assert 'python3 "$run_dir/source/tools/cpc_presto_cubic_benchmark.py"' in script
+          print('PBS_CUBIC_ENV_ISOLATION_PASS')
+          PY
       - name: Independent cubic Oh group, bond invariance and N1000 dimensions
         run: |
           python3 tests/cpc_cubic_pointgroup.py --sizes 4,6,8,10 --output "$RUNNER_TEMP/cubic-dim.json"
@@ -136,6 +173,28 @@ jobs:
       - name: Independent physical projected Hamiltonians for all Oh 1D irreps
         run: |
           python3 tests/cpc_cubic_pointgroup_regression.py --exe "$PWD/source/QS3ED2" --output "$RUNNER_TEMP/cubic-physics" --threads 1
+      - name: Native anchored representatives, compare every cache hop to the original ID/character
+        run: |
+          python3 tests/cpc_cubic_native_anchored_regression.py --exe "$PWD/source/QS3ED2" \
+            --sizes 4,6 --threads 1 --verify-hops --output "$RUNNER_TEMP/cubic-anchored-hops"
+          python3 tests/cpc_cubic_native_anchored_regression.py --exe "$PWD/source/QS3ED2" \
+            --sizes 4,6 --threads 4 --output "$RUNNER_TEMP/cubic-anchored-omp4"
+      - name: Native anchored lookup under the historical orbit-basis fallback
+        run: |
+          ED2_FORCE_LEGACY_ORBITS=1 python3 tests/cpc_cubic_native_anchored_regression.py \
+            --exe "$PWD/source/QS3ED2" --sizes 4 --threads 1 --verify-hops \
+            --output "$RUNNER_TEMP/cubic-anchored-legacy-basis"
+      - name: Native anchored fast path fails closed on translation-only sector
+        run: |
+          if ED2_CUBIC_ANCHORED_REP=1 python3 tools/cpc_presto_cubic_benchmark.py \
+            --source-revision "$(git rev-parse HEAD)" \
+            --source-archive "$RUNNER_TEMP/staged-source/ed2-source.tar.gz" \
+            --preset cubic-smoke --allow-shared --sizes 4 --sectors gamma-t --plan-only \
+            --output "$RUNNER_TEMP/should-not-exist" > "$RUNNER_TEMP/anchor-refusal.log" 2>&1; then
+            echo "ERROR: translation-only sector accepted nontrivial O_h anchored lookup" >&2
+            exit 1
+          fi
+          grep -q 'Anchored cubic representatives require a 1D O_h sector' "$RUNNER_TEMP/anchor-refusal.log"
       - name: Run and audit cubic 64/216-site shared smoke
         run: |
           python3 tools/cpc_presto_cubic_benchmark.py --exe "$PWD/source/QS3ED2" \
@@ -223,5 +282,8 @@ jobs:
             ${{ runner.temp }}/audit-216/
             ${{ runner.temp }}/cubic-216-mnte64/
             ${{ runner.temp }}/audit-216-mnte64/
+            ${{ runner.temp }}/cubic-anchored-hops/
+            ${{ runner.temp }}/cubic-anchored-omp4/
+            ${{ runner.temp }}/cubic-anchored-legacy-basis/
           if-no-files-found: warn
           retention-days: 30

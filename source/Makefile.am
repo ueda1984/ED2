@@ -5,6 +5,7 @@ QS3ED2_SOURCES = blas_lapack_interfaces.f90 \
               krylov_solvers.f90 \
               input_param.f90 \
               state_lists.f90 \
+              cubic_anchored_lookup.f90 \
               ham2vec.f90 \
               lanczos.f90 \
               eigen_solver.f90 \
@@ -19,7 +20,8 @@ QS3ED2_SOURCES = blas_lapack_interfaces.f90 \
 state_lists.o: input_param.o
 
 # ham2vec uses state_lists (+ likely input_param indirectly)
-ham2vec.o: input_param.o state_lists.o
+cubic_anchored_lookup.o: input_param.o state_lists.o
+ham2vec.o: input_param.o state_lists.o cubic_anchored_lookup.o
 
 # lanczos uses ham2vec and input_param
 lanczos.o: input_param.o ham2vec.o blas_lapack_interfaces.o krylov_solvers.o

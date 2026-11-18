@@ -46,7 +46,7 @@ lapack_interface_check_LDADD = $(top_builddir)/source/blas_lapack_interfaces.o
 lapack_failure_check_SOURCES = lapack_failure_check.f90
 lapack_failure_check_LDADD = $(top_builddir)/source/eigen_solver.o \
   $(top_builddir)/source/krylov_solvers.o $(top_builddir)/source/krylov_observations.o $(top_builddir)/source/krylov_residual_policy.o \
-  $(top_builddir)/source/ham2vec.o $(top_builddir)/source/state_lists.o \
+  $(top_builddir)/source/ham2vec.o $(top_builddir)/source/cubic_anchored_lookup.o $(top_builddir)/source/state_lists.o \
   $(top_builddir)/source/input_param.o $(top_builddir)/source/blas_lapack_interfaces.o
 EXTRA_DIST += test_lapack_interfaces.sh
 .PHONY: check-lapack
@@ -57,7 +57,7 @@ check-lapack: $(check_PROGRAMS)
 check_PROGRAMS += sparse_field_operator_check
 sparse_field_operator_check_SOURCES = sparse_field_operator_check.f90
 sparse_field_operator_check_LDADD = $(top_builddir)/source/ham2vec.o \
-  $(top_builddir)/source/state_lists.o $(top_builddir)/source/input_param.o
+  $(top_builddir)/source/cubic_anchored_lookup.o $(top_builddir)/source/state_lists.o $(top_builddir)/source/input_param.o
 EXTRA_DIST += sparse_field_validation.py numerical_baseline.py
 PYTHON ?= python3
 .PHONY: check-sparse-field
@@ -301,3 +301,6 @@ check-pointgroup:
 	$(PYTHON) $(srcdir)/cpc_pointgroup_translation_crosscheck.py \
 	  --exe "$(abs_top_builddir)/source/QS3ED2" \
 	  $(if $(POINTGROUP_OUTPUT),--output "$(POINTGROUP_OUTPUT)",)
+
+# Optional three-magnon cubic O_h anchored cache correctness regression.
+EXTRA_DIST += cpc_cubic_native_anchored_regression.py

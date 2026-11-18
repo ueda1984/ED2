@@ -14,6 +14,15 @@ if [[ ${ED2_EXCLUSIVE_CONFIRMED:-0} != 1 ]]; then
   echo "Refusing: set ED2_EXCLUSIVE_CONFIRMED=1 only after operator site-policy check" >&2
   exit 2
 fi
+# Native orbit lookup is an explicit, separately provenance-tracked experiment.
+case "${ED2_CUBIC_ANCHORED_REP:-0}" in
+  0|1) ;;
+  *) echo "Invalid ED2_CUBIC_ANCHORED_REP (only 0 or 1)" >&2; exit 2 ;;
+esac
+if [[ ${ED2_CUBIC_ANCHORED_VERIFY:-0} == 1 && ${ED2_CUBIC_ANCHORED_REP:-0} != 1 ]]; then
+  echo "ED2_CUBIC_ANCHORED_VERIFY requires ED2_CUBIC_ANCHORED_REP=1" >&2
+  exit 2
+fi
 for variable in PBS_JOBID PBS_O_WORKDIR PBS_NODEFILE ED2_STAGE ED2_RESULTS_ROOT; do
   if [[ ! -v $variable || -z ${!variable} ]]; then
     echo "Required PBS/ED2 variable missing: $variable" >&2
@@ -47,6 +56,8 @@ python3 -m py_compile \
   echo "STAGE=$stage"
   echo "OUTPUT=$run_dir"
   echo "SCHEDULER_PLACE=exclhost (requested; not an operator attestation)"
+  echo "CUBIC_ANCHORED_REP=${ED2_CUBIC_ANCHORED_REP:-0}"
+  echo "CUBIC_ANCHORED_VERIFY=${ED2_CUBIC_ANCHORED_VERIFY:-0}"
   date -Is
   command -v gfortran
   gfortran --version | head -1
@@ -67,6 +78,12 @@ export ED2_RNG_SEED=1984
 # Freeze a clean, exact compiled source snapshot inside the allocated node.
 (
   cd -- "$run_dir/source"
+  # These opt-in variables are intended ONLY for the cubic benchmark below.
+  # Never pass them to the generic 100-site spin-chain test in "make check":
+  # the anchored path deliberately errors on noncubic Hamiltonians.
+  # Unsetting inside this subshell leaves the parent PBS environment intact,
+  # so the requested native lookup remains enabled for the real benchmark.
+  unset ED2_CUBIC_ANCHORED_REP ED2_CUBIC_ANCHORED_VERIFY
   autoreconf -vfi
   # PRESTO provides libopenblas.so.0, but the unversioned development
   # linker names may be missing. Set private links only inside this
