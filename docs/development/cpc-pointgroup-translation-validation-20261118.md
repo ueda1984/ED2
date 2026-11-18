@@ -1,6 +1,6 @@
 # Translation and point-group physical verification (2026-11-18)
 
-This is a **scientific validation plan and test implementation**, not yet a claim of successful numerical execution. The tracked script is `tests/cpc_pointgroup_translation_crosscheck.py`, invoked using `make check-pointgroup`. As a research-only regression, it requires Python/NumPy in addition to the normal ED2 build and is not run by the default `make check`.
+**CI-verified numerical regression:** the 31-case standard physical suite passed on both gfortran-13 and gfortran-14 at [GitHub Actions run 44215282646](https://github.com/ueda1984/ED2/actions/runs/44215282646) (2026-11-18). This is not a claim that the optional 6x6 three-magnon stress tier or exclusive-node PRESTO performance tests have passed. The tracked script is `tests/cpc_pointgroup_translation_crosscheck.py`, invoked using `make check-pointgroup`. As a research-only regression, it requires Python/NumPy in addition to the normal ED2 build and is not run by the default `make check`.
 
 ## Motivation and provenance
 
@@ -31,6 +31,20 @@ For Gamma/M with full `C4v`, the two-dimensional `E` irrep is **not** represente
 4. Compare **all** eigenvalues from native ED2 dense diagonalization with the independently projected matrix to absolute `5e-9`. Check ring parity and X-point `C2v` spectrum decomposition. For Gamma/M track the unrepresented `E` sector rather than asserting false completeness.
 5. For selected noncommuting point-group sectors run **both** modern ALG=1 modes against the independently established lowest eigenvalue and check direct-residual telemetry. This makes the exercise relevant to the revived historical two-stage Lanczos PR.
 6. Record compiled-binary SHA256, exact per-case input hashes, projected levels, and the employed compiler in archived CI artifacts.
+
+## Verified standard-suite sector dimensions (CI 44215282646)
+
+| System / momentum | Translation-only dim | 1D irrep dimensions (A1,A2,B1,B2 for square) | Unrepresented dimension |
+| --- | ---: | --- | ---: |
+| Ring 12, 3-down, Gamma (even/odd) | 19 | 12, 7 | 0 |
+| Ring 12, 3-down, pi (even/odd) | 19 | 12, 7 | 0 |
+| Square 4x4, 3-down, Gamma (C4v) | 35 | 10, 1, 6, 4 | 14 (E irrep) |
+| Square 4x4, 3-down, M (C4v) | 35 | 10, 1, 6, 4 | 14 (E irrep) |
+| Square 4x4, 3-down, X (C2v) | 35 | 16, 5, 7, 7 | 0 |
+| Square 4x4, 2-down, Gamma (C4v) | 9 | 5, 0, 3, 1 | 0 |
+| Square 6x6, 2-down, Gamma (C4v) | 19 | 9, 1, 6, 3 | 0 |
+
+The empty square-4x4 two-down Gamma A2 sector is counted as a mathematically valid *empty sector*; no ED2 eigenvalue run is attempted for it. The remaining nonempty sectors were checked against native ED2 dense spectra. The standard suite additionally runs both ALG=1 Lanczos modes for selected noncommuting sectors.
 
 ## Source-derived caveats
 
