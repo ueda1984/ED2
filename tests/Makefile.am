@@ -330,3 +330,4 @@ EXTRA_DIST += cpc_cubic_cache_phase_profile_regression.py
 EXTRA_DIST += cpc_cubic_direct_hop_table_regression.py
 EXTRA_DIST += cpc_cubic_skip_unused_hash_regression.py
 EXTRA_DIST += cpc_real_cached_matvec_regression.py
+EXTRA_DIST += cpc_csr_real_cache_regression.py
