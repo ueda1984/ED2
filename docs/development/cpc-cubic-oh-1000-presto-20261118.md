@@ -217,3 +217,39 @@ unearned publication-ready status). The per-trial timeout is 1800 s;
 nonconvergence must be retained as a failed trial, not dropped.
 Only if this succeeds should the larger multi-OMP measurement be
 scheduled. No command in this document has been executed on PRESTO.
+
+
+## PRESTO runtime compatibility follow-up (2026-11-18)
+
+The first PRESTO allocations ended **before** any cubic three-magnon
+Lanczos timing was recorded. Keep both failed jobs as audit evidence:
+
+- `19307.jpmjpr1911`: `configure` failed to find the unversioned
+  BLAS/LAPACK development linker names even though an OpenBLAS runtime
+  was available. The production Fortran sources were not at fault.
+- `19353.jpmjpr1911`: with a private
+  `libopenblas.so -> libopenblas.so.0` and
+  `liblapack.so -> libopenblas.so.0` link workaround, `make check`
+  reported **PASS=1, FAIL=0, ERROR=0**; the following independent
+  Python geometry check then failed at `math.comb`, which was
+  introduced in Python 3.8. The actual PRESTO minor Python version is
+  not yet recorded here; query it with `python3 --version`.
+
+The updated job script embeds the PRESTO private-link fallback (without
+changing system libraries). The cubic geometry oracle now computes
+integer `C(n,3)` directly and its shared profile helper computes an
+integer binomial without `math.comb`; the auditor and 1000-site
+one-magnon smoke no longer use Python 3.8 assignment expressions.
+The runner uses pre-3.7 portable `subprocess.run` keyword arguments.
+GitHub CI checks the Python **3.6 syntax grammar** and deletes
+`math.comb` during oracle tests before repeating the physical
+regressions on gfortran-13/14.
+
+The source archive SHA and Git revision MUST be refreshed when using
+this compatibility fix. Do not patch the original stage in place and
+continue to identify the modified source by the old pinned commit.
+Create a new stage/output path so neither the historical
+`19307` nor `19353` evidence is overwritten. Re-run
+`cubic-pilot`, then independently inspect native direct residuals,
+actual allocation, logs, and audit before the first 1000-site
+three-magnon job.
