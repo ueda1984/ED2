@@ -1,0 +1,88 @@
+name: CPC point-group phase and resource regression
+
+on:
+  push:
+    branches:
+      - codex/ed2-cpc-pointgroup-performance
+    paths:
+      - ".github/workflows/cpc-pointgroup-profile.yml"
+      - "source/main.f90"
+      - "tests/cpc_pointgroup_profile.py"
+      - "tests/cpc_pointgroup_translation_crosscheck.py"
+      - "tests/Makefile.am"
+      - "Makefile.am"
+  pull_request:
+    paths:
+      - ".github/workflows/cpc-pointgroup-profile.yml"
+      - "source/main.f90"
+      - "tests/cpc_pointgroup_profile.py"
+      - "tests/cpc_pointgroup_translation_crosscheck.py"
+      - "tests/Makefile.am"
+      - "Makefile.am"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pointgroup-profile:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [gfortran-13, gfortran-14]
+    env:
+      FC: ${{ matrix.compiler }}
+      FCFLAGS: -O2 -fopenmp
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install compilers and optional NumPy for existing tests
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ${{ matrix.compiler }} libblas-dev liblapack-dev autoconf automake make python3-numpy time
+      - name: Build and baseline smoke
+        run: |
+          autoreconf -vfi
+          ./configure FC="$FC" FCFLAGS="$FCFLAGS"
+          make -j2
+          make check
+      - name: Assert independently certified point-group spectra and Ritz residuals
+        run: |
+          make check-pointgroup POINTGROUP_OUTPUT="$RUNNER_TEMP/pointgroup-physics"
+          python3 - "$RUNNER_TEMP/pointgroup-physics/report.json" <<'PY'
+          import json,sys
+          r=json.load(open(sys.argv[1],encoding="utf-8"))
+          assert r["passed"] and len(r["cases"])==31
+          a=[x for case in r["cases"] for x in case.get("lanczos",[])]
+          assert len(a)==4 and all(x["direct_residual"]<=1.1e-8 for x in a)
+          print("POINTGROUP PHYSICS PASS: 31 cases + 4 certified Ritz pairs")
+          PY
+      - name: Profile 4x4 and 6x6 three-magnon point-group sectors
+        run: |
+          make check-pointgroup-profile PGPROFILE_OUTPUT="$RUNNER_TEMP/pointgroup-profile" PGPROFILE_FLAGS="--sizes 4,6 --threads 1 --repeat 1"
+          python3 - "$RUNNER_TEMP/pointgroup-profile/report.json" <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1],encoding="utf-8"))
+          assert d["passed"] and len(d["results"])==16
+          for side in (4,6):
+              t=d["fixtures"][f"square{side}-gamma-t"]["dimension"]
+              a=d["fixtures"][f"square{side}-gamma-a1"]["dimension"]
+              assert a<t
+          assert all(r["residual"]<=1.01e-8 for r in d["results"])
+          print("POINTGROUP PROFILE PASSED 16 physical runs, no timing thresholds")
+          PY
+      - name: Upload provenance records
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pointgroup-profile-${{ matrix.compiler }}
+          path: |
+            ${{ runner.temp }}/pointgroup-profile/
+            ${{ runner.temp }}/pointgroup-physics/
+          if-no-files-found: warn
+          retention-days: 30
