@@ -316,6 +316,7 @@ cubic_basis_driver_LDADD = $(top_builddir)/source/state_lists.o $(top_builddir)/
 EXTRA_DIST += cpc_cubic_anchored_basis_regression.py
 EXTRA_DIST += cpc_cubic_basis_coordinate_cache_regression.py
 EXTRA_DIST += cpc_cubic_basis_coordinate_full_cache_regression.py
+EXTRA_DIST += cpc_cubic_basis_pruned_canonical_regression.py
 
 # Optional bit-for-bit cubic O_h fast group certificate regression.
 EXTRA_DIST += cpc_cubic_fast_group_certificate_regression.py
