@@ -127,6 +127,16 @@ check-residual-policy: krylov_policy_driver
 	  --exe "$(abs_top_builddir)/source/QS3ED2" \
 	  $(if $(RESIDUAL_OUTPUT),--output "$(RESIDUAL_OUTPUT)",)
 
+# Original QS-Cube/ED2 already used an energy-first/replay-once Lanczos.
+# Verify the modern opt-in restoration rather than claiming algorithm novelty.
+EXTRA_DIST += cpc_qscube_lanczos_regression.py
+.PHONY: check-qscube-lanczos
+check-qscube-lanczos: krylov_policy_driver
+	$(PYTHON) $(srcdir)/cpc_qscube_lanczos_regression.py \
+	  --driver "$(abs_builddir)/krylov_policy_driver" \
+	  --exe "$(abs_top_builddir)/source/QS3ED2" \
+	  $(if $(QSCUBE_OUTPUT),--output "$(QSCUBE_OUTPUT)",)
+
 # Source tree can be read-only and distinct from the build tree in distcheck.
 AM_TESTS_ENVIRONMENT = ED2_TEST_SOURCE_ROOT='$(abs_top_srcdir)'; export ED2_TEST_SOURCE_ROOT; \
                        ED2_TEST_BUILD_ROOT='$(abs_top_builddir)'; export ED2_TEST_BUILD_ROOT; \

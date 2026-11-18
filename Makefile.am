@@ -50,6 +50,12 @@ check-residual-policy:
 	$(AM_V_at)$(MAKE) -C source all
 	$(AM_V_at)$(MAKE) -C tests check-residual-policy RESIDUAL_OUTPUT="$(RESIDUAL_OUTPUT)"
 
+# Opt-in numerical regression: restored historical QS-Cube two-stage ALG=1.
+.PHONY: check-qscube-lanczos
+check-qscube-lanczos:
+	$(AM_V_at)$(MAKE) -C source all
+	$(AM_V_at)$(MAKE) -C tests check-qscube-lanczos QSCUBE_OUTPUT="$(QSCUBE_OUTPUT)"
+
 # Include reference fixtures, example templates and user documentation in
 # source archives used outside the Git repository.
 EXTRA_DIST = input/input.dat examples/ref_data docs tools CITATION.cff LICENSE mkdocs.yml .readthedocs.yaml

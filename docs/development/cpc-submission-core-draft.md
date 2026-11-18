@@ -278,9 +278,21 @@ Lanczos breakdown handling, reproducible
 random initialization and opt-in
 direct-residual policies. These are
 engineering correctness changes, not
-new eigenvalue algorithms. Their
-exact upstream/source comparison is
-recorded in the [contribution audit](cpc-software-provenance-contribution-audit.md).
+new eigenvalue algorithms. **The two-stage pattern in conventional
+Lanczos (energy convergence followed by a single low-memory Ritz-vector
+replay) was already present in the published QS³
+[QS-Cube/ED source](https://github.com/QS-Cube/ED/blob/main/source/lanczos.f90)
+and retained in the original
+[QS-Cube/ED2 implementation](https://github.com/QS-Cube/ED2/blob/main/source/lanczos.f90).**
+The modern opt-in implementation restores that economical structure while
+adding a projected Ritz-residual gate, independent direct-residual acceptance,
+centered variance diagnostics, and controlled failure/retry behavior.
+A measured reduction in H-application count or elapsed time is an
+*implementation/correctness restoration benchmark*, not evidence of a novel
+Lanczos algorithm. See the
+[historical comparison and controlled measurement audit](cpc-qscube-lanczos-restoration-20261118.md).
+Their exact upstream/source comparison is recorded in the
+[contribution audit](cpc-software-provenance-contribution-audit.md).
 
 For a returned Ritz pair
 \((E_j,\psi_j)\), define its

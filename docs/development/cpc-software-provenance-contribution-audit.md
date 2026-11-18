@@ -91,6 +91,24 @@ of the already-public upstream ED2. Both are possible,
 but neither justifies citing the fork as a wholly
 independent new program.
 
+## Addendum (2026-11-18): QS³ two-stage Lanczos provenance
+
+The energy-first, replay-once low-memory Lanczos scheme is demonstrably present
+in both the [original published QS³/ED `lanczos.f90`](https://github.com/QS-Cube/ED/blob/main/source/lanczos.f90)
+and [original QS-Cube/ED2 `lanczos.f90`](https://github.com/QS-Cube/ED2/blob/main/source/lanczos.f90).
+It must **not** be claimed as a new eigenvalue algorithm introduced in the current fork.
+The new experimental work *restores* this historic economical structure after a
+more recent residual-certification implementation began repeatedly reconstructing
+full-space Ritz vectors. The updated opt-in code adds a projected-residual gate,
+a final **direct** residual acceptance criterion, finite-value and breakdown
+checks, a controlled retry path, and stable centered variance diagnostics.
+
+PRESTO job 18730 recorded end-to-end ratios 5.61x/10.85x/13.18x at 1/16/32
+threads **against the newer repeated-reconstruction implementation**, not
+against original QS³ or QS-Cube/ED2. An independent 2026-11-18 report contains
+the complete validation, attribution, and caveats:
+[cpc-qscube-lanczos-restoration-20261118.md](cpc-qscube-lanczos-restoration-20261118.md).
+
 ## 2. Actual checked production source delta against fork main
 
 We compared the **GitHub content hashes for the entire `source/`

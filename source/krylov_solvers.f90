@@ -141,8 +141,24 @@ contains
         return
       end if
     end if
-    call lanczos_ground_core(apply,n,tol,maxiter,miniter,interval,value,vector, &
-                             iterations,status,reason,residual,initial,diagnostics,rng_seed,policy)
+    ! Opt-in experiment: preserve the historical residual-reconstruct path by default.
+    block
+      character(16) :: switch
+      integer :: env_status
+      switch=''
+      call get_environment_variable('ED2_LANCZOS_TWO_STAGE',switch,status=env_status)
+      if(env_status==1 .or. (env_status==0 .and. trim(adjustl(switch))=='0'))then
+        call lanczos_ground_core(apply,n,tol,maxiter,miniter,interval,value,vector, &
+                                 iterations,status,reason,residual,initial,diagnostics,rng_seed,policy)
+      else if(env_status==0 .and. trim(adjustl(switch))=='1')then
+        if(present(diagnostics)) diagnostics%lanczos_mode='two_stage'
+        call lanczos_ground_two_stage_core(apply,n,tol,maxiter,miniter,interval,value,vector, &
+                                           iterations,status,reason,residual,initial,diagnostics,rng_seed,policy)
+      else
+        status=-1;iterations=0;value=0d0;residual=huge(1d0);vector=(0d0,0d0)
+        reason='invalid ED2_LANCZOS_TWO_STAGE; expected 0 or 1'
+      end if
+    end block
     if(present(diagnostics))call finish_observation(diagnostics,status,reason,iterations)
   end subroutine
 
@@ -345,6 +361,233 @@ contains
       end do
     end subroutine reconstruct
   end subroutine lanczos_ground_core
+
+  ! Restore the original QS-Cube/ED -> QS-Cube/ED2 two-stage replay
+  ! pattern (ALG=1, explicit opt-in), with modern direct-residual safeguards.
+  ! This is NOT a newly invented Lanczos algorithm.
+  ! Stage I: diagonalize the small tridiagonal matrix, but do not replay the
+  ! full-space basis until BOTH the historical energy gate and the projected
+  ! Lanczos residual proxy satisfy their criteria.  Stage II: replay exactly
+  ! the stored recurrence once and measure the actual Hx-lambda*x norm.
+  ! An inadequate direct residual never yields status=0, irrespective of the
+  ! projected proxy.  Subsequent retries are spaced to avoid costly replay
+  ! on every energy-stagnation checkpoint; breakdown and budget exits force
+  ! a final direct check so diagnostics do not mask numerical failure.
+  subroutine lanczos_ground_two_stage_core(apply,n,tol,maxiter,miniter,interval,value,vector, &
+                                           iterations,status,reason,residual,initial,diagnostics,rng_seed,policy)
+    procedure(operator_action) :: apply
+    integer, intent(in) :: n,maxiter,miniter,interval
+    real(8), intent(in) :: tol
+    real(8), intent(out) :: value,residual
+    complex(8), intent(out) :: vector(n)
+    integer, intent(out) :: iterations,status
+    character(*), intent(out) :: reason
+    complex(8), intent(in), optional :: initial(n)
+    type(krylov_diagnostics), intent(inout), optional :: diagnostics
+    integer, intent(in), optional :: rng_seed
+    type(residual_policy), intent(in), optional :: policy
+    integer :: draw_index,k,limit,info,m,last_try_step,n_replays,replay_hcalls
+    complex(8), allocatable :: q(:,:),start(:),r(:),candidate(:),action(:)
+    real(8), allocatable :: alpha(:),beta(:),d(:),e(:),w(:),z(:,:),work(:)
+    integer, allocatable :: iwork(:),ifail(:)
+    real(8) :: scale,hnorm,previous,change,bnorm,projected,threshold,checked_projected
+    real(8) :: requested_scale,requested_threshold,mu,centered_norm,variance
+    logical :: breakdown,have_previous,energy_ok,qualified,requested_ok,do_verify
+
+    draw_index=0;last_try_step=0;n_replays=0;replay_hcalls=0;checked_projected=huge(1d0)
+    status=1;reason='maximum iterations without convergence';iterations=0
+    value=0d0;residual=huge(1d0);vector=(0d0,0d0)
+    if(n<1 .or. maxiter<1 .or. miniter<0 .or. interval<1 .or. .not.finite_real(tol))then
+      status=-1;reason='invalid Lanczos parameters';return
+    end if
+    if(tol<=0d0)then
+      status=-1;reason='invalid Lanczos tolerance';return
+    end if
+    limit=min(n,maxiter)
+    if(present(diagnostics))then
+      diagnostics%effective_budget=limit;diagnostics%miniter=miniter;diagnostics%interval=interval
+      diagnostics%scale_provenance='max observed ||Hq|| and |alpha| in first recurrence; estimate, not a spectral bound'
+    end if
+    allocate(q(n,3),start(n),r(n),candidate(n),action(n),alpha(limit),beta(0:limit))
+    if(present(initial))then
+      start=initial
+    else
+      call random_start(start,rng_seed,draw_index,diagnostics)
+    end if
+    if(.not.normalize_vector(start))then
+      status=-1;reason='invalid initial vector';return
+    end if
+    q=(0d0,0d0);q(:,1)=start;beta=0d0;scale=0d0;have_previous=.false.;previous=0d0
+    write(*,'(a)') 'Lanczos mode: two_stage (projected residual gate + final direct residual)'
+    do k=1,limit
+      iterations=k
+      if(present(diagnostics)) diagnostics%h_applications=diagnostics%h_applications+1_int64
+      call apply(n,q(:,1),action)
+      hnorm=dznrm2(n,action,1)
+      alpha(k)=real(zdotc(n,q(:,1),1,action,1),8)
+      if(.not.finite_real(hnorm) .or. .not.finite_real(alpha(k)))then
+        status=2;reason='nonfinite operator action';return
+      end if
+      scale=max(scale,hnorm,abs(alpha(k)))
+      if(present(diagnostics))then
+        diagnostics%operator_scale=scale;diagnostics%breakdown_threshold=near_limit(scale)
+        diagnostics%scale_available=.true.;diagnostics%random_vectors=draw_index
+      end if
+      r=action-alpha(k)*q(:,1)
+      if(k>1) r=r-beta(k-1)*q(:,3)
+      bnorm=dznrm2(n,r,1);beta(k)=bnorm
+      if(.not.finite_real(bnorm))then
+        status=2;reason='nonfinite Lanczos beta';return
+      end if
+      breakdown=bnorm<=near_limit(scale)
+      if(present(diagnostics))then
+        diagnostics%last_beta=bnorm
+        if(breakdown .and. bnorm==0d0) diagnostics%exact_closures=diagnostics%exact_closures+1
+        if(breakdown .and. bnorm>0d0) diagnostics%near_closures=diagnostics%near_closures+1
+      end if
+      if(breakdown .or. k==limit .or. (k>=miniter .and. mod(k,interval)==0))then
+        allocate(d(k),e(max(1,k-1)),w(k),z(k,1),work(5*k),iwork(5*k),ifail(k))
+        if(k==1)then
+          w(1)=alpha(1);z(1,1)=1d0
+        else
+          d=alpha(1:k);e=beta(1:k-1)
+          call dstevx('V','I',k,d,e,0d0,0d0,1,1,2d0*dlamch('S'),m,w,z,k,work,iwork,ifail,info)
+          call check_lapack_info('DSTEVX (Lanczos two_stage)',info)
+        end if
+        value=w(1);change=1d0
+        if(have_previous) change=energy_change(previous,value,scale)
+        energy_ok=have_previous .and. change<tol
+        if(present(diagnostics))then
+          diagnostics%energy_change=change;diagnostics%energy_change_available=have_previous
+          diagnostics%energy_gate_satisfied=energy_ok
+        end if
+        write(*,'("itr, ene, conv: ",i5,es25.15,es11.1)') k,value,change
+        projected=abs(beta(k)*z(k,1))
+        if(.not.finite_real(projected))then
+          status=2;reason='nonfinite projected Lanczos residual';return
+        end if
+        threshold=residual_limit(tol,scale,value)
+        requested_ok=.true.
+        if(present(policy))then
+          if(.not.requested_residual_limit(policy,value,requested_scale,requested_threshold))then
+            status=2;reason='nonfinite requested residual scale or threshold';return
+          end if
+          threshold=min(threshold,requested_threshold)
+        end if
+        if(present(diagnostics))then
+          diagnostics%projected_residual_available=.true.
+          diagnostics%last_projected_residual=projected
+        end if
+        ! A false near-zero projected residual cannot certify a vector.
+        ! Two-stage stop also requires the original energy-change gate.
+        do_verify=breakdown .or. k==limit
+        if(energy_ok .and. projected<=threshold)then
+          ! Direct-residual failures trigger replay only after appreciable
+          ! projected progress OR a sufficiently long recurrence continuation.
+          if(last_try_step==0)then
+            do_verify=.true.
+          else if(projected<=0.25d0*checked_projected)then
+            do_verify=.true.
+          else if(k-last_try_step>=max(50,10*interval))then
+            do_verify=.true.
+          end if
+        end if
+        if(do_verify)then
+          last_try_step=k;checked_projected=projected;n_replays=n_replays+1
+          if(present(diagnostics)) diagnostics%vector_reconstructions=n_replays
+          call reconstruct(k,z(:,1),candidate)
+          replay_hcalls=replay_hcalls+k-1
+          if(.not.normalize_vector(candidate))then
+            status=2;reason='invalid reconstructed eigenvector';return
+          end if
+          if(present(diagnostics)) diagnostics%h_applications=diagnostics%h_applications+1_int64
+          call apply(n,candidate,action)
+          residual=dznrm2(n,action-value*candidate,1)
+          ! Stable state variance: never subtract <H^2>-<H>^2 at large energy.
+          mu=real(zdotc(n,candidate,1,action,1),8)
+          centered_norm=dznrm2(n,action-mu*candidate,1)
+          variance=centered_norm**2
+          if(.not.finite_real(mu) .or. .not.finite_real(centered_norm) .or. &
+             .not.finite_real(variance))then
+            status=2;reason='nonfinite centered energy variance';return
+          end if
+          if(present(diagnostics))then
+            diagnostics%centered_variance=variance
+            diagnostics%centered_variance_available=.true.
+          end if
+          write(*,'(a,es25.15,a,es25.15)') &
+            'Two-stage Rayleigh energy=',mu,', stable variance=',variance
+          qualified=finite_real(residual)
+          if(qualified)then
+            if(present(diagnostics)) call observe_pair(diagnostics,1,1,value,candidate,action, &
+                                                       residual,residual_limit(tol,scale,value))
+          end if
+          if(qualified) qualified=residual<=residual_limit(tol,scale,value)
+          requested_ok=.true.
+          if(present(policy))then
+            requested_ok=finite_real(residual)
+            if(requested_ok)requested_ok=residual<=requested_threshold
+            if(present(diagnostics) .and. finite_real(residual)) &
+              call observe_requested_residual(diagnostics,1,1,requested_scale,requested_threshold,requested_ok)
+            qualified=qualified .and. requested_ok
+            if(k==limit .and. .not.requested_ok)reason='maximum iterations without requested residual convergence'
+          end if
+          write(*,'(a,i0,a,es12.4,a,es12.4)') &
+            'Two-stage direct check k=',k,', residual=',residual,', projected=',projected
+          if(qualified .and. (energy_ok .or. breakdown .or. k==n))then
+            vector=candidate;status=0
+            if(abs(value)<=sqrt(epsilon(1d0))*max(scale,tiny(1d0))) &
+              write(*,'(a)') 'Near-zero energy: use the absolute residual; the relative variance ratio is ill-conditioned.'
+            if(breakdown)then
+              if(bnorm==0d0)then
+                reason='happy breakdown (exact zero beta; residual certified)'
+              else
+                reason='numerical near-breakdown (residual certified)'
+              end if
+            else if(k==n)then
+              reason='full Krylov dimension (residual certified)'
+            else
+              reason='energy convergence (residual certified; two_stage)'
+            end if
+            write(*,'(a,i0,a,i0)') 'Two-stage replay count=',n_replays,', H-applications=', &
+                k+replay_hcalls+n_replays
+            return
+          end if
+          if(breakdown)then
+            status=2;reason='numerical breakdown without residual convergence'
+            if(present(policy))then
+              if(.not.requested_ok)reason='breakdown without requested residual convergence'
+            end if
+            return
+          end if
+        end if
+        previous=value;have_previous=.true.
+        deallocate(d,e,w,z,work,iwork,ifail)
+      end if
+      if(k<limit)then
+        q(:,3)=q(:,1);q(:,1)=r/bnorm
+      end if
+    end do
+  contains
+    subroutine reconstruct(count,coeff,out)
+      integer, intent(in) :: count
+      real(8), intent(in) :: coeff(count)
+      complex(8), intent(out) :: out(n)
+      complex(8), allocatable :: basis(:,:),hv(:)
+      integer :: step
+      allocate(basis(n,3),hv(n))
+      basis=(0d0,0d0);basis(:,1)=start;out=coeff(1)*start
+      do step=1,count-1
+        if(present(diagnostics)) diagnostics%h_applications=diagnostics%h_applications+1_int64
+        call apply(n,basis(:,1),hv)
+        hv=hv-alpha(step)*basis(:,1)
+        if(step>1) hv=hv-beta(step-1)*basis(:,3)
+        basis(:,3)=basis(:,1)
+        basis(:,1)=hv/beta(step)
+        out=out+coeff(step+1)*basis(:,1)
+      end do
+    end subroutine reconstruct
+  end subroutine lanczos_ground_two_stage_core
 
   subroutine orthogonalize(x,q,m)
     complex(8), intent(inout) :: x(:)
