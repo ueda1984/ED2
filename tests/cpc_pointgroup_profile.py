@@ -161,11 +161,22 @@ def run_case(exe, work, nsites, down, symmetry, dimension, threads, mode, timeou
     energies = [float(line.split()[-1].replace("D", "E"))
                 for line in (work / "eigenvalues.dat").read_text().splitlines() if line.strip()]
     assert len(energies) == 1 and math.isfinite(energies[0])
-    diag = dict(line.split("=", 1) for line in (work / "diagnostics.txt").read_text().splitlines()
-                if "=" in line)
+    diag_lines = (work / "diagnostics.txt").read_text().splitlines()
+    diag = dict(line.split("=", 1) for line in diag_lines if "=" in line)
     assert diag.get("lanczos_mode", "").strip() == ("two_stage" if mode == "two-stage" else "legacy")
-    residual = float(diag["pair_1_residual"])
-    assert math.isfinite(residual) and residual <= 1.01e-8, (symmetry, residual)
+    # ED2's schema=1 writes a *tabular* Ritz-pair row after pair_columns=... .
+    # The old 'pair_1_residual' dictionary key does not exist: never skip
+    # checking actual residuals because that optional key is absent.
+    assert sum(line.startswith("pair_columns=") for line in diag_lines) == 1
+    pairs = [line.split() for line in diag_lines if re.match(r"^\\s*1\\s+[TF]\\s+[TF]\\s+", line)]
+    assert len(pairs) == 1 and len(pairs[0]) == 8, ("Missing native Ritz-pair diagnostic", work)
+    pair = pairs[0]
+    assert pair[1] == "T" and pair[2] == "T", ("Uncertified eigenpair", work, pair)
+    assert abs(float(pair[3]) - energies[0]) < 1e-8
+    assert abs(float(pair[6]) - 1.) < 1e-8
+    residual = float(pair[5])
+    threshold = float(pair[7])
+    assert math.isfinite(residual) and residual <= min(1.01e-8, threshold * 1.01), (symmetry, residual, threshold)
     h_calls = int(diag["h_applications"])
     assert h_calls > 0
     phases = {}
