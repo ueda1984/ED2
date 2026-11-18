@@ -5,6 +5,8 @@ on:
     branches: [codex/ed2-cpc-cubic-oh-1000-presto]
     paths:
       - "source/state_lists.f90"
+      - "tests/Makefile.am"
+      - "docs/development/cpc-cubic-oh-1000-presto-20261118.md"
       - "tests/cpc_cubic_pointgroup.py"
       - "tests/cpc_cubic_pointgroup_regression.py"
       - "tools/cpc_presto_cubic_benchmark.py"
@@ -14,6 +16,8 @@ on:
   pull_request:
     paths:
       - "source/state_lists.f90"
+      - "tests/Makefile.am"
+      - "docs/development/cpc-cubic-oh-1000-presto-20261118.md"
       - "tests/cpc_cubic_pointgroup.py"
       - "tests/cpc_cubic_pointgroup_regression.py"
       - "tools/cpc_presto_cubic_benchmark.py"
