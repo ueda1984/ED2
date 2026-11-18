@@ -367,7 +367,7 @@ contains
     ! are sorted before any matrix element, preserving legacy offdiag order.
     max_jd=1
     !$omp parallel do private(i,j,k,site,spins,moved,incident,nel,old_j,i1,i2,n1,n2,c,phase,jd,id, & 
-    !$omp thread_id,t0,sampled_start,do_sample) &
+    !$omp& thread_id,t0,sampled_start,do_sample) &
     !$omp reduction(max:max_jd) schedule(static)
     do i=1,wk_dim
       if(profile)then
