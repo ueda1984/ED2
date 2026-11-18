@@ -4,8 +4,76 @@ module ham2vec
   real(8), parameter :: eps = 1.0d-15
   integer, allocatable :: wk_loc(:,:)
   complex(8), allocatable :: wk_ele(:,:)
+  ! Optional compressed row-wise copy of fully cached COMPLEX Hamiltonian.
+  ! Default is historical padded storage; no effect unless enabled.
+  logical, save :: csr_complex_cache=.false.
+  integer, allocatable, save :: csr_rowptr(:),csr_target(:)
+  complex(8), allocatable, save :: csr_coeff(:)
   !
 contains
+
+  subroutine configure_csr_complex_cache(lv)
+    use iso_fortran_env, only: int64
+    use input_param, only: wk_dim
+    integer, intent(in) :: lv
+    integer :: status,istat,i,j,nnz,p
+    integer(int64) :: entries,extra_bytes
+    character(len=16) :: setting
+    setting=''
+    call get_environment_variable('ED2_CSR_COMPLEX_CACHE',setting,status=status)
+    if(status==0)then
+      if(trim(adjustl(setting))/='0'.and.trim(adjustl(setting))/='1') &
+        error stop 'ED2_CSR_COMPLEX_CACHE must be 0 or 1'
+    else if(status/=1)then
+      error stop 'ED2_CSR_COMPLEX_CACHE flag too long or invalid'
+    end if
+    csr_complex_cache=status==0.and.trim(adjustl(setting))=='1'
+    if(allocated(csr_rowptr))deallocate(csr_rowptr)
+    if(allocated(csr_target))deallocate(csr_target)
+    if(allocated(csr_coeff))deallocate(csr_coeff)
+    if(.not.csr_complex_cache)return
+    if(wk_dim/=lv)error stop 'ED2_CSR_COMPLEX_CACHE requires fully cached matrix'
+
+    ! Preserve all original non-sentinel terms, including explicit zeros.
+    ! No sorting or floating-point reassociation is allowed.
+    allocate(csr_rowptr(lv+1),stat=istat)
+    if(istat/=0)error stop 'ED2_CSR_COMPLEX_CACHE row allocation failed'
+    csr_rowptr(1)=1
+    entries=0_int64
+    do i=1,lv
+      nnz=0
+      do j=1,size(wk_loc,1)
+        if(wk_loc(j,i)==0)exit
+        if(wk_loc(j,i)<1.or.wk_loc(j,i)>lv) &
+          error stop 'ED2_CSR_COMPLEX_CACHE invalid target'
+        nnz=nnz+1
+      end do
+      entries=entries+int(nnz,int64)
+      if(entries>=int(huge(i),int64)) &
+        error stop 'ED2_CSR_COMPLEX_CACHE row index capacity exceeded'
+      csr_rowptr(i+1)=int(entries)+1
+    end do
+
+    allocate(csr_target(int(entries)),csr_coeff(int(entries)),stat=istat)
+    if(istat/=0)error stop 'ED2_CSR_COMPLEX_CACHE values allocation failed'
+    do i=1,lv
+      p=csr_rowptr(i)
+      do j=1,size(wk_loc,1)
+        if(wk_loc(j,i)==0)exit
+        csr_target(p)=wk_loc(j,i)
+        csr_coeff(p)=wk_ele(j,i)
+        p=p+1
+      end do
+      if(p/=csr_rowptr(i+1))error stop 'ED2_CSR_COMPLEX_CACHE row count mismatch'
+    end do
+    extra_bytes=int(storage_size(csr_rowptr)/8,int64)*int(size(csr_rowptr),int64)+ &
+      int(storage_size(csr_target)/8,int64)*int(size(csr_target),int64)+ &
+      int(storage_size(csr_coeff)/8,int64)*int(size(csr_coeff),int64)
+    write(*,'(a,i0,a,i0)') &
+      'Hamiltonian action: csr-complex cache entries=',size(csr_coeff), &
+      ', extra_bytes=',extra_bytes
+  end subroutine configure_csr_complex_cache
+
 
   subroutine make_wk_loc_and_ele(lv)
     use state_lists, only: j_flip_ni, representative_SQ, findstate, list_fly, a_down_spin, &
@@ -239,6 +307,7 @@ contains
     write(*,*) "Current MNTE = ", wk_dim1 - 1
     write(*,*) "Optimal MNTE = ", max_jd - 1
 
+    call configure_csr_complex_cache(lv)
     return
   end subroutine make_wk_loc_and_ele
 
@@ -445,14 +514,24 @@ contains
 
     wk_dim1= size(wk_ele,1)
 
-    !$omp parallel do private(i,j)
-    do i = 1, wk_dim
-      v0(i) = 0.0d0
-      do j = 1, wk_dim1
-        if(wk_loc(j,i) == 0) exit
-        v0(i) = v0(i) + wk_ele(j,i) * v1(wk_loc(j,i))
+    if(csr_complex_cache)then
+      !$omp parallel do private(i,j)
+      do i = 1, wk_dim
+        v0(i) = 0.0d0
+        do j = csr_rowptr(i),csr_rowptr(i+1)-1
+          v0(i) = v0(i) + csr_coeff(j) * v1(csr_target(j))
+        end do
       end do
-    end do
+    else
+      !$omp parallel do private(i,j)
+      do i = 1, wk_dim
+        v0(i) = 0.0d0
+        do j = 1, wk_dim1
+          if(wk_loc(j,i) == 0) exit
+          v0(i) = v0(i) + wk_ele(j,i) * v1(wk_loc(j,i))
+        end do
+      end do
+    end if
     !
 
     !$omp parallel do private(n0,n1,n2,i1,i2,s,ni,id,ell,i,j,st_list,c)
