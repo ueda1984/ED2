@@ -8,6 +8,7 @@ on:
       - ".github/workflows/cpc-pointgroup-profile.yml"
       - "source/main.f90"
       - "tests/cpc_pointgroup_profile.py"
+      - "tests/cpc_pointgroup_translation_crosscheck.py"
       - "tests/Makefile.am"
       - "Makefile.am"
   pull_request:
@@ -15,6 +16,7 @@ on:
       - ".github/workflows/cpc-pointgroup-profile.yml"
       - "source/main.f90"
       - "tests/cpc_pointgroup_profile.py"
+      - "tests/cpc_pointgroup_translation_crosscheck.py"
       - "tests/Makefile.am"
       - "Makefile.am"
   workflow_dispatch:
@@ -49,6 +51,17 @@ jobs:
           ./configure FC="$FC" FCFLAGS="$FCFLAGS"
           make -j2
           make check
+      - name: Assert independently certified point-group spectra and Ritz residuals
+        run: |
+          make check-pointgroup POINTGROUP_OUTPUT="$RUNNER_TEMP/pointgroup-physics"
+          python3 - "$RUNNER_TEMP/pointgroup-physics/report.json" <<'PY'
+          import json,sys
+          r=json.load(open(sys.argv[1],encoding="utf-8"))
+          assert r["passed"] and len(r["cases"])==31
+          a=[x for case in r["cases"] for x in case.get("lanczos",[])]
+          assert len(a)==4 and all(x["direct_residual"]<=1.1e-8 for x in a)
+          print("POINTGROUP PHYSICS PASS: 31 cases + 4 certified Ritz pairs")
+          PY
       - name: Profile 4x4 and 6x6 three-magnon point-group sectors
         run: |
           make check-pointgroup-profile PGPROFILE_OUTPUT="$RUNNER_TEMP/pointgroup-profile" PGPROFILE_FLAGS="--sizes 4,6 --threads 1 --repeat 1"
@@ -68,6 +81,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: pointgroup-profile-${{ matrix.compiler }}
-          path: ${{ runner.temp }}/pointgroup-profile/
+          path: |
+            ${{ runner.temp }}/pointgroup-profile/
+            ${{ runner.temp }}/pointgroup-physics/
           if-no-files-found: warn
           retention-days: 30
