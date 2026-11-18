@@ -6,7 +6,7 @@ program cpc_csr_matvec_driver
     list_s,list_r,explist
   use state_lists, only: get_cum_ltd_rep_combination, &
     cum_ltd_rep_combination,allocate_lists_omp_SQ
-  use ham2vec, only: make_wk_loc_and_ele,ham_to_vec_wave_vector
+  use ham2vec, only: make_wk_loc_and_ele,ham_to_vec_wave_vector,wk_ele
   implicit none
   complex(real64), allocatable :: v(:),h_v(:)
   integer :: i,t,unit_no,io_status
@@ -22,6 +22,7 @@ program cpc_csr_matvec_driver
   if(THS<=0)error stop 'CSR test: invalid basis dimension'
   call allocate_lists_omp_SQ
   call make_wk_loc_and_ele(THS)
+  write(*,'(a,i0)') 'CPC_CSR_NATIVE_IMAG_COUNT=',count(aimag(wk_ele)/=0.0_real64)
 
   allocate(v(THS),h_v(THS))
   open(newunit=unit_no,file='csr_matvec_bits.txt',status='replace', &
