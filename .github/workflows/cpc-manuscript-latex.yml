@@ -4,6 +4,12 @@ on:
   push:
     branches:
       - codex/ed2-cpc-stationary-dm-scaling
+      - codex/ed2-cpc-publication-readiness
+    paths:
+      - ".github/workflows/cpc-manuscript-latex.yml"
+      - "paper/**"
+      - "docs/development/cpc-stationary-dm-reference.csv"
+  pull_request:
     paths:
       - ".github/workflows/cpc-manuscript-latex.yml"
       - "paper/**"
@@ -33,6 +39,17 @@ jobs:
           python3 -S paper/check_dm_figure.py \
             --csv docs/development/cpc-stationary-dm-reference.csv \
             --tex paper/cpc_ed2_main.tex --self-test
+      - name: Verify PR17 PRESTO timing transcription against source CSV
+        run: |
+          python3 -S paper/check_pr17_presto_table.py \
+            --csv paper/data/pr17_presto_coordinate_cache_pilot.csv \
+            --tex paper/cpc_ed2_main.tex
+      - name: Report CPC submission gate blockers without pretending submission readiness
+        run: |
+          mkdir -p "$RUNNER_TEMP/ed2-manuscript"
+          python3 -S paper/audit_cpc_submission.py \
+            --repo "$PWD" \
+            --output "$RUNNER_TEMP/ed2-manuscript/cpc-readiness-audit.json"
       - name: Compile source-pinned manuscript PDF
         run: |
           set -eu
@@ -50,6 +67,7 @@ jobs:
             "$RUNNER_TEMP/ed2-manuscript/article-text.txt"
           grep -q 'Program summary' "$RUNNER_TEMP/ed2-manuscript/article-text.txt"
           grep -q 'Conclusions' "$RUNNER_TEMP/ed2-manuscript/article-text.txt"
+          grep -q '1000-site' "$RUNNER_TEMP/ed2-manuscript/article-text.txt"
           sha256sum paper/cpc_ed2_main.tex \
             "$RUNNER_TEMP/ed2-manuscript/cpc_ed2_main.pdf" \
             | tee "$RUNNER_TEMP/ed2-manuscript/source-and-pdf-sha256.txt"

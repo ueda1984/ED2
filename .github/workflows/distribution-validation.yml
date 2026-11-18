@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - codex/ed2-phase2-distribution-validation
+      - codex/ed2-cpc-publication-readiness
     paths:
       - "Makefile.am"
       - "configure.ac"
@@ -12,6 +13,7 @@ on:
       - "script_*/**"
       - "input/**"
       - "docs/**"
+      - "paper/**"
       - ".github/workflows/distribution-validation.yml"
   workflow_dispatch:
 

@@ -57,8 +57,17 @@ cases: **216 sites / 3 magnons / dimension 7,677** and
 **1000 sites / 2 magnons / dimension 503**. QuSpin 1.0.1 independently
 reproduces both models; the 1000-site two-magnon energy is further
 checked with an independent relative-displacement Hamiltonian.
-The 1000-site **three**-magnon numerical claim remains unverified.
-Shared-runner timings are not controlled performance comparisons.
+The new [1000-site three-magnon Gamma/O_h native PR17 comparison](data/README.md)
+has four independently counted 1D symmetry sectors and **48/48**
+identical-input, identical-H-application numerical checks across
+PR17 coordinate-cache OFF/ON modes. The maximum directly evaluated
+Ritz residual is 9.71161e-9. This is a *large native numerical
+consistency test*, not an independent reference spectrum for all four
+sectors. The [12-row exploratory PRESTO medians](data/pr17_presto_coordinate_cache_pilot.csv)
+are checked against the [T8 manuscript table](cpc_ed2_main.tex)
+by `paper/check_pr17_presto_table.py`. Operator exclusivity
+confirmation remains outstanding; do not treat the ratios as
+CPC-ready speedup data.
 
 ## Few-magnon cache performance pilot
 
@@ -85,6 +94,16 @@ repeated experiment remains outstanding.
 | Literature spin-convention check | [Independent finite-size XYZ-DM verification](../docs/development/cpc-literature-matched-benchmark.md) |
 | Cache capacity and resource caveats | [Cache allocation derivation](../docs/development/cpc-cache-pareto-evaluation.md) |
 | Controlled performance measurements (not yet complete) | [Dedicated-node gated protocol](../docs/development/cpc-controlled-node-protocol.md) |
+
+## Publication gate tracking
+
+The [eight-gate CPC CPiP submission plan](CPC_SUBMISSION_GATES.md)
+separates scientific verification, controlled performance claims,
+source distribution, author/CRediT approval, version and licence,
+Program Library/Mendeley archiving, final manuscript QA and editorial
+submission. Run `python3 -S paper/audit_cpc_submission.py` for a
+conservative automated snapshot of identifiable blockers. No script
+issues DOI, tags a repository or submits a manuscript.
 
 ## Pre-submission blockers
 

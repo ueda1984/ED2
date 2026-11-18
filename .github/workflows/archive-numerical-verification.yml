@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - codex/ed2-phase2b-release-audit
+      - codex/ed2-cpc-publication-readiness
     paths:
       - ".github/workflows/archive-numerical-verification.yml"
       - "Makefile.am"
@@ -13,6 +14,7 @@ on:
       - "tools/**"
       - "script_*/**"
       - "input/**"
+      - "paper/**"
   workflow_dispatch:
 
 permissions:

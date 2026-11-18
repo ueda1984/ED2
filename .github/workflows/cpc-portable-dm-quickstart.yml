@@ -4,11 +4,13 @@ on:
   push:
     branches:
       - codex/ed2-cpc-stationary-dm-scaling
+      - codex/ed2-cpc-publication-readiness
     paths:
       - ".github/workflows/cpc-portable-dm-quickstart.yml"
       - "tests/cpc_portable_dm_quickstart.py"
       - "tests/Makefile.am"
       - "configure.ac"
+      - "paper/**"
       - "source/**"
   workflow_dispatch:
 
