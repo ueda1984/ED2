@@ -2,14 +2,18 @@ name: ED2 cubic Oh symmetry and PRESTO protocol
 
 on:
   push:
-    branches: [codex/ed2-cpc-cubic-oh-1000-presto, codex/ed2-cubic-cache-mnte-cap-experiment, codex/ed2-cubic-anchored-key-oracle]
+    branches: [codex/ed2-cpc-cubic-oh-1000-presto, codex/ed2-cubic-cache-mnte-cap-experiment, codex/ed2-cubic-anchored-key-oracle, codex/ed2-cubic-native-anchored-representatives]
     paths:
       - "source/state_lists.f90"
+      - "source/cubic_anchored_lookup.f90"
+      - "source/ham2vec.f90"
+      - "source/Makefile.am"
       - "tests/Makefile.am"
       - "docs/development/cpc-cubic-oh-1000-presto-20261118.md"
       - "docs/development/cpc-cubic-cache-mnte-study-20261118.md"
       - "tests/cpc_cubic_pointgroup.py"
       - "tests/cpc_cubic_anchored_orbit_key_oracle.py"
+      - "tests/cpc_cubic_native_anchored_regression.py"
       - "tests/cpc_cubic_pointgroup_regression.py"
       - "tests/cpc_cubic_1000_one_magnon_smoke.py"
       - "tests/cpc_pointgroup_profile.py"
@@ -20,11 +24,15 @@ on:
   pull_request:
     paths:
       - "source/state_lists.f90"
+      - "source/cubic_anchored_lookup.f90"
+      - "source/ham2vec.f90"
+      - "source/Makefile.am"
       - "tests/Makefile.am"
       - "docs/development/cpc-cubic-oh-1000-presto-20261118.md"
       - "docs/development/cpc-cubic-cache-mnte-study-20261118.md"
       - "tests/cpc_cubic_pointgroup.py"
       - "tests/cpc_cubic_anchored_orbit_key_oracle.py"
+      - "tests/cpc_cubic_native_anchored_regression.py"
       - "tests/cpc_cubic_pointgroup_regression.py"
       - "tests/cpc_cubic_1000_one_magnon_smoke.py"
       - "tests/cpc_pointgroup_profile.py"
@@ -84,6 +92,7 @@ jobs:
           files = [
               "tests/cpc_cubic_pointgroup.py",
               "tests/cpc_cubic_anchored_orbit_key_oracle.py",
+              "tests/cpc_cubic_native_anchored_regression.py",
               "tests/cpc_cubic_pointgroup_regression.py",
               "tests/cpc_cubic_1000_one_magnon_smoke.py",
               "tests/cpc_pointgroup_profile.py",
@@ -136,6 +145,23 @@ jobs:
       - name: Independent physical projected Hamiltonians for all Oh 1D irreps
         run: |
           python3 tests/cpc_cubic_pointgroup_regression.py --exe "$PWD/source/QS3ED2" --output "$RUNNER_TEMP/cubic-physics" --threads 1
+      - name: Native anchored representatives, compare every cache hop to the original ID/character
+        run: |
+          python3 tests/cpc_cubic_native_anchored_regression.py --exe "$PWD/source/QS3ED2" \
+            --sizes 4,6 --threads 1 --verify-hops --output "$RUNNER_TEMP/cubic-anchored-hops"
+          python3 tests/cpc_cubic_native_anchored_regression.py --exe "$PWD/source/QS3ED2" \
+            --sizes 4,6 --threads 4 --output "$RUNNER_TEMP/cubic-anchored-omp4"
+      - name: Native anchored fast path fails closed on translation-only sector
+        run: |
+          if ED2_CUBIC_ANCHORED_REP=1 python3 tools/cpc_presto_cubic_benchmark.py \
+            --source-revision "$(git rev-parse HEAD)" \
+            --source-archive "$RUNNER_TEMP/staged-source/ed2-source.tar.gz" \
+            --preset cubic-smoke --allow-shared --sizes 4 --sectors gamma-t --plan-only \
+            --output "$RUNNER_TEMP/should-not-exist" > "$RUNNER_TEMP/anchor-refusal.log" 2>&1; then
+            echo "ERROR: translation-only sector accepted nontrivial O_h anchored lookup" >&2
+            exit 1
+          fi
+          grep -q 'Anchored cubic representatives require a 1D O_h sector' "$RUNNER_TEMP/anchor-refusal.log"
       - name: Run and audit cubic 64/216-site shared smoke
         run: |
           python3 tools/cpc_presto_cubic_benchmark.py --exe "$PWD/source/QS3ED2" \
@@ -223,5 +249,7 @@ jobs:
             ${{ runner.temp }}/audit-216/
             ${{ runner.temp }}/cubic-216-mnte64/
             ${{ runner.temp }}/audit-216-mnte64/
+            ${{ runner.temp }}/cubic-anchored-hops/
+            ${{ runner.temp }}/cubic-anchored-omp4/
           if-no-files-found: warn
           retention-days: 30
