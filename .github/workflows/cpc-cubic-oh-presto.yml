@@ -2,7 +2,7 @@ name: ED2 cubic Oh symmetry and PRESTO protocol
 
 on:
   push:
-    branches: [codex/ed2-cpc-cubic-oh-1000-presto, codex/ed2-cubic-cache-mnte-cap-experiment, codex/ed2-cubic-anchored-key-oracle, codex/ed2-cubic-native-anchored-representatives, codex/ed2-cubic-basis-phase-instrumentation, codex/ed2-cubic-fast-oh-group-certificate, codex/ed2-cubic-anchored-basis-builder, codex/ed2-cubic-local-bond-cache, codex/ed2-cubic-cache-phase-profile]
+    branches: [codex/ed2-cpc-cubic-oh-1000-presto, codex/ed2-cubic-cache-mnte-cap-experiment, codex/ed2-cubic-anchored-key-oracle, codex/ed2-cubic-native-anchored-representatives, codex/ed2-cubic-basis-phase-instrumentation, codex/ed2-cubic-fast-oh-group-certificate, codex/ed2-cubic-anchored-basis-builder, codex/ed2-cubic-local-bond-cache, codex/ed2-cubic-cache-phase-profile, codex/ed2-cubic-direct-hop-table]
     paths:
       - "source/state_lists.f90"
       - "source/cubic_anchored_lookup.f90"
@@ -17,6 +17,7 @@ on:
       - "docs/development/cpc-cubic-anchored-basis-20261118.md"
       - "docs/development/cpc-cubic-local-bond-cache-20261118.md"
       - "docs/development/cpc-cubic-cache-profiler-20261118.md"
+      - "docs/development/cpc-cubic-direct-hop-table-20261118.md"
       - "tests/cpc_cubic_pointgroup.py"
       - "tests/cpc_cubic_anchored_orbit_key_oracle.py"
       - "tests/cpc_cubic_native_anchored_regression.py"
@@ -25,6 +26,7 @@ on:
       - "tests/cpc_cubic_anchored_basis_regression.py"
       - "tests/cpc_cubic_local_bond_cache_regression.py"
       - "tests/cpc_cubic_cache_phase_profile_regression.py"
+      - "tests/cpc_cubic_direct_hop_table_regression.py"
       - "tests/cubic_cache_driver.f90"
       - "tests/cubic_basis_driver.f90"
       - "tests/cpc_cubic_pointgroup_regression.py"
@@ -49,6 +51,7 @@ on:
       - "docs/development/cpc-cubic-anchored-basis-20261118.md"
       - "docs/development/cpc-cubic-local-bond-cache-20261118.md"
       - "docs/development/cpc-cubic-cache-profiler-20261118.md"
+      - "docs/development/cpc-cubic-direct-hop-table-20261118.md"
       - "tests/cpc_cubic_pointgroup.py"
       - "tests/cpc_cubic_anchored_orbit_key_oracle.py"
       - "tests/cpc_cubic_native_anchored_regression.py"
@@ -57,6 +60,7 @@ on:
       - "tests/cpc_cubic_anchored_basis_regression.py"
       - "tests/cpc_cubic_local_bond_cache_regression.py"
       - "tests/cpc_cubic_cache_phase_profile_regression.py"
+      - "tests/cpc_cubic_direct_hop_table_regression.py"
       - "tests/cubic_cache_driver.f90"
       - "tests/cubic_basis_driver.f90"
       - "tests/cpc_cubic_pointgroup_regression.py"
@@ -124,6 +128,7 @@ jobs:
               "tests/cpc_cubic_anchored_basis_regression.py",
               "tests/cpc_cubic_local_bond_cache_regression.py",
               "tests/cpc_cubic_cache_phase_profile_regression.py",
+              "tests/cpc_cubic_direct_hop_table_regression.py",
               "tests/cpc_cubic_pointgroup_regression.py",
               "tests/cpc_cubic_1000_one_magnon_smoke.py",
               "tests/cpc_pointgroup_profile.py",
@@ -281,6 +286,27 @@ jobs:
           fi
           grep -q 'Cache profiling requires ED2_CUBIC_LOCAL_BOND_CACHE=1' \
             "$RUNNER_TEMP/reject-profiler-plan.log"
+      - name: Dense cubic direct-hop table must preserve every complex Hamiltonian cache bit
+        run: |
+          python3 tests/cpc_cubic_direct_hop_table_regression.py \
+            --driver "$PWD/tests/cubic_cache_driver" --exe "$PWD/source/QS3ED2" \
+            --sides 4,6 --threads 1,4 \
+            --output "$RUNNER_TEMP/cubic-direct-hop-small"
+          python3 tests/cpc_cubic_direct_hop_table_regression.py \
+            --driver "$PWD/tests/cubic_cache_driver" --exe "$PWD/source/QS3ED2" \
+            --sides 10 --threads 1,4,8 --skip-lanczos \
+            --output "$RUNNER_TEMP/cubic-direct-hop-n1000"
+          if ED2_CUBIC_DIRECT_HOP_TABLE=1 python3 tools/cpc_presto_cubic_benchmark.py \
+            --source-revision "$(git rev-parse HEAD)" \
+            --source-archive "$RUNNER_TEMP/staged-source/ed2-source.tar.gz" \
+            --preset cubic-smoke --allow-shared --sizes 4 --sectors oh-a1g \
+            --plan-only --output "$RUNNER_TEMP/reject-direct-hop-plan" \
+            > "$RUNNER_TEMP/reject-direct-hop-plan.log" 2>&1; then
+            echo "ERROR: unguarded dense direct hop plan" >&2
+            exit 1
+          fi
+          grep -q 'Direct cubic hop table requires all four previous cubic opt-ins' \
+            "$RUNNER_TEMP/reject-direct-hop-plan.log"
       - name: Local cubic cache must reject general chains and incompatible non-XXZ bonds
         run: |
           if ED2_CUBIC_LOCAL_BOND_CACHE=1 tests/test_ex1.sh \
@@ -469,5 +495,8 @@ jobs:
             ${{ runner.temp }}/cubic-local-cache-small/summary.json
             ${{ runner.temp }}/cubic-local-cache-n1000/summary.json
             ${{ runner.temp }}/cubic-cache-profiler-proof/n10-oh-a1g-t1-profiled/driver.log
+            ${{ runner.temp }}/cubic-direct-hop-small/summary.json
+            ${{ runner.temp }}/cubic-direct-hop-n1000/summary.json
+            ${{ runner.temp }}/cubic-direct-hop-n1000/n10-oh-a1g-t1-direct/driver.log
           if-no-files-found: warn
           retention-days: 30
