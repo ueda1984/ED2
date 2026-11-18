@@ -152,7 +152,7 @@ def append_trial(path, rec):
         os.fsync(f.fileno())
 
 
-def execute(exe, out, spec, allocation_info, timeout):
+def execute(exe, out, spec, allocation_info, timeout, mnte):
     side, sector, threads, repeat, period, builder = spec
     key = f"s{side}-{sector}-t{threads}-{period}{repeat}-{builder}"
     work = out / "trials" / key
@@ -160,7 +160,7 @@ def execute(exe, out, spec, allocation_info, timeout):
     bonds = cubic.canonical_bonds(side)
     assert cubic.check_hamiltonian(side)
     dimension = cubic.sector_dimensions(side)[sector]
-    cubic.write_input(work, side, 3, generators, bonds, 2000, -1)
+    cubic.write_input(work, side, 3, generators, bonds, 2000, -1, mnte=mnte)
     before = os.environ.get("ED2_FORCE_LEGACY_ORBITS")
     try:
         if builder == "forced-legacy":
@@ -186,7 +186,7 @@ def execute(exe, out, spec, allocation_info, timeout):
     obs.update(dict(key=key, side=side, sector=sector, threads=threads,
                     repetition=repeat, period=period, builder=builder,
                     atomic_orbits=atomic, validated_noncommuting_action=normal_form,
-                    sample_utc=now(), status="PASS",
+                    mnte=mnte, sample_utc=now(), status="PASS",
                     all_input_sha256={f.name: sha(f) for f in work.iterdir()
                                       if f.suffix == ".dat" and f.name not in
                                       ("eigenvalues.dat", "diagnostics.dat")}))
@@ -206,6 +206,8 @@ def main():
     p.add_argument("--cpu-list", help="Optional explicitly verified physical logical CPU IDs")
     p.add_argument("--warmups", type=int)
     p.add_argument("--repeats", type=int)
+    p.add_argument("--mnte", type=int, default=-1,
+                   help="Cubic fixed-three-magnon cache capacity: -1 original auto, >=54 conservative degree bound")
     p.add_argument("--timeout", type=int, default=1200)
     p.add_argument("--time-budget", type=int, default=36000)
     p.add_argument("--seed", type=int, default=1984)
@@ -235,6 +237,8 @@ def main():
         p.error("Threads must be distinct positive integers")
     if not 0 <= warmups <= 5 or not 1 <= repeats <= 20:
         p.error("Invalid warmups/repeats")
+    if a.mnte != -1 and a.mnte < 54:
+        p.error("MNTE must be -1 (original) or >=54 (3 magnons times 18 neighbors)")
     if a.timeout < 5 or a.time_budget < a.timeout:
         p.error("Invalid per-run timeout / total time budget")
     if a.time_budget > 40000:
@@ -245,7 +249,7 @@ def main():
         count = sum(1 if sec == "gamma-t" or side > 4 else 2
                     for side in sizes for sec in sectors for _ in threads) * (warmups + repeats)
         print(json.dumps(dict(sizes=sizes, threads=threads, sectors=sectors, warmups=warmups, repeats=repeats,
-                              trial_count=count,
+                              trial_count=count, mnte=a.mnte,
                               source_revision=a.source_revision, archive_sha256=sha(archive)),
                          indent=2))
         return
@@ -266,7 +270,7 @@ def main():
                   symmetry_scope="Gamma translations and four 1D O_h irreps",
                   legacy_rule="force old basis only for side=4, no infeasible large-side legacy",
                   preset=a.preset, sizes=sizes, threads=threads, sectors=sectors, warmups=warmups,
-                  repeats=repeats, timeout=a.timeout, time_budget=a.time_budget,
+                  repeats=repeats, mnte=a.mnte, timeout=a.timeout, time_budget=a.time_budget,
                   seed=a.seed, protocol="preset-specific measured repeats and warmups",
                   publication_ready=False,
                   reason="Operator confirmation of exclusivity and independent review required")
@@ -307,7 +311,7 @@ def main():
                             raise TimeoutError("Time budget reached before next trial; results incomplete")
                         spec = (side, sector, nt, repeat, period, variant)
                         try:
-                            obs = execute(exe, root, spec, allocation_info, a.timeout)
+                            obs = execute(exe, root, spec, allocation_info, a.timeout, a.mnte)
                             obs["source_revision"] = a.source_revision
                             obs["archive_sha256"] = record["archive_sha256"]
                             append_trial(journal, obs)
