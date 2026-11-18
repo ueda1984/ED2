@@ -1,0 +1,31 @@
+name: ED2 original-main CSR source snapshot for independent verification
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [codex/ed2-main-complex-csr]
+    paths:
+      - ".github/workflows/main-csr-source-snapshot.yml"
+
+jobs:
+  source-snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Package exact checked-out source for independent GNU Fortran validation
+        run: |
+          tar -czf "$RUNNER_TEMP/ed2-csr-main-source.tar.gz" \
+            --exclude=.git -C "$GITHUB_WORKSPACE" .
+          sha256sum "$RUNNER_TEMP/ed2-csr-main-source.tar.gz" \
+            > "$RUNNER_TEMP/ed2-csr-main-source.sha256"
+          printf '%s\n' "$GITHUB_SHA" > "$RUNNER_TEMP/ed2-source-revision.txt"
+      - name: Preserve full source package
+        uses: actions/upload-artifact@v4
+        with:
+          name: ed2-main-csr-source-snapshot
+          path: |
+            ${{ runner.temp }}/ed2-csr-main-source.tar.gz
+            ${{ runner.temp }}/ed2-csr-main-source.sha256
+            ${{ runner.temp }}/ed2-source-revision.txt
+          retention-days: 7
