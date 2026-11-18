@@ -167,6 +167,7 @@ def execute(exe, out, spec, allocation_info, timeout, mnte):
     before_direct = os.environ.get("ED2_CUBIC_DIRECT_HOP_TABLE")
     before_coord_cache = os.environ.get("ED2_CUBIC_BASIS_COORD_CACHE")
     before_pruned = os.environ.get("ED2_CUBIC_BASIS_PRUNED_CANON")
+    before_skip_hash = os.environ.get("ED2_CUBIC_SKIP_UNUSED_HASH")
     try:
         if builder == "forced-legacy":
             os.environ["ED2_FORCE_LEGACY_ORBITS"] = "1"
@@ -175,11 +176,16 @@ def execute(exe, out, spec, allocation_info, timeout, mnte):
             os.environ.pop("ED2_CUBIC_DIRECT_HOP_TABLE", None)
             os.environ.pop("ED2_CUBIC_BASIS_COORD_CACHE", None)
             os.environ.pop("ED2_CUBIC_BASIS_PRUNED_CANON", None)
+            os.environ.pop("ED2_CUBIC_SKIP_UNUSED_HASH", None)
         else:
             os.environ.pop("ED2_FORCE_LEGACY_ORBITS", None)
         obs = physics.run_case(exe, work, side ** 3, 3, sector, dimension,
                                threads, "two-stage", timeout)
     finally:
+        if before_skip_hash is None:
+            os.environ.pop("ED2_CUBIC_SKIP_UNUSED_HASH", None)
+        else:
+            os.environ["ED2_CUBIC_SKIP_UNUSED_HASH"] = before_skip_hash
         if before_pruned is None:
             os.environ.pop("ED2_CUBIC_BASIS_PRUNED_CANON", None)
         else:
@@ -240,6 +246,10 @@ def execute(exe, out, spec, allocation_info, timeout, mnte):
     direct_hop_reported = "Representative lookup: cubic-direct-hop-pairs" in output
     if direct_hop_reported != (direct_hop_table and builder == "fast"):
         raise AssertionError("Native direct-hop table disagrees with requested fast path")
+    skip_unused_hash = os.environ.get("ED2_CUBIC_SKIP_UNUSED_HASH", "") == "1"
+    skip_reported = "Representative lookup: cubic-direct-only-unused-hash-elided" in output
+    if skip_reported != (skip_unused_hash and builder == "fast"):
+        raise AssertionError("Native direct-hop unused-hash elision provenance mismatch")
     profile_reported = "Cubic cache profile: representative_key_setup_wall_s=" in output
     local_profile_reported = "Cubic cache profile: resolver_calls=" in output
     if profile_reported != (cache_profile and builder == "fast"):
@@ -257,6 +267,7 @@ def execute(exe, out, spec, allocation_info, timeout, mnte):
                     repetition=repeat, period=period, builder=builder,
                     atomic_orbits=atomic, anchored_basis=anchored_basis_requested,
                     basis_coord_cache=basis_coord_cache, basis_pruned_canon=basis_pruned_canon,
+                    skip_unused_hash=skip_unused_hash,
                     native_basis_builder=("anchored-cubic" if anchored_basis_used else
                                           "atomic-orbits" if atomic else "forced-legacy"),
                     validated_noncommuting_action=normal_form,
@@ -343,6 +354,12 @@ def main():
     if direct_setting not in ("0", "1"):
         p.error("ED2_CUBIC_DIRECT_HOP_TABLE must be 0 or 1")
     direct_hop_table = direct_setting == "1"
+    skip_setting = os.environ.get("ED2_CUBIC_SKIP_UNUSED_HASH", "0")
+    if skip_setting not in ("0", "1"):
+        p.error("ED2_CUBIC_SKIP_UNUSED_HASH must be 0 or 1")
+    skip_unused_hash = skip_setting == "1"
+    if skip_unused_hash and not direct_hop_table:
+        p.error("Skipping unused orbit hash requires ED2_CUBIC_DIRECT_HOP_TABLE=1")
     if direct_hop_table and not (local_bond_cache and anchored and
                                  fast_group and anchored_basis):
         p.error("Direct cubic hop table requires all four previous cubic opt-ins")
@@ -380,6 +397,7 @@ def main():
                                anchored_lookup=anchored, anchored_verify=anchored_verify,
                                fast_group_validation=fast_group, anchored_basis=anchored_basis,
                    basis_coord_cache=basis_coord_cache, basis_pruned_canon=basis_pruned_canon,
+                    skip_unused_hash=skip_unused_hash,
                    local_bond_cache=local_bond_cache,
                    cache_profile=cache_profile, direct_hop_table=direct_hop_table,
                               source_revision=a.source_revision, archive_sha256=sha(archive)),
@@ -406,6 +424,7 @@ def main():
                    anchored_verify=anchored_verify,
                    fast_group_validation=fast_group, anchored_basis=anchored_basis,
                    basis_coord_cache=basis_coord_cache, basis_pruned_canon=basis_pruned_canon,
+                    skip_unused_hash=skip_unused_hash,
                    local_bond_cache=local_bond_cache,
                    cache_profile=cache_profile, direct_hop_table=direct_hop_table,
                    timeout=a.timeout, time_budget=a.time_budget,
