@@ -86,6 +86,10 @@ def main():
     assert isinstance(basis_coord_cache, bool)
     if basis_coord_cache:
         assert summary["anchored_basis"]
+    basis_pruned_canon = summary.get("basis_pruned_canon", False)
+    assert isinstance(basis_pruned_canon, bool)
+    if basis_pruned_canon:
+        assert basis_coord_cache
     if summary["direct_hop_table"]:
         assert summary["local_bond_cache"] and summary["anchored_lookup"]
         assert summary["anchored_basis"] and summary["fast_group_validation"]
@@ -147,6 +151,7 @@ def main():
         assert record["cache_profile"] is summary["cache_profile"]
         assert record["direct_hop_table"] is summary["direct_hop_table"]
         assert record.get("basis_coord_cache", False) is basis_coord_cache
+        assert record.get("basis_pruned_canon", False) is basis_pruned_canon
         raw_input = (root / "trials" / record["key"] / "input.dat").read_text()
         match = re.search(r"\bMNTE\s*=\s*(-?\d+)", raw_input, flags=re.IGNORECASE)
         assert match and int(match.group(1)) == summary["mnte"]
@@ -181,6 +186,8 @@ def main():
         assert anchored_basis_used == expected_anchored
         assert ("Basis orbit coordinates: exact precomputed periodic deltas" in log) is (
             basis_coord_cache and record["builder"] == "fast")
+        assert ("Basis canonical enumeration: exact-axis-pruned" in log) is (
+            basis_pruned_canon and record["builder"] == "fast")
         assert atomic == record["atomic_orbits"]
         assert atomic == (record["builder"] == "fast" and not summary["anchored_basis"])
         expected_sparse_cache = summary["local_bond_cache"] and record["builder"] == "fast"
@@ -279,6 +286,7 @@ def main():
                   cache_profile=summary["cache_profile"],
                   direct_hop_table=summary["direct_hop_table"],
                   basis_coord_cache=basis_coord_cache,
+                  basis_pruned_canon=basis_pruned_canon,
                   operator_attestation_present=attested,
                   review_eligible=eligible,
                   caution="Operator claim is not independent scheduler proof, and review gate is not publication approval.",
