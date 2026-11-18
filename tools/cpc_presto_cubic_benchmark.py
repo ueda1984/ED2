@@ -40,7 +40,7 @@ def sha(path):
 
 def capture(command, timeout=15):
     try:
-        cp = subprocess.run(command, capture_output=True, text=True, timeout=timeout)
+        cp = subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,\n                            universal_newlines=True, timeout=timeout)
         return dict(command=command, returncode=cp.returncode,
                     stdout=cp.stdout[-200000:], stderr=cp.stderr[-20000:])
     except (FileNotFoundError, subprocess.TimeoutExpired) as exc:
