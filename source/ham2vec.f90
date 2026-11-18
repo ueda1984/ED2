@@ -8,17 +8,18 @@ module ham2vec
 contains
 
   subroutine make_wk_loc_and_ele(lv)
-    use state_lists, only: j_flip_ni, representative_SQ, findstate, list_fly, a_down_spin, &
+    use state_lists, only: j_flip_ni, list_fly, a_down_spin, &
       c_down_spin, a2_down_spin, c2_down_spin
     use input_param, only: NODmax,NODmin,NO_one,NO_two,p_one,p_two,list_s,list_r,explist, &
       Jint,hvec,NOS,local_NODmax,local_spin,wk_dim,MNTE
+    use cubic_anchored_lookup, only: setup_cubic_anchored_lookup,resolve_cached_hop
     implicit none
     integer, intent(in)::lv
     integer :: s, id, wk_dim1
     integer :: n0, n1, n2, i1, i2, dN
     integer :: i, j, ell(6), jd, max_jd
     integer, allocatable :: ni(:), st_list(:)
-    complex(8) :: c
+    complex(8) :: c, phase
     !
     if(wk_dim < 0)then
       wk_dim = lv
@@ -32,6 +33,7 @@ contains
       wk_dim1= MNTE + 1
     end if
     !
+    call setup_cubic_anchored_lookup(lv)
     allocate(wk_loc(wk_dim1,wk_dim))
     allocate(wk_ele(wk_dim1,wk_dim))
     !
@@ -40,7 +42,7 @@ contains
     !
     max_jd = 1
     !
-    !$omp parallel do private(n0,n1,n2,i1,i2,s,ni,id,ell,i,j,st_list,c,jd) reduction(max:max_jd)
+    !$omp parallel do private(n0,n1,n2,i1,i2,s,ni,id,ell,i,j,st_list,c,jd,phase) reduction(max:max_jd)
     do i = 1, wk_dim
       wk_loc(1,i)  = i
       wk_loc(2:,i) = 0
@@ -58,14 +60,13 @@ contains
         c = 0.5d0 * ( hvec(1,j) + zi * hvec(2,j) )
         if(n0 < dN .and. n1>0 .and. abs(c) > eps)then
           ni = a_down_spin(i1,st_list,NODmax)
-          call representative_SQ(NODmax,s,ell,ni)
-          call findstate(s,list_s,id,lv)
+                    call resolve_cached_hop(ni,lv,id,phase)
           if(id > 0)then
             if(jd > wk_dim1) stop "MNTE is too small!!"
             wk_loc(jd,i) = id
             wk_ele(jd,i) = c &
               * sqrt((2.0d0*local_spin(i1)-n1+1)*n1) * list_r(id) / list_r(i) &
-              * explist(ell(1),ell(2),ell(3),ell(4),ell(5),ell(6))
+              * phase
             jd = jd + 1
           end if
         end if
@@ -73,15 +74,14 @@ contains
         c = 0.5d0 * ( hvec(1,j) - zi * hvec(2,j) )
         if( n0>0 .and. n1<local_NODmax(i1) .and. abs(c) > eps )then
           ni = c_down_spin(i1,st_list,NODmax)
-          call representative_SQ(NODmax,s,ell,ni)
-          call findstate(s,list_s,id,lv)
+                    call resolve_cached_hop(ni,lv,id,phase)
           if(id > 0)then
             if(jd > wk_dim1) stop "MNTE is too small!!"
             wk_loc(jd,i) = id
             wk_ele(jd,i) = c &
               * sqrt((n1+1)*(2.0d0*local_spin(i1)-n1)) &
               * list_r(id) / list_r(i) &
-              * explist(ell(1),ell(2),ell(3),ell(4),ell(5),ell(6))
+              * phase
             jd = jd + 1
           end if
         end if
@@ -100,15 +100,14 @@ contains
           c = 0.5d0 * ( zi * (Jint(4,j)+Jint(7,j)) - Jint(5,j) + Jint(8,j) )
           if(n0 < dN .and. abs(c) > eps)then
             ni = a_down_spin(i1,st_list,NODmax)
-            call representative_SQ(NODmax,s,ell,ni)
-            call findstate(s,list_s,id,lv)
+                        call resolve_cached_hop(ni,lv,id,phase)
             if(id > 0)then
               if(jd > wk_dim1) stop "MNTE is too small!!"
               wk_loc(jd,i) = id
               wk_ele(jd,i) = c &
                 * sqrt((2.0d0*local_spin(i1)-n1+1)*n1)*(local_spin(i2)-n2) &
                 * list_r(id) / list_r(i) &
-                * explist(ell(1),ell(2),ell(3),ell(4),ell(5),ell(6))
+                * phase
               jd = jd + 1
             end if
           end if
@@ -116,15 +115,14 @@ contains
           c = 0.25d0*(Jint(1,j) - Jint(2,j)) + zi * 0.5d0 * Jint(9,j)
           if(n0+1<dN .and. n2>0 .and. abs(c) > eps)then
             ni = a2_down_spin(i1,i2,st_list,NODmax)
-            call representative_SQ(NODmax,s,ell,ni)
-            call findstate(s,list_s,id,lv)
+                        call resolve_cached_hop(ni,lv,id,phase)
             if(id > 0)then
               if(jd > wk_dim1) stop "MNTE is too small!!"
               wk_loc(jd,i) = id
               wk_ele(jd,i) = c &
                 * sqrt((2.0d0*local_spin(i1)-n1+1)*n1*(2.0d0*local_spin(i2)-n2+1)*n2) &
                 * list_r(id) / list_r(i) &
-                * explist(ell(1),ell(2),ell(3),ell(4),ell(5),ell(6))
+                * phase
               jd = jd + 1
             end if
           end if
@@ -132,15 +130,14 @@ contains
           c = 0.25d0*(Jint(1,j)+Jint(2,j)) - zi*0.5d0*Jint(6,j)
           if(n2<local_NODmax(i2) .and. abs(c) > eps)then
             ni = j_flip_ni(i1,i2,st_list,NODmax)
-            call representative_SQ(NODmax,s,ell,ni)
-            call findstate(s,list_s,id,lv)
+                        call resolve_cached_hop(ni,lv,id,phase)
             if(id > 0)then
               if(jd > wk_dim1) stop "MNTE is too small!!"
               wk_loc(jd,i) = id
               wk_ele(jd,i) = c &
                 * sqrt((2.0d0*local_spin(i1)-n1+1)*n1*(n2+1)*(2.0d0*local_spin(i2)-n2) ) &
                 * list_r(id) / list_r(i) &
-                * explist(ell(1),ell(2),ell(3),ell(4),ell(5),ell(6))
+                * phase
               jd = jd + 1
             end if
           end if
@@ -150,15 +147,14 @@ contains
           c = 0.5d0 * ( -zi * (Jint(4,j) - Jint(7,j)) + Jint(5,j) + Jint(8,j) )
           if(n0<dN .and. abs(c) > eps)then
             ni = a_down_spin(i2,st_list,NODmax)
-            call representative_SQ(NODmax,s,ell,ni)
-            call findstate(s,list_s,id,lv)
+                        call resolve_cached_hop(ni,lv,id,phase)
             if(id > 0)then
               if(jd > wk_dim1) stop "MNTE is too small!!"
               wk_loc(jd,i) = id
               wk_ele(jd,i) = c &
                 * sqrt((2.0d0*local_spin(i2)-n2+1)*n2)*(local_spin(i1)-n1) &
                 * list_r(id) / list_r(i) &
-                * explist(ell(1),ell(2),ell(3),ell(4),ell(5),ell(6))
+                * phase
               jd = jd + 1
             end if
           end if
@@ -166,15 +162,14 @@ contains
           c = 0.25d0*(Jint(1,j)+Jint(2,j)) + zi*0.5d0*Jint(6,j)
           if(n1<local_NODmax(i1) .and. abs(c) > eps)then
             ni = j_flip_ni(i2,i1,st_list,NODmax)
-            call representative_SQ(NODmax,s,ell,ni)
-            call findstate(s,list_s,id,lv)
+                        call resolve_cached_hop(ni,lv,id,phase)
             if(id > 0)then
               if(jd > wk_dim1) stop "MNTE is too small!!"
               wk_loc(jd,i) = id
               wk_ele(jd,i) = c &
                 * sqrt((2.0d0*local_spin(i2)-n2+1)*n2*(n1+1)*(2.0d0*local_spin(i1)-n1) ) &
                 * list_r(id) / list_r(i) &
-                * explist(ell(1),ell(2),ell(3),ell(4),ell(5),ell(6))
+                * phase
               jd = jd + 1
             end if
           end if
@@ -184,15 +179,14 @@ contains
           c = 0.5d0 * ( -zi * ( Jint(4,j) + Jint(7,j) ) - Jint(5,j) + Jint(8,j) )
           if( n1<local_NODmax(i1) .and. abs(c) > eps )then
             ni = c_down_spin(i1,st_list,NODmax)
-            call representative_SQ(NODmax,s,ell,ni)
-            call findstate(s,list_s,id,lv)
+                        call resolve_cached_hop(ni,lv,id,phase)
             if(id > 0)then
               if(jd > wk_dim1) stop "MNTE is too small!!"
               wk_loc(jd,i) = id
               wk_ele(jd,i) = c &
                 * sqrt((n1+1)*(2.0d0*local_spin(i1)-n1))*(local_spin(i2)-n2) &
                 * list_r(id) / list_r(i) &
-                * explist(ell(1),ell(2),ell(3),ell(4),ell(5),ell(6))
+                * phase
               jd = jd + 1
             end if
           end if
@@ -201,15 +195,14 @@ contains
             c = 0.5d0 * ( zi * ( Jint(4,j) - Jint(7,j) ) + Jint(5,j) + Jint(8,j) )
             if( abs(c) > eps )then
               ni = c_down_spin(i2,st_list,NODmax)
-              call representative_SQ(NODmax,s,ell,ni)
-              call findstate(s,list_s,id,lv)
+                            call resolve_cached_hop(ni,lv,id,phase)
               if(id > 0)then
                 if(jd > wk_dim1) stop "MNTE is too small!!"
                 wk_loc(jd,i) = id
                 wk_ele(jd,i) = c &
                   * sqrt((n2+1)*(2.0d0*local_spin(i2)-n2))*(local_spin(i1)-n1) &
                   * list_r(id) / list_r(i) &
-                  * explist(ell(1),ell(2),ell(3),ell(4),ell(5),ell(6))
+                  * phase
                 jd = jd + 1
               end if
             end if
@@ -217,15 +210,14 @@ contains
             c = 0.25d0 * ( Jint(1,j) - Jint(2,j) ) - zi * 0.5d0 * Jint(9,j)
             if( n1<local_NODmax(i1) .and. n0>1 .and. abs(c) > eps )then
               ni = c2_down_spin(i1,i2,st_list,NODmax)
-              call representative_SQ(NODmax,s,ell,ni)
-              call findstate(s,list_s,id,lv)
+                            call resolve_cached_hop(ni,lv,id,phase)
               if(id > 0)then
                 if(jd > wk_dim1) stop "MNTE is too small!!"
                 wk_loc(jd,i) = id
                 wk_ele(jd,i) = c &
                   * sqrt((n1+1)*(2.0d0*local_spin(i1)-n1)*(n2+1)*(2.0d0*local_spin(i2)-n2)) &
                   * list_r(id) / list_r(i) &
-                  * explist(ell(1),ell(2),ell(3),ell(4),ell(5),ell(6))
+                  * phase
                 jd = jd + 1
               end if
             end if
