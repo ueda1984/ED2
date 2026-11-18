@@ -179,8 +179,8 @@ def execute(exe, out, spec, allocation_info, timeout, mnte):
     anchor_verified = os.environ.get("ED2_CUBIC_ANCHORED_VERIFY", "") == "1"
     fast_group = os.environ.get("ED2_CUBIC_FAST_GROUP_VALIDATION", "") == "1"
     fast_group_reported = "Symmetry certificate: canonical cubic O_h semidirect product verified" in output
-    if fast_group_reported != fast_group:
-        raise AssertionError("Requested fast cubic group certificate disagrees with native stdout")
+    if fast_group_reported != (fast_group and builder == "fast"):
+        raise AssertionError("Fast cubic group certificate mismatch for selected native basis builder")
     anchored_reported = "Representative lookup: cubic-anchored-orbits" in output
     if anchored_reported != anchored:
         raise AssertionError("Requested anchored lookup disagrees with native stdout")
