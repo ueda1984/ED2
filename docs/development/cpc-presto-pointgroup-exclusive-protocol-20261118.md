@@ -112,8 +112,16 @@ pull request. Make sure the staging archive and results directory are
 readable/writable from PRESTO compute nodes.
 
 One can inspect the **planned** run count without launching any ED2
-simulation by invoking the standard-library Python runner with
-`--plan-only`, the source revision and staged archive path.
+simulation using the command below; `--allow-shared` is a label required
+by the argument parser and does not request an allocation:
+
+```sh
+python3 tools/cpc_presto_pointgroup_benchmark.py \
+  --output /tmp/unused-plan-path \
+  --source-revision "$(git rev-parse HEAD)" \
+  --source-archive "$HOME/ed2-presto-stage-20261118/ed2-source.tar.gz" \
+  --preset main --allow-shared --plan-only
+```
 
 ## Manual submission only after site approval
 
