@@ -44,10 +44,14 @@ It compares the SHA256 digest of every (sorted representative rank,
 IEEE-754 norm bits) dump, verifies the independent expected sector
 dimension and checks the new provenance marker. The CI matrix exercises
 all four real 1D irreps, sides 4/6/8/10, threads 1/4 and side 10
-threads 8, plus explicit negative prerequisite rejection. Existing
-small/large original-versus-anchored bitwise proofs, full native
-Hamiltonian cache comparisons, two-stage Lanczos and generic tests
-remain in CI for both gfortran 13 and 14.
+threads 8, plus explicit negative prerequisite rejection. In addition, `tests/cpc_cubic_basis_coordinate_full_cache_regression.py`
+constructs the complete native Hamiltonian cache twice with the exact
+PR16 direct-hop code and coordinate flag OFF/ON, comparing the SHA256 of
+every diagonal/offdiagonal bit, native target and record order for side
+4,6 at T1/4 and side10 at T1/4/8, all four irreps. At side4,6 T1 it
+also compares complete native Ritz energy and both direct residuals.
+Existing original-versus-anchored basis and direct-hop regression
+oracles remain in CI. The entire suite runs for gfortran 13 and 14.
 
 **Do not infer PASS from the presence of the test:** wait for both
 compiler jobs to finish successfully and inspect all individual
