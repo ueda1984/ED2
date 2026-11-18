@@ -26,6 +26,7 @@ on:
       - "tests/cpc_cubic_fast_group_certificate_regression.py"
       - "tests/cpc_cubic_anchored_basis_regression.py"
       - "tests/cpc_cubic_basis_coordinate_cache_regression.py"
+      - "tests/cpc_cubic_basis_coordinate_full_cache_regression.py"
       - "tests/cpc_cubic_local_bond_cache_regression.py"
       - "tests/cpc_cubic_cache_phase_profile_regression.py"
       - "tests/cpc_cubic_direct_hop_table_regression.py"
@@ -62,6 +63,7 @@ on:
       - "tests/cpc_cubic_fast_group_certificate_regression.py"
       - "tests/cpc_cubic_anchored_basis_regression.py"
       - "tests/cpc_cubic_basis_coordinate_cache_regression.py"
+      - "tests/cpc_cubic_basis_coordinate_full_cache_regression.py"
       - "tests/cpc_cubic_local_bond_cache_regression.py"
       - "tests/cpc_cubic_cache_phase_profile_regression.py"
       - "tests/cpc_cubic_direct_hop_table_regression.py"
@@ -131,6 +133,7 @@ jobs:
               "tests/cpc_cubic_fast_group_certificate_regression.py",
               "tests/cpc_cubic_anchored_basis_regression.py",
               "tests/cpc_cubic_basis_coordinate_cache_regression.py",
+              "tests/cpc_cubic_basis_coordinate_full_cache_regression.py",
               "tests/cpc_cubic_local_bond_cache_regression.py",
               "tests/cpc_cubic_cache_phase_profile_regression.py",
               "tests/cpc_cubic_direct_hop_table_regression.py",
@@ -254,6 +257,16 @@ jobs:
           python3 tests/cpc_cubic_basis_coordinate_cache_regression.py \
             --driver "$PWD/tests/cubic_basis_driver" --sides 10 \
             --threads 8 --output "$RUNNER_TEMP/cubic-basis-coordinate-cache-t8"
+      - name: Coordinate cache must preserve complete native Hamiltonian cache bits and Ritz physics
+        run: |
+          python3 tests/cpc_cubic_basis_coordinate_full_cache_regression.py \
+            --driver "$PWD/tests/cubic_cache_driver" --exe "$PWD/source/QS3ED2" \
+            --sides 4,6 --threads 1,4 \
+            --output "$RUNNER_TEMP/cubic-coordinate-fullcache-small"
+          python3 tests/cpc_cubic_basis_coordinate_full_cache_regression.py \
+            --driver "$PWD/tests/cubic_cache_driver" --exe "$PWD/source/QS3ED2" \
+            --sides 10 --threads 1,4,8 --skip-lanczos \
+            --output "$RUNNER_TEMP/cubic-coordinate-fullcache-n1000"
       - name: Anchored cubic basis must fail closed on mismatched source geometry and symmetry
         run: |
           if ED2_CUBIC_ANCHORED_BASIS=1 ED2_CUBIC_FAST_GROUP_VALIDATION=1 \
