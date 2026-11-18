@@ -32,6 +32,14 @@ mkdir -- "$run_dir/source"
 cp -- "$stage/source-commit.txt" "$stage/ed2-source.sha256" "$run_dir/"
 sha256sum "$stage/ed2-source.tar.gz" > "$run_dir/archive-path-sha256.txt"
 tar -xzf "$stage/ed2-source.tar.gz" -C "$run_dir/source"
+# The documented PRESTO runtime may be Python 3.6/3.7. Require at least
+# Python 3.6 for f-strings, and parse scripts before compiling Fortran.
+python3 -c 'import sys; assert sys.version_info >= (3, 6), "ED2 cubic benchmark requires Python >= 3.6"'
+python3 -m py_compile \
+  "$run_dir/source/tests/cpc_cubic_pointgroup.py" \
+  "$run_dir/source/tests/cpc_pointgroup_profile.py" \
+  "$run_dir/source/tools/cpc_presto_cubic_benchmark.py" \
+  "$run_dir/source/tools/cpc_presto_cubic_audit.py"
 {
   echo "ED2_PRESTO_JOB=$PBS_JOBID"
   echo "HOST=$(hostname)"
@@ -85,13 +93,6 @@ export ED2_RNG_SEED=1984
 ) > "$run_dir/build-and-baseline-check.log" 2>&1
 exe="$run_dir/source/source/QS3ED2"
 test -x "$exe"
-# Before expensive cubic checks, fail immediately on unsupported Python
-# syntax; CI checks the same scripts against an older-Python grammar.
-python3 -m py_compile \
-  "$run_dir/source/tests/cpc_cubic_pointgroup.py" \
-  "$run_dir/source/tests/cpc_pointgroup_profile.py" \
-  "$run_dir/source/tools/cpc_presto_cubic_benchmark.py" \
-  "$run_dir/source/tools/cpc_presto_cubic_audit.py"
 python3 "$run_dir/source/tests/cpc_cubic_pointgroup.py" --sizes 4,6,10 --output "$run_dir/cubic-independent-symmetry.json"
 sha256sum "$exe" > "$run_dir/binary-sha256.txt"
 # Phase profiling is opt-in and does not affect numerical defaults otherwise.
