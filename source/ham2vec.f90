@@ -6,6 +6,10 @@ module ham2vec
   complex(8), allocatable :: wk_ele(:,:)
   ! Explicit opt-in: only full cached operators with exactly real entries.
   logical, save :: real_cached_matvec=.false.
+  ! Optional ordered compressed cache of COMPLEX matrix coefficients.
+  logical, save :: csr_complex_cache=.false.
+  integer, allocatable, save :: complex_csr_rowptr(:),complex_csr_target(:)
+  complex(8), allocatable, save :: complex_csr_coeff(:)
   !
 contains
 
@@ -27,6 +31,71 @@ contains
       error stop 'ED2_REAL_CACHED_MATVEC requires exactly real matrix elements'
     write(*,'(a)') 'Hamiltonian action: strictly-real cached coefficients'
   end subroutine enable_real_cached_matvec
+
+  subroutine enable_csr_complex_cached(lv)
+    use input_param, only: wk_dim
+    use iso_fortran_env, only: int64
+    integer, intent(in) :: lv
+    integer :: status,alloc_status,i,j,nnz,pos
+    integer(int64) :: entries,extra_bytes
+    character(len=16) :: setting
+    setting=''
+    call get_environment_variable('ED2_CSR_COMPLEX_CACHE',setting,status=status)
+    if(status==0)then
+      if(trim(adjustl(setting))/='0'.and.trim(adjustl(setting))/='1') &
+        error stop 'ED2_CSR_COMPLEX_CACHE must be 0 or 1'
+    else if(status/=1)then
+      error stop 'ED2_CSR_COMPLEX_CACHE flag too long or invalid'
+    end if
+    csr_complex_cache=status==0.and.trim(adjustl(setting))=='1'
+    if(allocated(complex_csr_rowptr))deallocate(complex_csr_rowptr)
+    if(allocated(complex_csr_target))deallocate(complex_csr_target)
+    if(allocated(complex_csr_coeff))deallocate(complex_csr_coeff)
+    if(.not.csr_complex_cache)return
+    if(real_cached_matvec) &
+      error stop 'ED2_CSR_COMPLEX_CACHE incompatible with ED2_REAL_CACHED_MATVEC=1'
+    if(wk_dim/=lv)error stop 'ED2_CSR_COMPLEX_CACHE requires fully cached matrix'
+    ! Keep all non-sentinel terms, INCLUDING stored complex zero coefficients.
+    ! No term is skipped based on numerical magnitude, and the original
+    ! ordered IEEE-754 complex accumulation is preserved at every H action.
+    allocate(complex_csr_rowptr(lv+1),stat=alloc_status)
+    if(alloc_status/=0)error stop 'ED2_CSR_COMPLEX_CACHE row allocation failed'
+    complex_csr_rowptr(1)=1
+    entries=0_int64
+    do i=1,lv
+      nnz=0
+      do j=1,size(wk_loc,1)
+        if(wk_loc(j,i)==0)exit
+        if(wk_loc(j,i)<1.or.wk_loc(j,i)>lv) &
+          error stop 'ED2_CSR_COMPLEX_CACHE invalid target'
+        nnz=nnz+1
+      end do
+      entries=entries+int(nnz,int64)
+      if(entries>=int(huge(i),int64)) &
+        error stop 'ED2_CSR_COMPLEX_CACHE row index capacity exceeded'
+      complex_csr_rowptr(i+1)=int(entries)+1
+    end do
+    allocate(complex_csr_target(int(entries)), &
+      complex_csr_coeff(int(entries)),stat=alloc_status)
+    if(alloc_status/=0)error stop 'ED2_CSR_COMPLEX_CACHE values allocation failed'
+    do i=1,lv
+      pos=complex_csr_rowptr(i)
+      do j=1,size(wk_loc,1)
+        if(wk_loc(j,i)==0)exit
+        complex_csr_target(pos)=wk_loc(j,i)
+        complex_csr_coeff(pos)=wk_ele(j,i)
+        pos=pos+1
+      end do
+      if(pos/=complex_csr_rowptr(i+1)) &
+        error stop 'ED2_CSR_COMPLEX_CACHE row count mismatch'
+    end do
+    extra_bytes=4_int64*int(size(complex_csr_rowptr),int64)+ &
+      4_int64*int(size(complex_csr_target),int64)+ &
+      16_int64*int(size(complex_csr_coeff),int64)
+    write(*,'(a,i0,a,i0)') &
+      'Hamiltonian action: csr-complex cache entries=',size(complex_csr_coeff), &
+      ', extra_bytes=',extra_bytes
+  end subroutine enable_csr_complex_cached
 
   subroutine make_wk_loc_and_ele(lv)
     use state_lists, only: j_flip_ni, list_fly, a_down_spin, &
@@ -84,6 +153,7 @@ contains
     if(use_local_bonds)then
       call build_cubic_local_bond_cache(lv,wk_dim1)
       call enable_real_cached_matvec(lv)
+      call enable_csr_complex_cached(lv)
       call dump_cubic_cache_if_requested()
       return
     end if
@@ -284,6 +354,7 @@ contains
     write(*,*) "Optimal MNTE = ", max_jd - 1
 
     call enable_real_cached_matvec(lv)
+    call enable_csr_complex_cached(lv)
     call dump_cubic_cache_if_requested()
     return
   end subroutine make_wk_loc_and_ele
@@ -754,7 +825,15 @@ contains
 
     wk_dim1= size(wk_ele,1)
 
-    if(real_cached_matvec)then
+    if(csr_complex_cache)then
+      !$omp parallel do private(i,j)
+      do i = 1, wk_dim
+        v0(i) = 0.0d0
+        do j = complex_csr_rowptr(i),complex_csr_rowptr(i+1)-1
+          v0(i) = v0(i) + complex_csr_coeff(j) * v1(complex_csr_target(j))
+        end do
+      end do
+    else if(real_cached_matvec)then
       ! Coefficients are proved exactly real ONCE during cache setup.
       ! Keep the original row and term accumulation order unchanged.
       !$omp parallel do private(i,j)
