@@ -6,14 +6,20 @@ module ham2vec
   complex(8), allocatable :: wk_ele(:,:)
   ! Explicit opt-in: only full cached operators with exactly real entries.
   logical, save :: real_cached_matvec=.false.
+  ! A second opt-in CSR-like row list, for exactly real fully cached H.
+  logical, save :: csr_real_cache=.false.
+  integer, allocatable, save :: csr_rowptr(:),csr_target(:)
+  real(8), allocatable, save :: csr_coeff(:)
   !
 contains
 
   subroutine enable_real_cached_matvec(lv)
     use input_param, only: wk_dim
+    use iso_fortran_env, only: int64
     integer, intent(in) :: lv
-    integer :: status
-    character(len=16) :: setting
+    integer :: status,csr_status,alloc_status,i,j,nnz,pos
+    integer(int64) :: entries,bytes_extra
+    character(len=16) :: setting,csr_setting
     setting=''
     call get_environment_variable('ED2_REAL_CACHED_MATVEC',setting,status=status)
     if(status==0)then
@@ -21,11 +27,62 @@ contains
         error stop 'ED2_REAL_CACHED_MATVEC must be 0 or 1'
     end if
     real_cached_matvec=status==0.and.trim(adjustl(setting))=='1'
+    csr_setting=''
+    call get_environment_variable('ED2_CSR_REAL_CACHE',csr_setting,status=csr_status)
+    if(csr_status==0)then
+      if(trim(adjustl(csr_setting))/='0'.and.trim(adjustl(csr_setting))/='1') &
+        error stop 'ED2_CSR_REAL_CACHE must be 0 or 1'
+    else if(csr_status/=1)then
+      error stop 'ED2_CSR_REAL_CACHE flag too long or invalid'
+    end if
+    csr_real_cache=csr_status==0.and.trim(adjustl(csr_setting))=='1'
+    if(csr_real_cache.and..not.real_cached_matvec) &
+      error stop 'ED2_CSR_REAL_CACHE requires ED2_REAL_CACHED_MATVEC=1'
+    if(allocated(csr_rowptr))deallocate(csr_rowptr)
+    if(allocated(csr_target))deallocate(csr_target)
+    if(allocated(csr_coeff))deallocate(csr_coeff)
     if(.not.real_cached_matvec)return
     if(wk_dim/=lv)error stop 'ED2_REAL_CACHED_MATVEC requires fully cached matrix'
     if(any(aimag(wk_ele)/=0d0)) &
       error stop 'ED2_REAL_CACHED_MATVEC requires exactly real matrix elements'
     write(*,'(a)') 'Hamiltonian action: strictly-real cached coefficients'
+    if(.not.csr_real_cache)return
+    ! Keep all non-sentinel records INCLUDING stored zero coefficients.
+    ! The original row-order numerical summation is thereby unchanged.
+    allocate(csr_rowptr(lv+1),stat=alloc_status)
+    if(alloc_status/=0)error stop 'ED2_CSR_REAL_CACHE row pointer allocation failed'
+    csr_rowptr(1)=1
+    entries=0_int64
+    do i=1,lv
+      nnz=0
+      do j=1,size(wk_loc,1)
+        if(wk_loc(j,i)==0)exit
+        if(wk_loc(j,i)<1.or.wk_loc(j,i)>lv) &
+          error stop 'ED2_CSR_REAL_CACHE invalid target'
+        nnz=nnz+1
+      end do
+      entries=entries+int(nnz,int64)
+      if(entries>=int(huge(i),int64)) &
+        error stop 'ED2_CSR_REAL_CACHE index capacity exceeded'
+      csr_rowptr(i+1)=int(entries)+1
+    end do
+    allocate(csr_target(int(entries)),csr_coeff(int(entries)),stat=alloc_status)
+    if(alloc_status/=0)error stop 'ED2_CSR_REAL_CACHE value allocation failed'
+    do i=1,lv
+      pos=csr_rowptr(i)
+      do j=1,size(wk_loc,1)
+        if(wk_loc(j,i)==0)exit
+        csr_target(pos)=wk_loc(j,i)
+        csr_coeff(pos)=dble(wk_ele(j,i))
+        pos=pos+1
+      end do
+      if(pos/=csr_rowptr(i+1))error stop 'ED2_CSR_REAL_CACHE row count mismatch'
+    end do
+    bytes_extra=4_int64*int(size(csr_rowptr),int64)+ &
+      4_int64*int(size(csr_target),int64)+8_int64*int(size(csr_coeff),int64)
+    write(*,'(a,i0,a,i0)') &
+      'Hamiltonian action: csr-real cache entries=',size(csr_coeff), &
+      ', extra_bytes=',bytes_extra
   end subroutine enable_real_cached_matvec
 
   subroutine make_wk_loc_and_ele(lv)
@@ -756,15 +813,25 @@ contains
 
     if(real_cached_matvec)then
       ! Coefficients are proved exactly real ONCE during cache setup.
-      ! Keep the original row and term accumulation order unchanged.
-      !$omp parallel do private(i,j)
-      do i = 1, wk_dim
-        v0(i) = 0.0d0
-        do j = 1, wk_dim1
-          if(wk_loc(j,i) == 0) exit
-          v0(i) = v0(i) + dble(wk_ele(j,i)) * v1(wk_loc(j,i))
+      ! Preserve the original ordered sequence of floating-point terms.
+      if(csr_real_cache)then
+        !$omp parallel do private(i,j)
+        do i = 1, wk_dim
+          v0(i) = 0.0d0
+          do j = csr_rowptr(i),csr_rowptr(i+1)-1
+            v0(i) = v0(i) + csr_coeff(j) * v1(csr_target(j))
+          end do
         end do
-      end do
+      else
+        !$omp parallel do private(i,j)
+        do i = 1, wk_dim
+          v0(i) = 0.0d0
+          do j = 1, wk_dim1
+            if(wk_loc(j,i) == 0) exit
+            v0(i) = v0(i) + dble(wk_ele(j,i)) * v1(wk_loc(j,i))
+          end do
+        end do
+      end if
     else
       !$omp parallel do private(i,j)
       do i = 1, wk_dim
