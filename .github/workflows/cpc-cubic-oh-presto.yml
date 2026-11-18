@@ -126,6 +126,31 @@ jobs:
           ./configure FC="$FC" FCFLAGS="$FCFLAGS"
           make -j2
           make check
+      - name: Regression - benchmark-only anchored opt-in must not break legacy make check
+        run: |
+          # Reproduce PRESTO job 19602's failure: the native 100-site spin-chain
+          # baseline is intentionally incompatible with the cubic-only fast path.
+          if ED2_CUBIC_ANCHORED_REP=1 ED2_CUBIC_ANCHORED_VERIFY=1 \
+              tests/test_ex1.sh > "$RUNNER_TEMP/leaked-anchored-ex1.log" 2>&1; then
+            echo "ERROR: baseline test unexpectedly accepted cubic-only opt-in" >&2
+            exit 1
+          fi
+          grep -q 'anchored: not a cubic volume' "$RUNNER_TEMP/leaked-anchored-ex1.log"
+          # Match the build subshell in the PBS script: the environment is
+          # restricted to a single child, never altered for the actual run.
+          (
+            export ED2_CUBIC_ANCHORED_REP=1 ED2_CUBIC_ANCHORED_VERIFY=1
+            unset ED2_CUBIC_ANCHORED_REP ED2_CUBIC_ANCHORED_VERIFY
+            tests/test_ex1.sh
+          )
+          python3 - <<'PY'
+          from pathlib import Path
+          script = Path('tools/presto_cubic_exclusive.pbs').read_text()
+          guard = '  unset ED2_CUBIC_ANCHORED_REP ED2_CUBIC_ANCHORED_VERIFY\\n  autoreconf -vfi'
+          assert guard in script, 'Cubic opt-in leaks into make check'
+          assert 'python3 "$run_dir/source/tools/cpc_presto_cubic_benchmark.py"' in script
+          print('PBS_CUBIC_ENV_ISOLATION_PASS')
+          PY
       - name: Independent cubic Oh group, bond invariance and N1000 dimensions
         run: |
           python3 tests/cpc_cubic_pointgroup.py --sizes 4,6,8,10 --output "$RUNNER_TEMP/cubic-dim.json"
