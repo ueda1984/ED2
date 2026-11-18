@@ -61,9 +61,16 @@ and only introduces:
   SHA256, exact output vector length and full-cache
   provenance, and checks old standalone TRLan spectra
   to an appropriately stated numerical tolerance.
-  The original main did not guarantee a seeded,
-  bitwise reproducible Lanczos start; thus only the
-  **per-action output** is held to bitwise equality.
+  The original main does not seed TRLan's initial
+  random vector, so a separate test-only
+  `cpc_csr_seeded_solver_driver.f90` calls the unchanged
+  native solver with a **fixed seed**. This avoids
+  false between-process failures (initial random
+  states lead to nonconverged Ritz-level differences)
+  without changing production solver behavior.
+  Only the **per-action output** is required to
+  match bit for bit; final Ritz values are compared
+  at an explicit 5e-10 tolerance.
   Partial cache and malformed/oversized flags are
   independently checked to fail closed.
 - `.github/workflows/main-generic-csr.yml`:
