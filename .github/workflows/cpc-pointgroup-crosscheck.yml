@@ -1,0 +1,70 @@
+name: CPC translation and point-group physical crosscheck
+
+on:
+  push:
+    branches:
+      - codex/ed2-cpc-pointgroup-crosscheck
+    paths:
+      - ".github/workflows/cpc-pointgroup-crosscheck.yml"
+      - "tests/cpc_pointgroup_translation_crosscheck.py"
+      - "tests/Makefile.am"
+      - "Makefile.am"
+      - "source/**"
+  pull_request:
+    paths:
+      - ".github/workflows/cpc-pointgroup-crosscheck.yml"
+      - "tests/cpc_pointgroup_translation_crosscheck.py"
+      - "tests/Makefile.am"
+      - "Makefile.am"
+      - "source/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  physical-pointgroup:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [gfortran-13, gfortran-14]
+    env:
+      FC: ${{ matrix.compiler }}
+      FCFLAGS: -O2 -fopenmp
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install toolchain and numerical reference dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ${{ matrix.compiler }} libblas-dev liblapack-dev autoconf automake make python3-numpy
+      - name: Build ED2 and run baseline smoke
+        run: |
+          autoreconf -vfi
+          ./configure FC="$FC" FCFLAGS="$FCFLAGS"
+          make -j2
+          make check
+      - name: Translation + point-group spectrum regression
+        run: |
+          make check-pointgroup POINTGROUP_OUTPUT="$RUNNER_TEMP/pointgroup-results"
+          python3 - "$RUNNER_TEMP/pointgroup-results/report.json" <<'PY'
+          import json,sys
+          r=json.load(open(sys.argv[1],encoding="utf-8"))
+          assert r["passed"] and len(r["cases"])>=30
+          assert any(x["label"]=="square4-n3-G-A1" and x["dimension"]==10 for x in r["cases"])
+          assert any(x["label"]=="square4-n3-X-A1" and x["dimension"]==16 for x in r["cases"])
+          print("Translation + point group:",len(r["cases"]),"cases PASS")
+          PY
+      - name: Archive sector spectra and input evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pointgroup-${{ matrix.compiler }}
+          path: ${{ runner.temp }}/pointgroup-results/
+          if-no-files-found: warn
+          retention-days: 30

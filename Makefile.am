@@ -56,6 +56,12 @@ check-qscube-lanczos:
 	$(AM_V_at)$(MAKE) -C source all
 	$(AM_V_at)$(MAKE) -C tests check-qscube-lanczos QSCUBE_OUTPUT="$(QSCUBE_OUTPUT)"
 
+# Optional independent physical test of combined translations and point-group irreps.
+.PHONY: check-pointgroup
+check-pointgroup:
+	$(AM_V_at)$(MAKE) -C source all
+	$(AM_V_at)$(MAKE) -C tests check-pointgroup POINTGROUP_OUTPUT="$(POINTGROUP_OUTPUT)"
+
 # Include reference fixtures, example templates and user documentation in
 # source archives used outside the Git repository.
 EXTRA_DIST = input/input.dat examples/ref_data docs tools CITATION.cff LICENSE mkdocs.yml .readthedocs.yaml
