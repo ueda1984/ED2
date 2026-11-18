@@ -38,8 +38,12 @@ jobs:
       - name: Build ORIGINAL ED2 main lineage without experimental cubic branches
         run: |
           autoreconf -vfi
+          # Existing original-main eigen_solver.f90 uses legacy implicit
+          # LAPACK calls that need this compatibility flag under GNU13/14.
+          # This is unrelated to the new CSR H*x code; an explicit-LAPACK
+          # interface modernization should be integrated independently.
           ./configure FC=gfortran-${{ matrix.gnu }} \
-            FCFLAGS="-O2 -fopenmp"
+            FCFLAGS="-O2 -fopenmp -fallow-argument-mismatch"
           make -j2
           make check
       - name: Compile independent native full-H vector bit-pattern driver
