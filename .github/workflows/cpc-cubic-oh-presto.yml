@@ -386,6 +386,52 @@ jobs:
           fi
           grep -q 'Pruned canonical basis requires ED2_CUBIC_BASIS_COORD_CACHE=1' \
             "$RUNNER_TEMP/cubic-pruned-invalid.log"
+      - name: Native PRESTO-like unused-hash provenance, legacy isolation and separate audit
+        run: |
+          ED2_CUBIC_ANCHORED_REP=1 ED2_CUBIC_FAST_GROUP_VALIDATION=1 \
+          ED2_CUBIC_ANCHORED_BASIS=1 ED2_CUBIC_LOCAL_BOND_CACHE=1 \
+          ED2_CUBIC_DIRECT_HOP_TABLE=1 ED2_CUBIC_BASIS_COORD_CACHE=1 \
+          ED2_CUBIC_BASIS_PRUNED_CANON=1 ED2_CUBIC_SKIP_UNUSED_HASH=1 \
+            python3 tools/cpc_presto_cubic_benchmark.py \
+              --exe "$PWD/source/QS3ED2" \
+              --output "$RUNNER_TEMP/cubic-skip-hash-benchmark" \
+              --source-revision "$(git rev-parse HEAD)" \
+              --source-archive "$RUNNER_TEMP/staged-source/ed2-source.tar.gz" \
+              --preset cubic-pilot --allow-shared --sizes 4 \
+              --sectors oh-a1g --threads 1 --warmups 0 --repeats 1 --mnte 64
+          python3 tools/cpc_presto_cubic_audit.py \
+            --root "$RUNNER_TEMP/cubic-skip-hash-benchmark" \
+            --output "$RUNNER_TEMP/audit-skip-hash-benchmark" \
+            --source-archive "$RUNNER_TEMP/staged-source/ed2-source.tar.gz" \
+            --exe "$PWD/source/QS3ED2"
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root=Path(os.environ['RUNNER_TEMP'])/'cubic-skip-hash-benchmark'
+          data=json.loads((root/'summary.json').read_text())
+          assert data['basis_coord_cache'] is True
+          assert data['basis_pruned_canon'] is True
+          assert data['direct_hop_table'] is True
+          assert data['skip_unused_hash'] is True
+          records=[json.loads(x) for x in (root/'trials.jsonl').read_text().splitlines()]
+          assert len(records)==2 and all(r['skip_unused_hash'] for r in records)
+          for rec in records:
+              native=(root/'trials'/rec['key']/'stdout.log').read_text(errors='replace')
+              expected=(rec['builder']=='fast')
+              assert ('Representative lookup: cubic-direct-only-unused-hash-elided' in native) is expected
+          print('CUBIC_SKIP_HASH_PRESTO_PROVENANCE_PASS')
+          PY
+          if ED2_CUBIC_SKIP_UNUSED_HASH=1 python3 tools/cpc_presto_cubic_benchmark.py \
+              --source-revision "$(git rev-parse HEAD)" \
+              --source-archive "$RUNNER_TEMP/staged-source/ed2-source.tar.gz" \
+              --preset cubic-smoke --allow-shared --sizes 4 --sectors oh-a1g \
+              --plan-only --output "$RUNNER_TEMP/cubic-skip-hash-invalid" \
+              > "$RUNNER_TEMP/cubic-skip-hash-invalid.log" 2>&1; then
+            echo "ERROR: unused hash bypass without direct hop accepted" >&2
+            exit 1
+          fi
+          grep -q 'Skipping unused orbit hash requires ED2_CUBIC_DIRECT_HOP_TABLE=1' \
+            "$RUNNER_TEMP/cubic-skip-hash-invalid.log"
       - name: Anchored cubic basis must fail closed on mismatched source geometry and symmetry
         run: |
           if ED2_CUBIC_ANCHORED_BASIS=1 ED2_CUBIC_FAST_GROUP_VALIDATION=1 \
