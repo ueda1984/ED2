@@ -19,6 +19,17 @@ import tempfile
 import time
 
 
+def binomial(n, k):
+    """Exact C(n,k) without math.comb, available only in Python >=3.8."""
+    if k < 0 or k > n:
+        return 0
+    k = min(k, n - k)
+    result = 1
+    for i in range(1, k + 1):
+        result = result * (n - i + 1) // i
+    return result
+
+
 def digest(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
@@ -102,7 +113,7 @@ def independent_dimension(nsites, down, gens):
         trace_sum += character * poly[down]
     assert len(seen) == order and trace_sum % order == 0, "Nonintegral character projector"
     dimension = trace_sum // order
-    assert 0 < dimension <= math.comb(nsites, down), "Invalid physical symmetry dimension"
+    assert 0 < dimension <= binomial(nsites, down), "Invalid physical symmetry dimension"
     return dimension
 
 
