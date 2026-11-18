@@ -146,8 +146,9 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           script = Path('tools/presto_cubic_exclusive.pbs').read_text()
-          guard = '  unset ED2_CUBIC_ANCHORED_REP ED2_CUBIC_ANCHORED_VERIFY\\n  autoreconf -vfi'
-          assert guard in script, 'Cubic opt-in leaks into make check'
+          guard = '  unset ED2_CUBIC_ANCHORED_REP ED2_CUBIC_ANCHORED_VERIFY'
+          assert guard in script, 'Cubic opt-in isolation is missing'
+          assert script.index('  cd -- "$run_dir/source"') < script.index(guard) < script.index('  autoreconf -vfi')
           assert 'python3 "$run_dir/source/tools/cpc_presto_cubic_benchmark.py"' in script
           print('PBS_CUBIC_ENV_ISOLATION_PASS')
           PY
