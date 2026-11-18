@@ -13,6 +13,7 @@ contains
     use input_param, only: NODmax,NODmin,NO_one,NO_two,p_one,p_two,list_s,list_r,explist, &
       Jint,hvec,NOS,local_NODmax,local_spin,wk_dim,MNTE
     use cubic_anchored_lookup, only: setup_cubic_anchored_lookup,resolve_cached_hop
+    use omp_lib, only: omp_get_wtime
     implicit none
     integer, intent(in)::lv
     integer :: s, id, wk_dim1
@@ -22,13 +23,25 @@ contains
     complex(8) :: c, phase
     character(len=16) :: local_bond_setting
     integer :: local_bond_status
-    logical :: use_local_bonds
+    logical :: use_local_bonds, cache_profile
+    character(len=16) :: profile_setting
+    integer :: profile_status
+    real(8) :: lookup_begin
     !
     local_bond_setting=''
     call get_environment_variable('ED2_CUBIC_LOCAL_BOND_CACHE', &
       local_bond_setting,status=local_bond_status)
     use_local_bonds=local_bond_status==0.and. &
       trim(adjustl(local_bond_setting))=='1'
+    profile_setting=''
+    call get_environment_variable('ED2_CUBIC_CACHE_PROFILE',profile_setting,status=profile_status)
+    if(profile_status==0)then
+      if(trim(adjustl(profile_setting))/='0'.and.trim(adjustl(profile_setting))/='1') &
+        error stop 'ED2_CUBIC_CACHE_PROFILE must be 0 or 1'
+    end if
+    cache_profile=profile_status==0.and.trim(adjustl(profile_setting))=='1'
+    if(cache_profile.and..not.use_local_bonds) &
+      error stop 'Cubic cache profile requires ED2_CUBIC_LOCAL_BOND_CACHE=1'
     if(wk_dim < 0)then
       wk_dim = lv
     else
@@ -41,7 +54,10 @@ contains
       wk_dim1= MNTE + 1
     end if
     !
+    if(cache_profile)lookup_begin=omp_get_wtime()
     call setup_cubic_anchored_lookup(lv)
+    if(cache_profile)write(*,'(a,es18.9)') &
+      'Cubic cache profile: representative_key_setup_wall_s=',omp_get_wtime()-lookup_begin
     allocate(wk_loc(wk_dim1,wk_dim))
     allocate(wk_ele(wk_dim1,wk_dim))
     if(use_local_bonds)then
@@ -268,7 +284,8 @@ contains
   ! and tested against every original cache diagonal). Each off-diagonal
   ! cache ID, order and real/imaginary IEEE bit pattern is unchanged.
   subroutine build_cubic_local_bond_cache(lv,wk_dim1)
-    use iso_fortran_env, only: real64
+    use iso_fortran_env, only: real64,int64
+    use omp_lib, only: omp_get_wtime,omp_get_thread_num,omp_get_max_threads
     use input_param, only: NOS,NODmin,NODmax,NO_one,NO_two,local_NODmax,local_spin, &
       p_two,Jint,list_s,list_r,wk_dim
     use state_lists, only: list_fly,insertion_sort,j_flip_ni
@@ -283,7 +300,23 @@ contains
     real(real64) :: e_reference
     character(len=16) :: setting
     integer :: env_status
-    integer :: n_sites
+    integer :: n_sites,prof_status,thread_id,num_threads
+    integer(int64), allocatable :: prof_counts(:,:)
+    real(real64), allocatable :: prof_times(:,:)
+    real(real64) :: t0,sampled_start,t_setup,t_columns,profile_start
+    real(real64) :: sample_estimate
+    character(len=16) :: prof_setting
+    logical :: profile,do_sample
+    prof_setting=''
+    call get_environment_variable('ED2_CUBIC_CACHE_PROFILE',prof_setting,status=prof_status)
+    profile=prof_status==0.and.trim(adjustl(prof_setting))=='1'
+    if(profile)then
+      num_threads=max(1,omp_get_max_threads())
+      allocate(prof_counts(6,0:num_threads-1),prof_times(4,0:num_threads-1))
+      prof_counts=0_int64
+      prof_times=0.0_real64
+      profile_start=omp_get_wtime()
+    end if
     setting=''
     call get_environment_variable('ED2_CUBIC_ANCHORED_REP',setting,status=env_status)
     if(env_status/=0.or.trim(adjustl(setting))/='1') &
@@ -326,17 +359,31 @@ contains
     end do
     if(any(degree/=degree_expected))error stop 'Local cubic cache degree is not 18'
     if(wk_dim1<1)error stop 'Local cubic cache invalid capacity'
+    if(profile)then
+      t_setup=omp_get_wtime()-profile_start
+      profile_start=omp_get_wtime()
+    end if
     ! Work each projected state independently; the original input bond IDs
     ! are sorted before any matrix element, preserving legacy offdiag order.
     max_jd=1
-    !$omp parallel do private(i,j,k,site,spins,moved,incident,nel,old_j,i1,i2,n1,n2,c,phase,jd,id) &
+    !$omp parallel do private(i,j,k,site,spins,moved,incident,nel,old_j,i1,i2,n1,n2,c,phase,jd,id, & 
+    !$omp& thread_id,t0,sampled_start,do_sample) &
     !$omp reduction(max:max_jd) schedule(static)
     do i=1,wk_dim
+      if(profile)then
+        thread_id=omp_get_thread_num()
+        prof_counts(1,thread_id)=prof_counts(1,thread_id)+1_int64
+        t0=omp_get_wtime()
+      end if
       wk_loc(1,i)=i
       wk_loc(2:,i)=0
       wk_ele(:,i)=zz
       wk_ele(1,i)=cmplx(e_reference,0d0,kind=8)
       spins=list_fly(list_s(i),3,3,NOS)
+      if(profile)then
+        prof_times(1,thread_id)=prof_times(1,thread_id)+(omp_get_wtime()-t0)
+        t0=omp_get_wtime()
+      end if
       nel=0
       do k=1,3
         site=spins(k)
@@ -344,24 +391,42 @@ contains
         nel=nel+degree_expected
       end do
       call insertion_sort(incident,nel)
+      if(profile)then
+        prof_times(2,thread_id)=prof_times(2,thread_id)+(omp_get_wtime()-t0)
+        t0=omp_get_wtime()
+      end if
       old_j=0
       jd=2
       do k=1,nel
         j=incident(k)
         if(j==old_j)cycle
+        if(profile)prof_counts(2,thread_id)=prof_counts(2,thread_id)+1_int64
         old_j=j
         i1=p_two(1,j)
         i2=p_two(2,j)
         n1=count(spins==i1)
         n2=count(spins==i2)
         if(n1==n2)cycle
+        if(profile)prof_counts(3,thread_id)=prof_counts(3,thread_id)+1_int64
         wk_ele(1,i)=wk_ele(1,i)-0.5d0*Jint(3,j)
         if(n1==1)then
           c=0.25d0*(Jint(1,j)+Jint(2,j)) - zi*0.5d0*Jint(6,j)
           if(abs(c)<=eps)cycle
           moved=j_flip_ni(i1,i2,spins,3)
+          if(profile)then
+            prof_counts(4,thread_id)=prof_counts(4,thread_id)+1_int64
+            do_sample=modulo(i+j,31)==0
+            if(do_sample)sampled_start=omp_get_wtime()
+          end if
           call resolve_cached_hop(moved,lv,id,phase)
+          if(profile)then
+            if(do_sample)then
+              prof_times(4,thread_id)=prof_times(4,thread_id)+(omp_get_wtime()-sampled_start)
+              prof_counts(5,thread_id)=prof_counts(5,thread_id)+1_int64
+            end if
+          end if
           if(id>0)then
+            if(profile)prof_counts(6,thread_id)=prof_counts(6,thread_id)+1_int64
             if(jd>wk_dim1)error stop 'Local cubic cache MNTE too small'
             wk_loc(jd,i)=id
             wk_ele(jd,i)=c &
@@ -373,8 +438,20 @@ contains
           c=0.25d0*(Jint(1,j)+Jint(2,j)) + zi*0.5d0*Jint(6,j)
           if(abs(c)<=eps)cycle
           moved=j_flip_ni(i2,i1,spins,3)
+          if(profile)then
+            prof_counts(4,thread_id)=prof_counts(4,thread_id)+1_int64
+            do_sample=modulo(i+j,31)==0
+            if(do_sample)sampled_start=omp_get_wtime()
+          end if
           call resolve_cached_hop(moved,lv,id,phase)
+          if(profile)then
+            if(do_sample)then
+              prof_times(4,thread_id)=prof_times(4,thread_id)+(omp_get_wtime()-sampled_start)
+              prof_counts(5,thread_id)=prof_counts(5,thread_id)+1_int64
+            end if
+          end if
           if(id>0)then
+            if(profile)prof_counts(6,thread_id)=prof_counts(6,thread_id)+1_int64
             if(jd>wk_dim1)error stop 'Local cubic cache MNTE too small'
             wk_loc(jd,i)=id
             wk_ele(jd,i)=c &
@@ -384,9 +461,36 @@ contains
           end if
         end if
       end do
+      if(profile)prof_times(3,thread_id)=prof_times(3,thread_id)+(omp_get_wtime()-t0)
       if(jd>max_jd)max_jd=jd
     end do
     !$omp end parallel do
+    if(profile)then
+      t_columns=omp_get_wtime()-profile_start
+      sample_estimate=0.0_real64
+      if(sum(prof_counts(5,:))>0_int64)sample_estimate= &
+        sum(prof_times(4,:))*real(sum(prof_counts(4,:)),real64)/ &
+        real(sum(prof_counts(5,:)),real64)
+      write(*,'(a,i0,a,i0)') 'Cubic cache profile: columns=',sum(prof_counts(1,:)), &
+        ', omp_max_threads=',num_threads
+      write(*,'(a,es18.9)') 'Cubic cache profile: adjacency_setup_wall_s=',t_setup
+      write(*,'(a,es18.9)') 'Cubic cache profile: column_parallel_wall_s=',t_columns
+      write(*,'(a,es18.9)') 'Cubic cache profile: state_decode_thread_elapsed_sum_s=',sum(prof_times(1,:))
+      write(*,'(a,es18.9)') 'Cubic cache profile: bond_union_sort_thread_elapsed_sum_s=',sum(prof_times(2,:))
+      write(*,'(a,es18.9)') 'Cubic cache profile: bond_math_thread_elapsed_sum_s=',sum(prof_times(3,:))
+      write(*,'(a,i0)') 'Cubic cache profile: unique_incident_bonds=',sum(prof_counts(2,:))
+      write(*,'(a,i0)') 'Cubic cache profile: active_exchange_bonds=',sum(prof_counts(3,:))
+      write(*,'(a,i0)') 'Cubic cache profile: resolver_calls=',sum(prof_counts(4,:))
+      write(*,'(a,i0)') 'Cubic cache profile: resolver_sampled_calls=',sum(prof_counts(5,:))
+      write(*,'(a,es18.9)') &
+        'Cubic cache profile: resolver_sampled_thread_elapsed_sum_s=',sum(prof_times(4,:))
+      write(*,'(a,es18.9)') &
+        'Cubic cache profile: resolver_extrapolated_thread_elapsed_sum_s=',sample_estimate
+      write(*,'(a,i0)') 'Cubic cache profile: stored_hops=',sum(prof_counts(6,:))
+      write(*,'(a)') 'Cubic cache profile: resolver uses deterministic 1/31 bond-ID sampling;'
+      write(*,'(a)') 'Cubic cache profile: thread elapsed sums are not parallel wall times;'
+      write(*,'(a)') 'Cubic cache profile: probe overhead and sampling bias prohibit publication timing.'
+    end if
     deallocate(degree,neighbors)
     write(*,'(a,i0,a)') 'Cubic cache builder: local-bond-sparse, degree=', &
       degree_expected,', sorted input-bond ordering retained'
