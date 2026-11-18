@@ -329,6 +329,51 @@ jobs:
           fi
           grep -q 'Basis coordinate cache requires ED2_CUBIC_ANCHORED_BASIS=1' \
             "$RUNNER_TEMP/cubic-coordinate-invalid.log"
+      - name: PRESTO-sort3 native opt-in provenance, forced-legacy isolation and independent audit
+        run: |
+          ED2_CUBIC_ANCHORED_REP=1 ED2_CUBIC_FAST_GROUP_VALIDATION=1 \
+          ED2_CUBIC_ANCHORED_BASIS=1 ED2_CUBIC_LOCAL_BOND_CACHE=1 \
+          ED2_CUBIC_DIRECT_HOP_TABLE=1 ED2_CUBIC_BASIS_COORD_CACHE=1 \
+          ED2_CUBIC_BASIS_SORT3_NETWORK=1 \
+            python3 tools/cpc_presto_cubic_benchmark.py \
+              --exe "$PWD/source/QS3ED2" \
+              --output "$RUNNER_TEMP/cubic-sort3-benchmark" \
+              --source-revision "$(git rev-parse HEAD)" \
+              --source-archive "$RUNNER_TEMP/staged-source/ed2-source.tar.gz" \
+              --preset cubic-pilot --allow-shared --sizes 4 \
+              --sectors oh-a1g --threads 1 --warmups 0 --repeats 1 --mnte 64
+          python3 tools/cpc_presto_cubic_audit.py \
+            --root "$RUNNER_TEMP/cubic-sort3-benchmark" \
+            --output "$RUNNER_TEMP/audit-sort3-benchmark" \
+            --source-archive "$RUNNER_TEMP/staged-source/ed2-source.tar.gz" \
+            --exe "$PWD/source/QS3ED2"
+          python3 - <<'PY'
+          import json,os
+          from pathlib import Path
+          root=Path(os.environ['RUNNER_TEMP'])/'cubic-sort3-benchmark'
+          s=json.loads((root/'summary.json').read_text())
+          assert s['basis_coord_cache'] is True and s['basis_sort3_network'] is True
+          data=[json.loads(x) for x in (root/'trials.jsonl').read_text().splitlines()]
+          assert len(data)==2
+          assert all(x['basis_sort3_network'] and x['basis_coord_cache'] for x in data)
+          labels={}
+          for r in data:
+              raw=(root/'trials'/r['key']/'stdout.log').read_text()
+              labels[r['builder']]='Basis canonical sorter: exact-three-site-network' in raw
+          assert labels=={'fast':True,'forced-legacy':False}
+          print('CUBIC_SORT3_PRESTO_PROVENANCE_PASS')
+          PY
+          if ED2_CUBIC_BASIS_SORT3_NETWORK=1 python3 tools/cpc_presto_cubic_benchmark.py \
+              --source-revision "$(git rev-parse HEAD)" \
+              --source-archive "$RUNNER_TEMP/staged-source/ed2-source.tar.gz" \
+              --preset cubic-smoke --allow-shared --sizes 4 --sectors oh-a1g \
+              --plan-only --output "$RUNNER_TEMP/cubic-sort3-invalid" \
+              > "$RUNNER_TEMP/cubic-sort3-invalid.log" 2>&1; then
+            echo "ERROR: sorter accepted missing coordinate-cache guard" >&2
+            exit 1
+          fi
+          grep -q 'Three-site sorter requires ED2_CUBIC_BASIS_COORD_CACHE=1' \
+            "$RUNNER_TEMP/cubic-sort3-invalid.log"
       - name: Anchored cubic basis must fail closed on mismatched source geometry and symmetry
         run: |
           if ED2_CUBIC_ANCHORED_BASIS=1 ED2_CUBIC_FAST_GROUP_VALIDATION=1 \
