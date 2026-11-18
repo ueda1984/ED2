@@ -201,10 +201,12 @@ def sector_dimensions(side, down=3):
     return result
 
 
-def write_input(work, side, down, gens, bonds, maxiter=2000, wk_dim=-1):
+def write_input(work, side, down, gens, bonds, maxiter=2000, wk_dim=-1, mnte=-1):
     work = Path(work)
     work.mkdir(parents=True, exist_ok=False)
     n = side ** 3
+    if mnte != -1 and mnte < 3 * 18:
+        raise ValueError("For this 3-magnon fixed-Sz J1-J2 cube, MNTE >= 54 is required")
     (work / "spins.dat").write_text("0.5\n" * n)
     (work / "caps.dat").write_text("1\n" * n)
     (work / "fields.dat").write_text("")
@@ -212,7 +214,7 @@ def write_input(work, side, down, gens, bonds, maxiter=2000, wk_dim=-1):
         f"{i+1} {j+1} {xy:g} {xy:g} {zz:g} 0 0 0 0 0 0\n"
         for i, j, xy, zz in bonds))
     lines = [f"NOS={n},NODmin={down},NODmax={down},ALG=1,",
-             f"NO_one=0,NO_two={len(bonds)},wk_dim={wk_dim},MNTE=-1,",
+             f"NO_one=0,NO_two={len(bonds)},wk_dim={wk_dim},MNTE={mnte},",
              "FILE_xyz_dm_gamma='bonds.dat',FILE_hvec='fields.dat',",
              "FILE_spin='spins.dat',FILE_NODmax='caps.dat',",
              "OUTDIR='./',FILE_wf='./',wr_wf=0,re_wf=0,cal_lm=0,cal_cf=0,"]
