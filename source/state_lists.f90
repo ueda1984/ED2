@@ -506,6 +506,120 @@ contains
     t = inv_list(n,NODmax)
   end subroutine representative_SQ
   !
+  ! A product of cyclic generators need not be Abelian.  The existing orbit
+  ! algorithm can also process noncommuting generators, but only when the
+  ! supplied normal form enumerates each finite permutation exactly once and
+  ! its prescribed phases are a genuine one-dimensional group character.
+  ! Verify both conditions before allowing the fast path; otherwise the
+  ! original full enumeration remains the backward-compatible fallback.
+  subroutine validate_noncommuting_action(maps,periods,valid)
+    use iso_fortran_env, only: int64
+    use input_param, only: NOS,explist
+    integer, intent(in) :: maps(0:NOS,6),periods(6)
+    logical, intent(out) :: valid
+    integer, allocatable :: elements(:,:),slots(:),composition(:)
+    integer(int64), allocatable :: hashes1(:),hashes2(:)
+    complex(8), allocatable :: chi(:)
+    integer(int64) :: nwide,h1,h2
+    integer :: ng,table_size,g,idx(6),q,b,site,loc,a,probe,j
+    logical :: found
+    complex(8) :: generator_chi
+    valid=.false.
+    nwide=1_int64
+    do a=1,6
+      if(periods(a)<1)return
+      if(nwide>huge(nwide)/int(periods(a),int64))return
+      nwide=nwide*int(periods(a),int64)
+    end do
+    ! Cap one-time validation memory: <=4 million integer site images and
+    ! <=8192 group elements. Larger noncommuting groups use the legacy path.
+    if(nwide>8192_int64)return
+    if(nwide>4000000_int64/int(NOS+1,int64))return
+    ng=int(nwide)
+    table_size=2*ng+1
+    allocate(elements(0:NOS,ng),composition(0:NOS),slots(table_size))
+    allocate(hashes1(ng),hashes2(ng),chi(ng))
+    slots=0
+    do g=1,ng
+      ! L1 varies fastest, identical to checkstate_SQ and representative_SQ.
+      q=g-1
+      do a=1,6
+        idx(a)=mod(q,periods(a))+1
+        q=q/periods(a)
+      end do
+      do site=0,NOS
+        loc=site
+        do a=6,1,-1
+          do b=1,idx(a)
+            loc=maps(loc,a)
+          end do
+        end do
+        elements(site,g)=loc
+      end do
+      chi(g)=explist(idx(1),idx(2),idx(3),idx(4),idx(5),idx(6))
+      call hash_permutation(elements(:,g),hashes1(g),hashes2(g))
+      probe=1+int(modulo(hashes1(g),int(table_size,int64)))
+      do
+        j=slots(probe)
+        if(j==0)then
+          slots(probe)=g
+          exit
+        end if
+        if(hashes1(g)==hashes1(j) .and. hashes2(g)==hashes2(j))then
+          if(all(elements(:,g)==elements(:,j)))return
+        end if
+        probe=mod(probe,table_size)+1
+      end do
+    end do
+    ! Last mixed-radix element has every exponent at its period: identity.
+    do site=0,NOS
+      if(elements(site,ng)/=site)return
+    end do
+    if(abs(chi(ng)-(1d0,0d0))>1d-10)return
+    ! Left multiplication by each generator must remain in the enumerated
+    ! set, and phase multiplication must respect the same group law. Because
+    ! the set contains the identity and is finite, closure under generators
+    ! certifies the finite group. Hash collisions are checked by exact maps.
+    do a=1,6
+      if(periods(a)==1)cycle
+      idx=periods
+      idx(a)=1
+      generator_chi=explist(idx(1),idx(2),idx(3),idx(4),idx(5),idx(6))
+      do g=1,ng
+        composition=maps(elements(:,g),a)
+        call hash_permutation(composition,h1,h2)
+        probe=1+int(modulo(h1,int(table_size,int64)))
+        found=.false.
+        do
+          j=slots(probe)
+          if(j==0)exit
+          if(h1==hashes1(j) .and. h2==hashes2(j))then
+            if(all(composition==elements(:,j)))then
+              found=.true.
+              if(abs(chi(j)-generator_chi*chi(g))>1d-10)return
+              exit
+            end if
+          end if
+          probe=mod(probe,table_size)+1
+        end do
+        if(.not.found)return
+      end do
+    end do
+    valid=.true.
+  contains
+    subroutine hash_permutation(perm,hash1,hash2)
+      integer, intent(in) :: perm(0:)
+      integer(int64), intent(out) :: hash1,hash2
+      integer :: site_index
+      hash1=17_int64
+      hash2=97_int64
+      do site_index=0,ubound(perm,1)
+        hash1=modulo(hash1*65599_int64+int(perm(site_index),int64),1000000007_int64)
+        hash2=modulo(hash2*65521_int64+int(perm(site_index),int64),1000000009_int64)
+      end do
+    end subroutine hash_permutation
+  end subroutine validate_noncommuting_action
+
   ! Only a globally minimal representative may mark its entire orbit visited.
   ! Atomic bitset accesses are required even when different bits share a word.
   ! Canonicality is decided BEFORE publication, so a later-ranked worker can
@@ -523,11 +637,16 @@ contains
     integer, allocatable :: maps(:,:),ns(:),np(:),ranks(:),order(:)
     integer(int64), allocatable :: visited(:)
     logical, allocatable :: seen(:)
-    logical :: is_representative
+    logical :: is_representative,commuting,valid_noncommuting
+    integer :: env_status
+    character(len=16) :: force_legacy
     real(8) :: ro
     real(8), allocatable :: norms(:)
     type(orbit_buffer), allocatable :: buffers(:)
     used=.false.
+    force_legacy=''
+    call get_environment_variable('ED2_FORCE_LEGACY_ORBITS',force_legacy,status=env_status)
+    if(env_status==0 .and. trim(adjustl(force_legacy))=='1')return
     periods=[L1,L2,L3,L4,L5,L6]
     if(any(periods<1).or.THS<1) return
     group_order=1_int64
@@ -555,6 +674,7 @@ contains
     maps(:,1)=shift_1;maps(:,2)=shift_2;maps(:,3)=shift_3
     maps(:,4)=shift_4;maps(:,5)=shift_5;maps(:,6)=shift_6
     if(any(maps(0,:)/=0))return
+    commuting=.true.
     do a=1,6
       if(any(maps(1:,a)<1).or.any(maps(1:,a)>NOS))return
       seen=.false.
@@ -578,10 +698,15 @@ contains
       end do
       do b=1,a-1
         do i=1,NOS
-          if(maps(maps(i,a),b)/=maps(maps(i,b),a))return
+          if(maps(maps(i,a),b)/=maps(maps(i,b),a))commuting=.false.
         end do
       end do
     end do
+    if(.not.commuting)then
+      call validate_noncommuting_action(maps,periods,valid_noncommuting)
+      if(.not.valid_noncommuting)return
+      write(*,'(a)') 'Symmetry action: noncommuting normal form and character validated'
+    end if
     deallocate(seen,maps)
     dim=THS
     capacity=int(min(int(dim,int64),max(128_int64,2_int64*dim/group_order/int(nt,int64))))
