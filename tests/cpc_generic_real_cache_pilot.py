@@ -124,7 +124,7 @@ def run_case(exe, work, n, threads, repetition, period, mode, timeout, seed):
     expected_packed = mode == "packed"
     assert ("Hamiltonian action: strictly-real cached coefficients" in stdout) == expected_real
     assert ("Hamiltonian action: compact-real cache extra_bytes=" in stdout) == expected_packed
-    lanczos_status = re.findall(r"Lanczos status: ([^\\n]+)", stdout)
+    lanczos_status = [line for line in stdout.splitlines() if line.startswith("Lanczos status: ")]
     assert len(lanczos_status) == 1 and "residual certified" in lanczos_status[0], (
         "Solver did not certify its final native residual", work, stdout[-2500:])
     pattern = r"ED2_PHASE {} wall_s=\s*([0-9.Ee+\-]+)"
