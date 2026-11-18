@@ -175,6 +175,13 @@ def execute(exe, out, spec, allocation_info, timeout, mnte):
         else:
             os.environ["ED2_FORCE_LEGACY_ORBITS"] = before
     output = (work / "stdout.log").read_text(errors="replace")
+    anchored = os.environ.get("ED2_CUBIC_ANCHORED_REP", "") == "1"
+    anchor_verified = os.environ.get("ED2_CUBIC_ANCHORED_VERIFY", "") == "1"
+    anchored_reported = "Representative lookup: cubic-anchored-orbits" in output
+    if anchored_reported != anchored:
+        raise AssertionError("Requested anchored lookup disagrees with native stdout")
+    if anchored and anchor_verified and "per-hop legacy verification=T" not in output:
+        raise AssertionError("Missing per-hop legacy verification confirmation")
     atomic = "Basis builder: atomic-orbits" in output
     normal_form = "Symmetry action: noncommuting normal form and character validated" in output
     if builder == "forced-legacy" and atomic:
@@ -186,7 +193,8 @@ def execute(exe, out, spec, allocation_info, timeout, mnte):
     obs.update(dict(key=key, side=side, sector=sector, threads=threads,
                     repetition=repeat, period=period, builder=builder,
                     atomic_orbits=atomic, validated_noncommuting_action=normal_form,
-                    mnte=mnte, sample_utc=now(), status="PASS",
+                    mnte=mnte, anchored_lookup=anchored,
+                     anchored_verify=anchor_verified, sample_utc=now(), status="PASS",
                     all_input_sha256={f.name: sha(f) for f in work.iterdir()
                                       if f.suffix == ".dat" and f.name not in
                                       ("eigenvalues.dat", "diagnostics.dat")}))
@@ -237,6 +245,12 @@ def main():
         p.error("Threads must be distinct positive integers")
     if not 0 <= warmups <= 5 or not 1 <= repeats <= 20:
         p.error("Invalid warmups/repeats")
+    anchored = os.environ.get("ED2_CUBIC_ANCHORED_REP", "") == "1"
+    anchored_verify = os.environ.get("ED2_CUBIC_ANCHORED_VERIFY", "") == "1"
+    if anchored_verify and not anchored:
+        p.error("ED2_CUBIC_ANCHORED_VERIFY requires ED2_CUBIC_ANCHORED_REP=1")
+    if anchored and "gamma-t" in sectors:
+        p.error("Anchored cubic representatives require a 1D O_h sector")
     if a.mnte != -1 and a.mnte < 54:
         p.error("MNTE must be -1 (original) or >=54 (3 magnons times 18 neighbors)")
     if a.timeout < 5 or a.time_budget < a.timeout:
@@ -250,6 +264,7 @@ def main():
                     for side in sizes for sec in sectors for _ in threads) * (warmups + repeats)
         print(json.dumps(dict(sizes=sizes, threads=threads, sectors=sectors, warmups=warmups, repeats=repeats,
                               trial_count=count, mnte=a.mnte,
+                               anchored_lookup=anchored, anchored_verify=anchored_verify,
                               source_revision=a.source_revision, archive_sha256=sha(archive)),
                          indent=2))
         return
@@ -270,7 +285,9 @@ def main():
                   symmetry_scope="Gamma translations and four 1D O_h irreps",
                   legacy_rule="force old basis only for side=4, no infeasible large-side legacy",
                   preset=a.preset, sizes=sizes, threads=threads, sectors=sectors, warmups=warmups,
-                  repeats=repeats, mnte=a.mnte, timeout=a.timeout, time_budget=a.time_budget,
+                  repeats=repeats, mnte=a.mnte, anchored_lookup=anchored,
+                   anchored_verify=anchored_verify,
+                   timeout=a.timeout, time_budget=a.time_budget,
                   seed=a.seed, protocol="preset-specific measured repeats and warmups",
                   publication_ready=False,
                   reason="Operator confirmation of exclusivity and independent review required")
