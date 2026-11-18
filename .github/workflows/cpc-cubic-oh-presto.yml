@@ -2,7 +2,7 @@ name: ED2 cubic Oh symmetry and PRESTO protocol
 
 on:
   push:
-    branches: [codex/ed2-cpc-cubic-oh-1000-presto, codex/ed2-cubic-cache-mnte-cap-experiment, codex/ed2-cubic-anchored-key-oracle, codex/ed2-cubic-native-anchored-representatives, codex/ed2-cubic-basis-phase-instrumentation]
+    branches: [codex/ed2-cpc-cubic-oh-1000-presto, codex/ed2-cubic-cache-mnte-cap-experiment, codex/ed2-cubic-anchored-key-oracle, codex/ed2-cubic-native-anchored-representatives, codex/ed2-cubic-basis-phase-instrumentation, codex/ed2-cubic-fast-oh-group-certificate]
     paths:
       - "source/state_lists.f90"
       - "source/cubic_anchored_lookup.f90"
@@ -17,6 +17,7 @@ on:
       - "tests/cpc_cubic_anchored_orbit_key_oracle.py"
       - "tests/cpc_cubic_native_anchored_regression.py"
       - "tests/cpc_cubic_basis_timing_regression.py"
+      - "tests/cpc_cubic_fast_group_certificate_regression.py"
       - "tests/cpc_cubic_pointgroup_regression.py"
       - "tests/cpc_cubic_1000_one_magnon_smoke.py"
       - "tests/cpc_pointgroup_profile.py"
@@ -39,6 +40,7 @@ on:
       - "tests/cpc_cubic_anchored_orbit_key_oracle.py"
       - "tests/cpc_cubic_native_anchored_regression.py"
       - "tests/cpc_cubic_basis_timing_regression.py"
+      - "tests/cpc_cubic_fast_group_certificate_regression.py"
       - "tests/cpc_cubic_pointgroup_regression.py"
       - "tests/cpc_cubic_1000_one_magnon_smoke.py"
       - "tests/cpc_pointgroup_profile.py"
@@ -100,6 +102,7 @@ jobs:
               "tests/cpc_cubic_anchored_orbit_key_oracle.py",
               "tests/cpc_cubic_native_anchored_regression.py",
               "tests/cpc_cubic_basis_timing_regression.py",
+              "tests/cpc_cubic_fast_group_certificate_regression.py",
               "tests/cpc_cubic_pointgroup_regression.py",
               "tests/cpc_cubic_1000_one_magnon_smoke.py",
               "tests/cpc_pointgroup_profile.py",
@@ -173,6 +176,32 @@ jobs:
         run: |
           python3 tests/cpc_cubic_basis_timing_regression.py --exe "$PWD/source/QS3ED2" \
             --sides 4,6 --threads 1,4 --output "$RUNNER_TEMP/cubic-basis-breakdown"
+      - name: Bit-for-bit normal-form certificate vs full legacy 48000-map validator
+        run: |
+          python3 tests/cpc_cubic_fast_group_certificate_regression.py --exe "$PWD/source/QS3ED2" \
+            --sides 4,6 --threads 1,4 --output "$RUNNER_TEMP/cubic-group-certificate-small"
+          python3 tests/cpc_cubic_fast_group_certificate_regression.py --exe "$PWD/source/QS3ED2" \
+            --sides 10 --threads 1 --sectors oh-a1g \
+            --output "$RUNNER_TEMP/cubic-group-certificate-n1000"
+      - name: Fast cubic group certificate must reject an unrelated chain
+        run: |
+          if ED2_CUBIC_FAST_GROUP_VALIDATION=1 tests/test_ex1.sh \
+            > "$RUNNER_TEMP/cubic-certificate-reject-chain.log" 2>&1; then
+            echo "ERROR: noncubic chain accepted cubic group certificate" >&2
+            exit 1
+          fi
+          grep -q 'Fast cubic group certificate requires noncommuting full O_h' \
+            "$RUNNER_TEMP/cubic-certificate-reject-chain.log"
+          if ED2_CUBIC_FAST_GROUP_VALIDATION=1 python3 tools/cpc_presto_cubic_benchmark.py \
+            --source-revision "$(git rev-parse HEAD)" \
+            --source-archive "$RUNNER_TEMP/staged-source/ed2-source.tar.gz" \
+            --preset cubic-smoke --allow-shared --sizes 4 --sectors gamma-t --plan-only \
+            --output "$RUNNER_TEMP/should-not-exist-group" > "$RUNNER_TEMP/group-refusal.log" 2>&1; then
+            echo "ERROR: translation-only sector accepted cubic group certificate" >&2
+            exit 1
+          fi
+          grep -q 'Fast cubic group certificate requires a noncommuting 1D O_h sector' \
+            "$RUNNER_TEMP/group-refusal.log"
       - name: Exhaustive anchored-key orbit census and O_h character equivariance
         run: |
           python3 tests/cpc_cubic_anchored_orbit_key_oracle.py --side 4 --samples 250
@@ -295,5 +324,7 @@ jobs:
             ${{ runner.temp }}/cubic-anchored-omp4/
             ${{ runner.temp }}/cubic-anchored-legacy-basis/
             ${{ runner.temp }}/cubic-basis-breakdown/
+            ${{ runner.temp }}/cubic-group-certificate-small/
+            ${{ runner.temp }}/cubic-group-certificate-n1000/
           if-no-files-found: warn
           retention-days: 30
