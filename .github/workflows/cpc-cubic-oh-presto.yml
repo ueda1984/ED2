@@ -2,7 +2,7 @@ name: ED2 cubic Oh symmetry and PRESTO protocol
 
 on:
   push:
-    branches: [codex/ed2-cpc-cubic-oh-1000-presto, codex/ed2-cubic-cache-mnte-cap-experiment, codex/ed2-cubic-anchored-key-oracle, codex/ed2-cubic-native-anchored-representatives, codex/ed2-cubic-basis-phase-instrumentation, codex/ed2-cubic-fast-oh-group-certificate, codex/ed2-cubic-anchored-basis-builder, codex/ed2-cubic-local-bond-cache]
+    branches: [codex/ed2-cpc-cubic-oh-1000-presto, codex/ed2-cubic-cache-mnte-cap-experiment, codex/ed2-cubic-anchored-key-oracle, codex/ed2-cubic-native-anchored-representatives, codex/ed2-cubic-basis-phase-instrumentation, codex/ed2-cubic-fast-oh-group-certificate, codex/ed2-cubic-anchored-basis-builder, codex/ed2-cubic-local-bond-cache, codex/ed2-cubic-cache-phase-profile]
     paths:
       - "source/state_lists.f90"
       - "source/cubic_anchored_lookup.f90"
@@ -16,6 +16,7 @@ on:
       - "docs/development/cpc-cubic-fast-group-certificate-20261118.md"
       - "docs/development/cpc-cubic-anchored-basis-20261118.md"
       - "docs/development/cpc-cubic-local-bond-cache-20261118.md"
+      - "docs/development/cpc-cubic-cache-profiler-20261118.md"
       - "tests/cpc_cubic_pointgroup.py"
       - "tests/cpc_cubic_anchored_orbit_key_oracle.py"
       - "tests/cpc_cubic_native_anchored_regression.py"
@@ -23,6 +24,7 @@ on:
       - "tests/cpc_cubic_fast_group_certificate_regression.py"
       - "tests/cpc_cubic_anchored_basis_regression.py"
       - "tests/cpc_cubic_local_bond_cache_regression.py"
+      - "tests/cpc_cubic_cache_phase_profile_regression.py"
       - "tests/cubic_cache_driver.f90"
       - "tests/cubic_basis_driver.f90"
       - "tests/cpc_cubic_pointgroup_regression.py"
@@ -46,6 +48,7 @@ on:
       - "docs/development/cpc-cubic-fast-group-certificate-20261118.md"
       - "docs/development/cpc-cubic-anchored-basis-20261118.md"
       - "docs/development/cpc-cubic-local-bond-cache-20261118.md"
+      - "docs/development/cpc-cubic-cache-profiler-20261118.md"
       - "tests/cpc_cubic_pointgroup.py"
       - "tests/cpc_cubic_anchored_orbit_key_oracle.py"
       - "tests/cpc_cubic_native_anchored_regression.py"
@@ -53,6 +56,7 @@ on:
       - "tests/cpc_cubic_fast_group_certificate_regression.py"
       - "tests/cpc_cubic_anchored_basis_regression.py"
       - "tests/cpc_cubic_local_bond_cache_regression.py"
+      - "tests/cpc_cubic_cache_phase_profile_regression.py"
       - "tests/cubic_cache_driver.f90"
       - "tests/cubic_basis_driver.f90"
       - "tests/cpc_cubic_pointgroup_regression.py"
@@ -119,6 +123,7 @@ jobs:
               "tests/cpc_cubic_fast_group_certificate_regression.py",
               "tests/cpc_cubic_anchored_basis_regression.py",
               "tests/cpc_cubic_local_bond_cache_regression.py",
+              "tests/cpc_cubic_cache_phase_profile_regression.py",
               "tests/cpc_cubic_pointgroup_regression.py",
               "tests/cpc_cubic_1000_one_magnon_smoke.py",
               "tests/cpc_pointgroup_profile.py",
@@ -259,6 +264,23 @@ jobs:
             --driver "$PWD/tests/cubic_cache_driver" --exe "$PWD/source/QS3ED2" \
             --sides 10 --threads 1 --skip-lanczos \
             --output "$RUNNER_TEMP/cubic-local-cache-n1000"
+      - name: Optional cache subphase probes leave every Hamiltonian cache bit unchanged
+        run: |
+          python3 tests/cpc_cubic_cache_phase_profile_regression.py \
+            --driver "$PWD/tests/cubic_cache_driver" \
+            --sides 4,10 --threads 1,4 --sectors oh-a1g \
+            --output "$RUNNER_TEMP/cubic-cache-profiler-proof"
+          if ED2_CUBIC_CACHE_PROFILE=1 python3 tools/cpc_presto_cubic_benchmark.py \
+              --source-revision "$(git rev-parse HEAD)" \
+              --source-archive "$RUNNER_TEMP/staged-source/ed2-source.tar.gz" \
+              --preset cubic-smoke --allow-shared --sizes 4 --sectors oh-a1g \
+              --plan-only --output "$RUNNER_TEMP/reject-profiler-plan" \
+              > "$RUNNER_TEMP/reject-profiler-plan.log" 2>&1; then
+            echo "ERROR: profiler allowed without local cache guard" >&2
+            exit 1
+          fi
+          grep -q 'Cache profiling requires ED2_CUBIC_LOCAL_BOND_CACHE=1' \
+            "$RUNNER_TEMP/reject-profiler-plan.log"
       - name: Local cubic cache must reject general chains and incompatible non-XXZ bonds
         run: |
           if ED2_CUBIC_LOCAL_BOND_CACHE=1 tests/test_ex1.sh \
@@ -446,5 +468,6 @@ jobs:
             ${{ runner.temp }}/audit-cubic-new-basis/
             ${{ runner.temp }}/cubic-local-cache-small/summary.json
             ${{ runner.temp }}/cubic-local-cache-n1000/summary.json
+            ${{ runner.temp }}/cubic-cache-profiler-proof/n10-oh-a1g-t1-profiled/driver.log
           if-no-files-found: warn
           retention-days: 30
