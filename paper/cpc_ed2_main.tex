@@ -31,7 +31,11 @@ through 32 fixed-magnetization eigenvalues, 15 momentum-resolved levels,
 and independently referenced conventional-Lanczos calculations for
 12--24 sites. Large-site continuity is independently confirmed in a
 1000-site two-magnon, translation-reduced sector against an exact
-relative-displacement reference and QuSpin. In a genuinely non-$U(1)$ alternating spin-$1/2$/spin-$1$
+relative-displacement reference and QuSpin. An additional 1000-site,
+three-magnon $\Gamma$-point stress test resolves four one-dimensional
+$O_h$ symmetry sectors and verifies 48 paired solver runs with identical
+physics under an optional exact basis-coordinate optimization.
+In a genuinely non-$U(1)$ alternating spin-$1/2$/spin-$1$
 chain, independent Hamiltonian constructions validate calculations
 through 12 sites (full Hilbert dimension 46,656).
 The staggered vector-chirality response to an oriented DM interaction
@@ -384,14 +388,47 @@ relative displacements. This explicitly constructs all
 166-million-state magnetization sector. The resulting
 sparse real-symmetric $\Gamma$-sector Hamiltonian contains
 3,151,137 nonzero matrix entries and passes a direct
-Hermiticity check. This is \emph{structural} validation
-only: neither an ED2 three-magnon run at 1000 sites
-nor an independently converged three-magnon eigenenergy
-is yet available.
-The reported old/new wall times were obtained on
-a shared CI runner with unmatched random Lanczos
-initial vectors and cannot be interpreted as a
-controlled speedup or efficiency comparison.
+Hermiticity check. This is an \emph{independent structural}
+reference, not an independently converged three-magnon
+ground energy.
+
+An additional native ED2 calculation on the same
+$10\times10\times10$ periodic nearest-neighbor
+spin-$1/2$ Heisenberg lattice resolves the $\Gamma$
+sector into four one-dimensional representations
+of the cubic point group $O_h$. Independent
+character counting gives respective dimensions
+4,299 ($A_{1g}$), 3,624 ($A_{2g}$),
+2,884 ($A_{1u}$) and 3,252 ($A_{2u}$).
+The group-aware basis construction enforces a
+canonical cubic symmetry certificate and reproduces
+the old representative ranks and their normalization
+bits in two-compiler regression tests.
+For the large-scale \emph{production} two-stage Lanczos
+calculation, 48 matched PRESTO trials (four irreps,
+one/four/eight threads, one warmup and three measured
+runs per configuration) were audited with an exact
+source revision, equal input checksums and consistent
+basis dimensions. Toggling only an optional
+periodic-coordinate cache left all 48 reported energies
+unchanged at recorded precision, changed no Hamiltonian
+application counts, and produced a maximum directly
+evaluated Ritz residual of $9.71161\times10^{-9}$.
+Complete Hamiltonian-cache records and basis
+representative/normalization bits were independently
+compared byte for byte for the two paths in the
+GNU Fortran 13 and 14 native test matrices.
+
+This establishes an executable numerical
+\emph{consistency test} at 1000 sites, whereas
+the previous relative-displacement Hamiltonian is
+an independent spectral reference for the distinct
+\emph{two}-magnon sector. We do not claim an
+independently converged energy benchmark in each
+1000-site, three-magnon $O_h$ sector; that remains
+a separate reproducibility target. The exploratory
+timing data and resource limitations are reported
+below in Sec.~\ref{sec:pr17-pilot}.
 
 \subsection{Independent mixed-spin basis checks}
 For $S_i=(1/2,1,1/2,1)$, the polynomial in
@@ -433,6 +470,7 @@ Staggered-DM response & 60 runs & $<1.4\times10^{-13}$ in $E_0$;
 $<1.5\times10^{-9}$ in $K$ \\
 Published XYZ--DM conventions & 12 runs & $<3\times10^{-14}$ in spectrum \\
 1000-site two magnons & 1 sector & Old QS$^3$, ED2, independent orbit ED and QuSpin agree within $10^{-10}$ \\
+1000-site three magnons & 48 paired runs & All energy differences reported as zero; maximum direct residual $9.712\times10^{-9}$ (no independent spectral reference) \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -824,6 +862,75 @@ reported as established software speedup factors.
 Controlled-node repeated measurements are required
 for that claim.
 
+
+\subsection{Exploratory 1000-site cubic symmetry-basis optimization}
+\label{sec:pr17-pilot}
+For the 1000-site three-magnon calculation described above, an
+exact optional coordinate cache reduces the repeated periodic
+coordinate differences evaluated while constructing cubic
+translation-and-point-group orbit representatives. The
+opt-in \texttt{ED2\_CUBIC\_BASIS\_COORD\_CACHE=1} is restricted
+to the independently validated three-magnon cubic
+$\Gamma$/$O_h$ pathway; the general ED2 basis and all
+original floating-point stabilizer summations are unchanged.
+The previous representation remains the default.
+
+We compare two separate PRESTO allocations using the
+\emph{same pinned source revision},
+\texttt{3fbe2d7dbb3314bbf57391565937b271c259ecb8},
+and byte-identical generated inputs, with the coordinate
+cache disabled/enabled, respectively. Both sets completed
+the native independent trial audit (48 trials per allocation).
+The maximum observed difference of corresponding Ritz
+energies is zero at recorded precision and both paths
+satisfy the requested direct residual tolerance of
+$1.01\times10^{-8}$. No Hamiltonian application count
+changed. All twelve sector/thread configurations exhibit
+shorter \emph{median} basis and end-to-end wall times;
+the basis ratio ranges from 2.256 to 2.338 and
+the end-to-end ratio ranges from 1.439 to 1.706.
+The full twelve-row summary is retained as
+\texttt{paper/data/pr17\_presto\_coordinate\_cache\_pilot.csv}.
+Table~\ref{tab:pr17-pilot} shows the eight-thread subset.
+
+\begin{table}[t]
+\centering
+\caption{Exploratory PRESTO two-allocation coordinate-cache
+comparison of 1000-site, three-magnon cubic $\Gamma/O_h$
+sectors. Warmup excluded; each entry is a median of three
+measured trials. Wall times are in milliseconds.
+The final column is total OFF divided by total ON.
+An operator-independent confirmation of exclusive
+hardware use is unavailable, and these are therefore
+\emph{not} publication-grade speedup factors.}
+\label{tab:pr17-pilot}
+\small
+% PR17_PRESTO_T8_BEGIN: all numbers must match the committed CSV.
+\begin{tabular}{lrrrrrr}
+\toprule
+Irrep & $\mathcal D$ & Basis OFF & Basis ON &
+Total OFF & Total ON & Total ratio \\
+\midrule
+$A_{1g}$ & 4299 & 208.052 & 90.850 & 294.141 & 178.219 & 1.650 \\
+$A_{2g}$ & 3624 & 208.144 & 91.193 & 288.792 & 170.932 & 1.690 \\
+$A_{1u}$ & 2884 & 207.745 & 91.235 & 282.004 & 165.509 & 1.704 \\
+$A_{2u}$ & 3252 & 210.377 & 90.878 & 289.525 & 169.664 & 1.706 \\
+\bottomrule
+\end{tabular}
+% PR17_PRESTO_T8_END
+\end{table}
+
+The observed change is overwhelmingly associated with basis
+generation, not a new Hamiltonian or eigensolver.
+These measurements are useful for identifying bottlenecks,
+but independent scheduler/operator confirmation of
+exclusive resource use, additional allocations, more
+repetitions and independent raw-data archiving are still
+required before a controlled performance claim can be made.
+An experimental follow-on reduction of canonical
+translation candidates is not part of this frozen
+comparison and is not presented as an ED2 release feature.
+
 The accompanying CI-based resource tests independently check
 energies, observables and direct residuals across cache policies,
 including observed peak RSS and Hamiltonian applications.
@@ -903,8 +1010,13 @@ Direct original-code comparisons establish continuity
 in both conserved subspaces and translation sectors,
 including 216-site three-magnon and 1000-site two-magnon
 examples independently checked with QuSpin and, for the
-latter, a separate relative-coordinate construction,
-while independent physical-response and numerical
+latter, a separate relative-coordinate construction.
+A four-irrep 1000-site three-magnon stress case
+additionally verifies ED2's symmetry-resolved execution
+and exact numerical equivalence under optional
+basis-coordinate caching, without claiming an
+independent energy reference for that larger sector.
+Independent physical-response and numerical
 acceptance tests demonstrate the broader executable
 model/observable interface. The software remains
 subject to finite-size growth and model-dependent
