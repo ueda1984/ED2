@@ -168,7 +168,7 @@ def run_case(exe, work, nsites, down, symmetry, dimension, threads, mode, timeou
     # The old 'pair_1_residual' dictionary key does not exist: never skip
     # checking actual residuals because that optional key is absent.
     assert sum(line.startswith("pair_columns=") for line in diag_lines) == 1
-    pairs = [line.split() for line in diag_lines if re.match(r"^\\s*1\\s+[TF]\\s+[TF]\\s+", line)]
+    pairs = [line.split() for line in diag_lines if re.match(r"^\s*1\s+[TF]\s+[TF]\s+", line)]
     assert len(pairs) == 1 and len(pairs[0]) == 8, ("Missing native Ritz-pair diagnostic", work)
     pair = pairs[0]
     assert pair[1] == "T" and pair[2] == "T", ("Uncertified eigenpair", work, pair)
