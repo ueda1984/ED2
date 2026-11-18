@@ -168,6 +168,8 @@ def check_eigenvalues(exe, root, n, dm, timeout):
         status, log = native(exe, work, 1, "1" if enabled else "0", timeout)
         assert status == 0, (work, log[-2500:])
         assert (MARKER in log) == enabled
+        assert "CPC_CSR_OLD_TRLAN_FIXED_SEED=1984" in log, (
+            "Solver wrapper must ensure identical seeded starting vectors", work)
         eigen = work / "eigenvalues.dat"
         assert eigen.is_file(), (work, "missing eigenvalues.dat")
         observations.append((matching_inputs(work), energies(eigen)))
@@ -175,7 +177,10 @@ def check_eigenvalues(exe, root, n, dm, timeout):
     assert len(observations[0][1]) == len(observations[1][1])
     differences = [abs(x-y) for x,y in zip(
         observations[0][1],observations[1][1])]
-    assert max(differences) <= 5e-8, (
+    # The original TRLan does not guarantee bitwise stability even for a
+    # seeded initial state: its iterative reductions vary at roundoff scale.
+    # The separate native H*x probes above DO require exact bit equality.
+    assert max(differences) <= 5e-10, (
         "Original Lanczos eigenvalues changed beyond tolerance",
         n, dm, observations)
     print("MAIN_COMPLEX_CSR_SOLVER_PASS size={} dm={} max_delta={:.3e}".format(
@@ -194,7 +199,8 @@ def reject(driver, root, name, n, dm, flag, partial, substring):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--driver", type=Path, required=True)
-    parser.add_argument("--exe", type=Path, required=True)
+    parser.add_argument("--exe", type=Path, required=True,
+                        help="Original TRLan linked in deterministic TEST-ONLY wrapper")
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--sizes", default="4,6,8")
     parser.add_argument("--threads", default="1,4")
