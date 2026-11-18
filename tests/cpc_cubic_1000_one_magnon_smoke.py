@@ -44,7 +44,11 @@ def main():
     assert math.isclose(expected, 863.91,abs_tol=1e-10)
     assert abs(energy-expected) < 1e-8, (energy,expected)
     lines=(work/'diagnostics.txt').read_text().splitlines()
-    rows=[v for s in lines if (v:=s.split()) and len(v)==8 and v[0]=='1' and v[1:3]==['T','T']]
+    rows=[]
+    for s in lines:
+        v=s.split()
+        if len(v)==8 and v[0]=='1' and v[1:3]==['T','T']:
+            rows.append(v)
     assert len(rows)==1
     assert float(rows[0][5]) <= 1e-8
     print(f'PASS cubic O_h 1000-site one-magnon fast path: D=1 E={energy:.12f} residual={float(rows[0][5]):.3e}',flush=True)
