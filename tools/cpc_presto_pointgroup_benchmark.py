@@ -111,7 +111,7 @@ def allocation(shared, selected_threads, cpu_list):
         qs = qstat["stdout"]
         if not re.search(r"Resource_List\.place\s*=\s*exclhost", qs):
             raise RuntimeError("PBS scheduler did not report place=exclhost")
-        if not re.search(r"Resource_List\.select\s*=\s*1:ncpus=", qs):
+        if not re.search(r"Resource_List\.select\s*=\s*1:ncpus=96\b", qs):
             raise RuntimeError("Expected a one-node CPU selection")
         if not re.search(r"\bqueue\s*=\s*standard\b", qs):
             raise RuntimeError("Not running in the expected standard queue")
