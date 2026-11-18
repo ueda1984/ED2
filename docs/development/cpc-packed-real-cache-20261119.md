@@ -83,6 +83,61 @@ claim. Hardware/BLAS/version/CPU binding, memory/RSS,
 source archive, raw trial output and operator confirmation
 would be needed for formal CPC benchmarking.
 
+## Non-cubic, physically non-U(1) mixed-spin experiment
+
+To check whether packing only helps the special cubic symmetry cache,
+an **independent native ED2** calculation used a 1D open alternating
+spin-1/2/spin-1 chain with real XYZ couplings, Jxx != Jyy, staggered
+transverse hx fields, and zero y field, DM and off-diagonal XY
+couplings. This model is genuinely non-U(1) but its Sz-basis
+Hamiltonian is strictly real.
+
+The local GNU14.2 prototype explored N=8 (dimension 1296) and
+N=10 (dimension 7776), T1/T4, five interleaved runs per
+mode, BLAS threads=1 and identical seeded two-stage Lanczos.
+Three modes were compared: original full complex coefficients,
+the PR22 real-product kernel, and the PR23 extra packed-real array.
+**All per-condition eigenvalue output SHA256 checks matched across
+all three modes, including N=10 (140 native H actions).**
+
+Local shared-host median milliseconds, `complex / real / packed`:
+
+| N | T | H-action wall (temporary profiler) | Lanczos wall | Full wall |
+|---:|---:|---|---|---|
+| 8 | 1 | 7.689 / 6.341 / 5.925 | 9.484 / 7.957 / 8.065 | 13.351 / 11.897 / 13.146 |
+| 8 | 4 | 4.930 / 4.097 / 4.942 | 6.962 / 6.386 / 7.065 | 10.036 / 8.567 / 10.177 |
+| 10 | 1 | 92.735 / 93.806 / 67.069 | 104.357 / 104.217 / 78.839 | 130.760 / 140.669 / 116.122 |
+| 10 | 4 | 43.604 / 46.228 / 31.727 | 55.745 / 58.977 / 44.857 | 70.333 / 71.496 / 67.149 |
+
+**Interpretation:** packed storage is not always helpful.
+At N=8 the extra setup/copy cost consumes much of the saving
+and one configuration is slower. At N=10 the higher
+H-action count and larger working set favor the packed kernel.
+In particular the 10-site H-action itself was faster by ~1.37–1.38x
+versus original complex multiplication in this shared-host sample;
+the end-to-end benefit was much smaller. This is not a claim
+of an automatic dimension threshold, publication benchmark,
+verified CPU exclusivity or statistical confidence interval.
+
+The portable, standard-library `tests/cpc_generic_real_cache_pilot.py`
+now regenerates these physical Hamiltonians and the three
+identical-input native modes without any PRESTO dependency,
+verifies all exact eigenvalue output SHA256s and H-application
+counts, and records phase times/median/MAD in JSONL/JSON.
+Example from a configured source checkout:
+
+    python3 tests/cpc_generic_real_cache_pilot.py \
+      --exe "$PWD/source/QS3ED2" \
+      --output "$PWD/real-cache-pilot-new" \
+      --sizes 8,10 --threads 1,4 --warmups 1 --repeats 5
+
+The independent source version, compiler/BLAS configuration,
+hardware and operator scheduling should be recorded alongside
+the output for meaningful performance comparisons. By
+default the output directory must be new and no file is
+overwritten. This pilot deliberately does **not** claim
+operator-exclusive resource attestation.
+
 ## Adoption
 
 Keep this code optional and Draft. Only consider enabling
