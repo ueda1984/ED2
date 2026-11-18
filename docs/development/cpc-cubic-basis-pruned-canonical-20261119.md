@@ -81,10 +81,14 @@ ON on both sides and pruning OFF/ON:
 - All historical PR13–17 group/geometry/cache/baseline safety tests
 - Both gfortran13 and gfortran14 CI matrix jobs must PASS
 
-An independent standalone randomized integer oracle compared the
-pruned and exhaustive 27-candidate algorithms for 45,000 random
-distinct three-site configurations over L=4,6,10 with zero mismatches.
-This oracle is auxiliary evidence, not a substitute for native ED2 tests.
+An independent seeded Python integer oracle is now checked into
+`tests/cpc_cubic_axis_pruning_oracle.py`, performing **exhaustive**
+comparison of all 41,664 distinct 3-site configurations at L=4,
+plus 6,000 seeded random configurations each at L=6,8,10
+against the complete original 27-candidate search.
+The earlier standalone 45,000-case random check also passed.
+This independent oracle is auxiliary evidence, not a substitute
+for the complete native ED2 basis/cache/Ritz tests.
 
 Only if numerical validation and a meaningful speed improvement both
 hold should the PR advance to PRESTO same-source sort-pruning OFF/ON
