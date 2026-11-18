@@ -2,7 +2,7 @@ name: ED2 cubic Oh symmetry and PRESTO protocol
 
 on:
   push:
-    branches: [codex/ed2-cpc-cubic-oh-1000-presto, codex/ed2-cubic-cache-mnte-cap-experiment, codex/ed2-cubic-anchored-key-oracle, codex/ed2-cubic-native-anchored-representatives, codex/ed2-cubic-basis-phase-instrumentation, codex/ed2-cubic-fast-oh-group-certificate, codex/ed2-cubic-anchored-basis-builder, codex/ed2-cubic-local-bond-cache, codex/ed2-cubic-cache-phase-profile, codex/ed2-cubic-direct-hop-table]
+    branches: [codex/ed2-cpc-cubic-oh-1000-presto, codex/ed2-cubic-cache-mnte-cap-experiment, codex/ed2-cubic-anchored-key-oracle, codex/ed2-cubic-native-anchored-representatives, codex/ed2-cubic-basis-phase-instrumentation, codex/ed2-cubic-fast-oh-group-certificate, codex/ed2-cubic-anchored-basis-builder, codex/ed2-cubic-local-bond-cache, codex/ed2-cubic-cache-phase-profile, codex/ed2-cubic-direct-hop-table, codex/ed2-cubic-basis-coordinate-cache]
     paths:
       - "source/state_lists.f90"
       - "source/cubic_anchored_lookup.f90"
@@ -18,12 +18,14 @@ on:
       - "docs/development/cpc-cubic-local-bond-cache-20261118.md"
       - "docs/development/cpc-cubic-cache-profiler-20261118.md"
       - "docs/development/cpc-cubic-direct-hop-table-20261118.md"
+      - "docs/development/cpc-cubic-basis-coordinate-cache-20261118.md"
       - "tests/cpc_cubic_pointgroup.py"
       - "tests/cpc_cubic_anchored_orbit_key_oracle.py"
       - "tests/cpc_cubic_native_anchored_regression.py"
       - "tests/cpc_cubic_basis_timing_regression.py"
       - "tests/cpc_cubic_fast_group_certificate_regression.py"
       - "tests/cpc_cubic_anchored_basis_regression.py"
+      - "tests/cpc_cubic_basis_coordinate_cache_regression.py"
       - "tests/cpc_cubic_local_bond_cache_regression.py"
       - "tests/cpc_cubic_cache_phase_profile_regression.py"
       - "tests/cpc_cubic_direct_hop_table_regression.py"
@@ -52,12 +54,14 @@ on:
       - "docs/development/cpc-cubic-local-bond-cache-20261118.md"
       - "docs/development/cpc-cubic-cache-profiler-20261118.md"
       - "docs/development/cpc-cubic-direct-hop-table-20261118.md"
+      - "docs/development/cpc-cubic-basis-coordinate-cache-20261118.md"
       - "tests/cpc_cubic_pointgroup.py"
       - "tests/cpc_cubic_anchored_orbit_key_oracle.py"
       - "tests/cpc_cubic_native_anchored_regression.py"
       - "tests/cpc_cubic_basis_timing_regression.py"
       - "tests/cpc_cubic_fast_group_certificate_regression.py"
       - "tests/cpc_cubic_anchored_basis_regression.py"
+      - "tests/cpc_cubic_basis_coordinate_cache_regression.py"
       - "tests/cpc_cubic_local_bond_cache_regression.py"
       - "tests/cpc_cubic_cache_phase_profile_regression.py"
       - "tests/cpc_cubic_direct_hop_table_regression.py"
@@ -126,6 +130,7 @@ jobs:
               "tests/cpc_cubic_basis_timing_regression.py",
               "tests/cpc_cubic_fast_group_certificate_regression.py",
               "tests/cpc_cubic_anchored_basis_regression.py",
+              "tests/cpc_cubic_basis_coordinate_cache_regression.py",
               "tests/cpc_cubic_local_bond_cache_regression.py",
               "tests/cpc_cubic_cache_phase_profile_regression.py",
               "tests/cpc_cubic_direct_hop_table_regression.py",
@@ -241,6 +246,14 @@ jobs:
             --driver "$PWD/tests/cubic_basis_driver" --exe "$PWD/source/QS3ED2" \
             --sides 10 --threads 4,8 --sectors oh-a1g --skip-lanczos \
             --output "$RUNNER_TEMP/cubic-anchored-basis-parallel"
+      - name: Exact coordinate-cache basis bits across all irreps and volumes
+        run: |
+          python3 tests/cpc_cubic_basis_coordinate_cache_regression.py \
+            --driver "$PWD/tests/cubic_basis_driver" --sides 4,6,8,10 \
+            --threads 1,4 --output "$RUNNER_TEMP/cubic-basis-coordinate-cache"
+          python3 tests/cpc_cubic_basis_coordinate_cache_regression.py \
+            --driver "$PWD/tests/cubic_basis_driver" --sides 10 \
+            --threads 8 --output "$RUNNER_TEMP/cubic-basis-coordinate-cache-t8"
       - name: Anchored cubic basis must fail closed on mismatched source geometry and symmetry
         run: |
           if ED2_CUBIC_ANCHORED_BASIS=1 ED2_CUBIC_FAST_GROUP_VALIDATION=1 \
