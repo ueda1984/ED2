@@ -32,6 +32,9 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+          # Pull requests default to a temporary merge SHA; the transferable
+          # staged archive must instead pin the actual reviewed branch HEAD.
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
       - name: Install Fortran and Autotools
         run: |
           sudo apt-get update -qq
