@@ -226,7 +226,7 @@ def execute(exe, root, expected, alg=3, mode="legacy", threads=1):
                             stderr=subprocess.STDOUT, env=env, timeout=90)
     output = (root / "stdout.log").read_text(errors="replace")
     assert cp.returncode == 0, (root, cp.returncode, output[-2200:])
-    found = re.findall(r"THS\\(k\\)\\s*=\\s*(\\d+)", output)
+    found = re.findall(r"THS\(k\)\s*=\s*(\d+)", output)
     assert len(found) == 1 and int(found[0]) == expected["dimension"], (root, found, expected["dimension"])
     values = [float(line.split()[-1].replace("D", "E"))
               for line in (root / "eigenvalues.dat").read_text().splitlines() if line.strip()]
