@@ -63,8 +63,10 @@ def produce(driver, root, side, sector, threads, profiling, timeout):
 
     if profiling:
         def metric(key):
+            prefix = (r", " if key == "omp_max_threads" else
+                      r"Cubic cache profile: ")
             r = re.search(
-                r"Cubic cache profile: " + re.escape(key) +
+                prefix + re.escape(key) +
                 r"=\s*([+-.0-9eEdD]+)", log)
             assert r, (key, dest)
             x = float(r.group(1).replace("D", "E"))
