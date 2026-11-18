@@ -77,6 +77,10 @@ def main():
     assert isinstance(summary["anchored_lookup"], bool)
     assert isinstance(summary["anchored_verify"], bool)
     assert isinstance(summary["fast_group_validation"], bool)
+    assert isinstance(summary["anchored_basis"], bool)
+    assert not summary["anchored_basis"] or summary["fast_group_validation"]
+    if summary["anchored_basis"]:
+        assert "gamma-t" not in summary["sectors"]
     if summary["fast_group_validation"]:
         assert "gamma-t" not in summary["sectors"]
     assert not summary["anchored_verify"] or summary["anchored_lookup"]
@@ -123,6 +127,7 @@ def main():
         assert record["anchored_lookup"] is summary["anchored_lookup"]
         assert record["anchored_verify"] is summary["anchored_verify"]
         assert record["fast_group_validation"] is summary["fast_group_validation"]
+        assert record["anchored_basis"] is summary["anchored_basis"]
         raw_input = (root / "trials" / record["key"] / "input.dat").read_text()
         match = re.search(r"\bMNTE\s*=\s*(-?\d+)", raw_input, flags=re.IGNORECASE)
         assert match and int(match.group(1)) == summary["mnte"]
@@ -147,12 +152,19 @@ def main():
         assert len(values) == 1 and abs(values[0] - energy) < 1e-8
         log = (path / "stdout.log").read_text(errors="replace")
         assert ("Representative lookup: cubic-anchored-orbits" in log) is summary["anchored_lookup"]
-        assert ("Symmetry certificate: canonical cubic O_h semidirect product verified" in log) is summary["fast_group_validation"]
+        expected_certificate = summary["fast_group_validation"] and record["builder"] == "fast"
+        assert ("Symmetry certificate: canonical cubic O_h semidirect product verified" in log) is expected_certificate
         if summary["anchored_verify"]:
             assert "per-hop legacy verification=T" in log
         atomic = "Basis builder: atomic-orbits" in log
+        anchored_basis_used = "Basis builder: anchored-cubic" in log
+        expected_anchored = record["builder"] == "fast" and summary["anchored_basis"]
+        assert anchored_basis_used == expected_anchored
         assert atomic == record["atomic_orbits"]
-        assert atomic == (record["builder"] == "fast")
+        assert atomic == (record["builder"] == "fast" and not summary["anchored_basis"])
+        expected_builder = ("anchored-cubic" if expected_anchored else
+                            "atomic-orbits" if atomic else "forced-legacy")
+        assert record["native_basis_builder"] == expected_builder
         if record["builder"] == "fast" and record["sector"] != "gamma-t":
             assert "Symmetry action: noncommuting normal form and character validated" in log
         phases = dict((phase, float(value)) for phase, value in
@@ -232,6 +244,7 @@ def main():
                   anchored_lookup=summary["anchored_lookup"],
                   anchored_verify=summary["anchored_verify"],
                   fast_group_validation=summary["fast_group_validation"],
+                  anchored_basis=summary["anchored_basis"],
                   operator_attestation_present=attested,
                   review_eligible=eligible,
                   caution="Operator claim is not independent scheduler proof, and review gate is not publication approval.",

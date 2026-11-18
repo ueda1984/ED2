@@ -308,5 +308,12 @@ EXTRA_DIST += cpc_cubic_native_anchored_regression.py
 # Optional diagnostic-only cubic basis phase timing validation.
 EXTRA_DIST += cpc_cubic_basis_timing_regression.py
 
+# Dedicated basis-only ED2 executable verifies every representative and
+# exact norm without potentially slow 1000-site Lanczos for all four sectors.
+check_PROGRAMS += cubic_basis_driver
+cubic_basis_driver_SOURCES = cubic_basis_driver.f90
+cubic_basis_driver_LDADD = $(top_builddir)/source/state_lists.o $(top_builddir)/source/input_param.o
+EXTRA_DIST += cpc_cubic_anchored_basis_regression.py
+
 # Optional bit-for-bit cubic O_h fast group certificate regression.
 EXTRA_DIST += cpc_cubic_fast_group_certificate_regression.py

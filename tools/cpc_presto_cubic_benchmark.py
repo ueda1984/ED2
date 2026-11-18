@@ -179,24 +179,33 @@ def execute(exe, out, spec, allocation_info, timeout, mnte):
     anchor_verified = os.environ.get("ED2_CUBIC_ANCHORED_VERIFY", "") == "1"
     fast_group = os.environ.get("ED2_CUBIC_FAST_GROUP_VALIDATION", "") == "1"
     fast_group_reported = "Symmetry certificate: canonical cubic O_h semidirect product verified" in output
-    if fast_group_reported != fast_group:
-        raise AssertionError("Requested fast cubic group certificate disagrees with native stdout")
+    if fast_group_reported != (fast_group and builder == "fast"):
+        raise AssertionError("Fast cubic group certificate mismatch for selected native basis builder")
     anchored_reported = "Representative lookup: cubic-anchored-orbits" in output
     if anchored_reported != anchored:
         raise AssertionError("Requested anchored lookup disagrees with native stdout")
     if anchored and anchor_verified and "per-hop legacy verification=T" not in output:
         raise AssertionError("Missing per-hop legacy verification confirmation")
+    anchored_basis_requested = os.environ.get("ED2_CUBIC_ANCHORED_BASIS", "") == "1"
+    anchored_basis_used = "Basis builder: anchored-cubic" in output
     atomic = "Basis builder: atomic-orbits" in output
+    if atomic and anchored_basis_used:
+        raise AssertionError("Two incompatible basis builders were logged")
+    if anchored_basis_used != (builder == "fast" and anchored_basis_requested):
+        raise AssertionError("Requested anchored cubic basis not used exactly for fast variant")
     normal_form = "Symmetry action: noncommuting normal form and character validated" in output
     if builder == "forced-legacy" and atomic:
         raise AssertionError("Forced-legacy run unexpectedly used atomic orbit basis")
-    if builder == "fast" and not atomic:
-        raise AssertionError("Fast run unexpectedly bypassed atomic orbit basis")
+    if builder == "fast" and not (atomic or anchored_basis_used):
+        raise AssertionError("Fast run unexpectedly bypassed both validated basis builders")
     if builder == "fast" and sector != "gamma-t" and not normal_form:
         raise AssertionError("Noncommuting group fast path lacked validation record")
     obs.update(dict(key=key, side=side, sector=sector, threads=threads,
                     repetition=repeat, period=period, builder=builder,
-                    atomic_orbits=atomic, validated_noncommuting_action=normal_form,
+                    atomic_orbits=atomic, anchored_basis=anchored_basis_requested,
+                    native_basis_builder=("anchored-cubic" if anchored_basis_used else
+                                          "atomic-orbits" if atomic else "forced-legacy"),
+                    validated_noncommuting_action=normal_form,
                     mnte=mnte, anchored_lookup=anchored,
                      fast_group_validation=fast_group,
                      anchored_verify=anchor_verified, sample_utc=now(), status="PASS",
@@ -255,6 +264,13 @@ def main():
     if anchored_verify and not anchored:
         p.error("ED2_CUBIC_ANCHORED_VERIFY requires ED2_CUBIC_ANCHORED_REP=1")
     fast_group = os.environ.get("ED2_CUBIC_FAST_GROUP_VALIDATION", "") == "1"
+    anchored_basis = os.environ.get("ED2_CUBIC_ANCHORED_BASIS", "") == "1"
+    if anchored_basis and not fast_group:
+        p.error("Anchored cubic basis requires ED2_CUBIC_FAST_GROUP_VALIDATION=1")
+    if anchored_basis and "gamma-t" in sectors:
+        p.error("Anchored cubic basis requires a 1D O_h sector")
+    if anchored_basis and any(side not in (4, 6, 8, 10) for side in sizes):
+        p.error("Anchored cubic basis currently requires cubic side 4, 6, 8 or 10")
     if fast_group and "gamma-t" in sectors:
         p.error("Fast cubic group certificate requires a noncommuting 1D O_h sector")
     if anchored and "gamma-t" in sectors:
@@ -273,7 +289,7 @@ def main():
         print(json.dumps(dict(sizes=sizes, threads=threads, sectors=sectors, warmups=warmups, repeats=repeats,
                               trial_count=count, mnte=a.mnte,
                                anchored_lookup=anchored, anchored_verify=anchored_verify,
-                               fast_group_validation=fast_group,
+                               fast_group_validation=fast_group, anchored_basis=anchored_basis,
                               source_revision=a.source_revision, archive_sha256=sha(archive)),
                          indent=2))
         return
@@ -296,7 +312,7 @@ def main():
                   preset=a.preset, sizes=sizes, threads=threads, sectors=sectors, warmups=warmups,
                   repeats=repeats, mnte=a.mnte, anchored_lookup=anchored,
                    anchored_verify=anchored_verify,
-                   fast_group_validation=fast_group,
+                   fast_group_validation=fast_group, anchored_basis=anchored_basis,
                    timeout=a.timeout, time_budget=a.time_budget,
                   seed=a.seed, protocol="preset-specific measured repeats and warmups",
                   publication_ready=False,

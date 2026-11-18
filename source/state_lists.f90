@@ -204,6 +204,10 @@ contains
     integer, allocatable :: order(:)
     real(8), allocatable :: tmp_list_r_pre(:)
     integer, allocatable :: list_s_pre(:)
+    ! Optional experimental anchored cubic Gamma/O_h basis construction.
+    ! Uses at most C(N-1,2) candidate translation-reduced shapes.
+    call try_cubic_anchored_basis(orbit_used)
+    if(orbit_used)return
     call try_orbit_basis(orbit_used)
     if(orbit_used)return
     num = omp_get_max_threads()
@@ -765,6 +769,252 @@ contains
     end do
     valid=.true.
   end subroutine validate_cubic_oh_gamma_certificate
+
+  ! Opt-in experimental cubic 3-magnon basis builder.  The exact orbit key is
+  ! one spin at site index zero plus an unordered pair of nonzero sites.
+  ! Every affine orbit is enumerated once by marking its 48*3 anchored views.
+  ! Its historical ED2 canonical representative is the minimum colex rank
+  ! among 48 point transforms and <=3^3 translations.  This restriction is
+  ! EXACT: at a lexically minimal translate, the minimum occupied x/y/z
+  ! coordinate is zero in each axis separately (otherwise shifting the
+  ! respective axis by -1 decreases all three rank indices).
+  !
+  ! The original stabilizer character sum is reconstructed in the exact
+  ! historical normal-form order.  Gamma translations have phase one, so
+  ! every stabilizing translation of a fixed point operation contributes
+  ! exactly the same floating-point complex summand.
+  subroutine try_cubic_anchored_basis(used)
+    use iso_fortran_env, only: int64, real64
+    use input_param, only: NOS,NODmax,NODmin,L1,L2,L3,L4,L5,L6, &
+      rk1,rk2,rk3,rk4,rk5,rk6,shift_1,shift_2,shift_3, &
+      shift_4,shift_5,shift_6, &
+      list_s,list_r,THS
+    use omp_lib, only: omp_get_wtime
+    implicit none
+    logical, intent(out) :: used
+    integer :: maps(0:NOS,6),periods(6)
+    integer, allocatable :: point_map(:,:), order(:)
+    integer, allocatable :: sites_xyz(:,:), candidate_ranks(:)
+    real(8), allocatable :: candidate_norms(:)
+    logical, allocatable :: visited(:)
+    logical :: certificate_valid,detail_timing
+    character(len=16) :: enable,detail_setting,basis_dump_setting,legacy_setting,cert_setting
+    integer :: status,detail_status,basis_dump_status,legacy_status,cert_status
+    integer :: side,pairs,pair_a,pair_b,site,g,i,j,k,a,b,c,idx, &
+      idx_a,idx_b,pi,pj,pk,best(3),shifted(3),point_sites(3), &
+      point_xyz(3,3),tmp(3),source_xyz(3,3),target_xyz(3), &
+      ntrans,stab_count,nrep,old_rank,basis_unit,basis_ios
+    integer :: t
+    real(8) :: p1,p2,p3,p4,p5,ro
+    real(8) :: begin_s,validation_start,validation_end,scan_start,scan_end,finish_s
+    complex(8) :: coef,phase
+    used=.false.
+    enable=''
+    call get_environment_variable('ED2_CUBIC_ANCHORED_BASIS',enable,status=status)
+    if(status/=0.or.trim(adjustl(enable))/='1')return
+    legacy_setting=''
+    call get_environment_variable('ED2_FORCE_LEGACY_ORBITS',legacy_setting,status=legacy_status)
+    if(legacy_status==0.and.trim(adjustl(legacy_setting))=='1')return
+    cert_setting=''
+    call get_environment_variable('ED2_CUBIC_FAST_GROUP_VALIDATION', &
+      cert_setting,status=cert_status)
+    if(cert_status/=0.or.trim(adjustl(cert_setting))/='1') &
+      error stop 'Anchored cubic basis requires ED2_CUBIC_FAST_GROUP_VALIDATION=1'
+    if(NODmin/=3.or.NODmax/=3) &
+      error stop 'Anchored cubic basis requires exactly three down spins'
+    detail_setting=''
+    call get_environment_variable('ED2_BASIS_DETAIL_TIMING',detail_setting,status=detail_status)
+    detail_timing=detail_status==0.and.trim(adjustl(detail_setting))=='1'
+    if(detail_timing)begin_s=omp_get_wtime()
+    periods=[L1,L2,L3,L4,L5,L6]
+    ! A runtime copy of all six operators is used for exact certification.
+    maps(:,1)=shift_1;maps(:,2)=shift_2;maps(:,3)=shift_3
+    maps(:,4)=shift_4;maps(:,5)=shift_5;maps(:,6)=shift_6
+    if(detail_timing)validation_start=omp_get_wtime()
+    call validate_cubic_oh_gamma_certificate(maps,periods,certificate_valid)
+    if(.not.certificate_valid)error stop 'Anchored cubic basis requires exact cubic Gamma/O_h certificate'
+    write(*,'(a)') 'Symmetry action: noncommuting normal form and character validated'
+    write(*,'(a)') 'Symmetry certificate: canonical cubic O_h semidirect product verified'
+    if(detail_timing)validation_end=omp_get_wtime()
+    side=L1
+    pairs=(NOS-1)*(NOS-2)/2
+    allocate(visited(pairs),point_map(NOS,48), &
+      sites_xyz(3,NOS),candidate_ranks(pairs),candidate_norms(pairs))
+    visited=.false.
+    do i=1,NOS
+      sites_xyz(1,i)=mod(i-1,side)
+      sites_xyz(2,i)=mod((i-1)/side,side)
+      sites_xyz(3,i)=(i-1)/(side*side)
+    end do
+    ! The exact ED2 point normal form uses a=1..4 fastest, then b,c.
+    g=0
+    do c=1,3
+      do b=1,4
+        do a=1,4
+          g=g+1
+          do site=1,NOS
+            t=site
+            do i=1,c
+              t=shift_6(t)
+            end do
+            do i=1,b
+              t=shift_5(t)
+            end do
+            do i=1,a
+              t=shift_4(t)
+            end do
+            point_map(site,g)=t
+          end do
+        end do
+      end do
+    end do
+    if(g/=48)error stop 'Anchored cubic basis point-group cardinality'
+    if(detail_timing)scan_start=omp_get_wtime()
+    nrep=0
+    do pair_b=2,NOS-1
+      do pair_a=1,pair_b-1
+        idx=(pair_b-1)*(pair_b-2)/2+pair_a
+        if(visited(idx))cycle
+        best=[NOS+1,NOS+1,NOS+1]
+        do g=1,48
+          point_sites=[point_map(1,g),point_map(pair_a+1,g),point_map(pair_b+1,g)]
+          point_xyz=sites_xyz(:,point_sites)
+          ! Mark the three translation anchors of each O_h image.
+          do i=1,3
+            do j=1,3
+              shifted(j)=modulo(point_xyz(1,j)-point_xyz(1,i),side)+ &
+                side*(modulo(point_xyz(2,j)-point_xyz(2,i),side)+ &
+                side*modulo(point_xyz(3,j)-point_xyz(3,i),side))
+            end do
+            call insertion_sort(shifted,3)
+            if(shifted(1)/=0)error stop 'Anchored cubic shape lacks origin'
+            idx_a=shifted(2);idx_b=shifted(3)
+            if(idx_a<1.or.idx_b>=NOS.or.idx_a>=idx_b) &
+              error stop 'Anchored cubic shape malformed'
+            idx=(idx_b-1)*(idx_b-2)/2+idx_a
+            visited(idx)=.true.
+          end do
+          ! Exact global-rank minimization: one spin must be at coordinate
+          ! zero along each axis at any optimal translation, giving <=27.
+          do pi=1,3
+            do pj=1,3
+              do pk=1,3
+                do j=1,3
+                  tmp(j)=1+modulo(point_xyz(1,j)-point_xyz(1,pi),side)+ &
+                    side*(modulo(point_xyz(2,j)-point_xyz(2,pj),side)+ &
+                    side*modulo(point_xyz(3,j)-point_xyz(3,pk),side))
+                end do
+                call insertion_sort(tmp,3)
+                do k=3,1,-1
+                  if(tmp(k)<best(k))then
+                    best=tmp
+                    exit
+                  else if(tmp(k)>best(k))then
+                    exit
+                  end if
+                end do
+              end do
+            end do
+          end do
+        end do
+        if(any(best>NOS))error stop 'Anchored cubic canonical state missing'
+        old_rank=inv_list(best,3)
+        ! Reproduce the original coef accumulation order i6/i5/i4/i3/i2/i1.
+        do j=1,3
+          source_xyz(:,j)=sites_xyz(:,best(j))
+        end do
+        coef=(0d0,0d0)
+        stab_count=0
+        do g=1,48
+          a=mod(g-1,4)+1
+          b=mod((g-1)/4,4)+1
+          c=(g-1)/16+1
+          point_sites=point_map(best,g)
+          point_xyz=sites_xyz(:,point_sites)
+          ntrans=0
+          do i=1,3
+            target_xyz=source_xyz(:,i)-point_xyz(:,1)
+            do j=1,3
+              shifted(j)=1+modulo(point_xyz(1,j)+target_xyz(1),side)+ &
+                side*(modulo(point_xyz(2,j)+target_xyz(2),side)+ &
+                side*modulo(point_xyz(3,j)+target_xyz(3),side))
+            end do
+            call insertion_sort(shifted,3)
+            if(all(shifted==best))ntrans=ntrans+1
+          end do
+          if(ntrans==0)cycle
+          ! The original p1 = rk2*i2 + (rk3*i3 + (rk4*i4 +
+          ! (rk5*i5 + rk6*i6))) for each stabilizing translation.
+          ! At Gamma rk1=rk2=rk3=0; using identity shift indices is exact.
+          p5=rk6*dble(c)
+          p4=rk5*dble(b)+p5
+          p3=rk4*dble(a)+p4
+          p2=rk3*dble(side)+p3
+          p1=rk2*dble(side)+p2
+          phase=exp((0d0,-1d0)*(rk1*dble(side)+p1))
+          do i=1,ntrans
+            coef=coef+phase
+            stab_count=stab_count+1
+          end do
+        end do
+        if(stab_count<1)error stop 'Anchored cubic stabilizer missing identity'
+        ro=(abs(coef)**2)*dble(48*NOS)/dble(stab_count)
+        if(ro>1d-15)then
+          nrep=nrep+1
+          candidate_ranks(nrep)=old_rank
+          candidate_norms(nrep)=sqrt(ro)
+        end if
+      end do
+    end do
+    if(nrep==0)error stop 'Anchored cubic basis is empty'
+    if(.not.all(visited))error stop 'Anchored cubic pair orbit coverage incomplete'
+    if(detail_timing)scan_end=omp_get_wtime()
+    allocate(list_s(nrep),list_r(nrep),order(nrep))
+    list_s=candidate_ranks(:nrep)
+    deallocate(visited,point_map,sites_xyz,candidate_ranks)
+    do i=1,nrep
+      order(i)=i
+    end do
+    call qsort_w_order(list_s,order,1,nrep)
+    do i=1,nrep
+      list_r(i)=candidate_norms(order(i))
+    end do
+    deallocate(order,candidate_norms)
+    if(nrep>1)then
+      if(any(list_s(2:)<=list_s(:nrep-1))) &
+        error stop 'Anchored cubic basis nonunique historical ranks'
+    end if
+    THS=nrep
+    basis_dump_setting=''
+    call get_environment_variable('ED2_CUBIC_BASIS_PROOF_DUMP', &
+      basis_dump_setting,status=basis_dump_status)
+    if(basis_dump_status==0.and.trim(adjustl(basis_dump_setting))=='1')then
+      open(newunit=basis_unit,file='cubic_basis_proof_dump.txt', &
+        status='replace',action='write',iostat=basis_ios)
+      if(basis_ios/=0)error stop 'Failed to open anchored cubic basis proof dump'
+      do i=1,nrep
+        write(basis_unit,'(i0,1x,z16.16)',iostat=basis_ios) &
+          list_s(i),transfer(list_r(i),0_int64)
+        if(basis_ios/=0)error stop 'Failed to write anchored cubic basis proof dump'
+      end do
+      close(basis_unit,iostat=basis_ios)
+      if(basis_ios/=0)error stop 'Failed to close anchored cubic basis proof dump'
+      write(*,'(a,i0)') 'Basis proof dump: exactly ranked states and bitwise norms=',nrep
+    end if
+    if(detail_timing)then
+      finish_s=omp_get_wtime()
+      write(*,'(a,es23.15)') 'ED2_BASIS_PHASE preflight_other wall_s=', &
+        validation_start-begin_s+scan_start-validation_end
+      write(*,'(a,es23.15)') 'ED2_BASIS_PHASE group_validation wall_s=', &
+        validation_end-validation_start
+      write(*,'(a,es23.15)') 'ED2_BASIS_PHASE orbit_scan wall_s=',scan_end-scan_start
+      write(*,'(a,es23.15)') 'ED2_BASIS_PHASE finalize wall_s=',finish_s-scan_end
+      write(*,'(a,es23.15)') 'ED2_BASIS_PHASE total wall_s=',finish_s-begin_s
+    end if
+    write(*,'(a,i0,a,i0)') 'Basis builder: anchored-cubic, orbit keys=',nrep, &
+      ', translation-reduced candidates=',pairs
+    used=.true.
+  end subroutine try_cubic_anchored_basis
 
   ! Only a globally minimal representative may mark its entire orbit visited.
   ! Atomic bitset accesses are required even when different bits share a word.
