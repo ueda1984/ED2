@@ -289,7 +289,7 @@ check-noncommuting-guard:
 
 # Independent cubic O_h three-magnon physical verification.
 # The dense reference needs NumPy; the group/Burnside oracle is stdlib-only.
-EXTRA_DIST += cpc_cubic_pointgroup.py cpc_cubic_pointgroup_regression.py
+EXTRA_DIST += cpc_cubic_pointgroup.py cpc_cubic_pointgroup_regression.py cpc_cubic_1000_one_magnon_smoke.py
 .PHONY: check-cubic-oh
 check-cubic-oh:
 	$(PYTHON) $(srcdir)/cpc_cubic_pointgroup.py --sizes 4,6,8,10
