@@ -61,7 +61,7 @@ trial vectors. Both old and new use byte-identical input.
   exactly real and genuinely complex (DM=0.12),
   L4/L6 at T1/T4: **8 native complex-vector bitwise
   pairs/compiler**.
-- Native two-stage spectra for 6-site real and
+- Native thick-restarted spectra for 6-site real and
   complex DM models must produce identical
   `eigenvalues.dat` SHA256, with certified residual.
 - Negative tests reject partial matrix cache,
@@ -71,7 +71,7 @@ trial vectors. Both old and new use byte-identical input.
   required in both GNU13/GNU14 CI jobs.
 
 An independent local GNU14.2 prototype completed 40
-separate two-stage generic **complex** DM/full-space
+separate native generic **complex** DM/full-space
 solver runs and another 40 genuinely non-U(1)
 **real** XYZ/transverse-field runs. It compared
 OFF and ON for each identical input/seed and
