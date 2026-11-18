@@ -2,7 +2,7 @@ name: ED2 cubic Oh symmetry and PRESTO protocol
 
 on:
   push:
-    branches: [codex/ed2-cpc-cubic-oh-1000-presto, codex/ed2-cubic-cache-mnte-cap-experiment, codex/ed2-cubic-anchored-key-oracle, codex/ed2-cubic-native-anchored-representatives, codex/ed2-cubic-basis-phase-instrumentation, codex/ed2-cubic-fast-oh-group-certificate, codex/ed2-cubic-anchored-basis-builder, codex/ed2-cubic-local-bond-cache, codex/ed2-cubic-cache-phase-profile, codex/ed2-cubic-direct-hop-table, codex/ed2-cubic-basis-coordinate-cache, codex/ed2-cubic-basis-pruned-canonical]
+    branches: [codex/ed2-cpc-cubic-oh-1000-presto, codex/ed2-cubic-cache-mnte-cap-experiment, codex/ed2-cubic-anchored-key-oracle, codex/ed2-cubic-native-anchored-representatives, codex/ed2-cubic-basis-phase-instrumentation, codex/ed2-cubic-fast-oh-group-certificate, codex/ed2-cubic-anchored-basis-builder, codex/ed2-cubic-local-bond-cache, codex/ed2-cubic-cache-phase-profile, codex/ed2-cubic-direct-hop-table, codex/ed2-cubic-basis-coordinate-cache, codex/ed2-cubic-basis-pruned-canonical, codex/ed2-cubic-direct-hop-elide-unused-hash]
     paths:
       - "source/state_lists.f90"
       - "source/cubic_anchored_lookup.f90"
@@ -20,6 +20,7 @@ on:
       - "docs/development/cpc-cubic-direct-hop-table-20261118.md"
       - "docs/development/cpc-cubic-basis-coordinate-cache-20261118.md"
       - "docs/development/cpc-cubic-basis-pruned-canonical-20261119.md"
+      - "docs/development/cpc-cubic-skip-unused-hash-20261119.md"
       - "tests/cpc_cubic_pointgroup.py"
       - "tests/cpc_cubic_anchored_orbit_key_oracle.py"
       - "tests/cpc_cubic_native_anchored_regression.py"
@@ -33,6 +34,7 @@ on:
       - "tests/cpc_cubic_local_bond_cache_regression.py"
       - "tests/cpc_cubic_cache_phase_profile_regression.py"
       - "tests/cpc_cubic_direct_hop_table_regression.py"
+      - "tests/cpc_cubic_skip_unused_hash_regression.py"
       - "tests/cubic_cache_driver.f90"
       - "tests/cubic_basis_driver.f90"
       - "tests/cpc_cubic_pointgroup_regression.py"
@@ -60,6 +62,7 @@ on:
       - "docs/development/cpc-cubic-direct-hop-table-20261118.md"
       - "docs/development/cpc-cubic-basis-coordinate-cache-20261118.md"
       - "docs/development/cpc-cubic-basis-pruned-canonical-20261119.md"
+      - "docs/development/cpc-cubic-skip-unused-hash-20261119.md"
       - "tests/cpc_cubic_pointgroup.py"
       - "tests/cpc_cubic_anchored_orbit_key_oracle.py"
       - "tests/cpc_cubic_native_anchored_regression.py"
@@ -73,6 +76,7 @@ on:
       - "tests/cpc_cubic_local_bond_cache_regression.py"
       - "tests/cpc_cubic_cache_phase_profile_regression.py"
       - "tests/cpc_cubic_direct_hop_table_regression.py"
+      - "tests/cpc_cubic_skip_unused_hash_regression.py"
       - "tests/cubic_cache_driver.f90"
       - "tests/cubic_basis_driver.f90"
       - "tests/cpc_cubic_pointgroup_regression.py"
@@ -141,6 +145,7 @@ jobs:
               "tests/cpc_cubic_basis_coordinate_cache_regression.py",
               "tests/cpc_cubic_basis_coordinate_full_cache_regression.py",
               "tests/cpc_cubic_basis_pruned_canonical_regression.py",
+              "tests/cpc_cubic_skip_unused_hash_regression.py",
               "tests/cpc_cubic_axis_pruning_oracle.py",
               "tests/cpc_cubic_local_bond_cache_regression.py",
               "tests/cpc_cubic_cache_phase_profile_regression.py",
@@ -447,6 +452,18 @@ jobs:
           fi
           grep -q 'Direct cubic hop table requires all four previous cubic opt-ins' \
             "$RUNNER_TEMP/reject-direct-hop-plan.log"
+      - name: Direct-hop mode must preserve full native H cache bits without unused hash table
+        run: |
+          python3 tests/cpc_cubic_skip_unused_hash_regression.py \
+            --driver "$PWD/tests/cubic_cache_driver" \
+            --exe "$PWD/source/QS3ED2" \
+            --sides 4,6,10 --threads 1,4 \
+            --output "$RUNNER_TEMP/cubic-elide-unused-hash-t1t4"
+          python3 tests/cpc_cubic_skip_unused_hash_regression.py \
+            --driver "$PWD/tests/cubic_cache_driver" \
+            --exe "$PWD/source/QS3ED2" \
+            --sides 10 --threads 8 --skip-lanczos \
+            --output "$RUNNER_TEMP/cubic-elide-unused-hash-t8"
       - name: Local cubic cache must reject general chains and incompatible non-XXZ bonds
         run: |
           if ED2_CUBIC_LOCAL_BOND_CACHE=1 tests/test_ex1.sh \
