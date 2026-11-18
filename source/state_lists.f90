@@ -797,14 +797,14 @@ contains
     integer, allocatable :: sites_xyz(:,:), candidate_ranks(:)
     real(8), allocatable :: candidate_norms(:)
     logical, allocatable :: visited(:)
-    logical :: certificate_valid,detail_timing,coord_cache_enabled
+    logical :: certificate_valid,detail_timing,coord_cache_enabled,sort3_network_enabled
     character(len=16) :: enable,detail_setting,basis_dump_setting,legacy_setting,cert_setting, &
-      coord_cache_setting
-    integer :: status,detail_status,basis_dump_status,legacy_status,cert_status,coord_cache_status
+      coord_cache_setting,sort3_setting
+    integer :: status,detail_status,basis_dump_status,legacy_status,cert_status,coord_cache_status,sort3_status
     integer :: side,pairs,pair_a,pair_b,site,g,i,j,k,a,b,c,idx, &
       idx_a,idx_b,pi,pj,pk,best(3),shifted(3),point_sites(3), &
       point_xyz(3,3),tmp(3),source_xyz(3,3),target_xyz(3), &
-      ntrans,stab_count,nrep,old_rank,basis_unit,basis_ios,delta_xyz(3,3,3)
+      ntrans,stab_count,nrep,old_rank,basis_unit,basis_ios,delta_xyz(3,3,3),sort_low,sort_high
     integer :: t
     real(8) :: p1,p2,p3,p4,p5,ro
     real(8) :: begin_s,validation_start,validation_end,scan_start,scan_end,finish_s
@@ -822,6 +822,15 @@ contains
     end if
     coord_cache_enabled=coord_cache_status==0.and. &
       trim(adjustl(coord_cache_setting))=='1'
+    sort3_setting=''
+    call get_environment_variable('ED2_CUBIC_BASIS_SORT3_NETWORK',sort3_setting,status=sort3_status)
+    if(sort3_status==0)then
+      if(trim(adjustl(sort3_setting))/='0'.and.trim(adjustl(sort3_setting))/='1') &
+        error stop 'Basis three-site sorting network flag must be 0 or 1'
+    end if
+    sort3_network_enabled=sort3_status==0.and.trim(adjustl(sort3_setting))=='1'
+    if(sort3_network_enabled.and..not.coord_cache_enabled) &
+      error stop 'Basis three-site sorter requires ED2_CUBIC_BASIS_COORD_CACHE=1'
     if(status/=0.or.trim(adjustl(enable))/='1')then
       if(coord_cache_enabled) &
         error stop 'Basis coordinate cache requires ED2_CUBIC_ANCHORED_BASIS=1'
@@ -950,7 +959,17 @@ contains
                       side*modulo(point_xyz(3,j)-point_xyz(3,pk),side))
                   end do
                 end if
-                call insertion_sort(tmp,3)
+                if(sort3_network_enabled)then
+                  ! Exact integer three-element sorting network (min,median,max).
+                  ! Identical output and candidate order to insertion_sort.
+                  sort_low=min(tmp(1),tmp(2))
+                  sort_high=max(tmp(1),tmp(2))
+                  tmp(1)=min(sort_low,tmp(3))
+                  tmp(2)=max(sort_low,min(sort_high,tmp(3)))
+                  tmp(3)=max(sort_high,tmp(3))
+                else
+                  call insertion_sort(tmp,3)
+                end if
                 do k=3,1,-1
                   if(tmp(k)<best(k))then
                     best=tmp
@@ -1061,6 +1080,8 @@ contains
       ', translation-reduced candidates=',pairs
     if(coord_cache_enabled) &
       write(*,'(a)') 'Basis orbit coordinates: exact precomputed periodic deltas'
+    if(sort3_network_enabled) &
+      write(*,'(a)') 'Basis canonical sorter: exact-three-site-network'
     used=.true.
   end subroutine try_cubic_anchored_basis
 
