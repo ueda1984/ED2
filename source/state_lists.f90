@@ -783,6 +783,62 @@ contains
   ! historical normal-form order.  Gamma translations have phase one, so
   ! every stabilizing translation of a fixed point operation contributes
   ! exactly the same floating-point complex summand.
+  ! Preserve the exact legacy canonical representative while skipping axis
+  ! translations that cannot minimize its largest occupied site index.
+  ! For site rank 1+x+L*(y+L*z), minimizing the largest rank first
+  ! minimizes its largest z; among z-maximal sites, its largest y; and
+  ! among z/y-maximal sites, its largest x. Each component dominates all
+  ! lower axes, so excluded candidates cannot minimize the colex tuple.
+  ! Keep EVERY tied minimizer and compare the complete sorted triples
+  ! in historical colex order. This is a pure integer optimization only.
+  pure subroutine cubic_pruned_three_site_canonical(delta,side,best)
+    integer, intent(in) :: delta(3,3,3),side
+    integer, intent(inout) :: best(3)
+    integer :: z_high(3),y_high(3),x_high(3)
+    integer :: z_min,y_min,x_min,pk,pj,pi,j,k,tmp(3)
+    do pk=1,3
+      z_high(pk)=maxval(delta(3,:,pk))
+    end do
+    z_min=minval(z_high)
+    do pk=1,3
+      if(z_high(pk)/=z_min)cycle
+      do pj=1,3
+        y_high(pj)=-1
+        do j=1,3
+          if(delta(3,j,pk)==z_min) &
+            y_high(pj)=max(y_high(pj),delta(2,j,pj))
+        end do
+      end do
+      y_min=minval(y_high)
+      do pj=1,3
+        if(y_high(pj)/=y_min)cycle
+        do pi=1,3
+          x_high(pi)=-1
+          do j=1,3
+            if(delta(3,j,pk)==z_min.and.delta(2,j,pj)==y_min) &
+              x_high(pi)=max(x_high(pi),delta(1,j,pi))
+          end do
+        end do
+        x_min=minval(x_high)
+        do pi=1,3
+          if(x_high(pi)/=x_min)cycle
+          do j=1,3
+            tmp(j)=1+delta(1,j,pi)+side*(delta(2,j,pj)+side*delta(3,j,pk))
+          end do
+          call insertion_sort(tmp,3)
+          do k=3,1,-1
+            if(tmp(k)<best(k))then
+              best=tmp
+              exit
+            else if(tmp(k)>best(k))then
+              exit
+            end if
+          end do
+        end do
+      end do
+    end do
+  end subroutine cubic_pruned_three_site_canonical
+
   subroutine try_cubic_anchored_basis(used)
     use iso_fortran_env, only: int64, real64
     use input_param, only: NOS,NODmax,NODmin,L1,L2,L3,L4,L5,L6, &
@@ -797,10 +853,11 @@ contains
     integer, allocatable :: sites_xyz(:,:), candidate_ranks(:)
     real(8), allocatable :: candidate_norms(:)
     logical, allocatable :: visited(:)
-    logical :: certificate_valid,detail_timing,coord_cache_enabled
+    logical :: certificate_valid,detail_timing,coord_cache_enabled,pruned_canon_enabled
     character(len=16) :: enable,detail_setting,basis_dump_setting,legacy_setting,cert_setting, &
-      coord_cache_setting
-    integer :: status,detail_status,basis_dump_status,legacy_status,cert_status,coord_cache_status
+      coord_cache_setting,pruned_canon_setting
+    integer :: status,detail_status,basis_dump_status,legacy_status,cert_status,coord_cache_status, &
+      pruned_canon_status
     integer :: side,pairs,pair_a,pair_b,site,g,i,j,k,a,b,c,idx, &
       idx_a,idx_b,pi,pj,pk,best(3),shifted(3),point_sites(3), &
       point_xyz(3,3),tmp(3),source_xyz(3,3),target_xyz(3), &
@@ -822,6 +879,18 @@ contains
     end if
     coord_cache_enabled=coord_cache_status==0.and. &
       trim(adjustl(coord_cache_setting))=='1'
+    pruned_canon_setting=''
+    call get_environment_variable('ED2_CUBIC_BASIS_PRUNED_CANON', &
+      pruned_canon_setting,status=pruned_canon_status)
+    if(pruned_canon_status==0)then
+      if(trim(adjustl(pruned_canon_setting))/='0'.and. &
+         trim(adjustl(pruned_canon_setting))/='1') &
+        error stop 'Pruned canonical basis flag must be 0 or 1'
+    end if
+    pruned_canon_enabled=pruned_canon_status==0.and. &
+      trim(adjustl(pruned_canon_setting))=='1'
+    if(pruned_canon_enabled.and..not.coord_cache_enabled) &
+      error stop 'Pruned canonical basis requires ED2_CUBIC_BASIS_COORD_CACHE=1'
     if(status/=0.or.trim(adjustl(enable))/='1')then
       if(coord_cache_enabled) &
         error stop 'Basis coordinate cache requires ED2_CUBIC_ANCHORED_BASIS=1'
@@ -935,6 +1004,9 @@ contains
           end do
           ! Exact global-rank minimization: one spin must be at coordinate
           ! zero along each axis at any optimal translation, giving <=27.
+          if(pruned_canon_enabled)then
+            call cubic_pruned_three_site_canonical(delta_xyz,side,best)
+          else
           do pi=1,3
             do pj=1,3
               do pk=1,3
@@ -962,6 +1034,7 @@ contains
               end do
             end do
           end do
+          end if
         end do
         if(any(best>NOS))error stop 'Anchored cubic canonical state missing'
         old_rank=inv_list(best,3)
@@ -1061,6 +1134,8 @@ contains
       ', translation-reduced candidates=',pairs
     if(coord_cache_enabled) &
       write(*,'(a)') 'Basis orbit coordinates: exact precomputed periodic deltas'
+    if(pruned_canon_enabled) &
+      write(*,'(a)') 'Basis canonical enumeration: exact-axis-pruned'
     used=.true.
   end subroutine try_cubic_anchored_basis
 
