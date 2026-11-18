@@ -105,11 +105,18 @@ def generic_tests(driver, exe, root, timeout):
             code, log = run(exe, work, generic_mode(1, enabled, False), timeout)
             assert code == 0, (label, log[-2300:])
             assert (MARKER in log) is enabled
-            assert "residual certified" in log
+            # This generic DM input selects the existing thick-restarted
+            # TRLan solver, not the cubic two-stage Lanczos pathway.
+            assert "TRLan status:" in log and "residuals certified" in log, (
+                label, "Native thick-restart solver did not certify residuals")
+            matches = re.findall(
+                r"Eigenpair residual norms:\s*([0-9.Ee+\-]+)\s+([0-9.Ee+\-]+)", log)
+            assert len(matches) == 1 and all(
+                float(val) <= 1.01e-8 for val in matches[0])
             records.append((sha(work / "input.dat"),
                             sha(work / "eigenvalues.dat")))
         assert records[0] == records[1], ("Mixed-spin energy bits changed", dm)
-    print("CSR_COMPLEX_GENERIC_RITZ_BITS_PASS 2 complex/real models", flush=True)
+    print("CSR_COMPLEX_GENERIC_RESTARTED_RITZ_BITS_PASS 2 complex/real models", flush=True)
 
     reject(exe, root, "partial", {FLAG: "1"},
            "ED2_CSR_COMPLEX_CACHE requires fully cached matrix", partial=True)
