@@ -74,6 +74,11 @@ def main():
     assert summary["status"] == "complete"
     assert summary["geometry"] == "3D_simple_cubic"
     assert isinstance(summary["mnte"], int)
+    assert isinstance(summary["anchored_lookup"], bool)
+    assert isinstance(summary["anchored_verify"], bool)
+    assert not summary["anchored_verify"] or summary["anchored_lookup"]
+    if summary["anchored_lookup"]:
+        assert "gamma-t" not in summary["sectors"]
     assert summary["mnte"] == -1 or summary["mnte"] >= 54
     assert summary["cubic_oracle_sha256"] == sha(cubic.__file__)
     assert env["source_revision"] == summary["source_revision"]
@@ -112,6 +117,8 @@ def main():
         assert record["binary_sha256"] == summary["binary_sha256"]
         assert record["mode"] == "two-stage"
         assert record["mnte"] == summary["mnte"]
+        assert record["anchored_lookup"] is summary["anchored_lookup"]
+        assert record["anchored_verify"] is summary["anchored_verify"]
         raw_input = (root / "trials" / record["key"] / "input.dat").read_text()
         match = re.search(r"\bMNTE\s*=\s*(-?\d+)", raw_input, flags=re.IGNORECASE)
         assert match and int(match.group(1)) == summary["mnte"]
@@ -135,6 +142,9 @@ def main():
                   (path / "eigenvalues.dat").read_text().splitlines() if v.strip()]
         assert len(values) == 1 and abs(values[0] - energy) < 1e-8
         log = (path / "stdout.log").read_text(errors="replace")
+        assert ("Representative lookup: cubic-anchored-orbits" in log) is summary["anchored_lookup"]
+        if summary["anchored_verify"]:
+            assert "per-hop legacy verification=T" in log
         atomic = "Basis builder: atomic-orbits" in log
         assert atomic == record["atomic_orbits"]
         assert atomic == (record["builder"] == "fast")
@@ -201,7 +211,8 @@ def main():
         assert attestation.get("evidence_reviewed", "").strip()
         attested = True
     eligible = (env["environment"]["mode"] == "pbs_exclhost_requested_attestation_pending"
-                and attested and summary["warmups"] >= 2 and summary["repeats"] >= 7)
+                and attested and summary["warmups"] >= 2 and summary["repeats"] >= 7
+                 and not summary["anchored_verify"])
     if a.require_publication and not eligible:
         raise RuntimeError("Publication prerequisite gate fails: operator evidence, PBS or replicates insufficient")
     report = dict(schema=1, audited=True, raw_trials=len(raw),
@@ -213,6 +224,8 @@ def main():
                   host=env["environment"]["host"],
                   pbs_mode=env["environment"]["mode"],
                   geometry=summary["geometry"], sectors=sectors, mnte=summary["mnte"],
+                  anchored_lookup=summary["anchored_lookup"],
+                  anchored_verify=summary["anchored_verify"],
                   operator_attestation_present=attested,
                   review_eligible=eligible,
                   caution="Operator claim is not independent scheduler proof, and review gate is not publication approval.",
