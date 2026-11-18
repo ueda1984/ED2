@@ -9,6 +9,8 @@ on:
       - "docs/development/cpc-cubic-oh-1000-presto-20261118.md"
       - "tests/cpc_cubic_pointgroup.py"
       - "tests/cpc_cubic_pointgroup_regression.py"
+      - "tests/cpc_cubic_1000_one_magnon_smoke.py"
+      - "tests/cpc_pointgroup_profile.py"
       - "tools/cpc_presto_cubic_benchmark.py"
       - "tools/cpc_presto_cubic_audit.py"
       - "tools/presto_cubic_exclusive.pbs"
@@ -20,6 +22,8 @@ on:
       - "docs/development/cpc-cubic-oh-1000-presto-20261118.md"
       - "tests/cpc_cubic_pointgroup.py"
       - "tests/cpc_cubic_pointgroup_regression.py"
+      - "tests/cpc_cubic_1000_one_magnon_smoke.py"
+      - "tests/cpc_pointgroup_profile.py"
       - "tools/cpc_presto_cubic_benchmark.py"
       - "tools/cpc_presto_cubic_audit.py"
       - "tools/presto_cubic_exclusive.pbs"
@@ -64,6 +68,42 @@ jobs:
           bash tools/presto_pointgroup_stage.sh "$PWD" "$RUNNER_TEMP/staged-source"
           (cd "$RUNNER_TEMP/staged-source" && sha256sum -c ed2-source.sha256)
           test "$(cat "$RUNNER_TEMP/staged-source/source-commit.txt")" = "$(git rev-parse HEAD)"
+      - name: Preflight Python 3.6 grammar and pre-3.8 math API
+        run: |
+          python3 - <<'PY'
+          import ast
+          import math
+          from pathlib import Path
+          import subprocess
+          import sys
+
+          files = [
+              "tests/cpc_cubic_pointgroup.py",
+              "tests/cpc_cubic_pointgroup_regression.py",
+              "tests/cpc_cubic_1000_one_magnon_smoke.py",
+              "tests/cpc_pointgroup_profile.py",
+              "tools/cpc_presto_cubic_benchmark.py",
+              "tools/cpc_presto_cubic_audit.py",
+          ]
+          for path in files:
+              ast.parse(Path(path).read_text(), filename=path, feature_version=(3, 6))
+              print("PYTHON_3_6_GRAMMAR_PASS", path)
+          sys.path.insert(0, str(Path('tests').resolve()))
+          import cpc_cubic_pointgroup as cubic
+          import cpc_pointgroup_profile as profile
+          saved_comb = math.comb
+          del math.comb
+          try:
+              assert cubic.choose3(0) == 0
+              assert cubic.choose3(2) == 0
+              assert cubic.choose3(1000) == 166167000
+              assert profile.binomial(1000, 3) == 166167000
+              assert cubic.sector_dimensions(4)['raw_dim'] == 41664
+              assert cubic.sector_dimensions(10)['oh-a1g'] == 4299
+          finally:
+              math.comb = saved_comb
+          print("PYTHON_PRE38_MATH_FALLBACK_PASS")
+          PY
       - name: Build production ED2 and run baseline checks
         run: |
           autoreconf -vfi
