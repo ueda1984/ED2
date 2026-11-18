@@ -2,13 +2,14 @@ name: ED2 cubic Oh symmetry and PRESTO protocol
 
 on:
   push:
-    branches: [codex/ed2-cpc-cubic-oh-1000-presto, codex/ed2-cubic-cache-mnte-cap-experiment]
+    branches: [codex/ed2-cpc-cubic-oh-1000-presto, codex/ed2-cubic-cache-mnte-cap-experiment, codex/ed2-cubic-anchored-key-oracle]
     paths:
       - "source/state_lists.f90"
       - "tests/Makefile.am"
       - "docs/development/cpc-cubic-oh-1000-presto-20261118.md"
       - "docs/development/cpc-cubic-cache-mnte-study-20261118.md"
       - "tests/cpc_cubic_pointgroup.py"
+      - "tests/cpc_cubic_anchored_orbit_key_oracle.py"
       - "tests/cpc_cubic_pointgroup_regression.py"
       - "tests/cpc_cubic_1000_one_magnon_smoke.py"
       - "tests/cpc_pointgroup_profile.py"
@@ -23,6 +24,7 @@ on:
       - "docs/development/cpc-cubic-oh-1000-presto-20261118.md"
       - "docs/development/cpc-cubic-cache-mnte-study-20261118.md"
       - "tests/cpc_cubic_pointgroup.py"
+      - "tests/cpc_cubic_anchored_orbit_key_oracle.py"
       - "tests/cpc_cubic_pointgroup_regression.py"
       - "tests/cpc_cubic_1000_one_magnon_smoke.py"
       - "tests/cpc_pointgroup_profile.py"
@@ -81,6 +83,7 @@ jobs:
 
           files = [
               "tests/cpc_cubic_pointgroup.py",
+              "tests/cpc_cubic_anchored_orbit_key_oracle.py",
               "tests/cpc_cubic_pointgroup_regression.py",
               "tests/cpc_cubic_1000_one_magnon_smoke.py",
               "tests/cpc_pointgroup_profile.py",
@@ -124,6 +127,9 @@ jobs:
           assert all(x['checked_bond_invariance'] for x in d['results'])
           print('CUBIC OH N64/216/512/1000 GROUP PASS')
           PY
+      - name: Exhaustive anchored-key orbit census and O_h character equivariance
+        run: |
+          python3 tests/cpc_cubic_anchored_orbit_key_oracle.py --side 4 --samples 250
       - name: Native 1000-site one-magnon Oh geometry and direct residual smoke
         run: |
           python3 tests/cpc_cubic_1000_one_magnon_smoke.py --exe "$PWD/source/QS3ED2" --output "$RUNNER_TEMP/cubic-1000-n1"
