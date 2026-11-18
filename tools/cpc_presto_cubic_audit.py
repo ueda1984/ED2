@@ -81,6 +81,11 @@ def main():
     assert isinstance(summary["local_bond_cache"], bool)
     assert isinstance(summary["cache_profile"], bool)
     assert isinstance(summary["direct_hop_table"], bool)
+    # Legacy PR16 evidence remains readable; PR17 records explicit provenance.
+    basis_coord_cache = summary.get("basis_coord_cache", False)
+    assert isinstance(basis_coord_cache, bool)
+    if basis_coord_cache:
+        assert summary["anchored_basis"]
     if summary["direct_hop_table"]:
         assert summary["local_bond_cache"] and summary["anchored_lookup"]
         assert summary["anchored_basis"] and summary["fast_group_validation"]
@@ -141,6 +146,7 @@ def main():
         assert record["local_bond_cache"] is summary["local_bond_cache"]
         assert record["cache_profile"] is summary["cache_profile"]
         assert record["direct_hop_table"] is summary["direct_hop_table"]
+        assert record.get("basis_coord_cache", False) is basis_coord_cache
         raw_input = (root / "trials" / record["key"] / "input.dat").read_text()
         match = re.search(r"\bMNTE\s*=\s*(-?\d+)", raw_input, flags=re.IGNORECASE)
         assert match and int(match.group(1)) == summary["mnte"]
@@ -173,6 +179,8 @@ def main():
         anchored_basis_used = "Basis builder: anchored-cubic" in log
         expected_anchored = record["builder"] == "fast" and summary["anchored_basis"]
         assert anchored_basis_used == expected_anchored
+        assert ("Basis orbit coordinates: exact precomputed periodic deltas" in log) is (
+            basis_coord_cache and record["builder"] == "fast")
         assert atomic == record["atomic_orbits"]
         assert atomic == (record["builder"] == "fast" and not summary["anchored_basis"])
         expected_sparse_cache = summary["local_bond_cache"] and record["builder"] == "fast"
@@ -270,6 +278,7 @@ def main():
                   local_bond_cache=summary["local_bond_cache"],
                   cache_profile=summary["cache_profile"],
                   direct_hop_table=summary["direct_hop_table"],
+                  basis_coord_cache=basis_coord_cache,
                   operator_attestation_present=attested,
                   review_eligible=eligible,
                   caution="Operator claim is not independent scheduler proof, and review gate is not publication approval.",
