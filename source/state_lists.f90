@@ -520,9 +520,10 @@ contains
     integer, allocatable :: elements(:,:),slots(:),composition(:)
     integer(int64), allocatable :: hashes1(:),hashes2(:)
     complex(8), allocatable :: chi(:)
-    integer(int64) :: nwide,h1,h2
-    integer :: ng,table_size,g,idx(6),q,b,site,loc,a,probe,j
+    integer(int64) :: nwide,h1,h2,element_limit,site_image_limit
+    integer :: ng,table_size,g,idx(6),q,b,site,loc,a,probe,j,large_status
     logical :: found
+    character(len=16) :: permit_large
     complex(8) :: generator_chi
     valid=.false.
     nwide=1_int64
@@ -531,10 +532,21 @@ contains
       if(nwide>huge(nwide)/int(periods(a),int64))return
       nwide=nwide*int(periods(a),int64)
     end do
-    ! Cap one-time validation memory: <=4 million integer site images and
-    ! <=8192 group elements. Larger noncommuting groups use the legacy path.
-    if(nwide>8192_int64)return
-    if(nwide>4000000_int64/int(NOS+1,int64))return
+    ! The historical safe caps remain the default. A reviewed, explicitly
+    ! opted-in large-group benchmark may use up to 64 million site images
+    ! (~244 MiB for int32), with a hard bound on the total group order.
+    ! Normal-form uniqueness, closure and phase checks are NEVER bypassed.
+    element_limit=8192_int64
+    site_image_limit=4000000_int64
+    permit_large=''
+    call get_environment_variable('ED2_ALLOW_LARGE_GROUP_VALIDATION', &
+                                  permit_large,status=large_status)
+    if(large_status==0 .and. trim(adjustl(permit_large))=='1')then
+      element_limit=65536_int64
+      site_image_limit=64000000_int64
+    end if
+    if(nwide>element_limit)return
+    if(nwide>site_image_limit/int(NOS+1,int64))return
     ng=int(nwide)
     table_size=2*ng+1
     allocate(elements(0:NOS,ng),composition(0:NOS),slots(table_size))
