@@ -82,6 +82,9 @@ args=(--exe "$exe" --output "$run_dir/measurements"
 if [[ -n ${ED2_THREADS:-} ]]; then args+=(--threads "$ED2_THREADS"); fi
 if [[ -n ${ED2_SIZES:-} ]]; then args+=(--sizes "$ED2_SIZES"); fi
 if [[ -n ${ED2_SECTORS:-} ]]; then args+=(--sectors "$ED2_SECTORS"); fi
+if [[ -n ${ED2_WARMUPS:-} ]]; then args+=(--warmups "$ED2_WARMUPS"); fi
+if [[ -n ${ED2_REPEATS:-} ]]; then args+=(--repeats "$ED2_REPEATS"); fi
+if [[ -n ${ED2_TIMEOUT:-} ]]; then args+=(--timeout "$ED2_TIMEOUT"); fi
 if [[ -n ${ED2_CPU_LIST:-} ]]; then args+=(--cpu-list "$ED2_CPU_LIST"); fi
 python3 "$run_dir/source/tools/cpc_presto_cubic_benchmark.py" \
   "${args[@]}" > "$run_dir/benchmark-console.log" 2>&1
