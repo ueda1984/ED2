@@ -63,3 +63,16 @@ The final comparison requires distinct output directories or the default indepen
 ## Review and publication posture
 
 No merge to main, no new default behavior declaration, and no CPC claim of new symmetry methods until independent source review, gfortran-13/14 CI, zero-cap and other stress fixtures, and exclusive PRESTO performance attribution are complete. As in the separate two-stage Lanczos restoration, direct residuals certify returned Ritz pairs but not global lowest-state inclusion. Distinguish demonstration of physical sectors, engineering speedup, and the provenance of published QS³ algorithms.
+
+
+### Follow-up portability defect (kept separate from this PR)
+
+The Debian 13 / GNU Fortran 14 direct LAPACK probe at `n=1` returned
+`INFO=0, WORK(1)=33, RWORK(1)=1, IWORK(1)=1`.
+`source/blas_lapack_interfaces.f90:zheevr_workspace_lengths` currently
+rejects `RWORK=1` as smaller than its documented safe minimum of `24*n`
+(and would also reject `IWORK=1` versus `10*n`). The code can allocate
+the documented minima while still validating finite/positive queries;
+a narrow `n=1` portability fix and backend-specific regression are
+appropriate as a separate change. The repository currently has GitHub
+Issues disabled, so this note serves as the tracked development finding.
