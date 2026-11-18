@@ -1,0 +1,133 @@
+name: ED2 cubic Oh symmetry and PRESTO protocol
+
+on:
+  push:
+    branches: [codex/ed2-cpc-cubic-oh-1000-presto]
+    paths:
+      - "source/state_lists.f90"
+      - "tests/cpc_cubic_pointgroup.py"
+      - "tests/cpc_cubic_pointgroup_regression.py"
+      - "tools/cpc_presto_cubic_benchmark.py"
+      - "tools/cpc_presto_cubic_audit.py"
+      - "tools/presto_cubic_exclusive.pbs"
+      - ".github/workflows/cpc-cubic-oh-presto.yml"
+  pull_request:
+    paths:
+      - "source/state_lists.f90"
+      - "tests/cpc_cubic_pointgroup.py"
+      - "tests/cpc_cubic_pointgroup_regression.py"
+      - "tools/cpc_presto_cubic_benchmark.py"
+      - "tools/cpc_presto_cubic_audit.py"
+      - "tools/presto_cubic_exclusive.pbs"
+      - ".github/workflows/cpc-cubic-oh-presto.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cubic-science-and-safety:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [gfortran-13, gfortran-14]
+    env:
+      FC: ${{ matrix.compiler }}
+      FCFLAGS: -O2 -fopenmp
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Install compiler, BLAS/LAPACK and independent NumPy reference
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ${{ matrix.compiler }} libblas-dev liblapack-dev autoconf automake make time python3-numpy
+      - name: Fail closed without a real PBS allocation
+        run: |
+          bash -n tools/presto_cubic_exclusive.pbs tools/presto_pointgroup_stage.sh
+          if ED2_EXCLUSIVE_CONFIRMED=1 bash tools/presto_cubic_exclusive.pbs > "$RUNNER_TEMP/pbs-refusal.log" 2>&1; then
+            echo "ERROR: cubic PBS script accepted an unallocated shared runner" >&2
+            exit 1
+          fi
+          grep -q 'Required PBS/ED2 variable missing' "$RUNNER_TEMP/pbs-refusal.log"
+      - name: Pin exact transferable reviewed source
+        run: |
+          bash tools/presto_pointgroup_stage.sh "$PWD" "$RUNNER_TEMP/staged-source"
+          (cd "$RUNNER_TEMP/staged-source" && sha256sum -c ed2-source.sha256)
+          test "$(cat "$RUNNER_TEMP/staged-source/source-commit.txt")" = "$(git rev-parse HEAD)"
+      - name: Build production ED2 and run baseline checks
+        run: |
+          autoreconf -vfi
+          ./configure FC="$FC" FCFLAGS="$FCFLAGS"
+          make -j2
+          make check
+      - name: Independent cubic Oh group, bond invariance and N1000 dimensions
+        run: |
+          python3 tests/cpc_cubic_pointgroup.py --sizes 4,6,8,10 --output "$RUNNER_TEMP/cubic-dim.json"
+          python3 - "$RUNNER_TEMP/cubic-dim.json" <<'PY'
+          import json,sys
+          d=json.load(open(sys.argv[1],encoding='utf-8'))
+          a={x['sites']:x for x in d['results']}
+          assert a[1000]['dimensions']=={'raw_dim':166167000,'gamma-t':166167,'oh-a1g':4299,'oh-a2g':3624,'oh-a1u':2884,'oh-a2u':3252}
+          assert a[1000]['bond_count']==9000
+          assert all(x['checked_bond_invariance'] for x in d['results'])
+          print('CUBIC OH N64/216/512/1000 GROUP PASS')
+          PY
+      - name: Independent physical projected Hamiltonians for all Oh 1D irreps
+        run: |
+          python3 tests/cpc_cubic_pointgroup_regression.py --exe "$PWD/source/QS3ED2" --output "$RUNNER_TEMP/cubic-physics" --threads 1
+      - name: Run and audit cubic 64/216-site shared smoke
+        run: |
+          python3 tools/cpc_presto_cubic_benchmark.py --exe "$PWD/source/QS3ED2" \
+            --output "$RUNNER_TEMP/cubic-64" --source-revision "$(git rev-parse HEAD)" \
+            --source-archive "$RUNNER_TEMP/staged-source/ed2-source.tar.gz" \
+            --preset cubic-smoke --allow-shared --timeout 180 --time-budget 2400
+          python3 tools/cpc_presto_cubic_audit.py --root "$RUNNER_TEMP/cubic-64" \
+            --output "$RUNNER_TEMP/audit-64" \
+            --source-archive "$RUNNER_TEMP/staged-source/ed2-source.tar.gz" \
+            --exe "$PWD/source/QS3ED2"
+          python3 tools/cpc_presto_cubic_benchmark.py --exe "$PWD/source/QS3ED2" \
+            --output "$RUNNER_TEMP/cubic-216" --source-revision "$(git rev-parse HEAD)" \
+            --source-archive "$RUNNER_TEMP/staged-source/ed2-source.tar.gz" \
+            --preset cubic-pilot --sizes 6 --sectors oh-a1g,oh-a2g \
+            --threads 1 --warmups 0 --repeats 1 --allow-shared --timeout 180 --time-budget 2400
+          python3 tools/cpc_presto_cubic_audit.py --root "$RUNNER_TEMP/cubic-216" \
+            --output "$RUNNER_TEMP/audit-216" \
+            --source-archive "$RUNNER_TEMP/staged-source/ed2-source.tar.gz" \
+            --exe "$PWD/source/QS3ED2"
+      - name: Shared data cannot pass publication gate or altered input audit
+        run: |
+          if python3 tools/cpc_presto_cubic_audit.py --root "$RUNNER_TEMP/cubic-64" \
+            --output "$RUNNER_TEMP/invalid-publication" \
+            --source-archive "$RUNNER_TEMP/staged-source/ed2-source.tar.gz" \
+            --exe "$PWD/source/QS3ED2" --require-publication; then
+            echo "ERROR: shared job was marked publication-ready" >&2; exit 1
+          fi
+          cp -a "$RUNNER_TEMP/cubic-64" "$RUNNER_TEMP/cubic-tampered"
+          printf 'tamper\n' >> "$RUNNER_TEMP/cubic-tampered/trials/s4-oh-a1g-t1-measure0-fast/input.dat"
+          if python3 tools/cpc_presto_cubic_audit.py --root "$RUNNER_TEMP/cubic-tampered" \
+            --output "$RUNNER_TEMP/invalid-tamper" \
+            --source-archive "$RUNNER_TEMP/staged-source/ed2-source.tar.gz" \
+            --exe "$PWD/source/QS3ED2"; then
+            echo "ERROR: input mutation was not rejected" >&2; exit 1
+          fi
+      - name: Archive exact source and raw evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cubic-oh-presto-${{ matrix.compiler }}
+          path: |
+            ${{ runner.temp }}/staged-source/
+            ${{ runner.temp }}/cubic-dim.json
+            ${{ runner.temp }}/cubic-physics/
+            ${{ runner.temp }}/cubic-64/
+            ${{ runner.temp }}/audit-64/
+            ${{ runner.temp }}/cubic-216/
+            ${{ runner.temp }}/audit-216/
+          if-no-files-found: warn
+          retention-days: 30
