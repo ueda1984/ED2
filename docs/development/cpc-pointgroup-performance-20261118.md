@@ -33,6 +33,14 @@ Every recorded run passed the native direct-residual certification (residuals ap
 
 **Interpretation:** on the shared CI runner, the point-group reduction lowered *total* runtime and memory for the tested lattices even though noncommuting point-group basis formation grew to roughly 13x (8x8) and 16x (10x10) the translation-only basis time. At 10x10 the `Gamma-A1` sector reduced dimension `1617 -> 247`, but the fallback consumed roughly `39 ms` of a `76 ms` program. This is a concrete reason to evaluate a validated noncommuting orbit builder, not evidence of a new physical algorithm.
 
+## Later experimental implementation
+
+The bounded group-normal-form and character validation described in
+[cpc-noncommuting-orbit-validation-20261118.md](cpc-noncommuting-orbit-validation-20261118.md)
+has now been implemented on a **separate draft branch** and locally
+compared against a forced-legacy basis. The source below remains a
+baseline performance record; it does not represent the newer fast path.
+
 ## Next engineering experiment
 
 Propose a **separate** opt-in/auditable improvement to `try_orbit_basis` with full enumeration of generator normal forms, exact duplicate-permutation detection, closure under multiplication by each generator, and a verified one-dimensional character homomorphism. **Do not** simply remove the commuting guard without those checks. Retain `ED2_FORCE_LEGACY_ORBITS=1` as a same-Hamiltonian/same-irrep baseline and test both builders against the independent fixed-magnon physical projector (eigenvalues, dimensions, eigenvector residuals) and cross-thread reproducibility.

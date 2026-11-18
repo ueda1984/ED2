@@ -46,6 +46,18 @@ For Gamma/M with full `C4v`, the two-dimensional `E` irrep is **not** represente
 
 The empty square-4x4 two-down Gamma A2 sector is counted as a mathematically valid *empty sector*; no ED2 eigenvalue run is attempted for it. The remaining nonempty sectors were checked against native ED2 dense spectra. The standard suite additionally runs both ALG=1 Lanczos modes for selected noncommuting sectors.
 
+## Development addendum: validated noncommuting atomic-orbit implementation
+
+The statement below that the optimized atomic-orbit builder cannot handle
+noncommuting generators describes the **pre-optimization baseline** (PR #2).
+On the subsequent experimental development branch, a bounded
+`validate_noncommuting_action` guard permits this fast path for a proven
+closed normal-form group and a consistent one-dimensional character.
+Incompatible or oversized inputs retain the historical fallback. See
+[cpc-noncommuting-orbit-validation-20261118.md](cpc-noncommuting-orbit-validation-20261118.md).
+The existing representation still does **not** support the two-dimensional
+`C4v` E irrep or automatically verify arbitrary Hamiltonian invariance.
+
 ## Source-derived caveats
 
 - Supplied maps and phases are generally **not** independently checked for Hamiltonian invariance or legitimate little-group characters by the ED2 production reader. Incorrect input could yield a formally projected but physically invalid spectrum. The test suite supplies a separate oracle for its specific fixtures.

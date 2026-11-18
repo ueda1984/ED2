@@ -279,6 +279,14 @@ check-pointgroup-profile:
 	  $(if $(PGPROFILE_OUTPUT),--output "$(PGPROFILE_OUTPUT)",) \
 	  $(PGPROFILE_FLAGS)
 
+# Negative group-closure and incompatible-character guard, source-only test.
+EXTRA_DIST += cpc_noncommuting_orbit_guard.py
+.PHONY: check-noncommuting-guard
+check-noncommuting-guard:
+	$(PYTHON) $(srcdir)/cpc_noncommuting_orbit_guard.py \
+	  --source "$(abs_top_srcdir)" --compiler "$(FC)" \
+	  $(if $(NONCOMMUTING_OUTPUT),--output "$(NONCOMMUTING_OUTPUT)",)
+
 # Translation / point-group physical sector validation: optional and NumPy test-only.
 EXTRA_DIST += cpc_pointgroup_translation_crosscheck.py
 .PHONY: check-pointgroup

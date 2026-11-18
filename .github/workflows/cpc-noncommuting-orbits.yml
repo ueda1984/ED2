@@ -1,0 +1,108 @@
+name: CPC validated noncommuting orbit regression
+
+on:
+  push:
+    branches: [codex/ed2-cpc-noncommuting-orbits]
+    paths:
+      - ".github/workflows/cpc-noncommuting-orbits.yml"
+      - "source/state_lists.f90"
+      - "tests/cpc_pointgroup_translation_crosscheck.py"
+      - "tests/cpc_noncommuting_orbit_guard.py"
+      - "tests/Makefile.am"
+  pull_request:
+    paths:
+      - ".github/workflows/cpc-noncommuting-orbits.yml"
+      - "source/state_lists.f90"
+      - "tests/cpc_pointgroup_translation_crosscheck.py"
+      - "tests/cpc_noncommuting_orbit_guard.py"
+      - "tests/Makefile.am"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  physical-and-orbit-certification:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [gfortran-13, gfortran-14]
+    env:
+      FC: ${{ matrix.compiler }}
+      FCFLAGS: -O2 -fopenmp
+      OMP_NUM_THREADS: '1'
+      OPENBLAS_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Install compiler and independent numerical dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ${{ matrix.compiler }} libblas-dev liblapack-dev autoconf automake make python3-numpy time
+      - name: Compile production executable and default smoke
+        run: |
+          autoreconf -vfi
+          ./configure FC="$FC" FCFLAGS="$FCFLAGS"
+          make -j2
+          make check
+      - name: Independent point-group spectra and forced-legacy equivalence
+        run: |
+          make check-pointgroup POINTGROUP_OUTPUT="$RUNNER_TEMP/pointgroup-physical"
+          python3 - "$RUNNER_TEMP/pointgroup-physical/report.json" <<'PY'
+          import json,sys
+          report=json.load(open(sys.argv[1],encoding='utf-8'))
+          assert report['passed'] and len(report['cases'])==31
+          both=[c for c in report['cases'] if c.get('forced_legacy')]
+          assert len(both)>=20
+          for c in both:
+              assert c['native']['atomic_orbits'] and not c['forced_legacy']['atomic_orbits']
+              assert abs(c['native']['energy']-c['forced_legacy']['energy'])<1e-9
+          pairs=[x for c in report['cases'] for x in c.get('lanczos',[])]
+          assert len(pairs)==4 and all(x['direct_residual']<=1.1e-8 for x in pairs)
+          print('POINT GROUP SPECTRA + LEGACY CROSSCHECK PASS',len(both),'sectors')
+          PY
+      - name: Reject invalid normal forms and incompatible characters
+        run: |
+          python3 tests/cpc_noncommuting_orbit_guard.py --source . --compiler "$FC" --threads 2 --output "$RUNNER_TEMP/noncommuting-guard"
+      - name: Checked OpenMP basis replay against pinned pre-optimization source
+        run: |
+          mkdir -p "$RUNNER_TEMP/old-orbit-source/source"
+          git show 6284bb6ecd6140a0763eeff83bd82a07f17e9d64:source/input_param.f90 > "$RUNNER_TEMP/old-orbit-source/source/input_param.f90"
+          git show 6284bb6ecd6140a0763eeff83bd82a07f17e9d64:source/state_lists.f90 > "$RUNNER_TEMP/old-orbit-source/source/state_lists.f90"
+          python3 tests/cpc_openmp_orbit_regression.py \
+            --baseline "$RUNNER_TEMP/old-orbit-source" --candidate . \
+            --output "$RUNNER_TEMP/checked-orbits" --compiler "$FC" \
+            --threads 1,2,4 --stress-repeats 2
+      - name: Compare identical physical sectors with both basis builders
+        run: |
+          make check-pointgroup-profile PGPROFILE_OUTPUT="$RUNNER_TEMP/fast-sectors" PGPROFILE_FLAGS="--sizes 8,10 --threads 1 --modes two-stage --repeat 1"
+          ED2_FORCE_LEGACY_ORBITS=1 make check-pointgroup-profile PGPROFILE_OUTPUT="$RUNNER_TEMP/legacy-sectors" PGPROFILE_FLAGS="--sizes 8,10 --threads 1 --modes two-stage --repeat 1"
+          python3 - "$RUNNER_TEMP/fast-sectors/report.json" "$RUNNER_TEMP/legacy-sectors/report.json" <<'PY'
+          import json,sys
+          a=json.load(open(sys.argv[1],encoding='utf-8'))['results']
+          b=json.load(open(sys.argv[2],encoding='utf-8'))['results']
+          assert len(a)==len(b)==8
+          for x,y in zip(a,b):
+              assert x['input_sha256']==y['input_sha256']
+              assert x['dimension']==y['dimension']
+              assert abs(x['energy']-y['energy'])<1e-8
+              assert x['residual']<1.1e-8 and y['residual']<1.1e-8
+          print('MATCHED SECTOR FAST/LEGACY PASS',len(a),'pairs; no wall-time threshold')
+          PY
+      - name: Archive complete independent evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: noncommuting-orbits-${{ matrix.compiler }}
+          path: |
+            ${{ runner.temp }}/pointgroup-physical/
+            ${{ runner.temp }}/noncommuting-guard/
+            ${{ runner.temp }}/checked-orbits/
+            ${{ runner.temp }}/fast-sectors/
+            ${{ runner.temp }}/legacy-sectors/
+          if-no-files-found: warn
+          retention-days: 30

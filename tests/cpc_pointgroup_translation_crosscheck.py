@@ -214,11 +214,14 @@ def make_input(root, kind, n, ndown, gens, bonds, alg):
         "lnc_ene_conv=1d-11,i_vec_min=1,i_vec_max=1\n/\n")
 
 
-def execute(exe, root, expected, alg=3, mode="legacy", threads=1):
+def execute(exe, root, expected, alg=3, mode="legacy", threads=1, force_legacy=False):
     env = dict(os.environ, OMP_NUM_THREADS=str(threads), OMP_DYNAMIC="FALSE",
                OPENBLAS_NUM_THREADS="1", MKL_NUM_THREADS="1", ED2_RNG_SEED="1984",
                ED2_DIAGNOSTICS="diagnostics.txt", ED2_RESIDUAL_ATOL="1e-8")
     env.pop("ED2_LANCZOS_TWO_STAGE", None)
+    env.pop("ED2_FORCE_LEGACY_ORBITS", None)
+    if force_legacy:
+        env["ED2_FORCE_LEGACY_ORBITS"] = "1"
     if mode == "two-stage":
         env["ED2_LANCZOS_TWO_STAGE"] = "1"
     with (root / "input.dat").open("rb") as inp, (root / "stdout.log").open("wb") as log:
@@ -256,16 +259,24 @@ def run_case(exe, root, kind, n, ndown, momentum, irrep, label, extra_alg1=False
     native = execute(exe, sub, ref)
     record.update(native=native, status="pass")
     if irrep is not None:
-        # Tx and reflection/rotation generally do not commute. The optimized
-        # atomic-orbit builder must conservatively fall back to the legacy path.
-        assert not native["atomic_orbits"], ("Unexpected noncommuting fast path", label)
+        # The fast path must be used only after noncommuting group validation.
+        # Compare it to a forced historical full-enumeration build at identical
+        # Hamiltonian, symmetry sector and independent full spectra.
+        assert native["atomic_orbits"], ("Validated noncommuting fast path missing", label)
+        legacy_dir = root / (label + "-forced-legacy")
+        make_input(legacy_dir, kind, n, ndown, gens, bonds, 3)
+        legacy = execute(exe, legacy_dir, ref, force_legacy=True)
+        assert not legacy["atomic_orbits"]
+        assert native["dimension"] == legacy["dimension"]
+        assert abs(native["energy"]-legacy["energy"]) < 1e-9
+        record["forced_legacy"] = legacy
     if extra_alg1:
         record["lanczos"] = []
         for mode in ("legacy", "two-stage"):
             work = root / (label + "-lanczos-" + mode)
             make_input(work, kind, n, ndown, gens, bonds, 1)
             data = execute(exe, work, ref, alg=1, mode=mode)
-            assert not data["atomic_orbits"]
+            assert data["atomic_orbits"]
             diagnostic_lines = (work / "diagnostics.txt").read_text().splitlines()
             diagnostic = dict(line.split("=", 1) for line in diagnostic_lines if "=" in line)
             assert diagnostic["lanczos_mode"] == ("two_stage" if mode == "two-stage" else "legacy")
