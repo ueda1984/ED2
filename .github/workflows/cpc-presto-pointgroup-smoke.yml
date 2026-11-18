@@ -1,0 +1,114 @@
+name: ED2 PRESTO point-group benchmark protocol smoke
+
+on:
+  push:
+    branches: [codex/ed2-cpc-presto-pointgroup-benchmark]
+    paths:
+      - "tools/cpc_presto_pointgroup_benchmark.py"
+      - "tools/cpc_presto_pointgroup_audit.py"
+      - "tools/presto_pointgroup_exclusive.pbs"
+      - "tools/presto_pointgroup_stage.sh"
+      - ".github/workflows/cpc-presto-pointgroup-smoke.yml"
+  pull_request:
+    paths:
+      - "tools/cpc_presto_pointgroup_benchmark.py"
+      - "tools/cpc_presto_pointgroup_audit.py"
+      - "tools/presto_pointgroup_exclusive.pbs"
+      - "tools/presto_pointgroup_stage.sh"
+      - ".github/workflows/cpc-presto-pointgroup-smoke.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke-only-not-exclusive:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          # Pull requests default to a temporary merge SHA; the transferable
+          # staged archive must instead pin the actual reviewed branch HEAD.
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Install Fortran and Autotools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends gfortran-14 liblapack-dev libblas-dev autoconf automake make time
+      - name: Check shell syntax and immutable source archive
+        run: |
+          bash -n tools/presto_pointgroup_exclusive.pbs tools/presto_pointgroup_stage.sh
+          bash tools/presto_pointgroup_stage.sh "$PWD" "$RUNNER_TEMP/staged-source"
+          (cd "$RUNNER_TEMP/staged-source" && sha256sum -c ed2-source.sha256)
+      - name: Ensure PBS script refuses execution without a real allocation
+        run: |
+          if ED2_EXCLUSIVE_CONFIRMED=1 bash tools/presto_pointgroup_exclusive.pbs                > "$RUNNER_TEMP/refused-login.log" 2>&1; then
+            echo "ERROR: PBS script ran outside allocated PBS job" >&2
+            exit 1
+          fi
+          grep -q "Required PBS/ED2 variable missing" "$RUNNER_TEMP/refused-login.log"
+      - name: Build and run historical smoke tests
+        run: |
+          autoreconf -vfi
+          ./configure FC=gfortran-14 FCFLAGS="-O2 -fopenmp"
+          make -j2
+          make check
+      - name: Matched fast/forced-legacy physical smoke (SHARED)
+        run: |
+          python3 tools/cpc_presto_pointgroup_benchmark.py \
+            --exe "$PWD/source/QS3ED2" \
+            --output "$RUNNER_TEMP/pg-shared-smoke" \
+            --source-revision "$(git rev-parse HEAD)" \
+            --source-archive "$RUNNER_TEMP/staged-source/ed2-source.tar.gz" \
+            --preset smoke --sizes 4,6 --threads 1 --warmups 0 --repeats 1 \
+            --allow-shared --timeout 60 --time-budget 1500
+      - name: Independent complete audit and negative publication gate
+        run: |
+          python3 tools/cpc_presto_pointgroup_audit.py \
+            --root "$RUNNER_TEMP/pg-shared-smoke" --output "$RUNNER_TEMP/pg-audit" \
+            --source-archive "$RUNNER_TEMP/staged-source/ed2-source.tar.gz" \
+            --exe "$PWD/source/QS3ED2"
+          python3 - "$RUNNER_TEMP/pg-audit/audit.json" <<'PY'
+          import json,sys
+          a=json.load(open(sys.argv[1]))
+          assert a["audited"] and a["raw_trials"]==14
+          assert not a["review_eligible"] and a["pbs_mode"]=="shared_smoke"
+          print("Shared smoke is never marked publication-ready")
+          PY
+          if python3 tools/cpc_presto_pointgroup_audit.py \
+             --root "$RUNNER_TEMP/pg-shared-smoke" --output "$RUNNER_TEMP/pg-must-not-pass" \
+             --source-archive "$RUNNER_TEMP/staged-source/ed2-source.tar.gz" \
+             --exe "$PWD/source/QS3ED2" --require-publication; then
+            echo "ERROR: shared smoke unexpectedly passed publication gate" >&2
+            exit 1
+          fi
+      - name: Prove that an altered input deck cannot pass audit
+        run: |
+          cp -a "$RUNNER_TEMP/pg-shared-smoke" "$RUNNER_TEMP/tampered-smoke"
+          printf 'tamper\n' >> "$RUNNER_TEMP/tampered-smoke/trials/s4-gamma-a1-t1-measure0-fast/input.dat"
+          if python3 tools/cpc_presto_pointgroup_audit.py \
+             --root "$RUNNER_TEMP/tampered-smoke" --output "$RUNNER_TEMP/tampered-must-not-pass" \
+             --source-archive "$RUNNER_TEMP/staged-source/ed2-source.tar.gz" \
+             --exe "$PWD/source/QS3ED2"; then
+            echo "ERROR: modified physical input was not detected" >&2
+            exit 1
+          fi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: immutable-presto-source-stage
+          path: ${{ runner.temp }}/staged-source/
+          if-no-files-found: error
+          retention-days: 14
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shared-smoke-protocol-evidence
+          path: |
+            ${{ runner.temp }}/pg-shared-smoke/
+            ${{ runner.temp }}/pg-audit/
+          if-no-files-found: warn
+          retention-days: 14
