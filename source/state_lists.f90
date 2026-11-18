@@ -797,13 +797,14 @@ contains
     integer, allocatable :: sites_xyz(:,:), candidate_ranks(:)
     real(8), allocatable :: candidate_norms(:)
     logical, allocatable :: visited(:)
-    logical :: certificate_valid,detail_timing
-    character(len=16) :: enable,detail_setting,basis_dump_setting,legacy_setting,cert_setting
-    integer :: status,detail_status,basis_dump_status,legacy_status,cert_status
+    logical :: certificate_valid,detail_timing,coord_cache_enabled
+    character(len=16) :: enable,detail_setting,basis_dump_setting,legacy_setting,cert_setting, &
+      coord_cache_setting
+    integer :: status,detail_status,basis_dump_status,legacy_status,cert_status,coord_cache_status
     integer :: side,pairs,pair_a,pair_b,site,g,i,j,k,a,b,c,idx, &
       idx_a,idx_b,pi,pj,pk,best(3),shifted(3),point_sites(3), &
       point_xyz(3,3),tmp(3),source_xyz(3,3),target_xyz(3), &
-      ntrans,stab_count,nrep,old_rank,basis_unit,basis_ios
+      ntrans,stab_count,nrep,old_rank,basis_unit,basis_ios,delta_xyz(3,3,3)
     integer :: t
     real(8) :: p1,p2,p3,p4,p5,ro
     real(8) :: begin_s,validation_start,validation_end,scan_start,scan_end,finish_s
@@ -811,10 +812,28 @@ contains
     used=.false.
     enable=''
     call get_environment_variable('ED2_CUBIC_ANCHORED_BASIS',enable,status=status)
-    if(status/=0.or.trim(adjustl(enable))/='1')return
+    coord_cache_setting=''
+    call get_environment_variable('ED2_CUBIC_BASIS_COORD_CACHE', &
+      coord_cache_setting,status=coord_cache_status)
+    if(coord_cache_status==0)then
+      if(trim(adjustl(coord_cache_setting))/='0'.and. &
+         trim(adjustl(coord_cache_setting))/='1') &
+        error stop 'Basis coordinate cache flag must be 0 or 1'
+    end if
+    coord_cache_enabled=coord_cache_status==0.and. &
+      trim(adjustl(coord_cache_setting))=='1'
+    if(status/=0.or.trim(adjustl(enable))/='1')then
+      if(coord_cache_enabled) &
+        error stop 'Basis coordinate cache requires ED2_CUBIC_ANCHORED_BASIS=1'
+      return
+    end if
     legacy_setting=''
     call get_environment_variable('ED2_FORCE_LEGACY_ORBITS',legacy_setting,status=legacy_status)
-    if(legacy_status==0.and.trim(adjustl(legacy_setting))=='1')return
+    if(legacy_status==0.and.trim(adjustl(legacy_setting))=='1')then
+      if(coord_cache_enabled) &
+        error stop 'Basis coordinate cache is incompatible with legacy orbit mode'
+      return
+    end if
     cert_setting=''
     call get_environment_variable('ED2_CUBIC_FAST_GROUP_VALIDATION', &
       cert_setting,status=cert_status)
@@ -879,13 +898,33 @@ contains
         do g=1,48
           point_sites=[point_map(1,g),point_map(pair_a+1,g),point_map(pair_b+1,g)]
           point_xyz=sites_xyz(:,point_sites)
+          ! Compute each periodic coordinate difference just once per point
+          ! image, rather than repeating division/modulo in 3 anchor views
+          ! and 27 canonical translations. Integer-only; rank and norm
+          ! accumulation order remain exactly those of the legacy builder.
+          if(coord_cache_enabled)then
+            do i=1,3
+              do j=1,3
+                do k=1,3
+                  delta_xyz(k,j,i)=modulo(point_xyz(k,j)-point_xyz(k,i),side)
+                end do
+              end do
+            end do
+          end if
           ! Mark the three translation anchors of each O_h image.
           do i=1,3
-            do j=1,3
-              shifted(j)=modulo(point_xyz(1,j)-point_xyz(1,i),side)+ &
-                side*(modulo(point_xyz(2,j)-point_xyz(2,i),side)+ &
-                side*modulo(point_xyz(3,j)-point_xyz(3,i),side))
-            end do
+            if(coord_cache_enabled)then
+              do j=1,3
+                shifted(j)=delta_xyz(1,j,i)+ &
+                  side*(delta_xyz(2,j,i)+side*delta_xyz(3,j,i))
+              end do
+            else
+              do j=1,3
+                shifted(j)=modulo(point_xyz(1,j)-point_xyz(1,i),side)+ &
+                  side*(modulo(point_xyz(2,j)-point_xyz(2,i),side)+ &
+                  side*modulo(point_xyz(3,j)-point_xyz(3,i),side))
+              end do
+            end if
             call insertion_sort(shifted,3)
             if(shifted(1)/=0)error stop 'Anchored cubic shape lacks origin'
             idx_a=shifted(2);idx_b=shifted(3)
@@ -899,11 +938,18 @@ contains
           do pi=1,3
             do pj=1,3
               do pk=1,3
-                do j=1,3
-                  tmp(j)=1+modulo(point_xyz(1,j)-point_xyz(1,pi),side)+ &
-                    side*(modulo(point_xyz(2,j)-point_xyz(2,pj),side)+ &
-                    side*modulo(point_xyz(3,j)-point_xyz(3,pk),side))
-                end do
+                if(coord_cache_enabled)then
+                  do j=1,3
+                    tmp(j)=1+delta_xyz(1,j,pi)+ &
+                      side*(delta_xyz(2,j,pj)+side*delta_xyz(3,j,pk))
+                  end do
+                else
+                  do j=1,3
+                    tmp(j)=1+modulo(point_xyz(1,j)-point_xyz(1,pi),side)+ &
+                      side*(modulo(point_xyz(2,j)-point_xyz(2,pj),side)+ &
+                      side*modulo(point_xyz(3,j)-point_xyz(3,pk),side))
+                  end do
+                end if
                 call insertion_sort(tmp,3)
                 do k=3,1,-1
                   if(tmp(k)<best(k))then
@@ -1013,6 +1059,8 @@ contains
     end if
     write(*,'(a,i0,a,i0)') 'Basis builder: anchored-cubic, orbit keys=',nrep, &
       ', translation-reduced candidates=',pairs
+    if(coord_cache_enabled) &
+      write(*,'(a)') 'Basis orbit coordinates: exact precomputed periodic deltas'
     used=.true.
   end subroutine try_cubic_anchored_basis
 
