@@ -52,11 +52,11 @@ def run(driver, work, side, sector, threads, enabled, timeout):
     assert "Basis builder: anchored-cubic" in log
     assert ("Basis orbit coordinates: exact precomputed periodic deltas" in log) == enabled
     dim = sector_dimensions(side)[sector]
-    matches = re.findall(r"ED2_BASIS_DRIVER_DIM=(\\d+)", log)
+    matches = re.findall(r"ED2_BASIS_DRIVER_DIM=(\d+)", log)
     assert len(matches) == 1 and int(matches[0]) == dim
     proof = work / "cubic_basis_proof_dump.txt"
     assert len(proof.read_bytes().splitlines()) == dim
-    timing = re.findall(r"ED2_BASIS_PHASE orbit_scan wall_s=\\s*([+\\-0-9.eE]+)", log)
+    timing = re.findall(r"ED2_BASIS_PHASE orbit_scan wall_s=\s*([+\-0-9.eE]+)", log)
     assert len(timing) == 1 and float(timing[0]) >= 0
     return sha256(work / "input.dat"), sha256(proof), float(timing[0])
 
