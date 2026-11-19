@@ -1,0 +1,40 @@
+name: ED2 documentation and navigation QA
+
+on:
+  push:
+    branches: [docs/ed2-general-performance-cpc-20261119]
+    paths:
+      - "docs/**"
+      - "mkdocs.yml"
+      - "README.md"
+      - "docs/requirements.txt"
+      - ".github/workflows/ed2-docs-qa.yml"
+  pull_request:
+    paths:
+      - "docs/**"
+      - "mkdocs.yml"
+      - "README.md"
+      - "docs/requirements.txt"
+      - ".github/workflows/ed2-docs-qa.yml"
+  workflow_dispatch:
+
+jobs:
+  build-docs:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install pinned documentation toolchain
+        run: python -m pip install -r docs/requirements.txt
+      - name: Build all MkDocs pages and fail on warnings
+        run: mkdocs build --strict --site-dir "$RUNNER_TEMP/ed2-site"
+      - name: Confirm new user pages are linked and generated
+        run: |
+          test -s "$RUNNER_TEMP/ed2-site/user-guide/performance-and-memory/index.html"
+          test -s "$RUNNER_TEMP/ed2-site/examples/optimization-tips/index.html"
+          grep -q 'ED2_CSR_DIRECT_BUILD' "$RUNNER_TEMP/ed2-site/user-guide/performance-and-memory/index.html"
+          grep -q 'Lattice- and model-specific optimization tips' "$RUNNER_TEMP/ed2-site/examples/optimization-tips/index.html"
+          echo "ED2_MKDOCS_GENERAL_OPTIMIZATION_PAGES_PASS"
