@@ -49,22 +49,80 @@ m, precise bond list, site order, J and field. Each runner must report that
 identifier, the actual U(1) dimension C(N,m), and an energy / direct residual.
 A different hash means different physics and disqualifies a comparison.
 
-### Proposed pilot grid
+### Primary 1000-site-class benchmark grid (supersedes the earlier small-site pilot)
 
-| Geometry | Shape | Down spins | U(1) dimension (formula) | Purpose |
-| --- | --- | --- | --- | --- |
-| PBC chain | (12,) and (24,) | 2, 3 | C(N,m) | Generic pilot, check 1D-specific optimized modes |
-| PBC square | (4,4) and (6,6) | 2, 3 | C(N,m) | Two-dimensional translation-free baseline |
-| PBC cubic | (4,4,4) | 2, 3 | C(64,m) | Local scaling and early memory behavior |
-| PBC cubic | (6,6,6) | 2, 3 | C(216,m) | Moderate size: enforce memory budget |
-| PBC cubic | (10,10,10) | 3 | C(1000,3)=166167000 | **Not** a default allocation: only with an approved memory/time budget and appropriate spatial-symmetry approach |
+**Study variable:** spatial site count N approximately 10^3, with *few*
+down spins. Do **not** replace this with 12--64 site performance graphs.
+Small ED instances only validate the physical model, symmetry projectors
+and measured code paths; they are not the claimed benchmark target.
 
-For the first stage compare *U(1) only* (no translations, reflection, or
-Oh projection) to ensure same Hilbert-space block. In a second stage use
-matched translational sectors (Gamma) and identical admissible point
-representations, with independent checks of noncommuting generator handling.
-For generic non-U(1) models, use the full physical sector and separately
-validate terms with an independent small-Hilbert-space matrix oracle.
+| Main workload | Geometry | N | m | U(1)-only dimension | Mandatory symmetry comparisons |
+| --- | --- | ---: | ---: | ---: | --- |
+| 1D-1000 | PBC chain 1000 | 1000 | 2 / 3 | 499500 / 166167000 | U(1), Gamma, Gamma + inversion-even |
+| 2D-1024 | PBC square 32 x 32 | 1024 | 2 / 3 | 523776 / 178433024 | U(1), Gamma, Gamma + C4v A1 |
+| 3D-1000 | PBC cube 10 x 10 x 10 | 1000 | 2 / 3 | 499500 / 166167000 | U(1), Gamma, Gamma + Oh A1g |
+
+**Primary scientific target:** N=1000, m=3, cubic Gamma/Oh A1g,
+including the experimentally validated ED2 specialized opt-ins, on
+**the exact same physical Hamiltonian**. A 1000-site chain and
+1024-site square form complementary geometry/overhead controls.
+m=2 is the lower-memory U(1) control; m=4 or different irreps are
+optional challenges conditional on measured memory/time feasibility.
+
+For 1000-site cubic m=3, dimension is **166167000** at U(1) only,
+**166167** at Gamma using just translation symmetries, and **4299**
+at Gamma/Oh A1g for the validated cubic sector. The latter is the
+development PR's dimension for its *compatible isotropic/XXZ*
+space-group representation; equal Hilbert dimension does not alone
+prove equality of Hamiltonians.
+
+The first shared comparison *at the stated N* is a **feasibility matrix**
+for each library/setting:
+(i) whether 1000/1024-site spin representations are accepted,
+(ii) whether correct fixed-m sectors are constructible,
+(iii) whether Gamma and full point-group A1 projections are
+supported and agree with independent dimension checks,
+(iv) whether the target eigenpair converges within the declared
+resource budget. Only **after** those checks is a runtime ratio
+meaningful.
+
+For Gamma/point-group benchmarks construct the *identical projected
+block* in each library and independently check dimensions and energy.
+Noncommuting space-group generators may need complete group projectors,
+not merely a blind combination of commuting-generator APIs.
+A solver limited to U(1) must **not** be directly compared to
+ED2's 4299-dimensional A1g block as a speed victory. Report its
+U(1)-only ability and resource status, and additionally compare against
+ED2 U(1) on the same physical Hamiltonian if feasible.
+
+QuSpin supports custom large-integer representations above 64 sites,
+but that is not evidence that it can efficiently enumerate m=3 at
+N=1000; the current U(1) pilot's cap intentionally refuses 166 million
+states. QuSpin's docs specifically discuss large bit types and
+noncommuting symmetries. XDiag's documentation lists Spinhalf and
+generic lattice symmetries but does not itself establish a 1000-site
+successful benchmark: test and record exact version, compile-time /
+runtime feasibility and errors before drawing conclusions.
+
+**Memory and time guardrails:** do not attempt a 166/178 million
+state CSR construction by default, nor infer resource needs solely
+from the final reduced block dimension (basis enumeration and orbit
+canonicalization can still visit the full fixed-m sector). Limit
+memory / wall time for feasibility tests. Use a dedicated approved HPC
+allocation for any large attempt; failed builds, unsupported N or
+resource exhaustion are distinct statuses and *not* measured
+speedups. The run_quspin.py prototype is U(1)-only and cannot
+benchmark the m=3 projected target until a separately verified
+large-site space-group adapter exists.
+
+### Independent validation (not performance data)
+
+Dense-oracle prechecks at N=6, 12, 16, 36 and 64 when manageable;
+tiny cases do not appear as headline runtime performance.
+Run a 1000-site metadata/symmetry-dimension check before any solver
+allocation, and save its physical input hash. Verify all large-case
+Hamiltonians are truly U(1) conserving and exactly obey specified
+space-group symmetries.
 
 ## Specialized cubic lane (S) is a distinct physical workload
 
