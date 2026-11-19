@@ -31,10 +31,7 @@ through 32 fixed-magnetization eigenvalues, 15 momentum-resolved levels,
 and independently referenced conventional-Lanczos calculations for
 12--24 sites. Large-site continuity is independently confirmed in a
 1000-site two-magnon, translation-reduced sector against an exact
-relative-displacement reference and QuSpin. A separate development-only 1000-site three-magnon
-symmetry experiment serves as a large-system consistency test; its
-non-upstream basis optimization is not a release feature.
-In a genuinely non-$U(1)$ alternating spin-$1/2$/spin-$1$
+relative-displacement reference and QuSpin. In a genuinely non-$U(1)$ alternating spin-$1/2$/spin-$1$
 chain, independent Hamiltonian constructions validate calculations
 through 12 sites (full Hilbert dimension 46,656).
 The staggered vector-chirality response to an oriented DM interaction
@@ -1011,11 +1008,6 @@ in both conserved subspaces and translation sectors,
 including 216-site three-magnon and 1000-site two-magnon
 examples independently checked with QuSpin and, for the
 latter, a separate relative-coordinate construction.
-A separate, unmerged four-irrep 1000-site three-magnon
-development stress test additionally checks the consistency
-of experimental symmetry-resolved orbit construction,
-without claiming an independent energy reference or
-attributing its speedup to the general released program.
 Independent physical-response and numerical
 acceptance tests demonstrate the broader executable
 model/observable interface. The software remains
@@ -1032,7 +1024,7 @@ record}. The specialized cubic coordinate cache was not merged
 into the generic ED2 mainline described in the program summary;
 its median timings cannot be used as mainline or
 CPC Program Library release performance results.
-For the 1000-site three-magnon calculation described above, an
+In the separate 1000-site three-magnon development setup, an
 exact optional coordinate cache reduces the repeated periodic
 coordinate differences evaluated while constructing cubic
 translation-and-point-group orbit representatives. The
