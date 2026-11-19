@@ -61,9 +61,14 @@ Because the system is studied close to the saturation magnetization, the relevan
 
 The first numerical task is therefore to determine **how large the cutoff $N_{\downarrow}$ must be** when small transverse perturbations are applied.
 
-![cutoff test](cutoff_test.png)
+!!! note "Figure asset pending"
 
-The figure above shows the response of the transverse magnetization when small **uniform** and **staggered** transverse fields are applied at
+    The original cutoff-test plot is not included in this documentation
+    source tree. The qualitative discussion is retained below, but a
+    quantitative comparison requires regenerating and archiving the
+    corresponding model data and image.
+
+The reference calculation considers the response of the transverse magnetization when small **uniform** and **staggered** transverse fields are applied at
 
 $$
 H/J = 3.7 .
@@ -95,7 +100,10 @@ The second step is to estimate the **spontaneous staggered magnetization** in th
 
 Because exact diagonalization can only be performed on finite systems, we analyze the dependence of the transverse magnetization on the small staggered field.
 
-![fitting functions](fitting_functions.png)
+!!! note "Figure asset pending"
+
+    The original fitting-function plot is not included in this repository.
+    The two analytic fit forms remain specified explicitly below.
 
 Two fitting functions are introduced:
 
@@ -129,7 +137,10 @@ Thus, by fitting the finite‑field response we obtain an estimate of the sponta
 
 The final step is to analyze the **finite‑size scaling** of the numerical results.
 
-![finite size scaling](finite_size_scaling.png)
+!!! note "Figure asset pending"
+
+    The original finite-size scaling plot is not currently part of the
+    source distribution; do not infer numerical data from a missing figure.
 
 Two quantities are examined:
 
