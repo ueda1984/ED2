@@ -117,6 +117,15 @@ Intended for:
 - CI
 - quick validation
 
+!!! warning "Heavy regression case"
+
+    `make check-long` runs the historical ex1–ex9
+    examples. The final ex9 is a large 1000-site
+    three-magnon workload, intended for systems with
+    sufficient CPU resources. On an ordinary workstation,
+    first run `make check` and the ex1–ex8 subset, then
+    schedule ex9 on suitable resources if needed.
+
 ### Extended regression suite
 
 ```bash
