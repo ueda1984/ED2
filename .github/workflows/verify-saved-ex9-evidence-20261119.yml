@@ -1,0 +1,60 @@
+name: Verify completed ex9 raw outputs against explicit historical symmetry projection
+on:
+  push:
+    branches: [audit/ex9-validate-evidence-20261119]
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: read
+jobs:
+  verify-saved-full-run:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Retrieve unchanged outputs from completed 1000-site ex9 computation
+        uses: actions/download-artifact@v4
+        with:
+          repository: ueda1984/ED2
+          run-id: 44514651378
+          name: full-ex9-run-evidence
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/evidence
+      - name: Show strict archival mismatch and pass documented symmetry-corrected validation
+        shell: bash
+        run: |
+          set -euo pipefail
+          ACTUAL="$RUNNER_TEMP/evidence/ED2/ED2/examples/cubic_sp_HB"
+          test -s "$ACTUAL/eigenvalues.dat"
+          test -s "$ACTUAL/local_mag.dat"
+          test -s "$ACTUAL/two_body_cf_xyz.dat"
+          test -s "$ACTUAL/two_body_cf_z+-.dat"
+          if python3 -B tests/verify_ex9.py --actual "$ACTUAL" \
+            > "$RUNNER_TEMP/raw-check.json" 2>&1; then
+            echo "ERROR: strict raw archive unexpectedly accepted" >&2
+            exit 1
+          fi
+          python3 -B tests/verify_ex9.py --actual "$ACTUAL" \
+            --legacy-ex9-symmetry-projection \
+            --json-out "$RUNNER_TEMP/ex9-projection-proof.json"
+          python3 - <<'PY'
+          import json,os
+          p=os.environ["RUNNER_TEMP"]+"/ex9-projection-proof.json"
+          x=json.load(open(p))
+          assert x["status"]=="PASS"
+          assert x["mode"]=="computed_vs_archive"
+          assert x["comparison"]["zpm"]["raw_max_abs_error"] > 1e-5
+          assert x["comparison"]["zpm"]["max_abs_error"] < 1e-8
+          assert x["observed_checks"]["max_ladder_hermiticity_gap"] < 1e-10
+          print("EX9_FULL_REPRODUCTION_EXPLICIT_HISTORICAL_PROJECTION_PASS")
+          PY
+      - name: Preserve long-run verification audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ex9-full-recomputation-projection-proof
+          path: |
+            ${{ runner.temp }}/ex9-projection-proof.json
+            ${{ runner.temp }}/raw-check.json
+          retention-days: 30
+          if-no-files-found: warn
