@@ -45,12 +45,25 @@ jobs:
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends libblas-dev liblapack-dev
+      - name: Restore previously compiled pinned XDiag install
+        id: xdiag-install-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: /tmp/ed2_xdiag_install
+          key: xdiag-27065537-cpp17-gcc15-ubuntu-20261119-r1
       - name: Build XDiag library using CMake C++17 OpenMP (no MPI)
+        if: steps.xdiag-install-cache.outputs.cache-hit != 'true'
         timeout-minutes: 24
         run: |
           cmake -S /tmp/ed2_xdiag_external -B /tmp/ed2_xdiag_build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/tmp/ed2_xdiag_install -DXDIAG_DISABLE_HDF5=On -DBUILD_EXAMPLES=Off -DBUILD_TESTING=Off -DXDIAG_OPTIMIZE_FOR_NATIVE=Off
           cmake --build /tmp/ed2_xdiag_build -j 2
           cmake --install /tmp/ed2_xdiag_build
+      - name: Save self-contained pinned XDiag install for future science iterations
+        if: steps.xdiag-install-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: /tmp/ed2_xdiag_install
+          key: xdiag-27065537-cpp17-gcc15-ubuntu-20261119-r1
       - name: Compile ED2 cross-library probe against real pinned XDiag headers
         run: |
           cmake -S benchmarks/cross_library/xdiag_app -B /tmp/ed2_xdiag_probe_build -DCMAKE_PREFIX_PATH=/tmp/ed2_xdiag_install -DCMAKE_BUILD_TYPE=Release
@@ -74,6 +87,8 @@ jobs:
           g=json.load(open('/tmp/xdiag_guard1000.json'))
           assert b['dimension']==15 and b['status']=='BASIS_ONLY'
           assert abs(ref['E0']-x['E0']) < 1e-8, (x,ref)
+          assert x['status']=='ENERGY_WITH_DIRECT_RESIDUAL',x
+          assert x['direct_residual'] < 1.e-8,x
           assert d['u1_dimension']==166167000
           assert g['status']=='SKIPPED_RESOURCE_CAP'
           print('PASS: pinned XDiag C++17 API, small U1 energy parity and N1000 safety cap')
