@@ -10,6 +10,8 @@ module ham2vec
   ! Separate optional release of historical padded cache after CSR packing.
   ! Keeping the arrays available is the default public module behavior.
   logical, save :: csr_release_padded=.false.
+  ! Optional coefficient-certified upper bound on padded cache row width.
+  logical, save :: cache_coeff_bound=.false.
   integer, allocatable, save :: csr_rowptr(:),csr_target(:)
   complex(8), allocatable, save :: csr_coeff(:)
   !
@@ -102,16 +104,60 @@ contains
   end subroutine configure_csr_complex_cache
 
 
+  subroutine coefficient_certified_cache_width(width)
+    use iso_fortran_env, only: int64
+    use input_param, only: NO_one,NO_two,p_one,hvec,Jint
+    integer, intent(out) :: width
+    integer :: j,i1
+    integer(int64) :: upper
+    complex(8) :: c
+    ! Each physical one-site and two-site operator can contribute at most
+    ! ONE row term per applicable transition, irrespective of basis size.
+    ! Exactly repeat the coefficient tests in make_wk_loc_and_ele.
+    upper=1_int64 ! required diagonal record
+    do j=1,NO_one
+      i1=p_one(j)
+      c=0.5d0*(hvec(1,i1)+zi*hvec(2,i1))
+      if(abs(c)>eps) upper=upper+1_int64
+      c=0.5d0*(hvec(1,i1)-zi*hvec(2,i1))
+      if(abs(c)>eps) upper=upper+1_int64
+    end do
+    do j=1,NO_two
+      c=0.5d0*(zi*(Jint(4,j)+Jint(7,j))-Jint(5,j)+Jint(8,j))
+      if(abs(c)>eps) upper=upper+1_int64
+      c=0.25d0*(Jint(1,j)-Jint(2,j))+zi*0.5d0*Jint(9,j)
+      if(abs(c)>eps) upper=upper+1_int64
+      c=0.25d0*(Jint(1,j)+Jint(2,j))-zi*0.5d0*Jint(6,j)
+      if(abs(c)>eps) upper=upper+1_int64
+      c=0.5d0*(-zi*(Jint(4,j)-Jint(7,j))+Jint(5,j)+Jint(8,j))
+      if(abs(c)>eps) upper=upper+1_int64
+      c=0.25d0*(Jint(1,j)+Jint(2,j))+zi*0.5d0*Jint(6,j)
+      if(abs(c)>eps) upper=upper+1_int64
+      c=0.5d0*(-zi*(Jint(4,j)+Jint(7,j))-Jint(5,j)+Jint(8,j))
+      if(abs(c)>eps) upper=upper+1_int64
+      c=0.5d0*(zi*(Jint(4,j)-Jint(7,j))+Jint(5,j)+Jint(8,j))
+      if(abs(c)>eps) upper=upper+1_int64
+      c=0.25d0*(Jint(1,j)-Jint(2,j))-zi*0.5d0*Jint(9,j)
+      if(abs(c)>eps) upper=upper+1_int64
+    end do
+    if(upper>int(huge(width),int64)) &
+      error stop 'ED2_CACHE_COEFF_BOUND upper bound exceeds index range'
+    width=int(upper)
+  end subroutine coefficient_certified_cache_width
+
   subroutine make_wk_loc_and_ele(lv)
     use state_lists, only: j_flip_ni, representative_SQ, findstate, list_fly, a_down_spin, &
       c_down_spin, a2_down_spin, c2_down_spin
     use input_param, only: NODmax,NODmin,NO_one,NO_two,p_one,p_two,list_s,list_r,explist, &
       Jint,hvec,NOS,local_NODmax,local_spin,wk_dim,MNTE
+    use iso_fortran_env, only: int64
     implicit none
     integer, intent(in)::lv
     integer :: s, id, wk_dim1
     integer :: n0, n1, n2, i1, i2, dN
-    integer :: i, j, ell(6), jd, max_jd
+    integer :: i, j, ell(6), jd, max_jd,nominal_width,width_status
+    integer(int64) :: nominal_bytes,bounded_bytes,bytes_per_element
+    character(len=16) :: width_setting
     integer, allocatable :: ni(:), st_list(:)
     complex(8) :: c
     !
@@ -121,10 +167,35 @@ contains
       wk_dim = min(wk_dim,lv)
     end if
     !
+    width_setting=''
+    call get_environment_variable('ED2_CACHE_COEFF_BOUND',width_setting,status=width_status)
+    if(width_status==0)then
+      if(trim(adjustl(width_setting))/='0'.and.trim(adjustl(width_setting))/='1') &
+        error stop 'ED2_CACHE_COEFF_BOUND must be 0 or 1'
+    else if(width_status/=1)then
+      error stop 'ED2_CACHE_COEFF_BOUND flag too long or invalid'
+    end if
+    cache_coeff_bound=width_status==0.and.trim(adjustl(width_setting))=='1'
     if(MNTE < 0)then
       wk_dim1= 2*NO_one+8*NO_two+1
+      if(cache_coeff_bound)then
+        nominal_width=wk_dim1
+        call coefficient_certified_cache_width(wk_dim1)
+        if(wk_dim1<1.or.wk_dim1>nominal_width) &
+          error stop 'ED2_CACHE_COEFF_BOUND invalid row width'
+        bytes_per_element=int(storage_size(wk_dim1)/8,int64)+ &
+          int(storage_size(c)/8,int64)
+        nominal_bytes=bytes_per_element*int(nominal_width,int64)*int(wk_dim,int64)
+        bounded_bytes=bytes_per_element*int(wk_dim1,int64)*int(wk_dim,int64)
+        write(*,'(a,i0,a,i0,a,i0)') &
+          'Hamiltonian cache: coefficient-bound width=',wk_dim1, &
+          ', nominal_width=',nominal_width, &
+          ', initial_bytes_saved=',nominal_bytes-bounded_bytes
+      end if
     else
       wk_dim1= MNTE + 1
+      if(cache_coeff_bound) &
+        write(*,'(a)') 'Hamiltonian cache: explicit MNTE override preserved'
     end if
     !
     allocate(wk_loc(wk_dim1,wk_dim))
