@@ -34,6 +34,8 @@ presented as newly invented numerical algorithms.
   script using only Python standard library and the compiled ED2
   program; it checks the chirality/energy-response identity and
   reference values for N4/N6.
+- `check_current_main_native_dm.py`: matches the mainline four/six-site native DM table to the archived CI-produced source/binary-provenance JSON, with a deliberately corrupted value rejected.
+- `MAINLINE_NATIVE_DM_REPRODUCTION.md`: native current-main four/six-site energy, staggered DM chirality, finite-difference Hellmann--Feynman, source/binary checksums and **no direct residual sidecar** caveat.
 - `check_mainline_cache_claims.py`: checks documented generic
   mainline opt-ins and exactly recomputes the new cache-allocation
   table from the recorded spin-model dimensions/record count. It
