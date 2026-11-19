@@ -536,7 +536,9 @@ contains
     integer :: n0, n1, n2, i1, i2, dN
     complex(8) :: c
     
-    allocate(ni(NODmax),st_list(NODmax))
+    ! Scratch state transitions are needed only for uncached rows.
+    ! Fully cached H*x must not allocate these arrays per application.
+    if(wk_dim<lv)allocate(ni(NODmax),st_list(NODmax))
     dN = NODmax - NODmin
 
     if(csr_complex_cache)then
