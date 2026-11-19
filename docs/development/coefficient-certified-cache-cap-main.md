@@ -6,8 +6,8 @@ complex CSR conversion. Default behavior is unchanged.
 
 ## Purpose and exact mechanism
 
-When input \`MNTE < 0\`, the original ED2 \`make_wk_loc_and_ele\` allocates
-\`wk_loc\` and \`wk_ele\` as dense padded arrays with each row dimension
+When input `MNTE < 0`, the original ED2 `make_wk_loc_and_ele` allocates
+`wk_loc` and `wk_ele` as dense padded arrays with each row dimension
 
 \[
 w_{\mathrm{old}} = 1 + 2N_{\mathrm{one}} + 8N_{\mathrm{two}}.
@@ -22,11 +22,11 @@ Opt in with:
 
     ED2_CACHE_COEFF_BOUND=1 ./source/QS3ED2 < input.dat
 
-An input with \`MNTE < 0\` computes a new conservative row bound *before*
+An input with `MNTE < 0` computes a new conservative row bound *before*
 the padded arrays are allocated: one guaranteed diagonal record plus one
 possible row record for **each nonzero one-site (2 per field) and two-site
 (8 per exchange tensor) transition coefficient**. Every presence test uses
-the exact same complex coefficient formula and \`abs(c)>eps\` test as the
+the exact same complex coefficient formula and `abs(c)>eps` test as the
 physical row generation below, so no physically allowed transition can
 be omitted on account of the new upper bound. The actual matrix generation,
 operation order, phase, normalization, basis enumeration, and native H*x
@@ -37,13 +37,13 @@ projection machinery as well.
 **The upper bound need not be tight**. If all nine exchange tensor terms
 are present, all eight offdiagonal transition channels can occur and
 no reduction may be possible. The source detects an impossible bound
-before allocation and preserves historical \`MNTE too small\` checks for
+before allocation and preserves historical `MNTE too small` checks for
 each row. A 64-bit intermediate protects its coefficient count.
 
-Explicit user \`MNTE>=0\` is intentionally **not** overridden. A machine
+Explicit user `MNTE>=0` is intentionally **not** overridden. A machine
 marker states that the manual cap was retained. Malformed/oversized
-\`ED2_CACHE_COEFF_BOUND\` values reject rather than silently change
-semantics. Setting \`0\` or leaving the variable unset is identical to
+`ED2_CACHE_COEFF_BOUND` values reject rather than silently change
+semantics. Setting `0` or leaving the variable unset is identical to
 the historical allocation policy.
 
 ## Native memory accounting and scope
@@ -52,18 +52,18 @@ The source reports:
 
     Hamiltonian cache: coefficient-bound width=W, nominal_width=N, initial_bytes_saved=B
 
-The saving is based on the allocator payload of \`wk_loc\` and \`wk_ele\`,
-using the source's actual \`storage_size\` element sizes and complete
-\`wk_dim\` rows. It is an **initial padded matrix allocation saving**,
+The saving is based on the allocator payload of `wk_loc` and `wk_ele`,
+using the source's actual `storage_size` element sizes and complete
+`wk_dim` rows. It is an **initial padded matrix allocation saving**,
 which also reduces the memory that coexists with the newly constructed
-CSR arrays when \`ED2_CSR_COMPLEX_CACHE=1\`. It is *not a measured peak RSS*
+CSR arrays when `ED2_CSR_COMPLEX_CACHE=1`. It is *not a measured peak RSS*
 or virtual address space bound, and it does not eliminate the padded
 arrays entirely. The independently optional
-\`ED2_CSR_RELEASE_PADDED_CACHE=1\` can subsequently remove their
+`ED2_CSR_RELEASE_PADDED_CACHE=1` can subsequently remove their
 long-lived storage after packing, but cannot eliminate CSR construction
 overlap by itself.
 
-Local GNU Fortran 14.2 \`-O2\` example, N10 alternating S=1/2,S=1,
+Local GNU Fortran 14.2 `-O2` example, N10 alternating S=1/2,S=1,
 full non-U1 Hilbert space D=7776, OBC:
 
 | Model | Historical row width | Certified width | Initial cache bytes avoided |
@@ -82,7 +82,7 @@ RAM must be independently audited.
 
 ## Exact numerical evidence and compiler policies
 
-The checked-in \`tests/cpc_coeff_cache_bound_regression.py\`
+The checked-in `tests/cpc_coeff_cache_bound_regression.py`
 constructs genuine native ED2 mixed-spin alternating S1/2,S1
 Hamiltonians in **four distinct families**: real anisotropic XYZ,
 genuinely complex DM, U1 XXZ, and full exchange tensors with
@@ -94,24 +94,24 @@ IEEE-754 bits) for:
 - complex CSR retained with/without coefficient bound;
 - complex CSR plus padded release with/without coefficient bound;
 - small-system independent native full dense-H reference;
-- an explicit \`MNTE\` override and two malformed flag cases.
+- an explicit `MNTE` override and two malformed flag cases.
 
 A separate local GNU14.2 copy of main with this change has:
-- \`-O2 -fopenmp\`: **32/32 model/size/thread cases** passed
+- `-O2 -fopenmp`: **32/32 model/size/thread cases** passed
   all six modes with *identical full vector bit hashes*,
   N4/N6/N8/N10, T1/T4, all four physical families.
-- \`-Ofast -fopenmp\`: **32/32** passed strict bitwise equality
+- `-Ofast -fopenmp`: **32/32** passed strict bitwise equality
   between bounded/unbounded within each layout, and strict
   CSR retained versus released bit equality. The historical
   original padded versus CSR layout is compared only under
-  explicit \`1e-12*max(1,max(|H*x|))\` numeric tolerance because
+  explicit `1e-12*max(1,max(|H*x|))` numeric tolerance because
   this compiler option permits reassociation of complex products.
-- \`make check\` and historical CPU-feasible \`ex1\`–\`ex8\`:
-  PASS under \`-O2\`.
+- `make check` and historical CPU-feasible `ex1`–`ex8`:
+  PASS under `-O2`.
 
 GNU13/GNU14 CI independently checks the exact PR source with
-the same original/CSR/release, real/complex/tensor, \`-O2\` versus
-\`-Ofast\` numerical policies. No PRESTO node, hardware-exclusive
+the same original/CSR/release, real/complex/tensor, `-O2` versus
+`-Ofast` numerical policies. No PRESTO node, hardware-exclusive
 performance figure, CPC manuscript change or release tag is claimed.
 
 ## Long-term engineering option
