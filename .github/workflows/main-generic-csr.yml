@@ -1,17 +1,30 @@
-name: ED2 original-main generic complex CSR proof
+name: ED2 original-main complex CSR and typed BLAS/LAPACK proof
 
 on:
   push:
     branches:
       - codex/ed2-main-complex-csr
+      - codex/ed2-main-typed-blas-lapack
     paths:
       - "source/ham2vec.f90"
+      - "source/eigen_solver.f90"
+      - "source/lanczos.f90"
+      - "source/blas_lapack_interfaces.f90"
+      - "source/Makefile.am"
+      - "source/Makefile.in"
+      - "tests/cpc_blas_lapack_contract_driver.f90"
       - "tests/cpc_csr_*"
       - ".github/workflows/main-generic-csr.yml"
       - "docs/development/generic-complex-csr-main.md"
   pull_request:
     paths:
       - "source/ham2vec.f90"
+      - "source/eigen_solver.f90"
+      - "source/lanczos.f90"
+      - "source/blas_lapack_interfaces.f90"
+      - "source/Makefile.am"
+      - "source/Makefile.in"
+      - "tests/cpc_blas_lapack_contract_driver.f90"
       - "tests/cpc_csr_*"
       - ".github/workflows/main-generic-csr.yml"
       - "docs/development/generic-complex-csr-main.md"
@@ -38,14 +51,26 @@ jobs:
       - name: Build ORIGINAL ED2 main lineage without experimental cubic branches
         run: |
           autoreconf -vfi
-          # Existing original-main eigen_solver.f90 uses legacy implicit
-          # LAPACK calls that need this compatibility flag under GNU13/14.
-          # This is unrelated to the new CSR H*x code; an explicit-LAPACK
-          # interface modernization should be integrated independently.
+          # No -fallow-argument-mismatch: every BLAS/LAPACK call here
+          # is compiled through explicit, typed LP64 interfaces.
           ./configure FC=gfortran-${{ matrix.gnu }} \
-            FCFLAGS="-O2 -fopenmp -fallow-argument-mismatch"
+            FCFLAGS="-O2 -fopenmp"
           make -j2
           make check
+      - name: Native LP64 BLAS complex ABI and full ZHEEVR eigensolver proof
+        run: |
+          gfortran-${{ matrix.gnu }} -O2 -fopenmp -I source \
+            -o "$RUNNER_TEMP/cpc-blas-contract-driver" \
+            tests/cpc_blas_lapack_contract_driver.f90 \
+            source/blas_lapack_interfaces.o source/input_param.o \
+            source/state_lists.o source/ham2vec.o source/eigen_solver.o \
+            -llapack -lopenblas
+          mkdir -p "$RUNNER_TEMP/cpc-blas-contract"
+          ( cd "$RUNNER_TEMP/cpc-blas-contract" && \
+            OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1 \
+            "$RUNNER_TEMP/cpc-blas-contract-driver" | tee blas-contract.log )
+          grep -q BLAS_LAPACK_TYPED_INTERFACE_REGRESSION_PASS \
+            "$RUNNER_TEMP/cpc-blas-contract/blas-contract.log"
       - name: Compile independent native full-H vector bit-pattern driver
         run: |
           gfortran-${{ matrix.gnu }} -O2 -fopenmp -I source \
@@ -75,6 +100,7 @@ jobs:
           name: main-generic-complex-csr-gnu${{ matrix.gnu }}
           path: |
             ${{ runner.temp }}/csr-main-proof/summary.json
+            ${{ runner.temp }}/cpc-blas-contract/blas-contract.log
             ${{ runner.temp }}/csr-main-proof/*/stdout.log
             ${{ runner.temp }}/csr-main-proof/*/csr_matvec_bits.txt
             tests/*.long.log
