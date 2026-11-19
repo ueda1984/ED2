@@ -33,6 +33,8 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("--shape", required=True)
     p.add_argument("--ndown", required=True, type=int, choices=[2, 3])
+    p.add_argument("--model", choices=["heisenberg-nn", "cubic-j1j2-xxz"],
+                   default="heisenberg-nn")
     p.add_argument("--sector", choices=["u1", "gamma"], default="u1")
     p.add_argument("--mode", choices=["dimensions", "basis", "solve"],
                    default="dimensions")
@@ -45,12 +47,21 @@ def main():
     args = p.parse_args()
     shape = parse_shape(args.shape)
     meta = case_metadata(shape, args.ndown)
+    if args.model == "cubic-j1j2-xxz":
+        if len(shape) != 3 or len(set(shape)) != 1:
+            p.error("cubic-j1j2-xxz requires L,L,L shape")
+        from export_cubic_xxz import metadata as xxz_metadata
+        special = xxz_metadata(shape[0], args.ndown)
+        meta.update(model=special["model"], physical_sha256=special["physical_sha256"],
+                    bonds=special["bond_count"], all_up_energy=special["all_up_energy"],
+                    source=special["source"])
     expected = meta["dimension_u1"]
     if args.sector == "gamma":
         from symmetry_dimensions import count_blocks
         expected = count_blocks(shape)["m%d" % args.ndown]["gamma_translation"]
     out = dict(meta, implementation="QuSpin/spin_basis_general",
                sector=args.sector, mode=args.mode, expected_dimension=expected,
+               model_choice=args.model,
                threads_omp=os.environ.get("OMP_NUM_THREADS", "unset"))
     if args.mode == "dimensions":
         print(json.dumps(dict(out, status="DIMENSIONS_ONLY"), sort_keys=True))
@@ -96,18 +107,23 @@ def main():
 
     # Explicit second resource guard for CSR storage. No implied matrix-free
     # result if this is skipped.
-    max_nnz_bound = expected * (1 + 2*args.ndown*len(shape))
+    coordination = 18 if args.model == "cubic-j1j2-xxz" else 2*len(shape)
+    max_nnz_bound = expected * (1 + args.ndown*coordination)
     if max_nnz_bound > args.max_csr_nnz:
         print(json.dumps(dict(out, status="SKIPPED_CSR_SAFETY_CAP",
                               max_nnz_bound=max_nnz_bound,
                               max_csr_nnz=args.max_csr_nnz,
                               basis_seconds=tbasis-t0), sort_keys=True))
         return
-    bonds = bonds_for_shape(shape)
+    if args.model == "cubic-j1j2-xxz":
+        from export_cubic_xxz import cubic_xxz_bonds
+        bonds = cubic_xxz_bonds(shape[0])
+    else:
+        bonds = [(i, j, 1.0, 1.0) for i, j in bonds_for_shape(shape)]
     static = [
-        ["zz", [[1.0, i, j] for i, j in bonds]],
-        ["+-", [[0.5, i, j] for i, j in bonds]],
-        ["-+", [[0.5, i, j] for i, j in bonds]],
+        ["zz", [[jzz, i, j] for i, j, jxy, jzz in bonds]],
+        ["+-", [[jxy/2.0, i, j] for i, j, jxy, jzz in bonds]],
+        ["-+", [[jxy/2.0, i, j] for i, j, jxy, jzz in bonds]],
     ]
     H = hamiltonian(static, [], basis=basis, dtype=np.float64,
                     check_herm=False, check_pcon=False, check_symm=False)
