@@ -128,7 +128,7 @@ jobs:
             echo "ERROR invalid generic chain accepted opt-in local cubic cache" >&2
             exit 1
           fi
-          grep -Eq 'Local cubic cache requires validated ED2_CUBIC_ANCHORED_REP|Auto cubic MNTE requires fixed three-magnon U\\(1\\) sector|Auto cubic MNTE requires full 9\\*N cubic bonds and basis' "$RUNNER_TEMP/general-reject.log"
+          grep -qF 'Auto cubic MNTE requires fixed three-magnon U(1) sector' "$RUNNER_TEMP/general-reject.log"
       - name: Make CPiP local-source evidence ready, not a performance claim
         run: |
           test -s "$RUNNER_TEMP/auto-mnte-science/summary.json"
