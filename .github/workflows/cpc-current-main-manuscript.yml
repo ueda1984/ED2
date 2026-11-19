@@ -14,6 +14,10 @@ on:
       - ".github/workflows/cpc-current-main-manuscript.yml"
   workflow_dispatch:
 
+concurrency:
+  group: cpc-ed2-paper-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
