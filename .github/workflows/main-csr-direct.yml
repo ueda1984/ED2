@@ -6,11 +6,13 @@ on:
     paths:
       - "source/ham2vec.f90"
       - "tests/cpc_csr_direct_build_regression.py"
+      - "tests/cpc_csr_direct_legacy_crossbuild.py"
       - ".github/workflows/main-csr-direct.yml"
   pull_request:
     paths:
       - "source/ham2vec.f90"
       - "tests/cpc_csr_direct_build_regression.py"
+      - "tests/cpc_csr_direct_legacy_crossbuild.py"
       - ".github/workflows/main-csr-direct.yml"
   workflow_dispatch:
 
@@ -18,7 +20,7 @@ jobs:
   native-direct-csr:
     name: Physical direct CSR exact H*x and memory (GNU${{ matrix.gnu }})
     runs-on: ubuntu-24.04
-    timeout-minutes: 35
+    timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
@@ -44,6 +46,31 @@ jobs:
             tests/cpc_csr_matvec_driver.f90 \
             source/input_param.o source/state_lists.o source/ham2vec.o \
             -llapack -lopenblas
+      - name: Checkout exact parent main before Hamiltonian row refactor
+        uses: actions/checkout@v4
+        with:
+          repository: ueda1984/ED2
+          ref: 3ab1e0cb9cc68cfeb91fcebcc6d10420c3236ab2
+          path: reference-main
+          persist-credentials: false
+      - name: Independently build original ED2 main native H-vector oracle
+        working-directory: reference-main
+        run: |
+          autoreconf -vfi
+          ./configure FC=gfortran-${{ matrix.gnu }} FCFLAGS="-O2 -fopenmp"
+          make -j2
+          gfortran-${{ matrix.gnu }} -O2 -fopenmp -I source \
+            -o "$RUNNER_TEMP/cpc-old-main-driver" \
+            tests/cpc_csr_matvec_driver.f90 \
+            source/input_param.o source/state_lists.o source/ham2vec.o \
+            -llapack -lopenblas
+      - name: Require exact previous-main H-vector bit patterns under O2
+        run: |
+          python3 -B tests/cpc_csr_direct_legacy_crossbuild.py \
+            --reference-driver "$RUNNER_TEMP/cpc-old-main-driver" \
+            --candidate-driver "$RUNNER_TEMP/cpc-direct-csr-driver" \
+            --output "$RUNNER_TEMP/direct-crossbuild-o2" \
+            --sizes 4,6,8,10 --threads 1,4 --timeout 180
       - name: Prove direct two-pass CSR and original complex H*x exact IEEE bits
         run: |
           python3 -B tests/cpc_csr_direct_build_regression.py \
