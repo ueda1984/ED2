@@ -1,127 +1,134 @@
-# ED2 first CPC program-paper source (provisional)
+# ED2 — first CPC Computer Programs in Physics manuscript
 
-This directory contains a **journal-formatted, author-review LaTeX draft**, not
-an accepted, submitted or finalized article.
+**Working author-review manuscript. Not submitted, accepted, tagged or archived.**
 
-- [Main manuscript](cpc_ed2_main.tex) uses Elsevier's `elsarticle` class.
-- [Paper compilation CI](https://github.com/ueda1984/ED2/actions/workflows/cpc-manuscript-latex.yml)
-  first verifies **25 DM/chirality points, 25 first-gap points, five
-  susceptibility plot values and five rounded susceptibility table entries**
-  against the committed independent stationary-reference CSV via
-  `paper/check_dm_figure.py`. It then compiles the PDF twice,
-  checks it with `pdfinfo`/`pdftotext`, and archives a proof artifact
-  for visual review. The workflow does not publish the PDF.
-- The [compact manuscript working draft](../docs/development/cpc-submission-core-draft.md)
-  contains the longer scientific argument and release TODOs.
-- The [detailed technical draft](../docs/development/cpc-manuscript-draft.md)
-  retains near-degenerate and engineering failure analyses that may be
-  moved to supplementary material.
-- The [published-QS³ to ED2 source and feature audit](../docs/development/cpc-qs3-ed-to-ed2-scope-matrix.md)
-  establishes what is new **relative to the published 2022 QS³ program**.
+This directory is a **paper-only port** of the earlier publication
+draft (historical Draft PR #20), rebased conceptually on the
+general-purpose `ueda1984/ED2` mainline as of 19 November 2026.
+It does not import the large experimental cubic-kernel branch stack.
 
-## Reproduce locally
+The intended article category is *Computer Programs in Physics*
+(CPiP) of [Computer Physics Communications](
+https://shop.elsevier.com/journals/computer-physics-communications/0010-4655).
+The proposed novelty is **ED2's validated generalization** of the
+previously published QS³ (CPC 277, 108369, 2022) to mixed local
+spin magnitudes, general real/complex anisotropic spin interactions,
+nonconserved (S^z), configurable compatible symmetries and complete
+Cartesian static observables. Standard Lanczos or CSR are **not**
+presented as newly invented numerical algorithms.
 
-On a system with TeX Live, including `elsarticle`, `amsmath`, `bm`,
-`hyperref` and `booktabs`:
+## Manuscript files and proof
 
-```sh
-mkdir -p paper/build
-pdflatex -interaction=nonstopmode -halt-on-error -output-directory=paper/build paper/cpc_ed2_main.tex
-pdflatex -interaction=nonstopmode -halt-on-error -output-directory=paper/build paper/cpc_ed2_main.tex
+- `cpc_ed2_main.tex`: complete Elsevier `elsarticle` review draft,
+  with Program Summary and a clearly provisional author list.
+- `data/cpc-stationary-dm-reference.csv`: archived independent
+  scientific reference for 25 chirality/gap points, five susceptibility
+  points and rounded table cells; this is previous scientific
+  evidence and must be revalidated on the final source revision.
+- `check_dm_figure.py`: checks every plotted/tabled physics value,
+  including deliberate corruption self-tests.
+- `audit_reference_small_systems.py`: independent NumPy/SciPy
+  Hamiltonian and response reconstruction at N4, N6, N8
+  (not an ED2 operator implementation).
+- `tools/cpc_portable_dm_quickstart.py`: end-user reproduction
+  script using only Python standard library and the compiled ED2
+  program; it checks the chirality/energy-response identity and
+  reference values for N4/N6.
+- `check_mainline_cache_claims.py`: checks documented generic
+  mainline opt-ins and exactly recomputes the new cache-allocation
+  table from the recorded spin-model dimensions/record count. It
+  **does not** claim independent physical generation of Nrec=191808.
+- `data/pr17_presto_coordinate_cache_pilot.csv` and
+  `check_pr17_presto_table.py`: **unmerged experimental branch**
+  provenance. Its source was pinned to PR17, **not** the current
+  mainline. This table now appears only in the manuscript appendix,
+  not as a program-wide speedup or a feature of the official release.
+- `CPC_SUBMISSION_GATES.md`: authoritative list of remaining
+  decisions before journal submission.
+- `CPC_PROGRAM_PACKAGE_PLAN.md`: intended CPiP source archive and
+  example distribution, pending approval.
+- `CPC_COVER_LETTER_DRAFT.md`: editorial proposal for coauthor review.
+
+## Local editorial checks
+
+From the repository root:
+
+```bash
+python3 -S paper/check_dm_figure.py --self-test
+python3 -S paper/check_pr17_presto_table.py
+python3 -S paper/check_mainline_cache_claims.py --self-test
+python3 -S paper/audit_cpc_submission.py --output paper-readiness.json
 ```
 
-The compiled PDF is a draft proof. All numerical values have independent
-source-linked evidence; the PDF is not a substitute for the tested code
-archive or the data files.
+The independent numerical physics reference additionally requires
+NumPy and SciPy:
 
-## Author-review checkpoint
+```bash
+python3 paper/audit_reference_small_systems.py \
+  --csv paper/data/cpc-stationary-dm-reference.csv
+```
 
-The [multi-angle 82/100 internal draft assessment](../docs/development/cpc-author-review-20261116.md)
-identifies the scientific evidence, novelty reservations and remaining
-release/benchmark blockers. **82/100 means ready for author review,
-not CPC submission readiness or likely acceptance.**
+The portable end-user demo, after a clean ED2 build, is:
 
-A separate [small-system physics reference audit](audit_reference_small_systems.py)
-reconstructs 15 L=4,6,8 parameter points without calling ED2, and checks
-three Hellmann--Feynman/susceptibility identities. See the
-[independent physics CI workflow](https://github.com/ueda1984/ED2/actions/workflows/cpc-independent-physics-audit.yml).
-This is separate from the paper's coordinate integrity checker and the
-earlier full L=4--12 numerical comparisons.
+```bash
+python3 -S paper/tools/cpc_portable_dm_quickstart.py \
+  --exe "$(pwd)/source/QS3ED2" --size 4 --omp 1 \
+  --output "$(pwd)/paper-dm-example-l4"
+```
 
-## Large-site near-saturation continuity
+Use a **new** output directory. Tests check physical response and
+sign conventions; if the historical TRLan solver fails to converge
+on a particular compiler/start, do not lower accuracy requirements
+to force a pass. Report the issue and pin the source/compiler/seed.
 
-The [source-pinned large-site comparison](../docs/development/cpc-large-few-magnon.md)
-now verifies the scientific continuity of old QS³/ED and generalized ED2
-on seven momentum sectors and two further large few-magnon stress
-cases: **216 sites / 3 magnons / dimension 7,677** and
-**1000 sites / 2 magnons / dimension 503**. QuSpin 1.0.1 independently
-reproduces both models; the 1000-site two-magnon energy is further
-checked with an independent relative-displacement Hamiltonian.
-The new [1000-site three-magnon Gamma/O_h native PR17 comparison](data/README.md)
-has four independently counted 1D symmetry sectors and **48/48**
-identical-input, identical-H-application numerical checks across
-PR17 coordinate-cache OFF/ON modes. The maximum directly evaluated
-Ritz residual is 9.71161e-9. This is a *large native numerical
-consistency test*, not an independent reference spectrum for all four
-sectors. The [12-row exploratory PRESTO medians](data/pr17_presto_coordinate_cache_pilot.csv)
-are checked against the [T8 manuscript table](cpc_ed2_main.tex)
-by `paper/check_pr17_presto_table.py`. Operator exclusivity
-confirmation remains outstanding; do not treat the ratios as
-CPC-ready speedup data.
+Compile and inspect the manuscript with a complete LaTeX installation:
 
-## Few-magnon cache performance pilot
+```bash
+mkdir -p paper/build
+pdflatex -interaction=nonstopmode -halt-on-error \
+  -output-directory=paper/build paper/cpc_ed2_main.tex
+pdflatex -interaction=nonstopmode -halt-on-error \
+  -output-directory=paper/build paper/cpc_ed2_main.tex
+```
 
-The [cache performance protocol and first validated pilot](../docs/development/cpc-few-magnon-cache-benchmark.md)
-compare none/half/full model-specific tight-row caching at 216
-sites (three magnons) and 1000 sites (two magnons).
-All six numerical cases passed residual, independent-energy,
-identical initial-vector and H-application checks. On a
-shared CI runner, *single* observed no/full end-to-end time
-ratios were 110.6 and 8.5 respectively; these are **exploratory**
-and not authorizable publication-level speedup estimates.
-The paper includes a fully labelled pilot table. A dedicated-node
-repeated experiment remains outstanding.
+The paper CI records source/PDF hashes and preserves a preview.
+A successful build proves only typesetting integrity and automated
+numerical transcription, **not** publication readiness.
 
-## Scientific evidence matrix
+## Current mainline cache options in the paper
 
-| Manuscript part | Regeneration / verification evidence |
-| --- | --- |
-| Published QS³ fixed-down-spin XXZ continuity | [32-level three-sector CSV](../docs/development/cpc-qs3-ed-ed2-32level-extended-ci.csv) |
-| Published QS³ momentum continuity | [15-level six-sector CSV](../docs/development/cpc-qs3-ed-ed2-momentum-15level-ci.csv) |
-| Conventional-Lanczos continuity, 12/18/24 sites | [Both original executable runs and independent eigenenergy checks](../docs/development/cpc-original-qs3-ed2-iterative-continuity.md) |
-| Bounded-occupation formula | [Full/bounded mixed-spin basis tests, 72 levels](../docs/development/cpc-qs3-ed-to-ed2-basis-generalization.md) |
-| Non-U(1) alternating-spin staggered DM response | [Physical model and 60-case verification](../docs/development/cpc-stationary-dm-application.md) |
-| Literature spin-convention check | [Independent finite-size XYZ-DM verification](../docs/development/cpc-literature-matched-benchmark.md) |
-| Cache capacity and resource caveats | [Cache allocation derivation](../docs/development/cpc-cache-pareto-evaluation.md) |
-| Controlled performance measurements (not yet complete) | [Dedicated-node gated protocol](../docs/development/cpc-controlled-node-protocol.md) |
+General source code supports `ED2_CACHE_COEFF_BOUND=1`,
+`ED2_CSR_COMPLEX_CACHE=1`,
+`ED2_CSR_RELEASE_PADDED_CACHE=1`, and
+`ED2_CSR_DIRECT_BUILD=1`. All are default OFF.
+The new CPC table documents **cache-array payload**, not
+measured peak RSS or a portable timing speedup. Full/partial
+cache eligibility and the more exact user instructions are in
+`docs/user-guide/performance-and-memory.md`.
 
-## Publication gate tracking
+The special N1000 cubic (\Gamma/O_h) coordinate-cache pilot was
+an audited numerical comparison between two PRESTO allocations,
+but hardware-exclusivity confirmation remains unavailable.
+It cannot be used to claim that the final mainline release
+achieves the same timing ratios.
 
-The [eight-gate CPC CPiP submission plan](CPC_SUBMISSION_GATES.md)
-separates scientific verification, controlled performance claims,
-source distribution, author/CRediT approval, version and licence,
-Program Library/Mendeley archiving, final manuscript QA and editorial
-submission. Run `python3 -S paper/audit_cpc_submission.py` for a
-conservative automated snapshot of identifiable blockers. No script
-issues DOI, tags a repository or submits a manuscript.
+## Outstanding external decisions
 
-## Pre-submission blockers
+The complete author list/order/affiliations and CRediT, official
+QS-Cube maintainer approval, a frozen program source/tag,
+author-approved release metadata, exact publication category,
+CPC Program Library/Mendeley Data accession and DOI, and final
+editorial declarations are **not yet resolved**. The repository
+currently has a metadata discrepancy (`configure.ac` **1.0.0**
+versus `CITATION.cff` **0.1.0** with a date that is not independently
+verified). The manuscript intentionally does not conceal it.
 
-The authorized authors and order, affiliation, official code release/tag,
-program archive DOI, CPC Program Library accession and final manuscript
-category are **not confirmed**. The original QS³ code contains a
-dynamical-structure-factor route which has not been shown to be
-natively reproduced by the current ED2 executable. Do not describe
-ED2 as automatically backward-compatible or the whole output feature
-set as a superset.
+The [published Read the Docs site](
+https://ed2.readthedocs.io/en/latest/) follows
+`QS-Cube/ED2`, not automatically the newer
+`ueda1984/ED2` development fork. Even merged fork
+documentation requires an upstream-authorized merge and a
+fresh Read the Docs build to reach users.
 
-Three `pgfplots` scientific figures (plus a TikZ program-flow schematic) now show the DM-response curves,
-finite-size excitation gaps and D=0 chiral susceptibilities. Their 55
-plotted ordinates and five rounded table values must pass the independent
-CSV transcription gate in CI, including four corruption-rejection probes.
-These checks cannot prove correctness of the independent reference itself;
-the physical reference has its own separate solver-validation workflows.
-Final main-text versus supplementary figure placement needs author review. The present resource
-numbers are **not** a controlled-node performance study.
-Scientific results and references require final author review before
-external submission.
+**Do not publish, deposit, tag, assign a DOI, or claim final
+authorship from this draft.**
