@@ -30,9 +30,14 @@ archive and its hash must be preserved before CPC submission.
 
 For every row the source table provides the median native phase timing,
 median maximum RSS and the maximum (over measured repeats) direct
-Ritz residual. The per-trial median absolute deviations (MAD), energies,
-Hamiltonian application counts and independent node allocation evidence
-were **not** in the copied table; do not synthesize them.
+Ritz residual. The per-trial energy series and independent node allocation evidence
+were **not** included in the pasted material; do not synthesize them.
+A subsequent user-reported **audit aggregate** supplies total-time
+MAD and the single distinct Hamiltonian-application count per case.
+These are now frozen alongside medians in
+[`data/presto-24608-cubic-size-sector-aggregates-with-mad-hcalls.csv`](data/presto-24608-cubic-size-sector-aggregates-with-mad-hcalls.csv).
+These per-case summary statistics are not a substitute for archived
+individual trials.
 
 ## Outcome: size, symmetry and OpenMP
 
@@ -85,9 +90,55 @@ CSV in a separate user-transfer ZIP:
 3. 1-to-16 median-total speedup by sector vs N;
 4. process RSS vs N by sector and thread count.
 
-The ZIP contains PNG (300 dpi), SVG, Python plotting source, source CSV,
-and derived-statistics JSON. These figures have **no error bars** until
-the original per-trial data provide MAD or other variability estimates.
+The earlier ZIP contains PNG (300 dpi), SVG, Python plotting source,
+source CSV and derived-statistics JSON. An updated package is available
+that plots total-phase **median ± MAD** and additionally normalizes
+Lanczos elapsed time by unique H-application counts.
+MAD is a descriptive median absolute deviation from seven measured
+repeats, **NOT** a 68%/95% confidence interval or standard error.
+Speedup-ratio MAD envelopes are descriptive bounds from separate
+input medians, not propagated statistical intervals.
+The original trial-level time series remains necessary for
+bootstrap/paired-inference uncertainty and independent attestation.
+
+### 2026-11-19 completion: total MAD and Hamiltonian-work counts
+
+All 32 missing cells are now supplied as audit-aggregate outputs.
+Exact data: `data/presto-24608-cubic-size-sector-aggregates-with-mad-hcalls.csv`.
+Total-time *relative MAD* range by system size:
+
+| N | Minimum relative MAD | Maximum relative MAD |
+|---:|---:|---:|
+| 64 | 2.073% | 7.379% |
+| 216 | 0.974% | 3.281% |
+| 512 | 0.308% | 1.292% |
+| 1000 | 0.214% | 1.177% |
+
+The sole distinct `h_applications` output for each case is a
+single integer, implying no observed within-case variation in this
+audited summary. Between T=1 and T=16, four cases change solver
+H-action count:
+
+| N | Irrep | H actions T1 | H actions T16 |
+|---:|---|---:|---:|
+| 216 | A1g | 90 | 100 |
+| 512 | A2g | 110 | 120 |
+| 1000 | A1g | 170 | 160 |
+| 1000 | A2u | 190 | 200 |
+
+This means comparing Lanczos phase time alone partly confounds
+the parallelism with the iteration/termination work. For a secondary
+metric, compute `lanczos_s/h_applications` but explicitly label it
+**solver-inclusive Lanczos time per H application**, *not* isolated
+matvec timing; it also includes Krylov orthogonalization and
+convergence logic. Avoid interpreting H-action counts as identical
+across different O_h blocks.
+
+The 1000-site A1g total time was 0.219021 ± 0.001131 s (T1),
+0.124789 ± 0.000708 s (T16); these are median ± MAD, not
+confidence intervals. The median speedup is 1.755x. The small
+N64 performance differences are closer to their per-case variability,
+so do not assert statistical significance from the MAD alone.
 
 ### Priority follow-up
 
