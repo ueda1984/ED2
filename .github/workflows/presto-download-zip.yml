@@ -1,0 +1,85 @@
+name: Build downloadable verified ED2 PRESTO ZIP
+
+on:
+  push:
+    branches:
+      - codex/ed2-presto-cross-library-latest-main-20261119
+    paths:
+      - "tools/presto_cross_library/**"
+      - ".github/workflows/presto-download-zip.yml"
+  pull_request:
+    paths:
+      - "tools/presto_cross_library/**"
+      - ".github/workflows/presto-download-zip.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: presto-download-zip-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  package-source-snapshots:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 18
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Validate packager and Japanese deployment instructions
+        run: |
+          bash -n tools/presto_cross_library/make_delivery_zip.sh
+          bash -n tools/presto_cross_library/stage_latest.sh
+          test -s tools/presto_cross_library/ZIP_DEPLOY_JP.md
+          command -v zip
+          command -v unzip
+      - name: Fetch actual current remote main and assemble standalone PRESTO ZIP
+        run: |
+          bash tools/presto_cross_library/make_delivery_zip.sh "$GITHUB_WORKSPACE" \
+            "$RUNNER_TEMP/ED2_PRESTO_LATEST_MAIN_AND_CUBIC_20261119.zip" \
+            > "$RUNNER_TEMP/delivery-build.log"
+          unzip -tq "$RUNNER_TEMP/ED2_PRESTO_LATEST_MAIN_AND_CUBIC_20261119.zip"
+          sha256sum "$RUNNER_TEMP/ED2_PRESTO_LATEST_MAIN_AND_CUBIC_20261119.zip" \
+            > "$RUNNER_TEMP/delivery-ZIP.sha256"
+      - name: Assert delivery contains all separate source archives and no false main claim
+        run: |
+          python3 - <<'PY'
+          import json,os,zipfile,pathlib
+          z=pathlib.Path(os.environ["RUNNER_TEMP"])/"ED2_PRESTO_LATEST_MAIN_AND_CUBIC_20261119.zip"
+          with zipfile.ZipFile(z) as f:
+              names=f.namelist()
+              prefix="ED2_PRESTO_DELIVERY_20261119/"
+              required=["README_PRESTO_JP.md","DELIVERY_MANIFEST.json","DELIVERY_SHA256SUMS",
+                        "latest_main_stage/ed2-main.tar.gz",
+                        "latest_main_stage/benchmark-tools.tar.gz",
+                        "latest_main_stage/launch-tools.tar.gz",
+                        "latest_main_stage/launch.pbs",
+                        "latest_main_stage/preflight.py",
+                        "experimental_cubic_PR21/ed2-source.tar.gz",
+                        "experimental_cubic_PR21/presto_cubic_exclusive.pbs",
+                        "experimental_cubic_PR21/source-commit.txt"]
+              for item in required:
+                  assert prefix+item in names,item
+              m=json.loads(f.read(prefix+"DELIVERY_MANIFEST.json"))
+              assert m["experimental_branch_is_NOT_main"] is True
+              assert m["pinned_commits"]["experimental_cubic_pr21"] != m["pinned_commits"]["main"]
+              assert len(m["pinned_commits"]) == 4
+              assert all(len(x)==40 for x in m["pinned_commits"].values())
+              assert m["publication_ready"] is False
+              print("PASS: standalone PRESTO delivery verified, size",z.stat().st_size,
+                    "commits",m["pinned_commits"])
+          PY
+      - name: Upload self-contained delivery ZIP and independently verified hash
+        uses: actions/upload-artifact@v4
+        with:
+          name: ed2-presto-latest-main-transfer-zip
+          path: |
+            ${{ runner.temp }}/ED2_PRESTO_LATEST_MAIN_AND_CUBIC_20261119.zip
+            ${{ runner.temp }}/delivery-ZIP.sha256
+            ${{ runner.temp }}/delivery-build.log
+          retention-days: 30
+          if-no-files-found: error
+      - name: No scheduler submission occurs here
+        run: echo "Only a source-code delivery ZIP was built; no PRESTO jobs were run."
