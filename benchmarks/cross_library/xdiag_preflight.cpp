@@ -6,9 +6,11 @@
 #include <algorithm>
 #include <chrono>
 #include <cstdint>
+#include <cmath>
 #include <limits>
 #include <fstream>
 #include <iostream>
+#include <sstream>
 #include <set>
 #include <stdexcept>
 #include <string>
@@ -40,8 +42,8 @@ static uint64_t choose_small(int64_t n, int64_t k) {
   return res;
 }
 int main(int argc, char **argv) try {
-  if (argc != 6) {
-    std::cerr << "Usage: xdiag_preflight N m {dimension|basis|solve} max_u1_dim bonds_file\n";
+  if (argc != 6 && argc != 7) {
+    std::cerr << "Usage: xdiag_preflight N m {dimension|basis|solve} max_u1_dim bonds_file [heisenberg-nn|cubic-j1j2-xxz]\\n";
     return 2;
   }
   int64_t n = std::stoll(argv[1]);
@@ -49,6 +51,9 @@ int main(int argc, char **argv) try {
   std::string mode = argv[3];
   uint64_t cap = std::stoull(argv[4]);
   std::string filename = argv[5];
+  std::string model = (argc == 7 ? argv[6] : "heisenberg-nn");
+  if (model != "heisenberg-nn" && model != "cubic-j1j2-xxz")
+    throw std::invalid_argument("unknown physical model");
   if (n <= 2 || n > 4096 || m < 0 || m > 3 || m > n || cap == 0 ||
       (mode != "dimension" && mode != "basis" && mode != "solve")) {
     throw std::invalid_argument("unsupported N/m/mode/cap");
@@ -84,23 +89,43 @@ int main(int argc, char **argv) try {
   // Single source of physical bonds: canonical export_case.py bond file.
   std::ifstream in(filename);
   if (!in) throw std::runtime_error("cannot open bond file");
-  std::set<std::pair<int64_t,int64_t>> bonds;
-  int64_t i, j;
-  while (in >> i >> j) {
-    if (i < 0 || j >= n || i >= j) {
-      throw std::runtime_error("invalid bond or order");
+  struct Bond { int64_t a, b; double jxy, jzz; };
+  std::vector<Bond> bonds;
+  std::set<std::pair<int64_t,int64_t>> pairs;
+  std::string line;
+  while (std::getline(in, line)) {
+    if (line.empty() || line[0] == '#') continue;
+    std::istringstream row(line);
+    int64_t i, j;
+    double jxy=1.0,jzz=1.0;
+    if (!(row >> i >> j)) throw std::runtime_error("malformed bond endpoints");
+    if (model == "cubic-j1j2-xxz") {
+      if (!(row >> jxy >> jzz))
+        throw std::runtime_error("missing Jxy/Jzz on XXZ bond");
     }
-    if (!bonds.emplace(i,j).second) {
-      throw std::runtime_error("duplicate bond");
-    }
+    std::string excess;
+    if (row >> excess) throw std::runtime_error("extra bond columns");
+    if (i < 0 || j >= n || i >= j || !std::isfinite(jxy) || !std::isfinite(jzz))
+      throw std::runtime_error("invalid bond endpoints/coefficients");
+    if (!pairs.emplace(i,j).second) throw std::runtime_error("duplicate bond");
+    bonds.push_back({i,j,jxy,jzz});
   }
-  if (!in.eof()) throw std::runtime_error("malformed bond file");
   if (bonds.empty()) throw std::runtime_error("no bonds");
   OpSum ops;
-  for (auto [a, b] : bonds) ops += "J" * Op("SdotS", {a, b});
-  ops["J"] = 1.0;
+  for (auto const &b : bonds) {
+    if (model == "cubic-j1j2-xxz") {
+      // Exchange = (S+_i S-_j + S-_i S+_j)/2 (XDiag convention).
+      // SzSz = Sz_i Sz_j. Identical spin-operator normalization to QuSpin
+      // with pauli=0; PR16 ED2 uses Jx=Jy=Jxy and Jz=Jzz.
+      ops += b.jxy * Op("Exchange", {b.a, b.b});
+      ops += b.jzz * Op("SzSz", {b.a, b.b});
+    } else {
+      ops += "J" * Op("SdotS", {b.a, b.b});
+    }
+  }
+  if (model == "heisenberg-nn") ops["J"] = 1.0;
   auto tsetup = SteadyClock::now();
-  double e0 = eigval0(ops, block); // API verified against XDiag example.
+  double e0 = eigval0(ops, block); // API examples: SdotS, Exchange, SzSz.
   auto tsolve = SteadyClock::now();
   std::cout << "{\"status\":\"ENERGY_ONLY_RESIDUAL_UNCHECKED\",\"N\":" << n
             << ",\"m\":" << m << ",\"dimension\":" << block.size()
