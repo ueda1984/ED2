@@ -1,4 +1,6 @@
 module lanczos
+  use blas_lapack_interfaces, only: dlamch, dznrm2, zdotc, dstevx, &
+    zdscal, zcopy, zaxpy
   use ham2vec
   implicit none
   integer :: ite_lancz, maxitr, dim, minitr, itrint
@@ -16,7 +18,6 @@ contains
     integer, intent(in) :: THS
     complex(8), allocatable, intent(out) :: psi(:,:)
     complex(8), allocatable :: xpsi(:,:)
-    complex(8) :: zdotc
     real(8) :: alpha(2)
     dim = THS
     allocate(ene(2))
@@ -53,10 +54,9 @@ contains
     complex(8), allocatable :: psi(:,:)
     real(8), allocatable :: alpha(:), beta(:), z(:,:)
     integer :: i, m, info, ell, il = 1, iu = 1, mitr
-    real(8) :: tmp(2), dznrm2, abstol, dlamch, conv, vl = 0.0d0, vu = 0.0d0
+    real(8) :: tmp(2), abstol, conv, vl = 0.0d0, vu = 0.0d0
     integer, allocatable :: iwork(:), ifail(:)
     real(8), allocatable :: work(:), w(:), d(:), e(:)
-    complex(8) :: zdotc
     abstol = 2.0d0*dlamch('S')
     allocate( psi(dim,3), alpha(maxitr), beta(0:maxitr) )
     !$omp parallel do private(i,tmp)
