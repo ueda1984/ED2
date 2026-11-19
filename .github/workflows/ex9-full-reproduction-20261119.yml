@@ -1,0 +1,83 @@
+name: Independent full ex9 reproduction (1000 sites; controlled run)
+on:
+  push:
+    branches:
+      - audit/ex9-full-reproduction-20261119
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-bundle:
+    name: Export exact source snapshot for independent local build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Archive the exact source tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          git rev-parse HEAD > "$RUNNER_TEMP/source-commit.txt"
+          git status --short > "$RUNNER_TEMP/source-status.txt"
+          tar -czf "$RUNNER_TEMP/ed2-source.tgz" --exclude=.git .
+          ls -lh "$RUNNER_TEMP/ed2-source.tgz"
+      - name: Preserve portable source snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: ex9-source-commit-snapshot
+          path: |
+            ${{ runner.temp }}/ed2-source.tgz
+            ${{ runner.temp }}/source-commit.txt
+            ${{ runner.temp }}/source-status.txt
+          retention-days: 30
+          if-no-files-found: error
+
+  full-ex9:
+    name: Build and fully reproduce ex9 including all two-body correlations
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install reproducible GNU14 BLAS/LAPACK toolchain
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+            gfortran-14 gcc make autoconf automake libopenblas-dev liblapack-dev time
+          gfortran-14 --version | head -1
+      - name: Build ED2 using conservative FP flags
+        shell: bash
+        run: |
+          set -euo pipefail
+          autoreconf -vfi
+          ./configure FC=gfortran-14 FCFLAGS="-O2 -fopenmp"
+          make -j2
+          test -x source/QS3ED2
+          test -x script_cubic_sp_HB/mk_input
+          git rev-parse HEAD
+      - name: Run full ex9, verify all 9 pair correlations, archive outputs
+        shell: bash
+        env:
+          OMP_NUM_THREADS: "2"
+          OPENBLAS_NUM_THREADS: "1"
+          MKL_NUM_THREADS: "1"
+          OMP_DYNAMIC: "FALSE"
+        run: |
+          set -euo pipefail
+          export ED2_EX9_AUDIT_DIR="$RUNNER_TEMP/ex9-audit-$GITHUB_RUN_ID"
+          /usr/bin/time -v sh tests/run_ex9_reproducibility.sh \
+            2>&1 | tee "$RUNNER_TEMP/ex9-workflow.log"
+          test -s "$ED2_EX9_AUDIT_DIR/comparison.json"
+          python3 -c 'import json,os; d=json.load(open(os.environ["ED2_EX9_AUDIT_DIR"]+"/comparison.json")); assert d["mode"]=="computed_vs_archive" and d["status"]=="PASS"; print(d)'
+      - name: Preserve evidence on success and failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: full-ex9-run-evidence
+          path: |
+            ${{ runner.temp }}/ex9-workflow.log
+            ${{ runner.temp }}/ex9-audit-*/**
+            examples/cubic_sp_HB/**
+          retention-days: 30
+          if-no-files-found: warn
