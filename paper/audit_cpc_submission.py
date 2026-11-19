@@ -124,7 +124,7 @@ def examine(repo):
             },
             "final_source_physics_response_retested": {
                 "pass": False,
-                "detail": "Re-run the complete observable/Hellmann-Feynman mixed-spin DM demo and independent references from the approved frozen mainline source; historical figure CSV alone does not prove current-release reproduction.",
+                "detail": "Four/six-site native DM E0, K and Hellmann-Feynman checks now PASS on current generic fork main (paper/MAINLINE_NATIVE_DM_REPRODUCTION.md, workflow 44445263717); must still freeze and re-run the approved official release and archive. No direct residual sidecar is available on current generic main.",
             },
             "readthedocs_and_official_upstream_synchronized": {
                 "pass": False,
