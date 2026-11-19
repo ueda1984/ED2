@@ -127,13 +127,39 @@ jobs:
           root=Path(os.environ['RUNNER_TEMP'])/'cpc-physical-dm'
           report=json.loads((root/'report.json').read_text())
           assert report['pass_complete'] is True
-          print("CPC_CURRENT_MAIN_PHYSICAL_DM_REPRO_PASS")
+          assert report['size']==4
+          assert all(row['diagnostic']['kind']=='original_main_no_direct_residual_sidecar'
+                     for row in report['rows'])
+          assert all(row['diagnostic']['direct_residual_certified'] is False
+                     for row in report['rows'])
+          assert report['metrics']['HF_abs_error'] < 3e-5
+          print("CPC_CURRENT_MAIN_PHYSICAL_DM_REPRO_PASS size=4")
+          PY
+      - name: Reproduce six-site native DM/Hellmann-Feynman physical reference
+        run: |
+          export OPENBLAS_NUM_THREADS=1 OMP_NUM_THREADS=1
+          python3 -S paper/tools/cpc_portable_dm_quickstart.py \
+            --exe "$PWD/source/QS3ED2" --size 6 --omp 1 \
+            --output "$RUNNER_TEMP/cpc-physical-dm-l6"
+          python3 - <<'PY'
+          import json,os
+          from pathlib import Path
+          root=Path(os.environ['RUNNER_TEMP'])/'cpc-physical-dm-l6'
+          report=json.loads((root/'report.json').read_text())
+          assert report['pass_complete'] is True
+          assert report['size']==6
+          assert all(not row['diagnostic']['direct_residual_certified']
+                     for row in report['rows'])
+          assert report['metrics']['HF_abs_error'] < 3e-5
+          print("CPC_CURRENT_MAIN_PHYSICAL_DM_REPRO_PASS size=6")
           PY
       - name: Preserve actual current-code physical source and outputs
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: cpc-ed2-current-main-native-dm
-          path: ${{ runner.temp }}/cpc-physical-dm/
+          path: |
+            ${{ runner.temp }}/cpc-physical-dm/
+            ${{ runner.temp }}/cpc-physical-dm-l6/
           retention-days: 21
           if-no-files-found: warn
