@@ -145,6 +145,27 @@ BLAS/LAPACK via:
 
 ------------------------------------------------------------------------
 
+## Current performance features and release scope
+
+The development fork supports optional, general-purpose complex
+Hamiltonian caching (ordered CSR), coefficient-certified cache
+capacity, padded-cache release, and memory-oriented two-pass
+CSR construction. These are explicitly controlled options and
+are **not** all faster or smaller on every model.
+
+See [Hamiltonian caching, performance, and memory](
+user-guide/performance-and-memory.md) and
+[lattice/model-specific optimization tips](
+examples/optimization-tips.md) for exact prerequisites and
+numerical verification requirements.
+
+**Version note:** this website is published from the official
+QS-Cube/ED2 repository. Features present only in the
+`ueda1984/ED2` development fork cannot be assumed available
+in the official released source until upstream integration.
+
+------------------------------------------------------------------------
+
 ## Typical workflow
 
 ``` bash
