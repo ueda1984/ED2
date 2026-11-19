@@ -185,6 +185,73 @@ allocations, without complete publication-level repeat / independent
 node-exclusivity attestation. They must NOT be used as publication-quality
 speedup figures or cross-library results.
 
+## Exact source-equivalent cubic J1-J2 XXZ model: primary Tier S
+
+**This is the actual model in ED2 cubic PR16**, distinct from the
+nearest-neighbor isotropic Heisenberg control:
+`H = sum_b [ Jxy(b) * (Sx_i Sx_j + Sy_i Sy_j) + Jzz(b) * Sz_i Sz_j ]`.
+
+| Shell | Displacements per site (positive representatives) | Bonds at N1000 | Jxy | Jzz |
+| --- | --- | ---: | ---: | ---: |
+| J1 axial | 3 | 3000 | 1.0 | 0.77 |
+| J2 face diagonal | 6 | 6000 | 0.31 | 0.19 |
+
+This 9N-bond Hamiltonian conserves Ndown and is invariant under the
+cubic full point group. All-up energy at N=1000 equals
+`E_all_up = (3000*.77+6000*.19)/4 = 862.5` exactly in the mathematical
+model. For three magnons, the U(1), Gamma and Gamma/Oh A1g dimensions
+are 166167000, 166167 and 4299, respectively. The existing ED2 PR16
+PRESTO A1g run reported Ritz energy about 847.307894065573,
+but that is a prior experimental ED2 result, **not** a new external
+comparison or an independent large-N spectrum.
+
+- `export_cubic_xxz.py` copies the exact bond-direction list and
+  real XXZ constants from PR16 pinned tests/cpc_cubic_pointgroup.py.
+  It writes 0-based, 4-column `i j Jxy Jzz` bonds and a JSON manifest
+  recording source, all-up energy, bond-file SHA256 and Hamiltonian
+  physical SHA256. The axial/face bond counts, all-up energy and
+  invariance under independent translational/O_h generators are tested.
+- `validate_native_xxz_input.py` checks **only bonds** of an
+  original ED2 11-column `bonds.dat` against those expected couplings.
+  It does NOT establish physical equivalence of the spin table, fields,
+  NOD sector, eigenstate irrep, solver settings or bytewise input files.
+- `xxz_projected_oracle.py` independently builds the full 4^3-site,
+  three-magnon space, explicitly enumerates all 44 Gamma/Oh A1g
+  orbits and computes the normalized projected Hamiltonian.
+  Local verification yielded E0=40.345908939159166,
+  direct eigen-residual about 3.35e-14 and matrix asymmetry below 1e-15.
+  This is a correctness-only oracle, not an N1000 performance datum.
+- `run_quspin.py --model cubic-j1j2-xxz` now builds exactly the
+  Jzz SzSz and Jxy/2 S+S- plus S-S+ terms, with `pauli=0`.
+  N1000/m3 remains resource-gated by raw C(1000,3), not by its
+  small post-projection dimension.
+- `xdiag_preflight.cpp` accepts a 4-column XXZ bond file as
+  its optional final argument `cubic-j1j2-xxz`.
+  Its source-level implementation uses `Jxy*Exchange+Jzz*SzSz`,
+  consistent with XDiag operator definitions. XDiag compilation,
+  actual runtime and direct residual **remain unverified**.
+
+Example canonical inputs (no solver allocation):
+
+~~~bash
+python3 benchmarks/cross_library/export_cubic_xxz.py --self-test
+python3 benchmarks/cross_library/xxz_projected_oracle.py --self-test
+python3 benchmarks/cross_library/export_cubic_xxz.py --side 10 --ndown 3 --output-prefix /tmp/cubic_j1j2_n1000
+python3 benchmarks/cross_library/run_quspin.py --shape 10,10,10 --ndown 3 --model cubic-j1j2-xxz --sector gamma --mode dimensions
+# Source-only XDiag demonstration after installation and separately verified build:
+./xdiag_preflight 1000 3 dimension 1000000 /tmp/cubic_j1j2_n1000.xxz_bonds cubic-j1j2-xxz
+~~~
+
+Verify native historical ED2 physical bonds with
+`python3 benchmarks/cross_library/validate_native_xxz_input.py --side 10
+--ed2-bonds /path/to/original/bonds.dat` (one command on one line).
+Make sure inputs/symmetry/energy are also independently verified
+before any speed ratio is attempted.
+
+Reference: https://github.com/ueda1984/ED2/blob/9692d8b1fd903bcb7b1b67a5f180c57430702510/tests/cpc_cubic_pointgroup.py
+and https://awietek.github.io/xdiag/examples/entanglement_ground_state/
+(XDiag `Exchange` + `SzSz` example).
+
 ## Required measurements for every individual trial
 
 - Exact repo URL, commit, compiler/version/flags, library + BLAS version,
@@ -243,8 +310,8 @@ both end-to-end and per-matvec numbers are required.
   require an installed QuSpin. The source has not yet been executed with
   QuSpin (only NumPy preflight checks are covered by CI).
 - xdiag_preflight.cpp: XDiag 0.6.0 API-based preliminary C++ U(1)
-  constructor and energy probe. Requires an external XDiag build,
-  and has not yet been compiler-tested against that library.
+  constructor and energy probe, for Heisenberg NN or exact cubic J1-J2 XXZ.
+  Requires an external XDiag build; not yet compiler-tested against it.
 - .github/workflows/cross-library-science.yml: independent model,
   orbit-count, export, guard and syntax checks; does not install or run
   QuSpin/XDiag, and does not produce performance claims.
