@@ -1,0 +1,101 @@
+name: PRESTO latest-main deployment protocol (no PBS submission)
+
+on:
+  push:
+    branches:
+      - codex/ed2-presto-cross-library-latest-main-20261119
+    paths:
+      - "tools/presto_cross_library/**"
+      - ".github/workflows/presto-cross-latest.yml"
+  pull_request:
+    paths:
+      - "tools/presto_cross_library/**"
+      - ".github/workflows/presto-cross-latest.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: presto-cross-latest-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  stage-safety-and-physics:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Syntax, real cubic input model and negative login-node check
+        run: |
+          bash -n tools/presto_cross_library/stage_latest.sh tools/presto_cross_library/launch.pbs
+          python3 -m py_compile tools/presto_cross_library/*.py
+          python3 tools/presto_cross_library/runner.py --plan-only > "$RUNNER_TEMP/plan.json"
+          python3 - <<'PY'
+          import importlib.util, json, pathlib, tempfile
+          spec=importlib.util.spec_from_file_location(
+              "prerun","tools/presto_cross_library/runner.py")
+          m=importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+          p=json.load(open(pathlib.Path(__import__("os").environ["RUNNER_TEMP"])/"plan.json"))
+          assert p["physical_sha256"]==m.MODEL_SHA
+          with tempfile.TemporaryDirectory() as td:
+              fixture=pathlib.Path(td)/"trial"
+              r=m.prepare_native(fixture)
+              assert r["physical_sha256"]==m.MODEL_SHA
+              assert r["expected_dimension"]==4299
+              assert len((fixture/"bonds.dat").read_text().splitlines())==9000
+              assert len((fixture/"symmetry6.dat").read_text().splitlines())==1000
+              assert "NODmin=3,NODmax=3" in (fixture/"input.dat").read_text()
+              print("PASS: exact physical model, 9000 bonds, six 1000-site maps")
+          PY
+          if ED2_EXCLUSIVE_CONFIRMED=1 bash tools/presto_cross_library/launch.pbs > "$RUNNER_TEMP/pbs-refusal.log" 2>&1; then
+            echo "ERROR: PBS launcher accepted non-PBS login context" >&2
+            exit 1
+          fi
+          grep -q "REFUSED: missing real PBS allocation variable" "$RUNNER_TEMP/pbs-refusal.log"
+      - name: Immutable source stage selects actual latest fork-main without changing checkout
+        run: |
+          bash tools/presto_cross_library/stage_latest.sh "$GITHUB_WORKSPACE" "$RUNNER_TEMP/ed2-cross-stage" > "$RUNNER_TEMP/stage-result.log"
+          (cd "$RUNNER_TEMP/ed2-cross-stage" && sha256sum -c SHA256SUMS)
+          python3 "$RUNNER_TEMP/ed2-cross-stage/preflight.py" --stage "$RUNNER_TEMP/ed2-cross-stage" --mode stage --output "$RUNNER_TEMP/stage-capabilities.json"
+          python3 - <<'PY'
+          import json,os,pathlib,subprocess
+          src=pathlib.Path(os.environ["RUNNER_TEMP"])/"ed2-cross-stage"
+          p=json.loads((pathlib.Path(os.environ["RUNNER_TEMP"])/"stage-capabilities.json").read_text())
+          assert p["status"] in ("READY","SOURCE_NOT_READY")
+          assert all(len(s)==40 for s in p["commits"].values())
+          assert p["commits"]["main"]==(src/"main-commit.txt").read_text().strip()
+          expected=subprocess.check_output(["git","ls-remote","origin","refs/heads/main"],text=True).split()[0]
+          assert expected==p["commits"]["main"]
+          print("PASS latest-main",expected,"source-ready=",p["status"])
+          PY
+      - name: Reject stale main before any manual qsub
+        run: |
+          stage="$RUNNER_TEMP/ed2-cross-stage"
+          cp "$stage/main-commit.txt" "$RUNNER_TEMP/original-main-sha"
+          printf '0000000000000000000000000000000000000000\n' > "$stage/main-commit.txt"
+          if python3 "$stage/preflight.py" --stage "$stage" --mode submit --repo "$GITHUB_WORKSPACE" > "$RUNNER_TEMP/stale-refusal.log" 2>&1; then
+            echo "ERROR: stale-main stage passed pre-submit gate" >&2
+            exit 1
+          fi
+          grep -q STALE_MAIN_RESTAGE_REQUIRED "$RUNNER_TEMP/stale-refusal.log"
+          cp "$RUNNER_TEMP/original-main-sha" "$stage/main-commit.txt"
+      - name: Preserve read-only deployment smoke
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: presto-latest-main-staging-smoke
+          path: |
+            ${{ runner.temp }}/plan.json
+            ${{ runner.temp }}/stage-result.log
+            ${{ runner.temp }}/stage-capabilities.json
+            ${{ runner.temp }}/pbs-refusal.log
+            ${{ runner.temp }}/stale-refusal.log
+          if-no-files-found: warn
+          retention-days: 14
+      - name: No PRESTO allocation or scientific timing is implied
+        run: |
+          echo "This CI performed no qsub, no login, no PRESTO allocation."
+          echo "Launch remains blocked until current main provides reviewed cubic A1g plus residual features."
