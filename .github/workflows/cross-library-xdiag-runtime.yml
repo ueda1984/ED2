@@ -1,0 +1,110 @@
+name: XDiag v0.6.0 comparator API pilot (not benchmark)
+
+concurrency:
+  group: xdiag-pilot-${{ github.ref }}
+  cancel-in-progress: true
+
+
+on:
+  push:
+    branches:
+      - codex/ed2-cross-library-benchmark-protocol-20261119
+    paths:
+      - "benchmarks/cross_library/xdiag_**"
+      - "benchmarks/cross_library/xdiag_app/**"
+      - ".github/workflows/cross-library-xdiag-runtime.yml"
+  pull_request:
+    paths:
+      - "benchmarks/cross_library/xdiag_**"
+      - "benchmarks/cross_library/xdiag_app/**"
+      - ".github/workflows/cross-library-xdiag-runtime.yml"
+  workflow_dispatch:
+
+jobs:
+  xdiag-source-built-api:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      OPENBLAS_NUM_THREADS: "1"
+      OMP_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+      XDIAG_PINNED_SHA: "27065537a743c642c35efa0e1b5ae4f326fd984c"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install independent numerical oracle deps
+        run: python -m pip install "numpy>=1.26,<3" "scipy>=1.11,<2"
+      - name: Pin exact XDiag code without modifying ED2 main
+        run: |
+          git clone --filter=blob:none https://github.com/awietek/xdiag.git /tmp/ed2_xdiag_external
+          git -C /tmp/ed2_xdiag_external checkout --detach "$XDIAG_PINNED_SHA"
+          test "$(git -C /tmp/ed2_xdiag_external rev-parse HEAD)" = "$XDIAG_PINNED_SHA"
+      - name: Install system BLAS and LAPACK development libraries
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends libblas-dev liblapack-dev
+      - name: Restore previously compiled pinned XDiag install
+        id: xdiag-install-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: /tmp/ed2_xdiag_install
+          key: xdiag-27065537-cpp17-gcc15-ubuntu-20261119-r1
+      - name: Build XDiag library using CMake C++17 OpenMP (no MPI)
+        if: steps.xdiag-install-cache.outputs.cache-hit != 'true'
+        timeout-minutes: 24
+        run: |
+          cmake -S /tmp/ed2_xdiag_external -B /tmp/ed2_xdiag_build -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/tmp/ed2_xdiag_install -DXDIAG_DISABLE_HDF5=On -DBUILD_EXAMPLES=Off -DBUILD_TESTING=Off -DXDIAG_OPTIMIZE_FOR_NATIVE=Off
+          cmake --build /tmp/ed2_xdiag_build -j 2
+          cmake --install /tmp/ed2_xdiag_build
+      - name: Save self-contained pinned XDiag install for future science iterations
+        if: steps.xdiag-install-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: /tmp/ed2_xdiag_install
+          key: xdiag-27065537-cpp17-gcc15-ubuntu-20261119-r1
+      - name: Compile ED2 cross-library probe against real pinned XDiag headers
+        run: |
+          cmake -S benchmarks/cross_library/xdiag_app -B /tmp/ed2_xdiag_probe_build -DCMAKE_PREFIX_PATH=/tmp/ed2_xdiag_install -DCMAKE_BUILD_TYPE=Release
+          cmake --build /tmp/ed2_xdiag_probe_build -j 2
+      - name: Probe small full U1 and very large fixed-m XDiag block construction
+        timeout-minutes: 3
+        run: |
+          B=/tmp/ed2_xdiag_probe_build/xdiag_preflight
+          python benchmarks/cross_library/export_case.py --shape 6 --ndown 2 --output-prefix /tmp/xdiag_ref6
+          python benchmarks/cross_library/reference.py --shape 6 --ndown 2 > /tmp/xdiag_ref6_oracle.json
+          "$B" 6 2 basis 1000 /tmp/xdiag_ref6.bonds heisenberg-nn > /tmp/xdiag_basis6.json
+          "$B" 6 2 solve 1000 /tmp/xdiag_ref6.bonds heisenberg-nn > /tmp/xdiag_energy6.json
+          "$B" 1000 3 dimension 1000000 /tmp/none.bonds cubic-j1j2-xxz > /tmp/xdiag_dimension1000.json
+          "$B" 1000 3 basis 1000000 /tmp/none.bonds cubic-j1j2-xxz > /tmp/xdiag_guard1000.json
+          python - <<'PY'
+          import json
+          b=json.load(open('/tmp/xdiag_basis6.json'))
+          x=json.load(open('/tmp/xdiag_energy6.json'))
+          ref=json.load(open('/tmp/xdiag_ref6_oracle.json'))
+          d=json.load(open('/tmp/xdiag_dimension1000.json'))
+          g=json.load(open('/tmp/xdiag_guard1000.json'))
+          assert b['dimension']==15 and b['status']=='BASIS_ONLY'
+          assert abs(ref['E0']-x['E0']) < 1e-8, (x,ref)
+          assert x['status']=='ENERGY_WITH_DIRECT_RESIDUAL',x
+          assert x['direct_residual'] < 1.e-8,x
+          assert d['u1_dimension']==166167000
+          assert g['status']=='SKIPPED_RESOURCE_CAP'
+          print('PASS: pinned XDiag C++17 API, small U1 energy parity and N1000 safety cap')
+          PY
+      - name: Probe 1000-site two-magnon U1 basis-only on a bounded runner
+        timeout-minutes: 4
+        run: |
+          timeout 180s /tmp/ed2_xdiag_probe_build/xdiag_preflight 1000 2 basis 600000 /tmp/none.bonds cubic-j1j2-xxz > /tmp/xdiag_u1_1000_m2.json
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/xdiag_u1_1000_m2.json'))
+          assert x['status']=='BASIS_ONLY' and x['dimension']==499500
+          print('PASS: XDiag N1000 U1 m2 basis only; not a Γ/O_h runtime')
+          print(x)
+          PY
+      - name: Show scope limitations
+        run: |
+          echo "Only U1 XDiag is tested; Gamma/Oh A1g implementation and direct Ritz residual not yet tested."
+          echo "No performance ratio or publication-grade timing is claimed."

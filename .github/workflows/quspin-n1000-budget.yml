@@ -1,0 +1,106 @@
+name: QuSpin N1000 m3 Oh A1g budgeted basis feasibility
+
+on:
+  push:
+    branches:
+      - codex/ed2-cross-library-benchmark-protocol-20261119
+    paths:
+      - ".github/workflows/quspin-n1000-budget.yml"
+  pull_request:
+    paths:
+      - ".github/workflows/quspin-n1000-budget.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: quspin-n1000-budget-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  bounded-1000site-three-magnon-feasibility:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+      NUMBA_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install actual pinned QuSpin
+        run: python -m pip install "quspin==1.0.1" "numpy<3" "scipy<2"
+      - name: Record immutable model, hardware and trial protocol
+        run: |
+          python benchmarks/cross_library/export_cubic_xxz.py --side 10 --ndown 3 --output-prefix /tmp/cubic_j1j2_n1000 > /tmp/canonical_manifest_stdout.json
+          git rev-parse HEAD > /tmp/ed2_benchmark_commit.txt
+          lscpu > /tmp/runner_cpu.txt
+          cat > /tmp/trial_protocol.txt <<'EOF'
+          N=1000, m=3, J1-J2 XXZ with ED2 PR16 exact couplings.
+          QuSpin 1.0.1, negative Nup=-4, Gamma/Oh/A1g, N_p=0.
+          Basis stage only; no Hamiltonian construction, no eigensolver.
+          Wall budget=180s, process virtual-memory limit=6GiB.
+          GitHub Actions shared runner; exploratory feasibility only.
+          EOF
+      - name: Execute bounded basis build and classify outcomes without faking a speed result
+        timeout-minutes: 4
+        run: |
+          set +e
+          (
+            ulimit -v 6291456
+            /usr/bin/time -v timeout -k 5s 180s python benchmarks/cross_library/run_quspin.py \
+              --shape 10,10,10 --ndown 3 --model cubic-j1j2-xxz \
+              --sector gamma-a1g --mode basis --max-raw-dim 200000000 \
+              --prefix-bits 0 --nup-convention negative
+          ) > /tmp/quspin_trial_stdout.json 2> /tmp/quspin_trial_stderr.log
+          rc=$?
+          set -e
+          echo "$rc" > /tmp/quspin_trial_exit_code.txt
+          python - "$rc" <<'PY'
+          import json, sys
+          rc=int(sys.argv[1])
+          result={"workflow":"quspin-n1000-budget","sites":1000,"ndown":3,
+                  "symmetry":"Gamma/Oh/A1g","required_dimension":4299,
+                  "resource_limit_virtual_bytes":6291456*1024,
+                  "wall_limit_seconds":180,"exit_code":rc,
+                  "publication_ready":False}
+          if rc==0:
+              try:
+                  trial=json.load(open("/tmp/quspin_trial_stdout.json"))
+                  if trial.get("status")=="BASIS_ONLY" and trial.get("dimension_constructed")==4299:
+                      result["status"]="BASIS_CONSTRUCTED"
+                      result["basis_seconds"]=trial.get("basis_seconds")
+                      result["peak_rss_kib"]=trial.get("peak_rss_kib")
+                  else:
+                      result["status"]="PHYSICS_OR_OUTPUT_MISMATCH"
+              except Exception:
+                  result["status"]="INVALID_OUTPUT"
+          elif rc==124:
+              result["status"]="BUDGET_TIMEOUT"
+          elif rc in (137,139):
+              result["status"]="RESOURCE_OR_PROCESS_TERMINATION"
+          else:
+              result["status"]="OTHER_NONZERO_EXIT_CHECK_STDERR"
+          with open("/tmp/quspin_trial_classification.json","w") as f:
+              json.dump(result,f,sort_keys=True,indent=2)
+          print(result)
+          if result["status"] in ("INVALID_OUTPUT","PHYSICS_OR_OUTPUT_MISMATCH"):
+              sys.exit(2)
+          PY
+      - name: Preserve complete bounded attempt and source manifest
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: quspin-n1000-m3-a1g-budgeted-attempt
+          path: |
+            /tmp/quspin_trial_*
+            /tmp/cubic_j1j2_n1000.json
+            /tmp/cubic_j1j2_n1000.xxz_bonds
+            /tmp/ed2_benchmark_commit.txt
+            /tmp/runner_cpu.txt
+            /tmp/trial_protocol.txt
+          retention-days: 30
+      - name: State research caveat
+        if: always()
+        run: echo "A bounded basis attempt is not a publishable or statistically repeated speed comparison."
