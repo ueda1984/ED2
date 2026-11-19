@@ -56,6 +56,27 @@ jobs:
             --output "$RUNNER_TEMP/csr-release-proof" \
             --sizes 4,6,8 --threads 1,4 --timeout 180
           test -s "$RUNNER_TEMP/csr-release-proof/summary.json"
+      - name: Fast-math numerical old/CSR vs strict CSR/release IEEE bits
+        run: |
+          # The ED2 historical default -Ofast permits reassociation.
+          # On truly complex DM, the padded and compressed loops may
+          # differ at roundoff (~1e-16), but releasing cache must remain
+          # bit-for-bit identical to retaining the CSR representation.
+          make clean
+          ./configure FC=gfortran-${{ matrix.gnu }} \
+            FCFLAGS="-Ofast -fopenmp"
+          make -j2
+          gfortran-${{ matrix.gnu }} -Ofast -fopenmp -I source \
+            -o "$RUNNER_TEMP/cpc-csr-release-ofast-driver" \
+            tests/cpc_csr_matvec_driver.f90 \
+            source/input_param.o source/state_lists.o source/ham2vec.o \
+            -llapack -lopenblas
+          python3 -B tests/cpc_csr_release_regression.py \
+            --driver "$RUNNER_TEMP/cpc-csr-release-ofast-driver" \
+            --output "$RUNNER_TEMP/csr-release-ofast-proof" \
+            --sizes 4,6,8 --threads 1,4 --timeout 180 \
+            --allow-fp-reassociation
+          test -s "$RUNNER_TEMP/csr-release-ofast-proof/summary.json"
       - name: Retain raw native outputs and memory provenance
         if: always()
         uses: actions/upload-artifact@v4
@@ -63,6 +84,8 @@ jobs:
           name: main-csr-release-gnu${{ matrix.gnu }}
           path: |
             ${{ runner.temp }}/csr-release-proof/summary.json
+            ${{ runner.temp }}/csr-release-ofast-proof/summary.json
+            ${{ runner.temp }}/csr-release-ofast-proof/*/stdout.log
             ${{ runner.temp }}/csr-release-proof/*/stdout.log
             tests/test-suite.log
           retention-days: 30
