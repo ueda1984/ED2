@@ -1,0 +1,89 @@
+name: ED2 two-pass direct complex CSR construction exactness
+
+on:
+  push:
+    branches: [codex/ed2-main-direct-csr-two-pass]
+    paths:
+      - "source/ham2vec.f90"
+      - "tests/cpc_csr_direct_build_regression.py"
+      - ".github/workflows/main-csr-direct.yml"
+  pull_request:
+    paths:
+      - "source/ham2vec.f90"
+      - "tests/cpc_csr_direct_build_regression.py"
+      - ".github/workflows/main-csr-direct.yml"
+  workflow_dispatch:
+
+jobs:
+  native-direct-csr:
+    name: Physical direct CSR exact H*x and memory (GNU${{ matrix.gnu }})
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        gnu: [13, 14]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install GNU Fortran and scientific libraries
+        run: |
+          sudo apt-get update -qq
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+            gfortran-${{ matrix.gnu }} libopenblas-dev liblapack-dev \
+            autoconf automake make python3
+      - name: Build refactored shared physical row generator without legacy flags
+        run: |
+          autoreconf -vfi
+          ./configure FC=gfortran-${{ matrix.gnu }} FCFLAGS="-O2 -fopenmp"
+          make -j2
+          make check
+      - name: Build native full complex H*x and independent dense-H oracle
+        run: |
+          gfortran-${{ matrix.gnu }} -O2 -fopenmp -I source \
+            -o "$RUNNER_TEMP/cpc-direct-csr-driver" \
+            tests/cpc_csr_matvec_driver.f90 \
+            source/input_param.o source/state_lists.o source/ham2vec.o \
+            -llapack -lopenblas
+      - name: Prove direct two-pass CSR and original complex H*x exact IEEE bits
+        run: |
+          python3 -B tests/cpc_csr_direct_build_regression.py \
+            --driver "$RUNNER_TEMP/cpc-direct-csr-driver" \
+            --output "$RUNNER_TEMP/csr-direct-o2" \
+            --sizes 4,6,8,10 --threads 1,4 \
+            --models real_xyz,complex_dm,u1_xxz,full_tensor --timeout 180
+          test -s "$RUNNER_TEMP/csr-direct-o2/summary.json"
+      - name: Default-off historical example regression ex1 to ex8
+        run: |
+          make -C tests check-long \
+            LONG_TESTS="test_ex1.sh test_ex2.sh test_ex3.sh test_ex4.sh test_ex5.sh test_ex6.sh test_ex7.sh test_ex8.sh"
+      - name: Also validate under original ED2 fast-math compiler policy
+        run: |
+          make clean
+          ./configure FC=gfortran-${{ matrix.gnu }} FCFLAGS="-Ofast -fopenmp"
+          make -j2
+          gfortran-${{ matrix.gnu }} -Ofast -fopenmp -I source \
+            -o "$RUNNER_TEMP/cpc-direct-csr-ofast-driver" \
+            tests/cpc_csr_matvec_driver.f90 \
+            source/input_param.o source/state_lists.o source/ham2vec.o \
+            -llapack -lopenblas
+          python3 -B tests/cpc_csr_direct_build_regression.py \
+            --driver "$RUNNER_TEMP/cpc-direct-csr-ofast-driver" \
+            --output "$RUNNER_TEMP/csr-direct-ofast" \
+            --sizes 4,6,8,10 --threads 1,4 \
+            --models real_xyz,complex_dm,u1_xxz,full_tensor \
+            --allow-fp-reassociation --timeout 180
+          test -s "$RUNNER_TEMP/csr-direct-ofast/summary.json"
+      - name: Preserve native results and worst-case cache payload accounting
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: direct-complex-csr-gnu${{ matrix.gnu }}
+          path: |
+            ${{ runner.temp }}/csr-direct-o2/summary.json
+            ${{ runner.temp }}/csr-direct-ofast/summary.json
+            ${{ runner.temp }}/csr-direct-o2/*/stdout.log
+            ${{ runner.temp }}/csr-direct-ofast/*/stdout.log
+            tests/*.long.log
+            tests/test-suite.log
+          retention-days: 30
+          if-no-files-found: warn
