@@ -1,0 +1,104 @@
+name: QuSpin comparator runtime pilot (not benchmark)
+
+on:
+  push:
+    branches:
+      - codex/ed2-cross-library-benchmark-protocol-20261119
+    paths:
+      - "benchmarks/cross_library/**"
+      - ".github/workflows/cross-library-quspin-runtime.yml"
+  pull_request:
+    paths:
+      - "benchmarks/cross_library/**"
+      - ".github/workflows/cross-library-quspin-runtime.yml"
+  workflow_dispatch:
+
+jobs:
+  quspin-real-api-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install pinned actual QuSpin runtime
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "quspin==1.0.1" "numpy<3" "scipy<2"
+      - name: Confirm QuSpin version and independent Oh factorization
+        env:
+          OMP_NUM_THREADS: "1"
+          OPENBLAS_NUM_THREADS: "1"
+          MKL_NUM_THREADS: "1"
+          NUMBA_NUM_THREADS: "1"
+        run: |
+          python benchmarks/cross_library/cubic_oh_generators.py --self-test
+          python - <<'PY'
+          import quspin
+          print("QU_SPIN_VERSION",quspin.__version__)
+          assert quspin.__version__ == "1.0.1"
+          PY
+      - name: Match fixed U1, Gamma small sector dimensions and energy
+        timeout-minutes: 4
+        env:
+          OMP_NUM_THREADS: "1"
+          OPENBLAS_NUM_THREADS: "1"
+          MKL_NUM_THREADS: "1"
+          NUMBA_NUM_THREADS: "1"
+        run: |
+          python benchmarks/cross_library/run_quspin.py --shape 6 --ndown 2 --sector u1 --mode solve --max-raw-dim 1000 > /tmp/quspin_u1.json
+          python benchmarks/cross_library/run_quspin.py --shape 6 --ndown 2 --sector gamma --mode solve --max-raw-dim 1000 > /tmp/quspin_gamma.json
+          python benchmarks/cross_library/reference.py --shape 6 --ndown 2 > /tmp/reference_u1.json
+          python - <<'PY'
+          import json
+          r=json.load(open('/tmp/reference_u1.json'))
+          u=json.load(open('/tmp/quspin_u1.json'))
+          g=json.load(open('/tmp/quspin_gamma.json'))
+          assert u['status']=='PASS' and g['status']=='PASS'
+          assert u['dimension_constructed']==15
+          assert abs(u['E0']-r['E0']) < 1.e-9
+          assert g['direct_residual'] <= 1.e-8
+          print('PASS small fixed-U1 / Gamma QuSpin against independent oracle')
+          PY
+      - name: Match complete Oh A1g small cubic sector to independent projected XXZ oracle
+        timeout-minutes: 6
+        env:
+          OMP_NUM_THREADS: "1"
+          OPENBLAS_NUM_THREADS: "1"
+          MKL_NUM_THREADS: "1"
+          NUMBA_NUM_THREADS: "1"
+        run: |
+          python benchmarks/cross_library/xxz_projected_oracle.py --ndown 2 > /tmp/oracle_64_m2.json
+          timeout 300s python benchmarks/cross_library/run_quspin.py --shape 4,4,4 --ndown 2 --model cubic-j1j2-xxz --sector gamma-a1g --mode solve --max-raw-dim 50000 --max-csr-nnz 1000000 > /tmp/quspin_64_m2_a1g.json
+          python - <<'PY'
+          import json
+          q=json.load(open('/tmp/quspin_64_m2_a1g.json'))
+          a=json.load(open('/tmp/oracle_64_m2.json'))
+          assert q['dimension_constructed']==a['projected_dimension']
+          assert abs(q['E0']-a['E0'])<1.e-8
+          assert q['direct_residual']<=1.e-8
+          print('PASS QuSpin Oh A1g N64 m2 vs independently projected XXZ Hamiltonian')
+          PY
+      - name: Probe actual 1000-site/m3 QuSpin constructor (no full basis allocation)
+        timeout-minutes: 3
+        env:
+          OMP_NUM_THREADS: "1"
+          OPENBLAS_NUM_THREADS: "1"
+          MKL_NUM_THREADS: "1"
+          NUMBA_NUM_THREADS: "1"
+        run: |
+          timeout 150s python benchmarks/cross_library/run_quspin.py --shape 10,10,10 --ndown 3 --model cubic-j1j2-xxz --sector gamma-a1g --mode construct --max-raw-dim 1000000 > /tmp/quspin_constructor_n1000.json
+          python - <<'PY'
+          import json
+          x=json.load(open('/tmp/quspin_constructor_n1000.json'))
+          assert x['status']=='CONSTRUCTOR_ONLY'
+          assert x['expected_dimension']==4299 and x['dimension_u1']==166167000
+          print('PASS QuSpin N=1000, m=3 Gamma/Oh A1g constructor; NO basis/eigenvalue')
+          print(x)
+          PY
+      - name: Show scope
+        run: |
+          echo "QuSpin actual N1000/m3 constructor tested but no full N1000/m3 basis enumeration."
+          echo "Small-system correctness is not a large-system speed comparison."
+          echo "Resource-limited full benchmark requires separate node attestation."
