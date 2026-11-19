@@ -10,6 +10,7 @@
 #include <limits>
 #include <fstream>
 #include <iostream>
+#include <iomanip>
 #include <sstream>
 #include <set>
 #include <stdexcept>
@@ -59,6 +60,7 @@ int main(int argc, char **argv) try {
     throw std::invalid_argument("unsupported N/m/mode/cap");
   }
   const auto dim = choose_small(n, m);
+  std::cout << std::setprecision(17); // Do not round eigenvalues in JSON.
   if (mode == "dimension") {
     std::cout << "{\"status\":\"DIMENSIONS_ONLY\",\"N\":" << n
               << ",\"m\":" << m << ",\"u1_dimension\":" << dim << "}\n";
@@ -125,17 +127,24 @@ int main(int argc, char **argv) try {
   }
   if (model == "heisenberg-nn") ops["J"] = 1.0;
   auto tsetup = SteadyClock::now();
-  double e0 = eigval0(ops, block); // API examples: SdotS, Exchange, SzSz.
+  auto [e0, gs] = eig0(ops, block); // Eigenvector required for a direct residual.
   auto tsolve = SteadyClock::now();
-  std::cout << "{\"status\":\"ENERGY_ONLY_RESIDUAL_UNCHECKED\",\"N\":" << n
+  arma::vec psi = vector(gs);
+  arma::vec hpsi = vector(apply(ops, gs));
+  const double direct_residual = arma::norm(hpsi - e0 * psi);
+  if (!std::isfinite(e0) || !std::isfinite(direct_residual))
+    throw std::runtime_error("nonfinite Ritz eigenvalue/residual");
+  std::cout << "{\"status\":\"ENERGY_WITH_DIRECT_RESIDUAL\",\"N\":" << n
             << ",\"m\":" << m << ",\"dimension\":" << block.size()
             << ",\"bonds\":" << bonds.size() << ",\"E0\":" << e0
+            << ",\"direct_residual\":" << direct_residual
             << ",\"basis_seconds\":" << seconds(start, tbasis)
             << ",\"operator_spec_seconds\":" << seconds(tbasis,tsetup)
             << ",\"solve_seconds\":" << seconds(tsetup,tsolve)
             << ",\"time_to_eigenvalue_seconds\":" << seconds(start,tsolve)
             << ",\"peak_rss_kib\":" << peak_kib() << "}\n";
-  // E0 alone cannot satisfy the publication-grade direct residual gate.
+  // Direct residual is measured; publication-grade equality, solver tolerances,
+  // independent physical source/matrix and resource attestation still required.
   return 0;
 } catch (std::exception const &e) {
   std::cerr << "XDiag pilot error: " << e.what() << "\n";
