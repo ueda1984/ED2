@@ -97,9 +97,11 @@ PY
   (cd experimental_cubic_previous_PR21 && sha256sum -c ed2-source.sha256)
   (cd latest_main_snapshot && sha256sum -c ed2-main.sha256)
   (cd cross_library_comparator && sha256sum -c comparator-source.sha256)
-  tar -tzf cubic_auto_mnte/ed2-source.tar.gz | grep -qx source/ham2vec.f90
-  tar -tzf cubic_auto_mnte/ed2-source.tar.gz | grep -qx tools/cpc_presto_compare_mnte.py
-  tar -tzf cubic_auto_mnte/ed2-source.tar.gz | grep -qx tests/cpc_cubic_auto_mnte_regression.py
+  # Enumerate once: grep -q on a live tar pipe under pipefail can SIGPIPE tar.
+  tar -tzf cubic_auto_mnte/ed2-source.tar.gz > "$tmp/candidate-files.txt"
+  grep -Fxq source/ham2vec.f90 "$tmp/candidate-files.txt"
+  grep -Fxq tools/cpc_presto_compare_mnte.py "$tmp/candidate-files.txt"
+  grep -Fxq tests/cpc_cubic_auto_mnte_regression.py "$tmp/candidate-files.txt"
 )
 
 # A moving main can invalidate the phrase 'latest-main snapshot'. Fail
