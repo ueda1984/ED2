@@ -71,7 +71,7 @@ OpenMP is used for shared-memory parallelism.
 \item[Unusual features:] Site-dependent mixed spins, oriented
 DM and symmetric off-diagonal exchange, complete Cartesian
 static correlators, optional Hamiltonian-transition caching
-and reproducible numerical-acceptance diagnostics; optional
+and source-level numerical regression tests; optional
 coefficient-certified cache capacity and exact-order complex CSR storage.
 \item[Nature of problem:] Finite-size spectra and static spin observables
 of spin models with unequal local spins and general bilinear couplings.
@@ -147,7 +147,7 @@ Site fields & Restricted input & Site-dependent Cartesian fields \\
 Basis & Fixed $N_\downarrow$ and momentum & Bounded occupations, full space, compatible symmetries \\
 Static output & Selected spin channels & Nine Cartesian pair components \\
 Dynamic spectra & Dedicated dynamic path & Equivalent native path unverified \\
-Solvers & Dense, Lanczos, restarted & Inherited families; revised diagnostics \\
+Solvers & Dense, Lanczos, restarted & Inherited families; typed LP64 BLAS/LAPACK \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -231,7 +231,7 @@ on-demand transitions or optional cache};
 \node[box,below=of action] (solver) {Dense LAPACK (ALG=3),
 Lanczos (ALG=1) or restarted iteration (ALG=2)};
 \node[box,below=of solver] (outputs) {Energies/eigenvectors,
-Cartesian static observables and residual diagnostics};
+Cartesian static observables and solver diagnostics};
 \draw[->] (inputs)--(basis);
 \draw[->] (basis)--(action);
 \draw[->] (action)--(solver);
@@ -246,10 +246,13 @@ families nor OpenMP execution are introduced as new algorithms.}
 ED2 supports dense Hermitian LAPACK diagonalization (ALG=3),
 conventional Lanczos (ALG=1), and restarted Hermitian iteration
 (ALG=2). The numerical-development line adds explicit
-BLAS/LAPACK interfaces, magnetic-field indexing repairs,
-Krylov diagnostics, residual acceptance controls and reproducible
-input/source distributions. It does not introduce a new
-Lanczos method.
+BLAS/LAPACK interfaces, generic complex Hamiltonian cache
+storage, source-level operator regression tests and reproducible
+input/source distributions. The current original-main TRLan
+solver retains its historical convergence indicators and
+variational energy checks; it does not issue the opt-in
+direct-residual sidecar available on the separate experimental
+development branches. No new Lanczos method is claimed.
 
 For a normalized Ritz pair $(E,\psi)$, the direct residual
 $r=\|H\psi-E\psi\|_2$ is an important numerical diagnostic.
@@ -385,58 +388,13 @@ particular 1000-site test. These comparisons demonstrate
 numerical continuity and reproducibility, not unique
 model support or solver superiority.
 
-At 1000 sites with three magnons, the unprojected
-dimension grows to $\binom{1000}{3}=166{,}167{,}000$
-and the $\Gamma$-sector dimension is 166,167.
-Besides exact character counting, we independently
-enumerated the translation orbits by fixing one magnon
-at the origin and canonically re-rooting each pair of
-relative displacements. This explicitly constructs all
-166,167 representatives without scanning the full
-166-million-state magnetization sector. The resulting
-sparse real-symmetric $\Gamma$-sector Hamiltonian contains
-3,151,137 nonzero matrix entries and passes a direct
-Hermiticity check. This is an \emph{independent structural}
-reference, not an independently converged three-magnon
-ground energy.
-
-An additional native ED2 calculation on the same
-$10\times10\times10$ periodic nearest-neighbor
-spin-$1/2$ Heisenberg lattice resolves the $\Gamma$
-sector into four one-dimensional representations
-of the cubic point group $O_h$. Independent
-character counting gives respective dimensions
-4,299 ($A_{1g}$), 3,624 ($A_{2g}$),
-2,884 ($A_{1u}$) and 3,252 ($A_{2u}$).
-The group-aware basis construction enforces a
-canonical cubic symmetry certificate and reproduces
-the old representative ranks and their normalization
-bits in two-compiler regression tests.
-For the large-scale \emph{production} two-stage Lanczos
-calculation, 48 matched PRESTO trials (four irreps,
-one/four/eight threads, one warmup and three measured
-runs per configuration) were audited with an exact
-source revision, equal input checksums and consistent
-basis dimensions. Toggling only an optional
-periodic-coordinate cache left all 48 reported energies
-unchanged at recorded precision, changed no Hamiltonian
-application counts, and produced a maximum directly
-evaluated Ritz residual of $9.71161\times10^{-9}$.
-Complete Hamiltonian-cache records and basis
-representative/normalization bits were independently
-compared byte for byte for the two paths in the
-GNU Fortran 13 and 14 native test matrices.
-
-This establishes an executable numerical
-\emph{consistency test} at 1000 sites, whereas
-the previous relative-displacement Hamiltonian is
-an independent spectral reference for the distinct
-\emph{two}-magnon sector. We do not claim an
-independently converged energy benchmark in each
-1000-site, three-magnon $O_h$ sector; that remains
-a separate reproducibility target. The exploratory
-timing data and resource limitations are reported
-below in Sec.~\ref{sec:pr17-pilot}.
+A distinct, non-upstream development branch examined
+$N=1000$, $N_\downarrow=3$ and additional cubic
+point-group sectors. That branch is not the generic
+program release considered here. It is not used to
+establish current ED2's general symmetry
+representations or performance, and its provenance
+is preserved only in Appendix~\ref{sec:pr17-pilot}.
 
 \subsection{Independent mixed-spin basis checks}
 For $S_i=(1/2,1,1/2,1)$, the polynomial in
@@ -478,7 +436,7 @@ Staggered-DM response & 60 runs & $<1.4\times10^{-13}$ in $E_0$;
 $<1.5\times10^{-9}$ in $K$ \\
 Published XYZ--DM conventions & 12 runs & $<3\times10^{-14}$ in spectrum \\
 1000-site two magnons & 1 sector & Old QS$^3$, ED2, independent orbit ED and QuSpin agree within $10^{-10}$ \\
-1000-site three magnons & 48 paired runs & All energy differences reported as zero; maximum direct residual $9.712\times10^{-9}$ (no independent spectral reference) \\
+General real/complex DM cached $H|\psi\rangle$ & 12 models per compiler & Every output IEEE bit matches old CSR path at $\mathrm{-O2}$; independent dense $H$ for 8 small-system cases \\
 \bottomrule
 \end{tabular}
 \end{table}
