@@ -139,6 +139,7 @@ python3 -m py_compile \
   echo "CACHE_PROFILE=${ED2_CUBIC_CACHE_PROFILE:-0}"
   echo "DIRECT_HOP_TABLE=${ED2_CUBIC_DIRECT_HOP_TABLE:-0}"
   echo "SKIP_UNUSED_HASH=${ED2_CUBIC_SKIP_UNUSED_HASH:-0}"
+  echo "CPC_PAIRED_MNTE=${ED2_CPC_PAIRED_MNTE:-0}"
   date -Is
   command -v gfortran
   gfortran --version | head -1
@@ -206,9 +207,11 @@ args=(--exe "$exe" --output "$run_dir/measurements"
   --timeout 1200 --time-budget 36000)
 # Optional storage-only experiment. Keep default -1 for comparable baseline.
 if [[ -n ${ED2_MNTE:-} ]]; then args+=(--mnte "$ED2_MNTE"); fi
-if [[ -n ${ED2_THREADS:-} ]]; then args+=(--threads "$ED2_THREADS"); fi
-if [[ -n ${ED2_SIZES:-} ]]; then args+=(--sizes "$ED2_SIZES"); fi
-if [[ -n ${ED2_SECTORS:-} ]]; then args+=(--sectors "$ED2_SECTORS"); fi
+# qsub -v splits on commas; use '+' within a multi-value variable and
+# restore exact benchmark comma-separated lists on the allocated compute node.
+if [[ -n ${ED2_THREADS:-} ]]; then args+=(--threads "${ED2_THREADS//+/,}"); fi
+if [[ -n ${ED2_SIZES:-} ]]; then args+=(--sizes "${ED2_SIZES//+/,}"); fi
+if [[ -n ${ED2_SECTORS:-} ]]; then args+=(--sectors "${ED2_SECTORS//+/,}"); fi
 if [[ -n ${ED2_WARMUPS:-} ]]; then args+=(--warmups "$ED2_WARMUPS"); fi
 if [[ -n ${ED2_REPEATS:-} ]]; then args+=(--repeats "$ED2_REPEATS"); fi
 if [[ -n ${ED2_TIMEOUT:-} ]]; then args+=(--timeout "$ED2_TIMEOUT"); fi
