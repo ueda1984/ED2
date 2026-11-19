@@ -58,6 +58,11 @@ def main():
         meta.update(model=special["model"], physical_sha256=special["physical_sha256"],
                     bonds=special["bond_count"], all_up_energy=special["all_up_energy"],
                     source=special["source"])
+        # Do not leave the isotropic Heisenberg J=1 metadata attached to the
+        # anisotropic J1-J2 XXZ input; its two shells have distinct Jxy/Jzz.
+        meta.pop("J", None)
+        meta.update(j1_xy=special["j1_xy"], j1_zz=special["j1_zz"],
+                    j2_xy=special["j2_xy"], j2_zz=special["j2_zz"])
     expected = meta["dimension_u1"]
     if args.sector in ("gamma", "gamma-a1g"):
         from symmetry_dimensions import count_blocks
