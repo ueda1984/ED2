@@ -80,6 +80,48 @@ jobs:
             --exe "$PWD/source/QS3ED2" \
             --sides 6 --threads 1,4 --sectors oh-a1g,oh-a2g,oh-a1u,oh-a2u \
             --skip-lanczos --output "$RUNNER_TEMP/auto-mnte-omp-proof"
+      - name: Offline same-host paired audit smoke on shared CI (NOT PRESTO performance)
+        run: |
+          mkdir -p "$RUNNER_TEMP/cpc-auto-stage"
+          git archive --format=tar HEAD | gzip -n > "$RUNNER_TEMP/cpc-auto-stage/ed2-source.tar.gz"
+          cp tools/cpc_presto_compare_mnte.py "$RUNNER_TEMP/paired-parser-source.py"
+          export ED2_CUBIC_ANCHORED_REP=1 ED2_CUBIC_FAST_GROUP_VALIDATION=1
+          export ED2_CUBIC_ANCHORED_BASIS=1 ED2_CUBIC_LOCAL_BOND_CACHE=1
+          export ED2_CUBIC_DIRECT_HOP_TABLE=1 ED2_CUBIC_SKIP_UNUSED_HASH=1
+          export ED2_CUBIC_BASIS_COORD_CACHE=1 ED2_CUBIC_BASIS_PRUNED_CANON=1
+          for mn in auto explicit64; do
+            if [[ "$mn" == auto ]]; then
+              cap=-1
+              dir="$RUNNER_TEMP/measurements"
+              audit="$RUNNER_TEMP/audit"
+            else
+              cap=64
+              dir="$RUNNER_TEMP/measurements-explicit64"
+              audit="$RUNNER_TEMP/audit-explicit64"
+            fi
+            python3 tools/cpc_presto_cubic_benchmark.py \
+              --exe "$PWD/source/QS3ED2" --source-revision "$(git rev-parse HEAD)" \
+              --source-archive "$RUNNER_TEMP/cpc-auto-stage/ed2-source.tar.gz" \
+              --output "$dir" --preset cubic-smoke \
+              --allow-shared --sizes 4 --sectors oh-a1g --threads 1 \
+              --warmups 0 --repeats 1 --mnte "$cap" --timeout 180 --time-budget 2400
+            python3 tools/cpc_presto_cubic_audit.py \
+              --root "$dir" --output "$audit" \
+              --source-archive "$RUNNER_TEMP/cpc-auto-stage/ed2-source.tar.gz" \
+              --exe "$PWD/source/QS3ED2"
+          done
+          python3 tools/cpc_presto_compare_mnte.py \
+            --auto "$RUNNER_TEMP/measurements" \
+            --explicit64 "$RUNNER_TEMP/measurements-explicit64" \
+            --output "$RUNNER_TEMP/paired-science.json"
+          python3 - <<'PY'
+          import json,os
+          from pathlib import Path
+          d=json.loads((Path(os.environ["RUNNER_TEMP"])/"paired-science.json").read_text())
+          assert d["paired_audit"]=="PASS"
+          assert d["publication_ready"] is False
+          print("SHARED_CI_PAIRED_CORRECTNESS_PASS -- not a performance measurement")
+          PY
       - name: The source-only generic control must not trigger cubic auto capacity
         run: |
           if ED2_CUBIC_LOCAL_BOND_CACHE=1 tests/test_ex1.sh > "$RUNNER_TEMP/general-reject.log" 2>&1; then
