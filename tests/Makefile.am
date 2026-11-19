@@ -329,3 +329,4 @@ EXTRA_DIST += cpc_cubic_local_bond_cache_regression.py
 EXTRA_DIST += cpc_cubic_cache_phase_profile_regression.py
 EXTRA_DIST += cpc_cubic_direct_hop_table_regression.py
 EXTRA_DIST += cpc_cubic_skip_unused_hash_regression.py
+EXTRA_DIST += cpc_cubic_auto_mnte_regression.py
