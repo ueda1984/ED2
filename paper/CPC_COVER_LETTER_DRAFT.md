@@ -48,12 +48,18 @@ For a genuinely non-U(1) alternating spin-1/2/spin-1 chain,
 we compare finite-size spectra, correlators, the
 Dzyaloshinskii--Moriya-conjugate vector chirality and its
 Hellmann--Feynman derivative against independent calculations.
-We additionally include a source-pinned, four-irrep
-1000-site/three-magnon cubic symmetry stress test in which
-48 paired production solver trials preserve the numerical
-results under a carefully isolated, optional basis-coordinate
-optimization. The performance data are explicitly marked as
-exploratory rather than operator-attested benchmark estimates.
+The general ED2 development mainline also includes
+optional exact-order complex CSR Hamiltonian storage,
+coefficient-certified row capacity bounds and memory-oriented
+two-pass construction. These implementations retain original
+transition records and are checked by full complex
+Hamiltonian-vector comparisons and independent dense-matrix
+references on real and complex-DM systems. We report
+model-specific allocated-cache memory accounting without
+claiming a universal hardware speedup or a new sparse-matrix
+algorithm. A distinct, unmerged 1000-site cubic-symmetry
+development trial is retained only as ancillary provenance,
+not a benchmark of the proposed official program release.
 
 We believe this combination of expanded scientific model
 coverage, explicit symmetry and truncation contracts,
@@ -88,5 +94,7 @@ Sincerely,
 - Freeze source and independent reproducibility package;
   link the actual CPC library/Mendeley archive DOI only
   when assigned; do not invent a DOI.
-- Recheck that the 1000-site performance paragraph does not
-  accidentally imply a scheduler-verified publication speedup.
+- Keep the unmerged 1000-site cubic timing as nonrelease
+  exploratory provenance, not a speedup claim for the final program.
+- Confirm that the official QS-Cube release and Read the Docs
+  actually include any newly described general cache options.
