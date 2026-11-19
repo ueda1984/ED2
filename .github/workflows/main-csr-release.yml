@@ -2,17 +2,19 @@ name: ED2 optional CSR-only padded cache release proof
 
 on:
   push:
-    branches: [codex/ed2-main-csr-release-typed-base]
+    branches: [codex/ed2-main-csr-release-typed-base, codex/ed2-main-coefficient-cache-bound]
     paths:
       - "source/ham2vec.f90"
       - "tests/cpc_csr_matvec_driver.f90"
       - "tests/cpc_csr_release_regression.py"
+      - "tests/cpc_coeff_cache_bound_regression.py"
       - ".github/workflows/main-csr-release.yml"
   pull_request:
     paths:
       - "source/ham2vec.f90"
       - "tests/cpc_csr_matvec_driver.f90"
       - "tests/cpc_csr_release_regression.py"
+      - "tests/cpc_coeff_cache_bound_regression.py"
       - ".github/workflows/main-csr-release.yml"
   workflow_dispatch:
 
@@ -56,6 +58,14 @@ jobs:
             --output "$RUNNER_TEMP/csr-release-proof" \
             --sizes 4,6,8 --threads 1,4 --timeout 180
           test -s "$RUNNER_TEMP/csr-release-proof/summary.json"
+      - name: Certify safe nonzero-coupling bound on original, CSR and release caches
+        run: |
+          python3 -B tests/cpc_coeff_cache_bound_regression.py \
+            --driver "$RUNNER_TEMP/cpc-csr-release-driver" \
+            --output "$RUNNER_TEMP/coeff-bound-o2-proof" \
+            --sizes 4,6,8 --threads 1,4 \
+            --models real_xyz,complex_dm,u1_xxz,full_tensor --timeout 180
+          test -s "$RUNNER_TEMP/coeff-bound-o2-proof/summary.json"
       - name: Fast-math numerical old/CSR vs strict CSR/release IEEE bits
         run: |
           # The ED2 historical default -Ofast permits reassociation.
@@ -77,6 +87,13 @@ jobs:
             --sizes 4,6,8 --threads 1,4 --timeout 180 \
             --allow-fp-reassociation
           test -s "$RUNNER_TEMP/csr-release-ofast-proof/summary.json"
+          python3 -B tests/cpc_coeff_cache_bound_regression.py \
+            --driver "$RUNNER_TEMP/cpc-csr-release-ofast-driver" \
+            --output "$RUNNER_TEMP/coeff-bound-ofast-proof" \
+            --sizes 4,6,8 --threads 1,4 \
+            --models real_xyz,complex_dm,u1_xxz,full_tensor --timeout 180 \
+            --allow-fp-reassociation
+          test -s "$RUNNER_TEMP/coeff-bound-ofast-proof/summary.json"
       - name: Retain raw native outputs and memory provenance
         if: always()
         uses: actions/upload-artifact@v4
@@ -84,6 +101,8 @@ jobs:
           name: main-csr-release-gnu${{ matrix.gnu }}
           path: |
             ${{ runner.temp }}/csr-release-proof/summary.json
+            ${{ runner.temp }}/coeff-bound-o2-proof/summary.json
+            ${{ runner.temp }}/coeff-bound-ofast-proof/summary.json
             ${{ runner.temp }}/csr-release-ofast-proof/summary.json
             ${{ runner.temp }}/csr-release-ofast-proof/*/stdout.log
             ${{ runner.temp }}/csr-release-proof/*/stdout.log
