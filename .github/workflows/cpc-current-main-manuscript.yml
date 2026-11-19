@@ -35,6 +35,7 @@ jobs:
           python3 -S paper/check_dm_figure.py --self-test
           python3 -S paper/check_pr17_presto_table.py
           python3 -S paper/check_mainline_cache_claims.py --self-test
+          python3 -S paper/check_current_main_native_dm.py --self-test
           mkdir -p "$RUNNER_TEMP/cpc-paper"
           python3 -S paper/audit_cpc_submission.py \
             --repo "$PWD" --output "$RUNNER_TEMP/cpc-paper/readiness.json"
