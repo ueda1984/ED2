@@ -5,7 +5,8 @@ TESTS = test_ex1.sh
 EXTRA_DIST = test_ex1.sh test_common.sh \
              test_ex2.sh test_ex3.sh test_ex4.sh test_ex5.sh \
              test_ex6.sh test_ex7.sh test_ex8.sh test_ex9.sh \
-             cpc_csr_matvec_driver.f90 cpc_csr_main_regression.py
+             cpc_csr_matvec_driver.f90 cpc_csr_main_regression.py \
+             cpc_csr_release_regression.py
 
 # check-long は“任意”なので自前ループで堅牢に実行
 LONG_TESTS = \
