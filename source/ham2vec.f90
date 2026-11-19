@@ -159,10 +159,11 @@ contains
     integer :: i, j, ell(6), jd, max_jd,nominal_width,width_status
     integer :: direct_status,prereq_status,alloc_status
     integer :: pass,first,last,batch_rows,ib,batch_max,nnz,pos
-    integer, parameter :: direct_batch_rows=64
+    integer :: direct_batch_rows, batch_status,batch_iostat
     integer(int64) :: nominal_bytes,bounded_bytes,bytes_per_element
     integer(int64) :: entries,extra_bytes,stage_bytes,max_stage_bytes
     character(len=16) :: width_setting,direct_setting,prereq_setting
+    character(len=32) :: batch_setting
     integer, allocatable :: ni(:), st_list(:)
     complex(8) :: c
     !
@@ -214,6 +215,26 @@ contains
       error stop 'ED2_CSR_DIRECT_BUILD flag too long or invalid'
     end if
     csr_direct_build=direct_status==0.and.trim(adjustl(direct_setting))=='1'
+    direct_batch_rows=64
+    batch_setting=''
+    call get_environment_variable('ED2_CSR_DIRECT_BATCH_ROWS',batch_setting, &
+      status=batch_status)
+    if(batch_status==0)then
+      if(.not.csr_direct_build) &
+        error stop 'ED2_CSR_DIRECT_BATCH_ROWS requires ED2_CSR_DIRECT_BUILD=1'
+      batch_setting=trim(adjustl(batch_setting))
+      if(len_trim(batch_setting)==0) &
+        error stop 'ED2_CSR_DIRECT_BATCH_ROWS must be an integer in [1,1024]'
+      if(verify(trim(batch_setting),'0123456789')/=0) &
+        error stop 'ED2_CSR_DIRECT_BATCH_ROWS must be an integer in [1,1024]'
+      read(batch_setting,*,iostat=batch_iostat)direct_batch_rows
+      if(batch_iostat/=0) &
+        error stop 'ED2_CSR_DIRECT_BATCH_ROWS integer parsing failed'
+      if(direct_batch_rows<1.or.direct_batch_rows>1024) &
+        error stop 'ED2_CSR_DIRECT_BATCH_ROWS out of range [1,1024]'
+    else if(batch_status/=1)then
+      error stop 'ED2_CSR_DIRECT_BATCH_ROWS flag too long or invalid'
+    end if
     if(csr_direct_build)then
       prereq_setting=''
       call get_environment_variable('ED2_CSR_COMPLEX_CACHE',prereq_setting,status=prereq_status)
@@ -244,7 +265,7 @@ contains
       ! Pass 2 allocates EXACT CSR capacity and generates the same rows.
       do pass=1,2
         do first=1,lv,direct_batch_rows
-          last=min(lv,first+direct_batch_rows-1)
+          last=first+min(lv-first+1,direct_batch_rows)-1
           batch_rows=last-first+1
           allocate(wk_loc(wk_dim1,batch_rows),wk_ele(wk_dim1,batch_rows),stat=alloc_status)
           if(alloc_status/=0)error stop 'ED2_CSR_DIRECT_BUILD batch allocation failed'
@@ -297,6 +318,7 @@ contains
         'Hamiltonian action: csr-direct-build passes=',2, &
         ', max_staging_bytes=',max_stage_bytes, &
         ', peak_cache_payload_upper_bytes=',extra_bytes+max_stage_bytes
+      write(*,'(a,i0)') 'Hamiltonian action: csr-direct-batch-rows=',direct_batch_rows
     else
       allocate(wk_loc(wk_dim1,wk_dim))
       allocate(wk_ele(wk_dim1,wk_dim))
