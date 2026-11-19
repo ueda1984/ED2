@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <chrono>
 #include <cstdint>
+#include <limits>
 #include <fstream>
 #include <iostream>
 #include <set>
@@ -15,9 +16,9 @@
 #include <vector>
 #include <sys/resource.h>
 
-using clock_t = std::chrono::steady_clock;
+using SteadyClock = std::chrono::steady_clock;
 
-static double seconds(clock_t::time_point start, clock_t::time_point end) {
+static double seconds(SteadyClock::time_point start, SteadyClock::time_point end) {
   return std::chrono::duration<double>(end - start).count();
 }
 static long peak_kib() {
@@ -33,7 +34,7 @@ static uint64_t choose_small(int64_t n, int64_t k) {
     // For this pilot k is 2 or 3; keep arithmetic exact and fail closed.
     __uint128_t v = (__uint128_t)res * (n - k + i);
     v /= i;
-    if (v > UINT64_MAX) throw std::overflow_error("binomial overflow");
+    if (v > std::numeric_limits<uint64_t>::max()) throw std::overflow_error("binomial overflow");
     res = (uint64_t)v;
   }
   return res;
@@ -48,7 +49,7 @@ int main(int argc, char **argv) try {
   std::string mode = argv[3];
   uint64_t cap = std::stoull(argv[4]);
   std::string filename = argv[5];
-  if (n <= 2 || m < 0 || m > 3 || m > n || cap == 0 ||
+  if (n <= 2 || n > 4096 || m < 0 || m > 3 || m > n || cap == 0 ||
       (mode != "dimension" && mode != "basis" && mode != "solve")) {
     throw std::invalid_argument("unsupported N/m/mode/cap");
   }
@@ -66,9 +67,9 @@ int main(int argc, char **argv) try {
 
   // This is intentionally only the U(1) block: NO false Gamma/Oh claim.
   using namespace xdiag;
-  auto start = clock_t::now();
+  auto start = SteadyClock::now();
   Spinhalf block(n, n - m);
-  auto tbasis = clock_t::now();
+  auto tbasis = SteadyClock::now();
   if ((uint64_t)block.size() != dim) {
     throw std::runtime_error("XDiag U1 dimension mismatch");
   }
@@ -98,9 +99,9 @@ int main(int argc, char **argv) try {
   OpSum ops;
   for (auto [a, b] : bonds) ops += "J" * Op("SdotS", {a, b});
   ops["J"] = 1.0;
-  auto tsetup = clock_t::now();
+  auto tsetup = SteadyClock::now();
   double e0 = eigval0(ops, block); // API verified against XDiag example.
-  auto tsolve = clock_t::now();
+  auto tsolve = SteadyClock::now();
   std::cout << "{\"status\":\"ENERGY_ONLY_RESIDUAL_UNCHECKED\",\"N\":" << n
             << ",\"m\":" << m << ",\"dimension\":" << block.size()
             << ",\"bonds\":" << bonds.size() << ",\"E0\":" << e0
