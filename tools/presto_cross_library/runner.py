@@ -202,8 +202,14 @@ def launch(command,cwd,env,output,timeout,cpus,vmem_gib):
                               if timepath.exists() else None)
 
 
-def parse_native(work):
+def parse_native(work, kind):
     stdout=(work/"stdout.log").read_text(errors="replace")
+    if kind=="ed2-cubic":
+        for proof in ("Symmetry certificate: canonical cubic O_h semidirect product verified",
+                      "Basis builder: anchored-cubic",
+                      "Representative lookup: cubic-direct-hop-pairs"):
+            if proof not in stdout:
+                raise RuntimeError("Requested specialized ED2 kernel missing proof: "+proof)
     found=re.findall(r"THS\(k\)\s*=\s*(\d+)",stdout)
     if len(found)!=1 or int(found[0])!=DIM:
         raise RuntimeError("ED2 sector dimension missing/mismatch")
@@ -223,6 +229,8 @@ def parse_native(work):
     if len(pairs)!=1 or len(pairs[0])!=8 or pairs[0][1:3]!=["T","T"]:
         raise RuntimeError("ED2 direct Ritz pair not certified")
     energy=energies[0]; residual=float(pairs[0][5])
+    if abs(float(pairs[0][3])-energy)>1e-8 or abs(float(pairs[0][6])-1.0)>1e-8:
+        raise RuntimeError("ED2 direct Ritz energy/norm inconsistent with output")
     if abs(energy-REFERENCE_E0)>1e-8 or not math.isfinite(residual) or residual>1e-8:
         raise RuntimeError("ED2 E0/direct residual differs from independent oracle")
     stages={}
@@ -360,7 +368,7 @@ def run(args):
                 if runtime["returncode"]!=0:
                     raise RuntimeError("Exit=%d timeout=%s"%(runtime["returncode"],
                                                             runtime["timeout"]))
-                result_phys=parse_native(work) if kind.startswith("ed2") else parse_quspin(work)
+                result_phys=parse_native(work,kind) if kind.startswith("ed2") else parse_quspin(work)
                 rec.update(result_phys)
             except Exception as exc:
                 rec.update(status="FAILED",error=str(exc))
