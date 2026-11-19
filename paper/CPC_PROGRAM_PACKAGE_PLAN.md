@@ -1,0 +1,131 @@
+# CPC Program Library source-and-test package: concrete assembly plan
+
+**Status: proposed structure only, not an official release or CPC submission.**
+The CPC target is a CPiP article for the `QS3ED2` Fortran executable,
+not an installed reusable Fortran library. The primary published predecessor
+is QS^3/ED (CPC 277, 108369, 2022); the intended official generalized ED2
+source is QS-Cube/ED2, subject to upstream/project approval.
+
+## Final archive contents (freeze only after release approval)
+
+The reviewed **general ED2 mainline** now has opt-in
+coefficient-certified cached-row width, exact-order complex CSR,
+optional padded deallocation and a two-pass direct construction.
+They may be described in a package's operator/memory guide,
+but only with their flag prerequisites and without claims
+of a PRESTO-verified speedup. The official QS-Cube/ED2 code
+and Read the Docs must be synchronized before citing a new
+official release.
+
+| Directory | Contents | Acceptance |
+| --- | --- | --- |
+| `source/`, `Makefile.am`, `configure.ac` | Reviewed original program sources and Autotools build recipe | A clean extracted archive builds without untracked files |
+| `LICENSE`, `CITATION.cff`, `README.md` | MIT notice, original contributor attribution, version and citation metadata | Version, date and tag match the approved release |
+| `tests/`, `examples/` | Standard reference examples, regression and scientific verification scripts | `make check`, `make check-long`, and packaged example tests pass |
+| `program_examples/` | Three **reviewed** sample input/output sets with expected diagnostics | Every input hash, energy, residual and output checksum documented |
+| `docs/`, `paper/` | Model conventions, executable usage, reproducibility appendix and manuscript | README instructions tested from unpacked archive |
+| `provenance/` | Compiler, numerical libraries, source/binary SHA256, relevant CI and independent reference records | Exact build/release provenance and separate numerical evidence |
+| `performance_pilot/` (optional) | Full read-only raw PRESTO input/log/trace/audit records, subject to redistribution clearance | Both original jobs and operator reservation evidence present; no partial-only favorable trial selection |
+
+**Do not manufacture a software DOI, CPC accession, release date or
+author list.** The approved CPiP/Mendeley Data deposit workflow may supply
+a permanent Program Library record; a separate Zenodo DOI, if chosen,
+requires its own metadata and version policy.
+
+## Three practical example families for the program package
+
+### Example A: basic conserved spin model / regression continuity
+
+From a clean archive on Linux:
+
+    autoreconf -vfi
+    ./configure FC=gfortran FCFLAGS="-O2 -fopenmp"
+    make -j2
+    make check
+    # make check-long additionally runs the HPC-scale N1000 ex9;
+    # schedule that separately on suitable hardware.
+
+The existing short source-regression checks and historical ex1--ex8
+examples can be reproduced on ordinary CI hardware. The full
+`make check-long` suite includes ex9 and must not be represented
+as a lightweight package smoke test. Select at least one historical
+XXZ test input and its *actual native expected output* from the
+clean run for the final `program_examples/01-xxz/` folder.
+Do **not** claim independent original QS3/QS-Cube/ED comparison
+unless the separate old executable and source hash are included.
+
+### Example B: non-U(1) alternating mixed-spin oriented-DM response
+
+After building the executable, no Python scientific stack is needed:
+
+    export OPENBLAS_NUM_THREADS=1
+    python3 -S paper/tools/cpc_portable_dm_quickstart.py       --exe "$(pwd)/source/QS3ED2" --size 4 --omp 1       --output "$(pwd)/cpc-example-dm-l4"
+
+This verifies a fully specified spin-1/2/spin-1 Hamiltonian
+at neighboring DM strengths, native vector-chirality output and
+an independent finite-size reference/response identity.
+Select actual source-generated `input.dat`, native outputs,
+diagnostics and independent expected checks into
+`program_examples/02-mixed-spin-dm/` after final freeze.
+
+### Example C: independent small-system numerical reference
+
+The paper bundles `paper/audit_reference_small_systems.py`, which
+constructs an independent full/CSR mixed-spin Hamiltonian with
+NumPy/SciPy rather than reading the ED2 matrix elements. It verifies
+L4/L6/L8 energy, excitation gaps, oriented DM chirality,
+Hellmann--Feynman derivative and finite-size susceptibility
+against the archived 25-case source CSV:
+
+    python3 paper/audit_reference_small_systems.py \
+      --csv paper/data/cpc-stationary-dm-reference.csv
+
+Unlike Examples A/B this reference script **does require NumPy
+and SciPy** but is independent of the native ED2 Hamiltonian
+implementation. It is a scientific cross-check, not a
+substitute for a third executable input/output fixture.
+Before submission, add a complete reviewed 3rd ED2-native
+model fixture (e.g. anisotropic exchange tensor/fields),
+or restore the historical literature-specific
+`cpc_literature_yi_xyz_dm.py` runner into the final package
+only after confirming that it works on the frozen mainline.
+Do not advertise absent legacy scripts as packaged programs.
+
+### Advanced optional example: 1000-site cubic Gamma/O_h
+
+PR17's checked N1000/Ndown3 1D-irrep benchmark is a useful
+large-site demonstration, but it has dedicated HPC resource
+requirements and is **not** an appropriate sole beginner
+test. The 12-row medians and scope are in
+`paper/data/pr17_presto_coordinate_cache_pilot.csv` and
+`paper/data/README.md`. Formal article-level timing use
+still requires allocation attestation, raw trial preservation
+and further controlled repetitions. The CPiP package can
+include this as an optional workload once independent
+archiving rights and final source are established.
+
+## Release acceptance matrix
+
+Before labeling the package ready:
+
+- [ ] Coauthors/maintainers choose the official QS-Cube/ED2 release SHA,
+      tag, date, Program Title, version and CRediT metadata.
+- [ ] `configure.ac` and `CITATION.cff` match; the current
+      **1.0.0 vs 0.1.0** mismatch is not silently changed.
+- [ ] Source archive is recreated reproducibly, hashed and independently
+      extracted/compiled on at least two supported compilers.
+- [ ] Numerical regression cases and all three example families pass
+      with archived inputs, diagnostics and reference outputs.
+- [ ] Program Summary and README list actual runtime dependencies and
+      restrictions, including nonconserving occupation-window
+      projections and no installed library ABI.
+- [ ] Author-approved software archive is deposited through the
+      journal's required program-library route; DOI/accession
+      is copied only from the real assigned record.
+- [ ] Final article, figures, declarations and cover letter have
+      unanimous sign-off. No submission before that point.
+
+The existing source-pinned CI demonstrations establish much of the
+physics case already, but the final program library bundle must
+refer to an immutable **approved** release rather than a moving
+development branch. Refer to `paper/CPC_SUBMISSION_GATES.md`.
