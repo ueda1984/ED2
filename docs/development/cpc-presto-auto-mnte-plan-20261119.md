@@ -33,6 +33,56 @@ the 64-transition storage whenever `MNTE=-1` AND the experimental
 `ED2_CUBIC_LOCAL_BOND_CACHE=1` fixed-three-magnon path is selected.
 The default generic ED2 path remains unchanged.
 
+## 1a. Completed paired PRESTO N1000 run (2026-11-19; reported aggregates)
+
+**Provenance:** User-provided native logs and summary for PBS
+`24582.jpmjpr1911`, not the raw job archive. The candidate source
+was from the **already transferred** 2026-11-19 ZIP; do not infer that
+later documentation-only repository commits were deployed to PRESTO.
+All 5 thread configurations had 2 warmups and 7 measured trials per
+capacity mode, i.e. 45 distinct trials per mode. Both independent
+producer-data audits reported `AUDIT PASS`; paired comparison reported
+`CPC_AUTO_MNTE_PAIRED_PASS job=24582.jpmjpr1911 trials=45 cases=5`.
+Independent operator attestation is still missing (`review_eligible=false`).
+
+For periodic N=1000, 3 magnons, Gamma/O_h A1g D=4299,
+with basis coordinate-cache + canonical pruning + direct-hop table,
+the **automatic MNTE=-1** measured native phase medians were:
+
+| Threads | Basis (s) | Cache (s) | Lanczos (s) | Total (s) | RSS (MiB) | Max direct Ritz residual |
+|---:|---:|---:|---:|---:|---:|---:|
+| 1 | 0.063686 | 0.043116 | 0.086935 | 0.216955 | 17.820 | 2.244e-9 |
+| 4 | 0.063730 | 0.025627 | 0.028661 | 0.140868 | 17.816 | 2.837e-9 |
+| 8 | 0.063865 | 0.022498 | 0.018013 | 0.128415 | 17.867 | 9.568e-9 |
+| 16 | 0.063476 | 0.021243 | 0.015358 | 0.124013 | 18.090 | 4.918e-9 |
+| 32 | 0.063512 | 0.020985 | 0.017671 | 0.129892 | 18.371 | 4.640e-9 |
+
+Paired **explicit MNTE=64** median native total times for the same
+PBS job were T1=0.220445s, T4=0.143192s, T8=0.129012s,
+T16=0.125475s, T32=0.130942s. Across these thread counts the
+automatic/explicit total median ratio was 0.9838-0.9954. Do not claim
+automatic MNTE is faster without a paired significance/ordering
+analysis; the scientific claim is **equal physical results with
+automatic safe capacity**.
+
+At this size 16 threads minimized the *native ED2 phase-total*
+(0.124013s); native 1-to-16 speedup 1.75x (not 16x) because the
+near-constant ~0.064s basis phase accounts for 51.2% of the T16 total.
+At T8 the maximum reported Ritz residual 9.568e-9 is below the
+1.01e-8 audit gate but close enough to disclose explicit thresholds
+and sensitivity. The number of Hamiltonian applications may vary with
+thread count; normalize solver-cost interpretation accordingly.
+RSS remains 17.8-18.4 MiB. These are Fortran phase-total wall times,
+**not** whole PBS turnaround times.
+
+**Publication gate still open:** retain original
+`$HOME/ED2_CPC_AUTO_MNTE_RESULTS/24582.jpmjpr1911/` including
+`measurements/trials.jsonl`, `measurements-explicit64/trials.jsonl`,
+both `audit.json` files, `paired-comparison.json`, PBS node
+preflight/postflight, compiler/process affinity and binary/source SHA
+records. Archive it with a SHA256 manifest. Independently obtain
+site-operator confirmation of scheduler exclusion before publication.
+
 ## 2. Unpack and verify (no scheduler action)
 
 Transfer this ZIP to PRESTO via your normal method and unzip it into a NEW
