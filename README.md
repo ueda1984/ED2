@@ -35,7 +35,16 @@ Official documentation:
 
 https://ed2.readthedocs.io/en/latest/
 
+**Development-versus-release note:** the Read the Docs site is built from
+`QS-Cube/ED2`; some general optimization options described in the
+`ueda1984/ED2` fork are not present upstream until its maintainers
+merge the corresponding changes and rebuild the site.
+
 Includes:
+
+- [General Hamiltonian cache tuning](docs/user-guide/performance-and-memory.md),
+  including complex CSR, coefficient-certified capacities and two-pass build
+- [Lattice-specific optimization tips](docs/examples/optimization-tips.md)
 
 - Installation instructions
 - Quickstart examples
