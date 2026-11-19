@@ -24,6 +24,7 @@ import hashlib
 import json
 import math
 import os
+import re
 from pathlib import Path
 import subprocess
 import sys
@@ -131,6 +132,60 @@ def diagnostics(path):
     return scalar,pairs
 
 
+
+def legacy_main_solver_diagnostics(stdout,dimension,energies):
+    """Original QS3ED2 TRLan has no direct-residual diagnostic sidecar.
+
+    Accept only a converged restart indicator AND two independently
+    computed native <Phi|H|Phi> expectations consistent with Ritz output.
+    This is NOT a direct ||H psi-E psi|| residual certification.
+    The separate reference E0/K/chi checks remain mandatory.
+    """
+    if "Eigen solver: my thick restart Lanczos" not in stdout:
+        raise AssertionError("Expected original-main thick-restart solver")
+    dim=re.findall(r"(?m)^\s*THS\(k\)\s*=\s*(\d+)\s*$",stdout)
+    if len(dim)!=1 or int(dim[0])!=dimension:
+        raise AssertionError("Incorrect native projected Hilbert dimension")
+    restart=re.findall(
+        r"(?m)^tritr, ene\(NOK\), max_conv, flag:\s*"
+        r"(\d+)\s+([-+0-9.EeDd]+)\s+([-+0-9.EeDd]+)\s+(\d+)\s*$",stdout)
+    if not restart:
+        raise AssertionError("Missing original-main TRLan restart diagnostic")
+    iteration,_,metric,flag=restart[-1]
+    conv=to_float(metric)
+    if int(flag)!=2 or not (0.0<=conv<=1e-10):
+        raise AssertionError("TRLan did not report converged restart: "+
+                             str(restart[-1]))
+    marker="Check accuracy <Phi|H|Phi>"
+    if stdout.count(marker)!=1:
+        raise AssertionError("Native eigenvector expectation check missing")
+    tail=stdout.split(marker,1)[1].split("total lanczos step:",1)[0]
+    rows=re.findall(r"(?m)^\s*([12])\s+\(\s*"
+                    r"([-+0-9.EeDd]+)\s*,\s*([-+0-9.EeDd]+)\s*\)\s*$",tail)
+    if len(rows)!=2 or [int(row[0]) for row in rows]!=[1,2]:
+        raise AssertionError("Unexpected native H expectation table")
+    checks=[complex(to_float(re),to_float(im)) for _,re,im in rows]
+    discrepancy=max(abs(z.real-e) for z,e in zip(checks,energies))
+    maximum_imag=max(abs(z.imag) for z in checks)
+    if discrepancy>1e-8 or maximum_imag>1e-8:
+        raise AssertionError("Native Ritz/energy expectation consistency failed: "+
+                             str((discrepancy,maximum_imag)))
+    steps=re.findall(r"(?m)^\s*total lanczos step:\s*(\d+)\s*$",stdout)
+    if len(steps)!=1 or int(steps[0])<1:
+        raise AssertionError("Missing original-main Lanczos iteration count")
+    return dict(
+        kind="original_main_no_direct_residual_sidecar",
+        direct_residual_certified=False,
+        max_direct_residual=None,
+        native_restart_iteration=int(iteration),
+        native_restart_metric=conv,
+        max_ritz_expectation_difference=discrepancy,
+        max_imaginary_ritz_expectation=maximum_imag,
+        lanczos_steps=int(steps[0]),
+        h_applications=None,
+        seed_verified=False,
+    )
+
 def run(exe,root,size,D,threads,timeout):
     label=("zero" if D==0 else f"{D:+.10g}".replace("+","p").replace("-","m"))
     work=root/f"D-{label}"
@@ -147,26 +202,45 @@ def run(exe,root,size,D,threads,timeout):
                             check=False,timeout=timeout)
     elapsed=time.perf_counter()-begin
     (work/"stdout.log").write_bytes(proc.stdout)
-    diag,pairs=diagnostics(work/"diagnostics.txt")
-    status=int(diag["status"])
-    if (status==0)!=(proc.returncode==0) or status!=0:
-        raise AssertionError("ED2 failed convergence/exit contract: "+
-                             str((status,proc.returncode,diag.get("reason"))))
+    if proc.returncode!=0:
+        raise AssertionError("Native ED2 exited with error code {}: {}".format(
+            proc.returncode, proc.stdout.decode("utf-8",errors="replace")[-2000:]))
     dimension=6**(size//2)
-    if int(diag["dimension"])!=dimension or int(diag["wanted"])!=2:
-        raise AssertionError("Incorrect full Hilbert dimension or requested pairs")
-    if diag.get("all_requested_residuals_met")!="T" or \
-       diag.get("residual_policy_enabled")!="T" or diag.get("seed_specified")!="T":
-        raise AssertionError("Solver residual/seed policy not honored")
-    if len(pairs)!=2 or any(p["index"]!=i+1 or p["available"]!="T" or
-                            p["certified"]!="T" or
-                            p["residual"]>RESIDUAL_REQUEST*(1+2e-12)
-                            for i,p in enumerate(pairs)):
-        raise AssertionError("Invalid low-eigenpair diagnostics")
     energy_rows=read_numeric(work/"eigenvalues.dat",2,2)
     if [int(v[0]) for v in energy_rows]!=[1,2]:
         raise AssertionError("Unexpected lowest eigenpair indices")
     energies=[v[1] for v in energy_rows]
+    if (work/"diagnostics.txt").is_file():
+        # Enhanced experimental branch: direct residuals are certified by
+        # a source-produced diagnostic file, not deduced from energies.
+        diag,pairs=diagnostics(work/"diagnostics.txt")
+        status=int(diag["status"])
+        if status!=0:
+            raise AssertionError("ED2 failed convergence/exit contract: "+
+                                 str((status,proc.returncode,diag.get("reason"))))
+        if int(diag["dimension"])!=dimension or int(diag["wanted"])!=2:
+            raise AssertionError("Incorrect full Hilbert dimension or requested pairs")
+        if diag.get("all_requested_residuals_met")!="T" or \
+           diag.get("residual_policy_enabled")!="T" or diag.get("seed_specified")!="T":
+            raise AssertionError("Solver residual/seed policy not honored")
+        if len(pairs)!=2 or any(p["index"]!=i+1 or p["available"]!="T" or
+                                p["certified"]!="T" or
+                                p["residual"]>RESIDUAL_REQUEST*(1+2e-12)
+                                for i,p in enumerate(pairs)):
+            raise AssertionError("Invalid low-eigenpair diagnostics")
+        evidence=dict(kind="enhanced_direct_residual_sidecar",
+                      direct_residual_certified=True,
+                      max_direct_residual=max(p["residual"] for p in pairs),
+                      h_applications=int(diag["h_applications"]),
+                      seed_verified=True,
+                      lanczos_steps=None)
+    else:
+        # The actual current generic main has no ED2_DIAGNOSTICS implementation.
+        # Its restart metric and <Phi|H|Phi> agreement are useful checks,
+        # but are *not* a direct eigenpair norm residual.
+        evidence=legacy_main_solver_diagnostics(
+            proc.stdout.decode("utf-8",errors="replace"),dimension,energies)
+    status=0
     if energies[1]-energies[0]<.05:
         raise AssertionError("Unexpectedly small physical lowest gap")
     mag=read_numeric(work/"local_mag.dat",4,size)
@@ -186,8 +260,7 @@ def run(exe,root,size,D,threads,timeout):
         total+=((-1)**j)*component
     return dict(D=D,energy0=energies[0],first_gap=energies[1]-energies[0],
                 kappa_sum=total,bond_kappa=bond_values,
-                max_direct_residual=max(p["residual"] for p in pairs),
-                h_applications=int(diag["h_applications"]),
+                diagnostic=evidence,
                 wall_seconds=elapsed,case=str(work.relative_to(root)),
                 status=status,dimension=dimension)
 
@@ -215,8 +288,8 @@ def main():
             result=run(exe,root,args.size,D,args.omp,args.timeout)
             rows.append(result)
             print("PORTABLE ED2 DM",result["case"],"E0",result["energy0"],
-                  "K",result["kappa_sum"],"residual",
-                  result["max_direct_residual"],flush=True)
+                  "K",result["kappa_sum"],"evidence",
+                  result["diagnostic"]["kind"],flush=True)
         except Exception as exc:
             problem=dict(D=D,error_type=type(exc).__name__,message=str(exc))
             issues.append(problem)
@@ -256,7 +329,7 @@ def main():
                 digest.update(block)
         return digest.hexdigest()
     binary_hash=sha256(exe)
-    report=dict(schema=1,source_sha=os.environ.get("GITHUB_SHA"),
+    report=dict(schema=2,source_sha=os.environ.get("GITHUB_SHA"),
                 bin_path=str(exe),bin_sha256=binary_hash,
                 model="connected two-site periodic non-U1 mixed-spin XYZ/Gamma/DM OBC",
                 caveat="finite-size software demonstration, not a thermodynamic phase claim",
