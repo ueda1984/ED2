@@ -7,7 +7,7 @@ program cpc_csr_matvec_driver
   use state_lists, only: get_cum_ltd_rep_combination, &
     cum_ltd_rep_combination,allocate_lists_omp_SQ
   use ham2vec, only: make_wk_loc_and_ele,ham_to_vec_wave_vector, &
-    make_full_hamiltonian,wk_ele
+    make_full_hamiltonian,wk_ele,wk_loc,csr_coeff,csr_release_padded
   implicit none
   complex(real64), allocatable :: v(:),h_v(:),dense_h(:,:)
   real(real64) :: delta
@@ -24,7 +24,16 @@ program cpc_csr_matvec_driver
   if(THS<=0)error stop 'CSR test: invalid basis dimension'
   call allocate_lists_omp_SQ
   call make_wk_loc_and_ele(THS)
-  write(*,'(a,i0)') 'CPC_CSR_NATIVE_IMAG_COUNT=',count(aimag(wk_ele)/=0.0_real64)
+  if(allocated(wk_ele))then
+    write(*,'(a,i0)') 'CPC_CSR_NATIVE_IMAG_COUNT=',count(aimag(wk_ele)/=0.0_real64)
+    if(.not.allocated(wk_loc))error stop 'CSR test: partial padded cache retained'
+    write(*,'(a)') 'CPC_CSR_PADDED_RETAINED_PASS'
+  else
+    if(.not.csr_release_padded)error stop 'CSR test: unexpected padded release'
+    if(allocated(wk_loc))error stop 'CSR test: padded location retained'
+    write(*,'(a,i0)') 'CPC_CSR_NATIVE_IMAG_COUNT=',count(aimag(csr_coeff)/=0.0_real64)
+    write(*,'(a)') 'CPC_CSR_PADDED_RELEASE_PASS'
+  end if
 
   allocate(v(THS),h_v(THS))
   if(THS<=216)then
