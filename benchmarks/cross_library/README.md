@@ -195,6 +195,10 @@ both end-to-end and per-matvec numbers are required.
 - reference.py: NumPy dense small-sector oracle, physical case metadata,
   bond construction, independent self-tests. Safe metadata-only mode for
   large cases.
+- symmetry_dimensions.py: independent Burnside-count oracle for 1000-site
+  classes. For m=2,3 it calculates exact U(1), translation Gamma and
+  trivial point-group A1 dimensions without enumerating many-body basis
+  states. It also records the canonical physical-model SHA256.
 - run_quspin.py: executable *U(1)-only* QuSpin/SciPy CSR pilot with a hard
   dimension safety cap; prints JSON and records actual direct residual.
   It is intentionally not a claim of the best possible QuSpin performance.
@@ -209,13 +213,20 @@ QuSpin, NumPy, SciPy):
 
 ~~~bash
 python3 benchmarks/cross_library/reference.py --self-test
+python3 benchmarks/cross_library/reference.py --shape 10,10,10 --ndown 3 --metadata-only
+OPENBLAS_NUM_THREADS=1 python3 benchmarks/cross_library/symmetry_dimensions.py --all-primary
+# Small solver correctness smoke only (NOT a headline benchmark):
 python3 benchmarks/cross_library/reference.py --shape 6 --ndown 2
 OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 \
   python3 benchmarks/cross_library/run_quspin.py --shape 6 --ndown 2
 ~~~
 
-On the current development host, QuSpin and XDiag are unavailable. Only
-the standalone reference and Python syntax checks have been executed.
+The prior standalone numerical prechecks and a local independent NumPy
+Burnside prototype (N1000/1024) have been executed; the latter reproduced
+cubic Gamma/Oh A1g D=4299. The committed symmetry_dimensions.py source
+and full comparator adapters still need clean CI integration. No actual
+QuSpin/XDiag 1000-site runtime measurements exist yet. Do not treat any
+prototype check as a performance result.
 
 ## Specific audit warning about existing documentation
 
