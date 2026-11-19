@@ -1,0 +1,149 @@
+#!/usr/bin/env bash
+#PBS -N ED2_QS3_N1000
+#PBS -q standard
+#PBS -l select=1:ncpus=96:mem=64gb
+#PBS -l place=exclhost
+#PBS -l walltime=06:00:00
+#PBS -j oe
+#
+# PRESTO: manual qsub after site operator verifies the *actual* allocation
+# policy. No job submission by this script. Publication attestation is separate.
+set -euo pipefail
+umask 077
+if [[ ${ED2_EXCLUSIVE_CONFIRMED:-0} != 1 ]]; then
+  echo "REFUSED: site/operator review required; ED2_EXCLUSIVE_CONFIRMED=1" >&2
+  exit 2
+fi
+for variable in PBS_JOBID PBS_O_WORKDIR PBS_NODEFILE ED2_STAGE ED2_RESULTS_ROOT; do
+  if [[ ! -v $variable || -z ${!variable} ]]; then
+    echo "REFUSED: missing real PBS allocation variable $variable" >&2
+    exit 2
+  fi
+done
+if [[ ! -f "$PBS_NODEFILE" ]]; then
+  echo "REFUSED: PBS_NODEFILE missing" >&2; exit 2
+fi
+stage=$(cd -- "$ED2_STAGE" && pwd -P)
+mkdir -p -- "$ED2_RESULTS_ROOT"
+results_root=$(cd -- "$ED2_RESULTS_ROOT" && pwd -P)
+case "$PBS_JOBID" in
+  *[!A-Za-z0-9_.-]*|"") echo "REFUSED: malformed PBS_JOBID" >&2; exit 2 ;;
+esac
+work="$results_root/$PBS_JOBID"
+mkdir -- "$work" # never overwrite even partial results
+work=$(cd -- "$work" && pwd -P)
+trap 'printf "PBS WRAPPER EXIT %s %s\n" "$?" "$(date -Is)" >&2' EXIT
+# Check scheduler's ACTUAL allocation, not merely the requested #PBS tags.
+qstat -f "$PBS_JOBID" > "$work/qstat-start.txt" 2>&1
+pbsnodes -av > "$work/pbsnodes-start.txt" 2>&1 || true
+grep -Eq 'Resource_List\.place[[:space:]]*=[[:space:]]*exclhost' "$work/qstat-start.txt" ||
+  { echo "REFUSED: actual PBS place not exclhost" >&2; exit 2; }
+grep -Eq 'Resource_List\.select[[:space:]]*=[[:space:]]*1:ncpus=96' "$work/qstat-start.txt" ||
+  { echo "REFUSED: actual PBS select differs from approved 96 CPUs" >&2; exit 2; }
+grep -Eq 'queue[[:space:]]*=[[:space:]]*standard' "$work/qstat-start.txt" ||
+  { echo "REFUSED: actual PBS queue not standard" >&2; exit 2; }
+grep -q 'exec_vnode' "$work/qstat-start.txt" ||
+  { echo "REFUSED: actual exec_vnode absent" >&2; exit 2; }
+node_names=$(awk -F. '{print $1}' "$PBS_NODEFILE" | sort -u)
+if [[ $(printf '%s\n' "$node_names" | wc -l) -ne 1 ||
+      "$node_names" != "$(hostname -s)" ]]; then
+  echo "REFUSED: allocation does not match a single current host" >&2; exit 2
+fi
+(cd -- "$stage" && sha256sum -c SHA256SUMS) > "$work/archive-checksums.log"
+# Re-evaluate the archived source capability gate *in the allocation*.
+python3 "$stage/preflight.py" --stage "$stage" --mode stage   --output "$work/archive-capabilities.json" > "$work/preflight.log"
+python3 - "$work/archive-capabilities.json" <<'PY'
+import json,sys
+p=json.load(open(sys.argv[1]))
+if p["status"]!="READY":
+    raise SystemExit("REFUSED: archived main lacks certified cubic/diagnostic features")
+PY
+for name in main benchmark launcher; do
+  cp -- "$stage/$name-commit.txt" "$work/"
+done
+(
+  cd -- "$work"
+  sha256sum "$stage/ed2-main.tar.gz" "$stage/benchmark-tools.tar.gz"     "$stage/launch-tools.tar.gz"
+  date -Is
+  hostname
+  lscpu
+  free -h
+  taskset -pc $$
+  command -v gfortran
+  gfortran --version | head -1
+  command -v python3
+  python3 --version
+) > "$work/environment.txt" 2>&1
+mkdir -- "$work/main"
+tar -xzf "$stage/ed2-main.tar.gz" -C "$work/main"
+tar -xzf "$stage/benchmark-tools.tar.gz" -C "$work"
+tar -xzf "$stage/launch-tools.tar.gz" -C "$work"
+if [[ ! -r "$work/tools/presto_cross_library/runner.py" ||
+      ! -r "$work/benchmarks/cross_library/run_quspin.py" ]]; then
+  echo "Benchmark runner missing after verified archive extraction" >&2; exit 2
+fi
+# These flags must never persist into the native build/test baseline.
+unset ED2_CUBIC_FAST_GROUP_VALIDATION ED2_CUBIC_ANCHORED_REP   ED2_CUBIC_ANCHORED_BASIS ED2_CUBIC_LOCAL_BOND_CACHE   ED2_CUBIC_DIRECT_HOP_TABLE ED2_LANCZOS_TWO_STAGE   ED2_PHASE_TIMING ED2_DIAGNOSTICS ED2_ALLOW_LARGE_GROUP_VALIDATION
+export OMP_NUM_THREADS=1 OMP_DYNAMIC=FALSE OMP_PROC_BIND=close OMP_PLACES=cores
+export OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 BLIS_NUM_THREADS=1
+export NUMEXPR_NUM_THREADS=1 VECLIB_MAXIMUM_THREADS=1 GOTO_NUM_THREADS=1
+export ED2_RNG_SEED=1984
+(
+  cd "$work/main"
+  autoreconf -vfi
+  # PRESTO may ship the versioned OpenBLAS runtime without development links.
+  # The workaround is private to the temporary extracted source directory.
+  openblas=''
+  for lib in /usr/lib64/libopenblas.so.0 /lib64/libopenblas.so.0; do
+    if [[ -r "$lib" ]]; then openblas=$lib; break; fi
+  done
+  if [[ -n "$openblas" ]]; then
+    mkdir -p .ed2-local-libs
+    ln -s "$openblas" .ed2-local-libs/libopenblas.so
+    ln -s "$openblas" .ed2-local-libs/liblapack.so
+    LDFLAGS="-L$PWD/.ed2-local-libs" ./configure FC=gfortran FCFLAGS="-O2 -fopenmp"
+  else
+    ./configure FC=gfortran FCFLAGS="-O2 -fopenmp"
+  fi
+  make -j4
+  make check
+) > "$work/build-check.log" 2>&1
+exe="$work/main/source/QS3ED2"
+test -x "$exe"
+sha256sum "$exe" > "$work/ed2-executable.sha256"
+programs=${ED2_PROGRAMS:-ed2-cubic}
+case "$programs" in
+  ed2-cubic|ed2-cubic,quspin|quspin,ed2-cubic|ed2-legacy|ed2-legacy,ed2-cubic|ed2-cubic,ed2-legacy|quspin)
+    ;;
+  *) echo "REFUSED: unreviewed ED2_PROGRAMS=$programs" >&2; exit 2 ;;
+esac
+if [[ "$programs" == *quspin* ]]; then
+  : "${ED2_QUSPIN_PYTHON:?Provide a preinstalled QuSpin 1.0.1 Python >=3.10 env}"
+  test -x "$ED2_QUSPIN_PYTHON"
+  "$ED2_QUSPIN_PYTHON" - <<'PY' > "$work/quspin-environment.txt" 2>&1
+import quspin,sys,numpy,scipy
+assert sys.version_info >= (3,10),sys.version
+assert quspin.__version__ == "1.0.1",quspin.__version__
+print(sys.version)
+print("QuSpin",quspin.__version__,"NumPy",numpy.__version__,"SciPy",scipy.__version__)
+PY
+fi
+mkdir "$work/trials"
+export ED2_EXCLUSIVE_CONFIRMED=1
+export ED2_MAIN_COMMIT=$(cat "$stage/main-commit.txt")
+args=(--exe "$exe" --bench "$work/benchmarks/cross_library"
+      --out "$work/trials" --programs "$programs"
+      --threads "${ED2_THREADS:-1}"
+      --warmups "${ED2_WARMUPS:-0}" --repeats "${ED2_REPEATS:-1}"
+      --timeout-seconds "${ED2_TIMEOUT_SECONDS:-1800}"
+      --max-virtual-gib "${ED2_MAX_VMEM_GIB:-48}")
+if [[ "$programs" == *quspin* ]]; then args+=(--quspin-python "$ED2_QUSPIN_PYTHON"); fi
+python3 "$work/tools/presto_cross_library/runner.py" "${args[@]}"   > "$work/trials-console.log" 2>&1
+{
+  date -Is
+  qstat -f "$PBS_JOBID" || true
+  pbsnodes -av || true
+  taskset -pc $$
+} > "$work/allocation-postflight.txt" 2>&1
+printf "PRESTO pilot completed: %s/trials/summary.json\n" "$work"
+echo "WARNING: Requires independent human confirmation of actual node exclusivity."
