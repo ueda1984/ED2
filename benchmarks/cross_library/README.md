@@ -124,6 +124,42 @@ allocation, and save its physical input hash. Verify all large-case
 Hamiltonians are truly U(1) conserving and exactly obey specified
 space-group symmetries.
 
+## External library source-level feasibility audit (2026-11-19)
+
+These are *code-path observations*, not executed N=1000 benchmarks.
+
+- **QuSpin 1.0.1:** the documented spin_basis_general constructor supports
+  large custom integer dtypes including uint1024, and custom translation
+  maps. Its make(N_p=0) option avoids allocating an unnecessarily large
+  prefix table for dilute bases. These features do not establish practical
+  runtime, peak RSS, or correctness for 1000/1024-site m=3. The current
+  run_quspin.py probes exactly U(1) or commuting-translation Gamma;
+  noncommuting point-group symmetry projections require separate proof.
+- **XDiag 0.6.0:** source xdiag/blocks/spinhalf.cpp (at upstream commit
+  27065537a743c642c35efa0e1b5ae4f326fd984c) dispatches fixed-nup
+  cases with nsites>128 to Combinations<BitsetDynamic>. Thus it is false
+  to claim a universal 64-site limit for fixed magnetization. However
+  its fast <k>sublattice symmetry backend explicitly rejects nsites>64.
+  xdiag/blocks/distributed/spinhalf_distributed.cpp independently rejects
+  nsites>64 and distributed permutation symmetries. Whether the generic
+  BitsetDynamic+BasisSymmetric implementation finishes N1000/m3 efficiently
+  is a resource/benchmark question, not resolved by the dispatch alone.
+- **XDiag source probe:** xdiag_preflight.cpp is a preliminary single-node
+  C++17 U(1)-only capacity/eigenvalue adapter, based on documented
+  Spinhalf(n,nup), OpSum/SdotS and eigval0 APIs. The code has not yet been
+  compiled against the external XDiag library. Its optional solve path
+  records the eigenvalue but does **not** compute the direct residual;
+  consequently it is NOT eligible for a CPC performance table.
+- **Scope warning:** an U(1)-only success at 1000 sites is not the same
+  calculation as a Gamma+Oh A1g success (dimension 4299). Separately report
+  XDiag generic symmetries, sublattice optimized symmetries and MPI support.
+
+Sources:
+- https://quspin.github.io/QuSpin/generated/quspin.basis.spin_basis_general.html
+- https://quspin.github.io/QuSpin/basis.html
+- https://github.com/awietek/xdiag/blob/27065537a743c642c35efa0e1b5ae4f326fd984c/xdiag/blocks/spinhalf.cpp
+- https://github.com/awietek/xdiag/blob/27065537a743c642c35efa0e1b5ae4f326fd984c/xdiag/blocks/distributed/spinhalf_distributed.cpp
+
 ## Specialized cubic lane (S) is a distinct physical workload
 
 Existing ED2 draft PRs #13--#21 contain exact but highly scoped cubic
@@ -192,41 +228,65 @@ both end-to-end and per-matvec numbers are required.
 
 ## Tools currently provided
 
-- reference.py: NumPy dense small-sector oracle, physical case metadata,
-  bond construction, independent self-tests. Safe metadata-only mode for
-  large cases.
-- symmetry_dimensions.py: independent Burnside-count oracle for 1000-site
-  classes. For m=2,3 it calculates exact U(1), translation Gamma and
-  trivial point-group A1 dimensions without enumerating many-body basis
-  states. It also records the canonical physical-model SHA256.
-- run_quspin.py: executable *U(1)-only* QuSpin/SciPy CSR pilot with a hard
-  dimension safety cap; prints JSON and records actual direct residual.
-  It is intentionally not a claim of the best possible QuSpin performance.
-  Tests against an installed QuSpin runtime remain to be performed.
-- XDiag: next implementation step, starting with Spinhalf(N,N-m) and
-  matrix-free versus CSR modes (C++ recommended). XDiag release and
-  source SHA must be pinned. The XDiag benchmark guide explicitly compares
-  single Lanczos iteration, so record end-to-end timing independently.
+- reference.py: NumPy dense small-sector oracle (NO performance inference),
+  bond generator and model SHA256. Use --metadata-only at N1000.
+- symmetry_dimensions.py: independent Burnside group-orbit dimension
+  calculations at large N, with N1000/1024 dimensions verified locally.
+- verify_orbits.py: independent explicit small-geometry orbit traversal.
+  Six small cases were locally verified against Burnside, including
+  (4,4,4), three magnons: 44 space-group A1 orbits.
+- export_case.py: deterministic same-physics .bonds and .json manifest,
+  with physical model and bond SHA256 for the other language adapters.
+- run_quspin.py: gated U(1)-only or translation-Gamma QuSpin prototype,
+  staged --mode dimensions|basis|solve. Default dimensions stage
+  requires NO QuSpin and allocates no many-body states; basis/solve
+  require an installed QuSpin. The source has not yet been executed with
+  QuSpin (only NumPy preflight checks are covered by CI).
+- xdiag_preflight.cpp: XDiag 0.6.0 API-based preliminary C++ U(1)
+  constructor and energy probe. Requires an external XDiag build,
+  and has not yet been compiler-tested against that library.
+- .github/workflows/cross-library-science.yml: independent model,
+  orbit-count, export, guard and syntax checks; does not install or run
+  QuSpin/XDiag, and does not produce performance claims.
 
-Suggested local smoke (the second command needs NumPy, the third requires
-QuSpin, NumPy, SciPy):
+### Non-allocating feasibility commands
 
 ~~~bash
 python3 benchmarks/cross_library/reference.py --self-test
+OPENBLAS_NUM_THREADS=1 python3 benchmarks/cross_library/symmetry_dimensions.py --self-test
+OPENBLAS_NUM_THREADS=1 python3 benchmarks/cross_library/verify_orbits.py --self-test
 python3 benchmarks/cross_library/reference.py --shape 10,10,10 --ndown 3 --metadata-only
-OPENBLAS_NUM_THREADS=1 python3 benchmarks/cross_library/symmetry_dimensions.py --all-primary
-# Small solver correctness smoke only (NOT a headline benchmark):
-python3 benchmarks/cross_library/reference.py --shape 6 --ndown 2
-OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 \
-  python3 benchmarks/cross_library/run_quspin.py --shape 6 --ndown 2
+python3 benchmarks/cross_library/export_case.py --shape 10,10,10 --ndown 3 --output-prefix /tmp/cubic_n1000_m3
+OPENBLAS_NUM_THREADS=1 python3 benchmarks/cross_library/run_quspin.py --shape 10,10,10 --ndown 3 --sector gamma --mode dimensions
+# Intentionally SKIPPED_RESOURCE_CAP; never construct C(1000,3) by default:
+OPENBLAS_NUM_THREADS=1 python3 benchmarks/cross_library/run_quspin.py --shape 10,10,10 --ndown 3 --sector gamma --mode basis --max-raw-dim 1000000
 ~~~
 
-The prior standalone numerical prechecks and a local independent NumPy
-Burnside prototype (N1000/1024) have been executed; the latter reproduced
-cubic Gamma/Oh A1g D=4299. The committed symmetry_dimensions.py source
-and full comparator adapters still need clean CI integration. No actual
-QuSpin/XDiag 1000-site runtime measurements exist yet. Do not treat any
-prototype check as a performance result.
+### Controlled, conditional probe on an installed external library
+
+QuSpin 1000-site **two-magnon** basis-only evaluation may be attempted,
+only with CPU/memory/time limits approved by the host operator:
+
+~~~bash
+OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 MKL_NUM_THREADS=1 timeout 120s \
+  python3 benchmarks/cross_library/run_quspin.py --shape 10,10,10 --ndown 2 --sector gamma --mode basis --max-raw-dim 600000
+~~~
+
+The default m3 safety cap is not a claim that QuSpin cannot run m3.
+Record skipped resource gates distinctly from runtime failures.
+
+After the user separately builds xdiag_preflight.cpp against XDiag v0.6.0
+and pins the installed source SHA, the equivalent source-only U(1) probe
+takes arguments: N, m, dimension|basis|solve, maximum raw U(1)
+dimension, canonical .bonds path. For example:
+
+~~~bash
+./xdiag_preflight 1000 3 dimension 1000000 /tmp/cubic_n1000_m3.bonds
+./xdiag_preflight 1000 3 basis 1000000 /tmp/cubic_n1000_m3.bonds
+~~~
+
+The latter must return SKIPPED_RESOURCE_CAP without constructing
+C(1000,3). Actual 1000-site XDiag timing remains unmeasured.
 
 ## Specific audit warning about existing documentation
 
