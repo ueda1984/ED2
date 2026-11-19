@@ -252,6 +252,58 @@ Reference: https://github.com/ueda1984/ED2/blob/9692d8b1fd903bcb7b1b67a5f180c574
 and https://awietek.github.io/xdiag/examples/entanglement_ground_state/
 (XDiag `Exchange` + `SzSz` example).
 
+## Independently recovered 1000-site cubic physical eigenvalue
+
+A **standalone C++17** implementation (independent_cubic_a1g.cpp)
+constructs the complete Gamma/Oh A1g projected Hamiltonian of the
+certified cubic J1-J2 XXZ model, without calling any ED2 Fortran,
+QuSpin or XDiag routines. It enumerates anchored three-site shapes
+(C(N-1,2), not C(N,3)), closes each spatial orbit under all signed
+axis permutations and three anchor translations, and uses full raw
+orbit cardinalities for the correctly normalized symmetric basis.
+
+The code asserts both (i) orbit-size sum equals C(N,3) and
+(ii) max_abs(H-H^T)<=1e-9. It emits a Matrix Market sparse matrix;
+independent_cubic_solver.py then solves for the smallest eigenvalue
+with SciPy eigsh and checks the direct eigenvector residual.
+
+For **N=1000** the independent local calculation yielded:
+- 166167000 total fixed-three-down states
+- 4299 Gamma/Oh A1g projected basis states
+- 193791 stored matrix elements (including diagonal)
+- eigenvalue E0=847.3078940655738 (local sample),
+  direct residual=6.04e-10 at eigsh tol=1e-12,
+  matrix asymmetry <=4.45e-16
+- previous ED2 PRESTO PR16 E0=847.3078940655731, within 1e-12
+  (floating-point environment dependent).
+
+At side=4, D=44, standalone C++ construction returned
+E0=40.34590893916067, consistent within 2e-12 with the independent
+fully enumerated 41664-state Python-orbit-projected Hamiltonian
+E0=40.345908939159166. This double independent check makes a
+model/normalization mistake much less likely.
+
+Build and verify (all calculations are *physics checks*, not timing
+benchmarks; requires a C++17 compiler, NumPy and SciPy):
+
+~~~bash
+g++ -std=c++17 -O2 -Wall -Wextra benchmarks/cross_library/independent_cubic_a1g.cpp -o /tmp/independent_cubic_a1g
+/tmp/independent_cubic_a1g 4 /tmp/independent_A1g_N64.mtx
+OPENBLAS_NUM_THREADS=1 python3 benchmarks/cross_library/independent_cubic_solver.py --side 4 --matrix /tmp/independent_A1g_N64.mtx
+/tmp/independent_cubic_a1g 10 /tmp/independent_A1g_N1000.mtx
+OPENBLAS_NUM_THREADS=1 python3 benchmarks/cross_library/independent_cubic_solver.py --side 10 --matrix /tmp/independent_A1g_N1000.mtx
+~~~
+
+An independent GitHub workflow compiled and verified both sides
+successfully on the experiment branch:
+https://github.com/ueda1984/ED2/actions/runs/44468545819
+
+**Limitations:** This is an independent code implementation of the
+same mathematical orbit-reduction concept, not a competing software
+benchmark. It does not prove QuSpin/XDiag symmetry compatibility
+or timing, and cannot replace independent scientific and
+exclusive-resource review of PRESTO performance claims.
+
 ## Required measurements for every individual trial
 
 - Exact repo URL, commit, compiler/version/flags, library + BLAS version,
