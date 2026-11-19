@@ -11,6 +11,8 @@ For every model, compare both entire complex output vectors bit-for-bit.
 import argparse
 import itertools
 import json
+import math
+import struct
 import os
 from pathlib import Path
 import re
@@ -49,8 +51,23 @@ def run(driver, work, threads, csr, release, timeout):
     return proc.returncode, log
 
 
-def check_case(root, driver, n, dm, threads, timeout):
+def parse_complex_dump(data):
+    out=[]
+    for raw in data.decode("ascii").splitlines():
+        fields=raw.split()
+        assert len(fields)==4
+        bits_re=int(fields[2],16).to_bytes(8,"big")
+        bits_im=int(fields[3],16).to_bytes(8,"big")
+        re_val=struct.unpack(">d",bits_re)[0]
+        im_val=struct.unpack(">d",bits_im)[0]
+        assert math.isfinite(re_val) and math.isfinite(im_val)
+        out.append(complex(re_val,im_val))
+    return out
+
+
+def check_case(root, driver, n, dm, threads, timeout, allow_fp_reassociation=False):
     results = []
+    bitstreams=[]
     rows = 6 ** (n//2)
     for mode, (csr, release) in MODES.items():
         work = root / ("s{}-dm{}-t{}-{}".format(
@@ -67,7 +84,9 @@ def check_case(root, driver, n, dm, threads, timeout):
         imag = re.search(r"CPC_CSR_NATIVE_IMAG_COUNT=(\d+)", log)
         assert imag and (int(imag.group(1)) > 0) == (dm != 0)
         dump = work / "csr_matvec_bits.txt"
-        assert len(dump.read_bytes().splitlines()) == 2*rows
+        bits=dump.read_bytes()
+        assert len(bits.splitlines()) == 2*rows
+        bitstreams.append(bits)
         data = {
             "mode": mode, "sha256": sha256(dump), "input_sha256": matching_inputs(work)
         }
@@ -88,11 +107,31 @@ def check_case(root, driver, n, dm, threads, timeout):
             assert released > 0
             data.update(released_bytes=released, net_saved_bytes=saved)
         results.append(data)
-    assert len({x["sha256"] for x in results}) == 1, (
-        "Full complex output bits changed", n, dm, threads, results)
     assert len({x["input_sha256"] for x in results}) == 1
-    print("CSR_PADDED_RELEASE_ALL_THREE_NATIVE_BITS_PASS n={} dm={} threads={}".format(
-        n, dm, threads), flush=True)
+    # Both CSR storage variants run the identical multiplication loop even
+    # under -Ofast and MUST retain exact original IEEE bit patterns.
+    assert bitstreams[1] == bitstreams[2], (
+        "Releasing padded data changed CSR H-vector bits",n,dm,threads)
+    baseline_exact=(bitstreams[0] == bitstreams[1])
+    if allow_fp_reassociation:
+        old=parse_complex_dump(bitstreams[0])
+        csr=parse_complex_dump(bitstreams[1])
+        assert len(old)==len(csr)==2*rows
+        max_delta=max(abs(x-y) for x,y in zip(old,csr))
+        scale=max(1.0,max(abs(x) for x in old))
+        assert max_delta <= 1.0e-12*scale, (
+            "Fast-math changed H*x beyond double roundoff",n,dm,threads,
+            max_delta,scale)
+        results[0]["original_vs_csr_max_abs_delta"]=max_delta
+        results[0]["original_vs_csr_max_scaled_error"]=max_delta/scale
+        print("CSR_PADDED_RELEASE_FAST_MATH_NUMERIC_PASS n={} dm={} t={} max_delta={:.3e}".format(
+            n,dm,threads,max_delta),flush=True)
+    else:
+        assert baseline_exact, (
+            "Strict -O2 full complex H-vector bits changed",n,dm,threads,results)
+        print("CSR_PADDED_RELEASE_ALL_THREE_NATIVE_BITS_PASS n={} dm={} threads={}".format(
+            n, dm, threads), flush=True)
+    results[0]["original_vs_csr_exact_bits"]=baseline_exact
     return results
 
 
@@ -117,6 +156,8 @@ def main():
     parser.add_argument("--sizes", default="4,6,8")
     parser.add_argument("--threads", default="1,4")
     parser.add_argument("--timeout", type=int, default=180)
+    parser.add_argument("--allow-fp-reassociation", action="store_true",
+                        help="For -Ofast only: require numeric original/CSR equality; still require exact CSR/release bits")
     args=parser.parse_args()
     driver=args.driver.resolve(strict=True)
     sizes=[int(x) for x in args.sizes.split(",")]
@@ -128,7 +169,7 @@ def main():
     trials={}
     for n, dm, t in itertools.product(sizes, (0.0,0.12), threads):
         trials["n{}-dm{}-t{}".format(n,dm,t)]=check_case(
-            root,driver,n,dm,t,args.timeout)
+            root,driver,n,dm,t,args.timeout,args.allow_fp_reassociation)
     reject(root,driver,"missing-csr","0","1",False,
            "ED2_CSR_RELEASE_PADDED_CACHE requires ED2_CSR_COMPLEX_CACHE=1")
     reject(root,driver,"bad-flag","1","2",False,
@@ -140,7 +181,9 @@ def main():
     (root/"summary.json").write_text(json.dumps({
         "status":"PASS", "model_cases":len(trials),
         "per_case_modes":list(MODES), "rejected_conditions":4,
-        "no_presto":True, "memory_note":"steady-state cache accounting, not peak RSS",
+        "no_presto":True,
+        "fp_policy":"fast_math_numeric_baseline" if args.allow_fp_reassociation else "strict_bits",
+        "memory_note":"steady-state cache accounting, not peak RSS",
         "trials":trials
     }, indent=2)+"\n", encoding="utf-8")
     print("CSR_PADDED_RELEASE_REGRESSION_PASS cases={} invalid_conditions=4".format(
