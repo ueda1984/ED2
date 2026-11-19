@@ -7,6 +7,9 @@ module ham2vec
   ! Optional compressed row-wise copy of fully cached COMPLEX Hamiltonian.
   ! Default is historical padded storage; no effect unless enabled.
   logical, save :: csr_complex_cache=.false.
+  ! Separate optional release of historical padded cache after CSR packing.
+  ! Keeping the arrays available is the default public module behavior.
+  logical, save :: csr_release_padded=.false.
   integer, allocatable, save :: csr_rowptr(:),csr_target(:)
   complex(8), allocatable, save :: csr_coeff(:)
   !
@@ -16,9 +19,9 @@ contains
     use iso_fortran_env, only: int64
     use input_param, only: wk_dim
     integer, intent(in) :: lv
-    integer :: status,istat,i,j,nnz,p
-    integer(int64) :: entries,extra_bytes
-    character(len=16) :: setting
+    integer :: status,release_status,istat,i,j,nnz,p
+    integer(int64) :: entries,extra_bytes,old_bytes
+    character(len=16) :: setting,release_setting
     setting=''
     call get_environment_variable('ED2_CSR_COMPLEX_CACHE',setting,status=status)
     if(status==0)then
@@ -28,6 +31,19 @@ contains
       error stop 'ED2_CSR_COMPLEX_CACHE flag too long or invalid'
     end if
     csr_complex_cache=status==0.and.trim(adjustl(setting))=='1'
+    release_setting=''
+    call get_environment_variable('ED2_CSR_RELEASE_PADDED_CACHE', &
+      release_setting,status=release_status)
+    if(release_status==0)then
+      if(trim(adjustl(release_setting))/='0'.and. &
+         trim(adjustl(release_setting))/='1') &
+        error stop 'ED2_CSR_RELEASE_PADDED_CACHE must be 0 or 1'
+    else if(release_status/=1)then
+      error stop 'ED2_CSR_RELEASE_PADDED_CACHE flag too long or invalid'
+    end if
+    csr_release_padded=release_status==0.and.trim(adjustl(release_setting))=='1'
+    if(csr_release_padded.and..not.csr_complex_cache) &
+      error stop 'ED2_CSR_RELEASE_PADDED_CACHE requires ED2_CSR_COMPLEX_CACHE=1'
     if(allocated(csr_rowptr))deallocate(csr_rowptr)
     if(allocated(csr_target))deallocate(csr_target)
     if(allocated(csr_coeff))deallocate(csr_coeff)
@@ -72,6 +88,17 @@ contains
     write(*,'(a,i0,a,i0)') &
       'Hamiltonian action: csr-complex cache entries=',size(csr_coeff), &
       ', extra_bytes=',extra_bytes
+    if(csr_release_padded)then
+      old_bytes=int(storage_size(wk_loc)/8,int64)*int(size(wk_loc),int64)+ &
+        int(storage_size(wk_ele)/8,int64)*int(size(wk_ele),int64)
+      ! Peak construction memory still includes both representations.
+      ! Deallocation reduces long-lived cached storage, not peak RSS.
+      deallocate(wk_loc,wk_ele,stat=istat)
+      if(istat/=0)error stop 'ED2_CSR_RELEASE_PADDED_CACHE deallocation failed'
+      write(*,'(a,i0,a,i0)') &
+        'Hamiltonian action: csr-padded-cache released_bytes=',old_bytes, &
+        ', net_saved_bytes=',old_bytes-extra_bytes
+    end if
   end subroutine configure_csr_complex_cache
 
 
@@ -512,7 +539,13 @@ contains
     allocate(ni(NODmax),st_list(NODmax))
     dN = NODmax - NODmin
 
-    wk_dim1= size(wk_ele,1)
+    if(csr_complex_cache)then
+      ! The padded array is intentionally absent in CSR release mode.
+      wk_dim1=0
+    else
+      if(.not.allocated(wk_ele))error stop 'ED2 cached matrix unavailable'
+      wk_dim1=size(wk_ele,1)
+    end if
 
     if(csr_complex_cache)then
       !$omp parallel do private(i,j)
