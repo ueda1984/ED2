@@ -419,7 +419,8 @@ ground state in a near-degenerate problem.
 \centering
 \caption{Verified comparisons to the published executable
 or to independently assembled reference Hamiltonians.
-Reported maxima refer to different numerical observables.}
+Reported maxima refer to different observables. The final
+row counts model cases \emph{per} compiler in GNU13/14.}
 \label{tab:validation}
 \small
 \begin{tabular}{p{0.37\linewidth}r p{0.35\linewidth}}
@@ -433,7 +434,7 @@ Staggered-DM response & 60 runs & $<1.4\times10^{-13}$ in $E_0$;
 $<1.5\times10^{-9}$ in $K$ \\
 Published XYZ--DM conventions & 12 runs & $<3\times10^{-14}$ in spectrum \\
 1000-site two magnons & 1 sector & Old QS$^3$, ED2, independent orbit ED and QuSpin agree within $10^{-10}$ \\
-General real/complex DM cached $H|\psi\rangle$ & 12 models per compiler & Every output IEEE bit matches old CSR path at $\mathrm{-O2}$; independent dense $H$ for 8 small-system cases \\
+General DM cached $H|\psi\rangle$ & 12 & Full complex-output bits match at \texttt{-O2}; 8 independent dense-$H$ cases \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -1013,9 +1014,9 @@ comparisons are \emph{not} equivalent to an independently
 evaluated norm $\|H\psi-E\psi\|_2$ for the reported Ritz pairs.
 
 The paper bundle retains the self-contained input generator
-\texttt{paper/tools/cpc\_portable\_dm\_quickstart.py}, the
+\path{paper/tools/cpc_portable_dm_quickstart.py}, the
 independent reference data in
-\texttt{paper/data/cpc\_stationary\_dm\_reference.csv}, and
+\path{paper/data/cpc-stationary-dm-reference.csv}, and
 the exact source revision. The separate generic ED2 mainline
 also contains full complex $H|\psi\rangle$ regression tests
 against real and nonreal DM Hamiltonians; those verify
