@@ -517,7 +517,10 @@ jobs:
             echo "ERROR: general spin chain accepted local cubic cache" >&2
             exit 1
           fi
-          grep -q 'Local cubic cache requires validated ED2_CUBIC_ANCHORED_REP' \
+          # Automatic MNTE validates the fixed-three-magnon preconditions
+          # before entering the local sparse cache builder.  Both rejection
+          # messages are safe; a generic chain must never accept this path.
+          grep -qF 'Auto cubic MNTE requires fixed three-magnon U(1) sector' \
             "$RUNNER_TEMP/reject-local-cache-chain.log"
           python3 - <<'PY'
           import os

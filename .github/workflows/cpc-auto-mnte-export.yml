@@ -1,0 +1,83 @@
+name: Export verified CPC PRESTO auto-MNTE ZIP
+
+on:
+  push:
+    branches:
+      - codex/ed2-cpc-auto-mnte-presto-20261119
+    paths:
+      - "source/ham2vec.f90"
+      - "tests/cpc_cubic_auto_mnte_regression.py"
+      - "tools/cpc_presto_*.sh"
+      - "tools/cpc_presto_compare_mnte.py"
+      - "tools/presto_cubic_exclusive.pbs"
+      - "docs/development/cpc-presto-auto-mnte-plan-20261119.md"
+      - ".github/workflows/cpc-auto-mnte-export.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cpc-auto-mnte-export-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pinned-manual-presto-delivery:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+      - name: Check safe manual-only packager and dual PBS audit
+        run: |
+          bash -n tools/cpc_presto_make_delivery_zip.sh
+          bash -n tools/presto_cubic_exclusive.pbs
+          grep -q 'ED2_CPC_PAIRED_MNTE' tools/presto_cubic_exclusive.pbs
+          test -s docs/development/cpc-presto-auto-mnte-plan-20261119.md
+      - name: Assemble and SHA-verify immutable candidate plus old and comparison sources
+        run: |
+          bash tools/cpc_presto_make_delivery_zip.sh "$GITHUB_WORKSPACE" \
+            "$RUNNER_TEMP/ED2_CPC_AUTO_MNTE_PRESTO_20261119.zip" \
+            > "$RUNNER_TEMP/package-build.log"
+          unzip -tqq "$RUNNER_TEMP/ED2_CPC_AUTO_MNTE_PRESTO_20261119.zip"
+          sha256sum "$RUNNER_TEMP/ED2_CPC_AUTO_MNTE_PRESTO_20261119.zip" \
+            > "$RUNNER_TEMP/DELIVERY_ZIP_SHA256.txt"
+      - name: Machine-read provenance and four independently pinned source archives
+        run: |
+          python3 - <<'PY'
+          import json,os,zipfile
+          from pathlib import Path
+          file=Path(os.environ["RUNNER_TEMP"])/"ED2_CPC_AUTO_MNTE_PRESTO_20261119.zip"
+          pre="ED2_CPC_AUTO_MNTE_PRESTO_20261119/"
+          with zipfile.ZipFile(file) as z:
+              names=set(z.namelist())
+              for item in ("README_PRESTO_JP.md","DELIVERY_MANIFEST.json",
+                           "DELIVERY_SHA256SUMS","cubic_auto_mnte/ed2-source.tar.gz",
+                           "cubic_auto_mnte/presto_cubic_exclusive.pbs",
+                           "experimental_cubic_previous_PR21/ed2-source.tar.gz",
+                           "latest_main_snapshot/ed2-main.tar.gz",
+                           "cross_library_comparator/comparator-source.tar.gz"):
+                  assert pre+item in names,item
+              m=json.loads(z.read(pre+"DELIVERY_MANIFEST.json"))
+              assert m["candidate_commit"]==os.environ["GITHUB_SHA"]
+              assert m["old_measured_PR21_commit"]!=m["candidate_commit"]
+              assert m["candidate_contains_unmerged_cubic_features"]
+              assert m["citation_ready"] is False
+              print("PASS: immutable PRESTO source delivery; bytes",
+                    file.stat().st_size,"commit",m["candidate_commit"])
+          PY
+      - name: Upload user-transfer ZIP, hash and build ledger
+        uses: actions/upload-artifact@v4
+        with:
+          name: ED2-CPC-auto-MNTE-PRESTO-transfer
+          path: |
+            ${{ runner.temp }}/ED2_CPC_AUTO_MNTE_PRESTO_20261119.zip
+            ${{ runner.temp }}/DELIVERY_ZIP_SHA256.txt
+            ${{ runner.temp }}/package-build.log
+          retention-days: 30
+          if-no-files-found: error
+      - name: Confirm absence of PRESTO scheduling
+        run: echo "ZIP exported only; PRESTO job submission is manual and NOT performed."
