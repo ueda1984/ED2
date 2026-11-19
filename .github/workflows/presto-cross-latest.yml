@@ -32,6 +32,12 @@ jobs:
         run: |
           bash -n tools/presto_cross_library/stage_latest.sh tools/presto_cross_library/launch.pbs
           python3 -m py_compile tools/presto_cross_library/*.py
+          python3 - <<'PY'
+          import ast, pathlib
+          for p in pathlib.Path('tools/presto_cross_library').glob('*.py'):
+              ast.parse(p.read_text(),filename=str(p),feature_version=(3,6))
+              print('PASS: Python 3.6-compatible syntax',p)
+          PY
           python3 tools/presto_cross_library/runner.py --plan-only > "$RUNNER_TEMP/plan.json"
           python3 - <<'PY'
           import importlib.util, json, pathlib, tempfile
