@@ -1,48 +1,108 @@
 #!/usr/bin/env python3
-"""QuSpin U(1)-only pilot; NOT a spatial-symmetry-projected comparison."""
+"""QuSpin pilot for large-site U(1) or translation-Gamma spin-1/2 sectors.
+
+Every mode is resource-gated by the *raw* fixed-magnetization dimension,
+because the basis constructor may scan that space before symmetry reduction.
+The optional Gamma sector uses commuting translations only. Do NOT claim
+Oh/C4v full point-group equivalence.
+"""
 import argparse
 import json
+import math
 import os
 import resource
 import time
 from reference import bonds_for_shape, case_metadata, parse_shape
 
 
+def translations(shape):
+    n = math.prod(shape)
+    stride = [math.prod(shape[:i]) for i in range(len(shape))]
+    result = {}
+    for d, side in enumerate(shape):
+        step = stride[d]
+        # A generator that translates lattice site i forward along axis d.
+        perm = [i + step if (i // step) % side + 1 < side
+                else i - (side - 1) * step for i in range(n)]
+        assert len(set(perm)) == n
+        result["xyz"[d] + "block"] = (perm, 0)
+    return result
+
+
 def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--shape", required=True)
-    ap.add_argument("--ndown", type=int, required=True)
-    ap.add_argument("--max-dim", type=int, default=1000000)
-    ap.add_argument("--tol", type=float, default=1e-10)
-    ap.add_argument("--maxiter", type=int, default=3000)
-    ap.add_argument("--matvec-repetitions", type=int, default=25)
-    a = ap.parse_args()
-    shape = parse_shape(a.shape)
-    meta = case_metadata(shape, a.ndown)
-    out = dict(meta, implementation="QuSpin/SciPy-CSR", symmetry="U1_only",
-               threads_omp=os.environ.get("OMP_NUM_THREADS", "unset"),
-               tolerance_requested=a.tol)
-    if a.max_dim < 1 or a.matvec_repetitions < 1 or a.tol <= 0:
-        raise ValueError("invalid resource/tolerance settings")
-    if meta["dimension_u1"] > a.max_dim:
-        print(json.dumps(dict(out, status="SKIPPED_DIMENSION_SAFETY_CAP", max_dim=a.max_dim),
+    p = argparse.ArgumentParser()
+    p.add_argument("--shape", required=True)
+    p.add_argument("--ndown", required=True, type=int, choices=[2, 3])
+    p.add_argument("--sector", choices=["u1", "gamma"], default="u1")
+    p.add_argument("--mode", choices=["dimensions", "basis", "solve"],
+                   default="dimensions")
+    p.add_argument("--max-raw-dim", type=int, default=1_000_000)
+    p.add_argument("--max-csr-nnz", type=int, default=10_000_000)
+    p.add_argument("--prefix-bits", type=int, default=0)
+    p.add_argument("--tol", type=float, default=1e-10)
+    p.add_argument("--maxiter", type=int, default=3000)
+    p.add_argument("--matvec-repetitions", type=int, default=25)
+    args = p.parse_args()
+    shape = parse_shape(args.shape)
+    meta = case_metadata(shape, args.ndown)
+    expected = meta["dimension_u1"]
+    if args.sector == "gamma":
+        from symmetry_dimensions import count_blocks
+        expected = count_blocks(shape)["m%d" % args.ndown]["gamma_translation"]
+    out = dict(meta, implementation="QuSpin/spin_basis_general",
+               sector=args.sector, mode=args.mode, expected_dimension=expected,
+               threads_omp=os.environ.get("OMP_NUM_THREADS", "unset"))
+    if args.mode == "dimensions":
+        print(json.dumps(dict(out, status="DIMENSIONS_ONLY"), sort_keys=True))
+        return
+
+    # QuSpin may enumerate C(N,m) states even when Gamma reduces to a few
+    # thousand states; always apply guard to *raw* U(1) dimension.
+    if meta["dimension_u1"] > args.max_raw_dim:
+        print(json.dumps(dict(out, status="SKIPPED_RESOURCE_CAP",
+                              max_raw_dim=args.max_raw_dim), sort_keys=True))
+        return
+    if args.prefix_bits < 0 or args.prefix_bits > 16 or args.tol <= 0 or args.maxiter < 1:
+        raise ValueError("invalid settings")
+    import quspin
+    import numpy as np
+    import scipy
+    from quspin.basis import spin_basis_general
+    from quspin.operators import hamiltonian
+    from scipy.sparse.linalg import eigsh
+    out.update(quspin_version=getattr(quspin, "__version__", "unknown"),
+               numpy_version=np.__version__, scipy_version=scipy.__version__,
+               prefix_bits=args.prefix_bits)
+    t0 = time.perf_counter()
+    kwargs = translations(shape) if args.sector == "gamma" else {}
+    # Disable automatic block-table expansion; use explicit N_p (for dilute
+    # systems the default prefix table can be poor). This is a test setting,
+    # NOT a demonstrated optimal QuSpin configuration.
+    basis = spin_basis_general(meta["sites"], Nup=meta["sites"]-args.ndown,
+                               S="1/2", pauli=0, Ns_block_est=expected,
+                               make_basis=False, **kwargs)
+    basis.make(N_p=args.prefix_bits)
+    tbasis = time.perf_counter()
+    if int(basis.Ns) != expected:
+        raise AssertionError("symmetry dimension mismatch: got %d expected %d" %
+                             (basis.Ns, expected))
+    if args.mode == "basis":
+        print(json.dumps(dict(out, status="BASIS_ONLY",
+                              dimension_constructed=int(basis.Ns),
+                              basis_seconds=tbasis-t0,
+                              peak_rss_kib=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss),
                          sort_keys=True))
         return
 
-    import numpy as np
-    import scipy
-    import quspin
-    from scipy.sparse.linalg import eigsh
-    from quspin.basis import spin_basis_general
-    from quspin.operators import hamiltonian
-    out.update(numpy_version=np.__version__, scipy_version=scipy.__version__,
-               quspin_version=getattr(quspin, "__version__", "unknown"))
-    start = time.perf_counter()
-    basis = spin_basis_general(meta["sites"], Nup=meta["sites"]-a.ndown,
-                               S="1/2", pauli=0)
-    tbasis = time.perf_counter()
-    if int(basis.Ns) != meta["dimension_u1"]:
-        raise AssertionError("wrong U1 sector")
+    # Explicit second resource guard for CSR storage. No implied matrix-free
+    # result if this is skipped.
+    max_nnz_bound = expected * (1 + 2*args.ndown*len(shape))
+    if max_nnz_bound > args.max_csr_nnz:
+        print(json.dumps(dict(out, status="SKIPPED_CSR_SAFETY_CAP",
+                              max_nnz_bound=max_nnz_bound,
+                              max_csr_nnz=args.max_csr_nnz,
+                              basis_seconds=tbasis-t0), sort_keys=True))
+        return
     bonds = bonds_for_shape(shape)
     static = [
         ["zz", [[1.0, i, j] for i, j in bonds]],
@@ -53,33 +113,35 @@ def main():
                     check_herm=False, check_pcon=False, check_symm=False)
     csr = H.tocsr()
     tcsr = time.perf_counter()
-    dim = int(csr.shape[0])
-    assert dim == meta["dimension_u1"]
-    if dim <= 2:
-        values, vecs = np.linalg.eigh(csr.toarray())
-        e0, vec = float(values[0]), vecs[:, 0]
+    d = int(csr.shape[0])
+    if d != expected:
+        raise AssertionError("CSR dimension mismatch")
+    if d <= 2:
+        w,v = np.linalg.eigh(csr.toarray())
+        e0, vec = float(w[0]),v[:,0]
     else:
-        v0 = np.linspace(1.0, 2.0, dim)
+        v0 = np.linspace(1.0, 2.0, d)
         v0 /= np.linalg.norm(v0)
-        values, vecs = eigsh(csr, k=1, which="SA", tol=a.tol, v0=v0, maxiter=a.maxiter)
-        e0, vec = float(values[0]), vecs[:, 0]
+        w,v = eigsh(csr, k=1, which="SA", tol=args.tol, v0=v0, maxiter=args.maxiter)
+        e0, vec = float(w[0]),v[:,0]
     tsolve = time.perf_counter()
-    residual = float(np.linalg.norm(csr @ vec-e0*vec))
-    x = np.linspace(.1, 1.1, dim)
+    direct_residual = float(np.linalg.norm(csr @ vec-e0*vec))
+    x = np.linspace(.1, 1.1, d)
     x /= np.linalg.norm(x)
     for _ in range(3):
         y = csr @ x
-    t0 = time.perf_counter()
-    for _ in range(a.matvec_repetitions):
-        y = csr @ x
     t1 = time.perf_counter()
-    out.update(status="PASS" if residual <= max(1e-8, 20*a.tol) else "BAD_RESIDUAL",
-               dimension_constructed=dim, nnz=int(csr.nnz),
-               E0=e0, direct_residual=residual, basis_seconds=tbasis-start,
+    for _ in range(args.matvec_repetitions):
+        y = csr @ x
+    t2 = time.perf_counter()
+    out.update(status="PASS" if direct_residual <= max(1e-8, 20*args.tol)
+               else "BAD_RESIDUAL",
+               dimension_constructed=d, nnz=int(csr.nnz), E0=e0,
+               direct_residual=direct_residual, basis_seconds=tbasis-t0,
                csr_seconds=tcsr-tbasis, solve_seconds=tsolve-tcsr,
-               time_to_eigenpair_seconds=tsolve-start,
-               matvec_seconds=(t1-t0)/a.matvec_repetitions,
-               matvec_repetitions=a.matvec_repetitions,
+               time_to_eigenpair_seconds=tsolve-t0,
+               matvec_seconds=(t2-t1)/args.matvec_repetitions,
+               matvec_repetitions=args.matvec_repetitions,
                peak_rss_kib=resource.getrusage(resource.RUSAGE_SELF).ru_maxrss)
     print(json.dumps(out, sort_keys=True))
     if out["status"] != "PASS":
