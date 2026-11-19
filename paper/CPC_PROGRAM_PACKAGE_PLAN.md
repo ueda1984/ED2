@@ -8,6 +8,15 @@ source is QS-Cube/ED2, subject to upstream/project approval.
 
 ## Final archive contents (freeze only after release approval)
 
+The reviewed **general ED2 mainline** now has opt-in
+coefficient-certified cached-row width, exact-order complex CSR,
+optional padded deallocation and a two-pass direct construction.
+They may be described in a package's operator/memory guide,
+but only with their flag prerequisites and without claims
+of a PRESTO-verified speedup. The official QS-Cube/ED2 code
+and Read the Docs must be synchronized before citing a new
+official release.
+
 | Directory | Contents | Acceptance |
 | --- | --- | --- |
 | `source/`, `Makefile.am`, `configure.ac` | Reviewed original program sources and Autotools build recipe | A clean extracted archive builds without untracked files |
@@ -33,10 +42,13 @@ From a clean archive on Linux:
     ./configure FC=gfortran FCFLAGS="-O2 -fopenmp"
     make -j2
     make check
-    make check-long
+    # make check-long additionally runs the HPC-scale N1000 ex9;
+    # schedule that separately on suitable hardware.
 
-This checks the existing nine native example families and the basic
-build/legacy input contract. Select at least one historical
+The existing short source-regression checks and historical ex1--ex8
+examples can be reproduced on ordinary CI hardware. The full
+`make check-long` suite includes ex9 and must not be represented
+as a lightweight package smoke test. Select at least one historical
 XXZ test input and its *actual native expected output* from the
 clean run for the final `program_examples/01-xxz/` folder.
 Do **not** claim independent original QS3/QS-Cube/ED comparison
@@ -47,7 +59,7 @@ unless the separate old executable and source hash are included.
 After building the executable, no Python scientific stack is needed:
 
     export OPENBLAS_NUM_THREADS=1
-    python3 -S tests/cpc_portable_dm_quickstart.py       --exe "$(pwd)/source/QS3ED2" --size 4 --omp 1       --output "$(pwd)/cpc-example-dm-l4"
+    python3 -S paper/tools/cpc_portable_dm_quickstart.py       --exe "$(pwd)/source/QS3ED2" --size 4 --omp 1       --output "$(pwd)/cpc-example-dm-l4"
 
 This verifies a fully specified spin-1/2/spin-1 Hamiltonian
 at neighboring DM strengths, native vector-chirality output and
@@ -56,19 +68,28 @@ Select actual source-generated `input.dat`, native outputs,
 diagnostics and independent expected checks into
 `program_examples/02-mixed-spin-dm/` after final freeze.
 
-### Example C: literature Hamiltonian convention and observable test
+### Example C: independent small-system numerical reference
 
-Requires NumPy/SciPy for the *independent reference program*
-(the ED2 executable itself only needs Fortran BLAS/LAPACK):
+The paper bundles `paper/audit_reference_small_systems.py`, which
+constructs an independent full/CSR mixed-spin Hamiltonian with
+NumPy/SciPy rather than reading the ED2 matrix elements. It verifies
+L4/L6/L8 energy, excitation gaps, oriented DM chirality,
+Hellmann--Feynman derivative and finite-size susceptibility
+against the archived 25-case source CSV:
 
-    python3 tests/cpc_literature_yi_xyz_dm.py       --exe "$(pwd)/source/QS3ED2"       --sizes 4,6,8 --omp 1       --output "$(pwd)/cpc-example-xyz-dm"
+    python3 paper/audit_reference_small_systems.py \
+      --csv paper/data/cpc-stationary-dm-reference.csv
 
-The reference validates the finite-size Hamiltonian from
-Yi et al., Phys. Rev. B 100, 024423 (2019), including
-Pauli-versus-spin conventions, oriented periodic DM bonds,
-spectra, local moments and Cartesian correlators.
-Package source-generated cases plus reference outputs under
-`program_examples/03-xyz-dm-literature/`.
+Unlike Examples A/B this reference script **does require NumPy
+and SciPy** but is independent of the native ED2 Hamiltonian
+implementation. It is a scientific cross-check, not a
+substitute for a third executable input/output fixture.
+Before submission, add a complete reviewed 3rd ED2-native
+model fixture (e.g. anisotropic exchange tensor/fields),
+or restore the historical literature-specific
+`cpc_literature_yi_xyz_dm.py` runner into the final package
+only after confirming that it works on the frozen mainline.
+Do not advertise absent legacy scripts as packaged programs.
 
 ### Advanced optional example: 1000-site cubic Gamma/O_h
 
