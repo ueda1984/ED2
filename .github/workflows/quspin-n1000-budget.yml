@@ -6,6 +6,9 @@ on:
       - codex/ed2-cross-library-benchmark-protocol-20261119
     paths:
       - ".github/workflows/quspin-n1000-budget.yml"
+  pull_request:
+    paths:
+      - ".github/workflows/quspin-n1000-budget.yml"
   workflow_dispatch:
 
 concurrency:
