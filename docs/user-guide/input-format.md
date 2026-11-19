@@ -219,6 +219,24 @@ During runtime, ED2 prints an **Optimal MNTE**, which can be used to tune memory
 
 ---
 
+### General cache optimization settings
+
+The **environment-variable** optimization settings are separate
+from the Fortran NAMELIST input. Options include coefficient-based
+cache row bounds, ordered complex CSR storage, optional release
+of padded arrays and two-pass direct CSR construction. Some
+combinations require `wk_dim=-1` or an otherwise fully cached
+projected matrix; an explicit `MNTE` cap is never overridden
+by the coefficient-based bound.
+
+See [Hamiltonian caching, performance, and memory](
+performance-and-memory.md) for the exact flags,
+requirements, allocation semantics and reproducibility
+checks. Not every development-fork setting is available
+in the official upstream release.
+
+---
+
 ### Diagonalization algorithm and wavefunction I/O
 
 | Key | Type | Meaning |
