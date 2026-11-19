@@ -8,7 +8,8 @@ EXTRA_DIST = test_ex1.sh test_common.sh \
              cpc_csr_matvec_driver.f90 cpc_csr_main_regression.py \
              cpc_blas_lapack_contract_driver.f90 \
              cpc_csr_release_regression.py \
-             cpc_partial_cache_allocation_regression.py
+             cpc_partial_cache_allocation_regression.py \
+             cpc_coeff_cache_bound_regression.py
 
 # check-long は“任意”なので自前ループで堅牢に実行
 LONG_TESTS = \
