@@ -49,7 +49,30 @@ contains
     end if
     !
     if(MNTE < 0)then
-      wk_dim1= 2*NO_one+8*NO_two+1
+      if(use_local_bonds)then
+        ! The opt-in local cubic cache has a certified maximum of 18 incident
+        ! bonds per down spin and EXACTLY three down spins.  Three times 18
+        ! gives at most 54 hopping records per projected basis column.
+        ! Reserve 64 transitions plus the diagonal as a conservative margin.
+        ! Do not apply this shortcut to the generic ED2 Hamiltonian path.
+        !
+        ! Validate all fixed-sector/material prerequisites BEFORE allocating.
+        ! The local cache builder subsequently verifies every input bond
+        ! endpoint and the exact degree of all sites before any use.
+        if(NODmax/=3.or.NODmin/=3.or.NO_one/=0) &
+          error stop 'Auto cubic MNTE requires fixed three-magnon U(1) sector'
+        if(NO_two/=9*NOS.or.NOS<64.or.wk_dim/=lv) &
+          error stop 'Auto cubic MNTE requires full 9*N cubic bonds and basis'
+        if(any(local_NODmax/=1).or.any(local_spin/=0.5d0)) &
+          error stop 'Auto cubic MNTE requires spin half'
+        if(any(Jint(1,:)/=Jint(2,:)).or.any(Jint(4:9,:)/=0d0)) &
+          error stop 'Auto cubic MNTE requires exactly real XXZ bonds'
+        wk_dim1=65
+        write(*,'(a)') &
+          'Cubic cache capacity: auto-MNTE=64, conservative 3x18 degree bound'
+      else
+        wk_dim1= 2*NO_one+8*NO_two+1
+      end if
     else
       wk_dim1= MNTE + 1
     end if
