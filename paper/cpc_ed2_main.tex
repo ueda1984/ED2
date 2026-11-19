@@ -31,20 +31,23 @@ through 32 fixed-magnetization eigenvalues, 15 momentum-resolved levels,
 and independently referenced conventional-Lanczos calculations for
 12--24 sites. Large-site continuity is independently confirmed in a
 1000-site two-magnon, translation-reduced sector against an exact
-relative-displacement reference and QuSpin. An additional 1000-site,
-three-magnon $\Gamma$-point stress test resolves four one-dimensional
-$O_h$ symmetry sectors and verifies 48 paired solver runs with identical
-physics under an optional exact basis-coordinate optimization.
+relative-displacement reference and QuSpin. A separate development-only 1000-site three-magnon
+symmetry experiment serves as a large-system consistency test; its
+non-upstream basis optimization is not a release feature.
 In a genuinely non-$U(1)$ alternating spin-$1/2$/spin-$1$
 chain, independent Hamiltonian constructions validate calculations
 through 12 sites (full Hilbert dimension 46,656).
 The staggered vector-chirality response to an oriented DM interaction
 agrees with the Hellmann--Feynman energy derivative and independently
-computed finite-size susceptibilities. Additional numerical tests probe
-near-degenerate states and quantify model-dependent operator-cache
-storage. ED2 thus extends the accessible model and observable scope of
-the earlier program without claiming a new eigensolver or a previously
-unknown magnetic phase.
+computed finite-size susceptibilities. General-purpose complex Hamiltonian caching is also tested:
+coefficient-certified allocation bounds, ordered complex compressed
+row storage, and optional two-pass construction reduce selected
+cache-array allocations without discarding transition records.
+The native operator action is checked against independent
+dense-Hamiltonian constructions for both real and complex DM examples.
+ED2 thus extends the accessible model and observable scope of
+the earlier program without claiming a new eigensolver,
+a universal hardware speedup, or a previously unknown magnetic phase.
 \end{abstract}
 \begin{keyword}
 exact diagonalization \sep quantum spin systems \sep mixed spins \sep
@@ -68,7 +71,8 @@ OpenMP is used for shared-memory parallelism.
 \item[Unusual features:] Site-dependent mixed spins, oriented
 DM and symmetric off-diagonal exchange, complete Cartesian
 static correlators, optional Hamiltonian-transition caching
-and reproducible numerical-acceptance diagnostics.
+and reproducible numerical-acceptance diagnostics; optional
+coefficient-certified cache capacity and exact-order complex CSR storage.
 \item[Nature of problem:] Finite-size spectra and static spin observables
 of spin models with unequal local spins and general bilinear couplings.
 \item[Solution method:] Bounded-occupation basis construction,
@@ -104,6 +108,10 @@ conserved. ED2 also provides Cartesian one- and two-spin observables.
 The original program's numerical solvers and OpenMP methodology
 are not claimed as new algorithms, nor is ED2 presented as a strict
 feature superset of the original dynamical-response code.
+The current development mainline additionally implements
+general-purpose sparse Hamiltonian storage options. These are
+engineering improvements rather than novel diagonalization algorithms,
+and their official upstream release requires maintainer approval.
 
 The broader computational ecosystem includes ALPS~\cite{bauer2011},
 QuSpin~\cite{weinberg2017} and the H$\Phi$ quantum-lattice solver,
@@ -863,8 +871,104 @@ Controlled-node repeated measurements are required
 for that claim.
 
 
-\subsection{Exploratory 1000-site cubic symmetry-basis optimization}
+Specialized cubic symmetry/orbit construction is a useful
+additional stress test but is not part of the general ED2
+mainline cache implementation considered for the CPiP release.
+Its unaudited-resource exploratory timing provenance is given
+separately in Appendix~\ref{sec:pr17-pilot};
+it is not used to establish a program-wide speedup.
+
+\section{User workflow and reproducibility}
+ED2 is currently distributed as a Fortran executable
+\texttt{source/QS3ED2}, not as a stable installed library.
+For the examples in this article the input records specify
+on-site spins, oriented bonds with their couplings, fields
+and requested Cartesian correlations. The output includes
+low energies, magnetizations and nine component-resolved
+two-site correlators. The ordering in
+\texttt{two\_body\_cf\_xyz.dat} is
+$(xx,yx,zx,xy,yy,zy,xz,yz,zz)$ rather than
+the usual row-major ordering; the operator-conjugate
+$xy-yx$ check is designed to catch an inadvertent swap.
+
+For a Linux environment with GNU Fortran, GNU Autotools
+and BLAS/LAPACK, the $L=4$ physical example can be
+regenerated from a reviewed checkout with the following
+commands (all output paths must be fresh):
+\begin{verbatim}
+autoreconf -vfi
+./configure FC=gfortran FCFLAGS="-O2 -fopenmp"
+make -j2
+export OPENBLAS_NUM_THREADS=1
+python3 -S tests/cpc_portable_dm_quickstart.py \
+  --exe "$(pwd)/source/QS3ED2" \
+  --size 4 --omp 1 \
+  --output "$(pwd)/ed2-reproduction-l4"
+\end{verbatim}
+This driver constructs the input decks, runs ED2
+at three nearby DM strengths and checks the native
+correlation-derived chirality and finite-difference
+susceptibility against frozen independent references.
+It uses only the Python standard library \emph{after}
+building the Fortran executable. The full independent
+physics tests instead require NumPy/SciPy to construct
+separate dense/sparse spin Hamiltonians.
+The source archive and development repository retain
+the input recipes, reference CSV and workflow definitions.
+
+The final CPC program package must replace the moving
+branch with a full immutable source SHA or release tag,
+author-approved version and source archive, compiler
+and numerical-library provenance, and representative
+input/output files. The software DOI and Program Library
+accession are not assigned in this draft.
+
+\section{Availability and limitations}
+The public source lineage is
+\url{https://github.com/QS-Cube/ED2};
+development verification is archived under
+\url{https://github.com/ueda1984/ED2}.
+Build and test scripts reproduce the original
+source-pinned QS$^3$ overlap, stationary mixed-spin
+DM response, independent low-energy references
+and model-specific memory accounting.
+The eventual official merged release, archive version,
+CPC Program Library accession, software DOI and complete
+authorship/credit require project approval and
+must be specified before submission.
+The old program's dynamical spin-structure-factor pathway
+is not verified as a native ED2 capability.
+
+\section{Conclusions}
+ED2 generalizes the published QS$^3$ program's
+spin-$1/2$ XXZ computational setting to mixed local
+spins and nonconserving anisotropic bilinear operators.
+Direct original-code comparisons establish continuity
+in both conserved subspaces and translation sectors,
+including 216-site three-magnon and 1000-site two-magnon
+examples independently checked with QuSpin and, for the
+latter, a separate relative-coordinate construction.
+A separate, unmerged four-irrep 1000-site three-magnon
+development stress test additionally checks the consistency
+of experimental symmetry-resolved orbit construction,
+without claiming an independent energy reference or
+attributing its speedup to the general released program.
+Independent physical-response and numerical
+acceptance tests demonstrate the broader executable
+model/observable interface. The software remains
+subject to finite-size growth and model-dependent
+resource costs. The results do not imply a new
+eigensolver, a universal performance improvement
+or an undiscovered magnetic phase.
+
+\appendix
+\section{Unmerged cubic-specific performance experiment}
 \label{sec:pr17-pilot}
+This appendix is retained solely as a **development provenance
+record**. The specialized cubic coordinate cache was not merged
+into the generic ED2 mainline described in the program summary;
+its median timings cannot be used as mainline or
+CPC Program Library release performance results.
 For the 1000-site three-magnon calculation described above, an
 exact optional coordinate cache reduces the repeated periodic
 coordinate differences evaluated while constructing cubic
@@ -939,90 +1043,6 @@ publication benchmark requires exclusive-node,
 CPU-pinned, repeated measurements and operator
 verification of hardware exclusivity. No general speedup
 or parallel efficiency is claimed here.
-
-
-\section{User workflow and reproducibility}
-ED2 is currently distributed as a Fortran executable
-\texttt{source/QS3ED2}, not as a stable installed library.
-For the examples in this article the input records specify
-on-site spins, oriented bonds with their couplings, fields
-and requested Cartesian correlations. The output includes
-low energies, magnetizations and nine component-resolved
-two-site correlators. The ordering in
-\texttt{two\_body\_cf\_xyz.dat} is
-$(xx,yx,zx,xy,yy,zy,xz,yz,zz)$ rather than
-the usual row-major ordering; the operator-conjugate
-$xy-yx$ check is designed to catch an inadvertent swap.
-
-For a Linux environment with GNU Fortran, GNU Autotools
-and BLAS/LAPACK, the $L=4$ physical example can be
-regenerated from a reviewed checkout with the following
-commands (all output paths must be fresh):
-\begin{verbatim}
-autoreconf -vfi
-./configure FC=gfortran FCFLAGS="-O2 -fopenmp"
-make -j2
-export OPENBLAS_NUM_THREADS=1
-python3 -S tests/cpc_portable_dm_quickstart.py \
-  --exe "$(pwd)/source/QS3ED2" \
-  --size 4 --omp 1 \
-  --output "$(pwd)/ed2-reproduction-l4"
-\end{verbatim}
-This driver constructs the input decks, runs ED2
-at three nearby DM strengths and checks the native
-correlation-derived chirality and finite-difference
-susceptibility against frozen independent references.
-It uses only the Python standard library \emph{after}
-building the Fortran executable. The full independent
-physics tests instead require NumPy/SciPy to construct
-separate dense/sparse spin Hamiltonians.
-The source archive and development repository retain
-the input recipes, reference CSV and workflow definitions.
-
-The final CPC program package must replace the moving
-branch with a full immutable source SHA or release tag,
-author-approved version and source archive, compiler
-and numerical-library provenance, and representative
-input/output files. The software DOI and Program Library
-accession are not assigned in this draft.
-
-\section{Availability and limitations}
-The public source lineage is
-\url{https://github.com/QS-Cube/ED2};
-development verification is archived under
-\url{https://github.com/ueda1984/ED2}.
-Build and test scripts reproduce the original
-source-pinned QS$^3$ overlap, stationary mixed-spin
-DM response, independent low-energy references
-and model-specific memory accounting.
-The eventual official merged release, archive version,
-CPC Program Library accession, software DOI and complete
-authorship/credit require project approval and
-must be specified before submission.
-The old program's dynamical spin-structure-factor pathway
-is not verified as a native ED2 capability.
-
-\section{Conclusions}
-ED2 generalizes the published QS$^3$ program's
-spin-$1/2$ XXZ computational setting to mixed local
-spins and nonconserving anisotropic bilinear operators.
-Direct original-code comparisons establish continuity
-in both conserved subspaces and translation sectors,
-including 216-site three-magnon and 1000-site two-magnon
-examples independently checked with QuSpin and, for the
-latter, a separate relative-coordinate construction.
-A four-irrep 1000-site three-magnon stress case
-additionally verifies ED2's symmetry-resolved execution
-and exact numerical equivalence under optional
-basis-coordinate caching, without claiming an
-independent energy reference for that larger sector.
-Independent physical-response and numerical
-acceptance tests demonstrate the broader executable
-model/observable interface. The software remains
-subject to finite-size growth and model-dependent
-resource costs. The results do not imply a new
-eigensolver, a universal performance improvement
-or an undiscovered magnetic phase.
 
 \begin{thebibliography}{9}
 \bibitem{ueda2022}
