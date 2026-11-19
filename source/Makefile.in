@@ -99,7 +99,8 @@ CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
-am_QS3ED2_OBJECTS = input_param.$(OBJEXT) state_lists.$(OBJEXT) \
+am_QS3ED2_OBJECTS = blas_lapack_interfaces.$(OBJEXT) \
+	input_param.$(OBJEXT) state_lists.$(OBJEXT) \
 	ham2vec.$(OBJEXT) lanczos.$(OBJEXT) eigen_solver.$(OBJEXT) \
 	get_expectation_values.$(OBJEXT) main.$(OBJEXT)
 QS3ED2_OBJECTS = $(am_QS3ED2_OBJECTS)
@@ -244,7 +245,8 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-QS3ED2_SOURCES = input_param.f90 \
+QS3ED2_SOURCES = blas_lapack_interfaces.f90 \
+              input_param.f90 \
               state_lists.f90 \
               ham2vec.f90 \
               lanczos.f90 \
@@ -550,6 +552,14 @@ uninstall-am: uninstall-binPROGRAMS
 	uninstall-binPROGRAMS
 
 .PRECIOUS: Makefile
+
+# Fortran module dependencies kept in sync with source/Makefile.am.
+state_lists.o: input_param.o
+ham2vec.o: input_param.o state_lists.o
+lanczos.o: input_param.o ham2vec.o blas_lapack_interfaces.o
+eigen_solver.o: input_param.o ham2vec.o blas_lapack_interfaces.o
+get_expectation_values.o: input_param.o ham2vec.o
+main.o: input_param.o state_lists.o ham2vec.o lanczos.o eigen_solver.o get_expectation_values.o
 
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
