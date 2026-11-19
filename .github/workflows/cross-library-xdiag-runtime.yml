@@ -1,5 +1,10 @@
 name: XDiag v0.6.0 comparator API pilot (not benchmark)
 
+concurrency:
+  group: xdiag-pilot-${{ github.ref }}
+  cancel-in-progress: true
+
+
 on:
   push:
     branches:
