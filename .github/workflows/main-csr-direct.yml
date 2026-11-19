@@ -7,12 +7,14 @@ on:
       - "source/ham2vec.f90"
       - "tests/cpc_csr_direct_build_regression.py"
       - "tests/cpc_csr_direct_legacy_crossbuild.py"
+      - "tests/cpc_csr_direct_batch_regression.py"
       - ".github/workflows/main-csr-direct.yml"
   pull_request:
     paths:
       - "source/ham2vec.f90"
       - "tests/cpc_csr_direct_build_regression.py"
       - "tests/cpc_csr_direct_legacy_crossbuild.py"
+      - "tests/cpc_csr_direct_batch_regression.py"
       - ".github/workflows/main-csr-direct.yml"
   workflow_dispatch:
 
@@ -79,6 +81,15 @@ jobs:
             --sizes 4,6,8,10 --threads 1,4 \
             --models real_xyz,complex_dm,u1_xxz,full_tensor --timeout 180
           test -s "$RUNNER_TEMP/csr-direct-o2/summary.json"
+      - name: Native H-vector exactness for explicit 1-1024 row CSR stage sizes
+        run: |
+          python3 -B tests/cpc_csr_direct_batch_regression.py \
+            --driver "$RUNNER_TEMP/cpc-direct-csr-driver" \
+            --output "$RUNNER_TEMP/csr-batch-o2" \
+            --sizes 4,6,10 --threads 1,4 \
+            --models real_xyz,complex_dm,u1_xxz,full_tensor \
+            --batches 1,64,256,512,1024 --timeout 180
+          test -s "$RUNNER_TEMP/csr-batch-o2/summary.json"
       - name: Default-off historical example regression ex1 to ex8
         run: |
           make -C tests check-long \
@@ -100,6 +111,13 @@ jobs:
             --models real_xyz,complex_dm,u1_xxz,full_tensor \
             --allow-fp-reassociation --timeout 180
           test -s "$RUNNER_TEMP/csr-direct-ofast/summary.json"
+          python3 -B tests/cpc_csr_direct_batch_regression.py \
+            --driver "$RUNNER_TEMP/cpc-direct-csr-ofast-driver" \
+            --output "$RUNNER_TEMP/csr-batch-ofast" \
+            --sizes 4,6,10 --threads 1,4 \
+            --models real_xyz,complex_dm,u1_xxz,full_tensor \
+            --batches 1,64,256,512,1024 --timeout 180
+          test -s "$RUNNER_TEMP/csr-batch-ofast/summary.json"
       - name: Prove old main versus refactored IEEE bits under historical Ofast
         run: |
           ( cd reference-main && \
@@ -127,6 +145,8 @@ jobs:
             ${{ runner.temp }}/direct-crossbuild-o2/summary.json
             ${{ runner.temp }}/direct-crossbuild-ofast/summary.json
             ${{ runner.temp }}/csr-direct-ofast/summary.json
+            ${{ runner.temp }}/csr-batch-o2/summary.json
+            ${{ runner.temp }}/csr-batch-ofast/summary.json
             ${{ runner.temp }}/csr-direct-o2/*/stdout.log
             ${{ runner.temp }}/csr-direct-ofast/*/stdout.log
             tests/*.long.log
