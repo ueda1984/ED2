@@ -1,0 +1,100 @@
+name: CPC opt-in cubic automatic MNTE verification
+
+on:
+  push:
+    branches:
+      - codex/ed2-cpc-auto-mnte-presto-20261119
+  pull_request:
+    paths:
+      - "source/ham2vec.f90"
+      - "tests/cpc_cubic_auto_mnte_regression.py"
+      - "tools/cpc_presto_compare_mnte.py"
+      - "tools/presto_cubic_exclusive.pbs"
+      - ".github/workflows/cpc-auto-mnte-validation.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  native-auto-capacity-science:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 28
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [gfortran-13, gfortran-14]
+    env:
+      FC: ${{ matrix.compiler }}
+      FCFLAGS: -O2 -fopenmp
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Install native build prerequisites
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends ${{ matrix.compiler }} libblas-dev liblapack-dev autoconf automake make python3-numpy
+      - name: Parse PRESTO Python 3.6 grammar and PBS shell
+        run: |
+          python3 - <<'PY'
+          import ast
+          from pathlib import Path
+          for path in ("tests/cpc_cubic_auto_mnte_regression.py",
+                       "tools/cpc_presto_compare_mnte.py",
+                       "tools/cpc_presto_cubic_benchmark.py",
+                       "tools/cpc_presto_cubic_audit.py"):
+              ast.parse(Path(path).read_text(),filename=path,feature_version=(3,6))
+              print("PYTHON3_6_GRAMMAR_PASS",path)
+          PY
+          bash -n tools/presto_cubic_exclusive.pbs
+          if ED2_EXCLUSIVE_CONFIRMED=1 bash tools/presto_cubic_exclusive.pbs > "$RUNNER_TEMP/pbs-refusal.log" 2>&1; then
+            echo "ERROR PBS accepted unallocated runner" >&2
+            exit 1
+          fi
+          grep -q 'Required PBS/ED2 variable missing' "$RUNNER_TEMP/pbs-refusal.log"
+      - name: Build exact native source, audit general ED2 make check
+        run: |
+          autoreconf -vfi
+          ./configure FC="$FC" FCFLAGS="$FCFLAGS"
+          make -j2
+          make check
+      - name: Exact native H-cache + physical Ritz regression (N64, N1000)
+        run: |
+          python3 tests/cpc_cubic_auto_mnte_regression.py \
+            --driver "$PWD/tests/cubic_cache_driver" \
+            --exe "$PWD/source/QS3ED2" \
+            --sides 4,10 --threads 1 --sectors oh-a1g,oh-a2g \
+            --output "$RUNNER_TEMP/auto-mnte-science"
+      - name: Multi-thread complete H-cache equality N216 for each cubic parity
+        run: |
+          python3 tests/cpc_cubic_auto_mnte_regression.py \
+            --driver "$PWD/tests/cubic_cache_driver" \
+            --exe "$PWD/source/QS3ED2" \
+            --sides 6 --threads 1,4 --sectors oh-a1g,oh-a2g,oh-a1u,oh-a2u \
+            --skip-lanczos --output "$RUNNER_TEMP/auto-mnte-omp-proof"
+      - name: The source-only generic control must not trigger cubic auto capacity
+        run: |
+          if ED2_CUBIC_LOCAL_BOND_CACHE=1 tests/test_ex1.sh > "$RUNNER_TEMP/general-reject.log" 2>&1; then
+            echo "ERROR invalid generic chain accepted opt-in local cubic cache" >&2
+            exit 1
+          fi
+          grep -q 'Local cubic cache requires validated ED2_CUBIC_ANCHORED_REP' "$RUNNER_TEMP/general-reject.log"
+      - name: Make CPiP local-source evidence ready, not a performance claim
+        run: |
+          test -s "$RUNNER_TEMP/auto-mnte-science/summary.json"
+          test -s "$RUNNER_TEMP/auto-mnte-omp-proof/summary.json"
+          echo "Native cache bits, Ritz and error guards checked. PRESTO measurements remain required."
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cpc-auto-mnte-native-science-${{ matrix.compiler }}
+          path: |
+            ${{ runner.temp }}/auto-mnte-science/summary.json
+            ${{ runner.temp }}/auto-mnte-omp-proof/summary.json
+            ${{ runner.temp }}/general-reject.log
+          if-no-files-found: warn
+          retention-days: 30
