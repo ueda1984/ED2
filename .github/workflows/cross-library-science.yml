@@ -34,6 +34,7 @@ jobs:
           python benchmarks/cross_library/symmetry_dimensions.py --self-test
           python benchmarks/cross_library/verify_orbits.py --self-test
           python benchmarks/cross_library/export_cubic_xxz.py --self-test
+          python benchmarks/cross_library/xxz_projected_oracle.py --self-test
       - name: Verify N1000/1024 primary feasibility metadata and input export
         env:
           OPENBLAS_NUM_THREADS: "1"
