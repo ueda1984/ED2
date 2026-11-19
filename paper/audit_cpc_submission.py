@@ -27,6 +27,7 @@ def examine(repo):
     citation = read("CITATION.cff")
     license_file = read("LICENSE")
     makefile = read("source/Makefile.am")
+    ham2vec = read("source/ham2vec.f90")
 
     autotools = parse_version(
         conf, r"AC_INIT\(\[QS3-ED2\],\s*\[([^\]]+)\]", "configure.ac")
@@ -74,9 +75,22 @@ def examine(repo):
             "scientific_manuscript_drafted": {
                 "pass": all(x in tex for x in (
                     r"\begin{abstract}", r"\section{Conclusions}",
-                    r"\section*{Program summary", r"\label{tab:pr17-pilot}"
+                    r"\section*{Program summary", r"\label{tab:general-csr-payload}"
                 )),
                 "detail": "A complete manuscript draft exists; scientific/visual editorial review remains open.",
+            },
+            "current_main_generic_cache_science_linked": {
+                "pass": all(x in ham2vec for x in (
+                    "ED2_CSR_COMPLEX_CACHE", "ED2_CSR_DIRECT_BUILD",
+                    "ED2_CACHE_COEFF_BOUND",
+                    "ED2_CSR_RELEASE_PADDED_CACHE"
+                )) and all((repo / x).is_file() for x in (
+                    "paper/check_mainline_cache_claims.py",
+                    "tests/cpc_csr_main_regression.py",
+                    "tests/cpc_csr_direct_build_regression.py",
+                    "paper/data/cpc-stationary-dm-reference.csv",
+                )),
+                "detail": "Current generic mainline source, exact H*x tests and table-audit script exist; freeze and rerun the release source later.",
             },
             "pilot_table_and_checker_present": {
                 "pass": all((repo / x).is_file() for x in (
@@ -102,9 +116,19 @@ def examine(repo):
                 "pass": accession_assigned,
                 "detail": "Do not invent a CPC Program Library accession or a Mendeley Data / software DOI.",
             },
-            "raw_trial_provenance_and_operator_attestation": {
+            "unmerged_cubic_pilot_not_used_as_release_speedup": {
+                "pass": (r"\appendix" in tex and
+                         r"\section{Unmerged cubic-specific" in tex and
+                         "not" in tex.split(r"\section{Unmerged cubic-specific", 1)[1].lower()),
+                "detail": "PR17 PRESTO trials had no operator exclusivity attestation; appendix-only provenance is permitted, but a journal-level speedup claim is not. A controlled dedicated-node benchmark is optional if no speedup is asserted.",
+            },
+            "final_source_physics_response_retested": {
                 "pass": False,
-                "detail": "PR17 jobs 22282/22322 passed 48-pair physics checks, but exclusivity operator review is false and raw trials are not archived with the paper.",
+                "detail": "Re-run the complete observable/Hellmann-Feynman mixed-spin DM demo and independent references from the approved frozen mainline source; historical figure CSV alone does not prove current-release reproduction.",
+            },
+            "readthedocs_and_official_upstream_synchronized": {
+                "pass": False,
+                "detail": "The official QS-Cube/ED2 and its Read the Docs published site have not been confirmed to include the newer fork optimizations and current instructions.",
             },
             "representative_input_output_and_clean_build": {
                 "pass": False,
