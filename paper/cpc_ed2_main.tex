@@ -745,7 +745,99 @@ $L$ & $D_{\rm Y}$ & $E_0$ & $E_1-E_0$\\
 \end{tabular}
 \end{table}
 
-\section{Cache storage and performance limitations}
+\section{Hamiltonian cache representations and resource limits}
+\subsection{General-purpose exact-order complex CSR storage}
+The generalized model operator is not restricted to real matrix
+elements: oriented DM couplings and transverse fields can generate
+complex transitions in the working basis. In the reviewed development
+mainline, an optional Hamiltonian cache stores each non-sentinel
+matrix record in an \emph{ordered complex compressed-row}
+representation, using a row pointer, a target-state index and the
+original complex coefficient. Explicitly stored zero coefficients
+and all row terms are retained in their original order, with no
+coefficient thresholding or re-summation. This remains a
+\emph{storage choice for a full cached Hamiltonian}, not a new
+solver or an approximation to the physical operator.
+
+Let $\mathcal D$ be the projected Hilbert-space dimension,
+$W$ the padded cache width and $N_{\mathrm{rec}}$ the number
+of stored non-sentinel row records, including the diagonal.
+For a standard LP64 build with four-byte integer indices and
+16-byte complex coefficients, the cache-array payloads are
+\begin{align}
+B_{\mathrm{pad}} &= 20 W\mathcal D, \nonumber\\
+B_{\mathrm{CSR}} &= 4(\mathcal D+1)+20N_{\mathrm{rec}}.
+\label{eq:general-csr-size}
+\end{align}
+These are \emph{allocated cache payloads}, not whole-process
+resident-memory measurements. The initial padded width can be
+conservatively reduced before allocation by certifying which
+one-site and two-site transition coefficients are actually
+nonzero; an explicitly supplied \texttt{MNTE} cap is preserved.
+Only after all CSR records are constructed may the original padded
+arrays optionally be released, reducing long-lived allocations
+but \emph{not} the simultaneous arrays required during construction.
+
+An alternative two-pass constructor avoids the global padded
+matrix. It uses exactly the same physical row generator as the
+original representation, first counting records, then allocating
+exact CSR capacity and regenerating those records in small staging
+batches. Its memory-oriented setting trades additional row-building
+work for a smaller simultaneously allocated cache payload.
+For the present development mainline the staging width defaults
+to 64 rows; no automatic timing-optimal batch size is claimed.
+The direct constructor and optional padded release both
+require a fully cached projected Hamiltonian. Partial caching
+continues to use the original on-demand Hamiltonian action.
+
+Table~\ref{tab:general-csr-payload} gives an explicit
+\emph{non-$U(1)$} real-XYZ/complex-DM example for an open
+alternating spin-$1/2$/spin-$1$ chain with ten sites,
+$\mathcal D=6^5=7776$. In this example the coefficient
+certificate changes the padded capacity from $W=93$ to
+$W=57$ and exact CSR contains $N_{\mathrm{rec}}=191808$
+records. Direct CSR's last row counts agree with the
+baseline generator. The table is \emph{deterministic allocation
+accounting}, not evidence of a measured peak-RSS reduction or
+a model-independent speedup.
+
+\begin{table}[t]
+\centering
+\caption{Allocated Hamiltonian-cache payloads in bytes for a
+ten-site alternating spin-$1/2$/spin-$1$ XYZ/DM example
+($\mathcal D=7776$), using LP64 integers and complex double
+precision. The direct two-pass upper bound includes the
+64-row staging batch but excludes all non-cache process allocations.}
+\label{tab:general-csr-payload}
+\small
+\begin{tabular}{lr}
+\toprule
+Storage during preparation & Cache payload (bytes)\\
+\midrule
+Original unbounded padded representation & 14,463,360\\
+Coefficient-certified padded representation & 8,864,640\\
+Coefficient-bounded padded + CSR simultaneously & 12,731,908\\
+Two-pass direct CSR + staging (upper bound) & 3,940,228\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The general native scientific regression compares two independent
+complex input vectors and every complex output bit of $H|\psi\rangle$
+under \texttt{-O2}, for both strictly real and genuinely
+complex DM Hamiltonians. For small systems it also constructs
+the full dense matrix independently, checking the physical
+operator rather than merely comparing two optimized versions.
+Under the historical \texttt{-Ofast} compilation option,
+floating-point reassociation may change the last bits between
+padded and CSR loops: this is checked with a stated numerical
+tolerance, not presented as bitwise reproducibility.
+Invalid configurations (including a partially cached direct
+builder) are rejected explicitly. Individual lattice-symmetry
+fast paths belong in the user documentation and are not used
+to justify the generic cache claims in this section.
+
+\subsection{Model-specific cache policies and exploratory timing}
 The existing ED2 cache controls \texttt{wk\_dim} and \texttt{MNTE}
 trade stored Hamiltonian transitions against on-demand work.
 For the stationary alternating chain in Sec.~\ref{sec:chirality},
@@ -964,8 +1056,8 @@ or an undiscovered magnetic phase.
 \appendix
 \section{Unmerged cubic-specific performance experiment}
 \label{sec:pr17-pilot}
-This appendix is retained solely as a **development provenance
-record**. The specialized cubic coordinate cache was not merged
+This appendix is retained solely as a \emph{development provenance
+record}. The specialized cubic coordinate cache was not merged
 into the generic ED2 mainline described in the program summary;
 its median timings cannot be used as mainline or
 CPC Program Library release performance results.
