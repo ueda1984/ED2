@@ -1,5 +1,10 @@
 name: Cross-library benchmark science preflight
 
+concurrency:
+  group: science-preflight-${{ github.ref }}
+  cancel-in-progress: true
+
+
 on:
   push:
     branches:
