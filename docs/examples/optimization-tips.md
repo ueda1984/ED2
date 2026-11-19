@@ -9,10 +9,10 @@ produce a different projected operator.
 
 ## One-dimensional spin-1/2 chain
 
-- For an XXZ Hamiltonian with a field parallel to (z) and no
+- For an XXZ Hamiltonian with a field parallel to $z$ and no
   spin-nonconserving terms, work at fixed
-  (N_{\downarrow}) using `NODmin=NODmax`. The sector
-  dimension for spin-1/2 is (inom{L}{N_{\downarrow}}).
+  $N_{\downarrow}$ using `NODmin=NODmax`. The sector
+  dimension for spin-1/2 is $\binom{L}{N_{\downarrow}}$.
   This is a **conserved sector**, not an approximation.
 - Use lattice translation only if bond couplings and fields
   are periodic with the **same** translation. For a
@@ -27,7 +27,7 @@ produce a different projected operator.
 ## Alternating mixed-spin chain
 
 For an alternating spin-1/2/spin-1 chain with (L) unit
-cells, the full Hilbert space has dimension (6^L).
+cells, the full Hilbert space has dimension $6^L$.
 Translation by **one unit cell** preserves the spin
 magnitudes; a one-site shift generally does not.
 
@@ -43,7 +43,7 @@ conservation of total (S^z). In that case:
   the directed bond changes the sign of the
   antisymmetric exchange.
 - For modest Hilbert dimensions, compare native
-  energies and (H|\psi\rangle) with an independently
+  energies and $H|\psi\rangle$ with an independently
   assembled dense Hamiltonian.
 - For a fully cached sparse operator, compare regular
   CSR and direct two-pass CSR, including setup time and
@@ -76,15 +76,15 @@ necessarily a symmetry of its Hamiltonian.
 
 ## Simple-cubic dilute-magnon example
 
-For a periodic simple-cubic lattice with (N=L^3)
+For a periodic simple-cubic lattice with $N=L^3$
 spin-1/2 sites and **exactly three conserved magnons**,
 the unprojected fixed-magnon dimension is
-(inom{N}{3}). A 10×10×10 lattice has
-(inom{1000}{3}=166{,}167{,}000) such basis states
+$\binom{N}{3}$. A 10×10×10 lattice has
+$\binom{1000}{3}=166{,}167{,}000$ such basis states
 before lattice-symmetry reduction.
 
-A development-only experiment on the (\Gamma)
-point and four one-dimensional (O_h) sectors found
+A development-only experiment on the $\Gamma$
+point and four one-dimensional $O_h$ sectors found
 projected dimensions 4,299; 3,624; 2,884; and 3,252.
 These are **specific to the verified isotropic
 few-magnon setup**, not generic input/output
@@ -106,7 +106,7 @@ as general CPC performance figures.
 The stable [cubic example](cubic.md) includes
 an anisotropic XYZ/DM model. Its symmetries should
 be checked against its actual couplings; do
-**not** transfer the isotropic (O_h) example's
+**not** transfer the isotropic $O_h$ example's
 sector dimensions or benchmark settings to it.
 
 ## Benchmarking checklist
