@@ -111,7 +111,10 @@ export ED2_RNG_SEED=1984
 exe="$work/main/source/QS3ED2"
 test -x "$exe"
 sha256sum "$exe" > "$work/ed2-executable.sha256"
+# PBS qsub -v uses commas as VARIABLE separators. Use '+' between
+# program names in the qsub environment, and normalize inside the job.
 programs=${ED2_PROGRAMS:-ed2-cubic}
+programs=${programs//+/,}
 case "$programs" in
   ed2-cubic|ed2-cubic,quspin|quspin,ed2-cubic|ed2-legacy|ed2-legacy,ed2-cubic|ed2-cubic,ed2-legacy|quspin)
     ;;
