@@ -80,6 +80,26 @@ jobs:
           assert q['direct_residual']<=1.e-8
           print('PASS QuSpin Oh A1g N64 m2 vs independently projected XXZ Hamiltonian')
           PY
+      - name: Match 64-site three-magnon cubic Gamma/Oh A1g energy with independent ED2-free oracle
+        timeout-minutes: 8
+        env:
+          OMP_NUM_THREADS: "1"
+          OPENBLAS_NUM_THREADS: "1"
+          MKL_NUM_THREADS: "1"
+          NUMBA_NUM_THREADS: "1"
+        run: |
+          python benchmarks/cross_library/xxz_projected_oracle.py --ndown 3 > /tmp/oracle_64_m3.json
+          timeout 420s python benchmarks/cross_library/run_quspin.py --shape 4,4,4 --ndown 3 --model cubic-j1j2-xxz --sector gamma-a1g --mode solve --max-raw-dim 100000 --max-csr-nnz 1000000 > /tmp/quspin_64_m3_a1g.json
+          python - <<'PY'
+          import json
+          q=json.load(open('/tmp/quspin_64_m3_a1g.json'))
+          a=json.load(open('/tmp/oracle_64_m3.json'))
+          assert q['status']=='PASS'
+          assert q['dimension_constructed']==44==a['projected_dimension']
+          assert abs(q['E0']-a['E0'])<1.e-8
+          assert q['direct_residual']<=1.e-8
+          print('PASS: QuSpin N64/m3 Oh A1g projected energy and direct residual match independent Hamiltonian',q)
+          PY
       - name: Probe actual 1000-site/m3 QuSpin constructor (no full basis allocation)
         timeout-minutes: 3
         env:
@@ -97,6 +117,30 @@ jobs:
           print('PASS QuSpin N=1000, m=3 Gamma/Oh A1g constructor; NO basis/eigenvalue')
           print(x)
           PY
+      - name: Probe actual 1000-site two-magnon U1 basis construction with hard safety cap
+        timeout-minutes: 4
+        env:
+          OMP_NUM_THREADS: "1"
+          OPENBLAS_NUM_THREADS: "1"
+          MKL_NUM_THREADS: "1"
+          NUMBA_NUM_THREADS: "1"
+        run: |
+          timeout 180s python benchmarks/cross_library/run_quspin.py --shape 10,10,10 --ndown 2 --model cubic-j1j2-xxz --sector u1 --mode basis --max-raw-dim 600000 > /tmp/quspin_n1000_m2_u1_basis.json
+          python - <<'PY'
+          import json
+          q=json.load(open('/tmp/quspin_n1000_m2_u1_basis.json'))
+          assert q['status']=='BASIS_ONLY' and q['dimension_constructed']==499500
+          print('PASS: QuSpin 1000-site m2 full U1 basis constructed; NO Gamma/Oh or eigenpair',q)
+          PY
+      - name: Save exact pilot results for independent later audit
+        uses: actions/upload-artifact@v4
+        with:
+          name: quspin-comparator-raw-trials
+          path: |
+            /tmp/quspin_*.json
+            /tmp/oracle_64_m*.json
+            /tmp/reference_u1.json
+          retention-days: 14
       - name: Show scope
         run: |
           echo "QuSpin actual N1000/m3 constructor tested but no full N1000/m3 basis enumeration."
