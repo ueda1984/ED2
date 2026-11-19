@@ -1,5 +1,10 @@
 name: QuSpin comparator runtime pilot (not benchmark)
 
+concurrency:
+  group: quspin-pilot-${{ github.ref }}
+  cancel-in-progress: true
+
+
 on:
   push:
     branches:
