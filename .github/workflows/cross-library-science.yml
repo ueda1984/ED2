@@ -33,6 +33,7 @@ jobs:
           python benchmarks/cross_library/reference.py --self-test
           python benchmarks/cross_library/symmetry_dimensions.py --self-test
           python benchmarks/cross_library/verify_orbits.py --self-test
+          python benchmarks/cross_library/export_cubic_xxz.py --self-test
       - name: Verify N1000/1024 primary feasibility metadata and input export
         env:
           OPENBLAS_NUM_THREADS: "1"
@@ -40,6 +41,8 @@ jobs:
         run: |
           python benchmarks/cross_library/symmetry_dimensions.py --all-primary > /tmp/ed2_oracle.jsonl
           python benchmarks/cross_library/export_case.py --shape 10,10,10 --ndown 3 --output-prefix /tmp/ed2_primary > /tmp/ed2_export_stdout.json
+          python benchmarks/cross_library/export_cubic_xxz.py --side 10 --ndown 3 --output-prefix /tmp/ed2_cubic_xxz > /tmp/ed2_cubic_xxz_stdout.json
+          python benchmarks/cross_library/run_quspin.py --shape 10,10,10 --ndown 3 --sector gamma --model cubic-j1j2-xxz --mode dimensions > /tmp/ed2_cubic_xxz_quspin_dimensions.json
           python benchmarks/cross_library/run_quspin.py --shape 10,10,10 --ndown 3 --sector gamma --mode dimensions > /tmp/ed2_quspin_dimensions.json
           python benchmarks/cross_library/run_quspin.py --shape 10,10,10 --ndown 3 --sector gamma --mode basis --max-raw-dim 1000000 > /tmp/ed2_quspin_guard.json
           python - <<'PY'
@@ -52,6 +55,13 @@ jobs:
           bonds=(out/'ed2_primary.bonds').read_bytes()
           assert hashlib.sha256(bonds).hexdigest()==manifest['bond_sha256']
           assert len(bonds.splitlines())==3000
+          xxz=json.loads((out/'ed2_cubic_xxz.json').read_text())
+          assert xxz['bond_count']==9000 and xxz['j1_bonds']==3000 and xxz['j2_bonds']==6000
+          assert xxz['u1_dimension']==166167000 and abs(xxz['all_up_energy']-862.5)<1e-10
+          assert hashlib.sha256((out/'ed2_cubic_xxz.xxz_bonds').read_bytes()).hexdigest()==xxz['bond_file_sha256']
+          assert xxz['physical_sha256']!=manifest['physical_sha256']
+          qxxz=json.loads((out/'ed2_cubic_xxz_quspin_dimensions.json').read_text())
+          assert qxxz['expected_dimension']==166167 and qxxz['physical_sha256']==xxz['physical_sha256']
           assert json.loads((out/'ed2_quspin_dimensions.json').read_text())['expected_dimension']==166167
           assert json.loads((out/'ed2_quspin_guard.json').read_text())['status']=='SKIPPED_RESOURCE_CAP'
           print('PASS: N1000/1024 model hashes, sector counts, bond export, and non-allocating cap')
