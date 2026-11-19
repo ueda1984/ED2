@@ -14,6 +14,14 @@ if [[ ${ED2_EXCLUSIVE_CONFIRMED:-0} != 1 ]]; then
   echo "Refusing: set ED2_EXCLUSIVE_CONFIRMED=1 only after operator site-policy check" >&2
   exit 2
 fi
+case "${ED2_CPC_PAIRED_MNTE:-0}" in
+  0|1) ;;
+  *) echo "ED2_CPC_PAIRED_MNTE must be 0 or 1" >&2; exit 2 ;;
+esac
+if [[ ${ED2_CPC_PAIRED_MNTE:-0} == 1 && ${ED2_MNTE:--1} != -1 ]]; then
+  echo "Paired auto-MNTE trial requires primary ED2_MNTE=-1" >&2
+  exit 2
+fi
 # Native orbit lookup is an explicit, separately provenance-tracked experiment.
 case "${ED2_CUBIC_ANCHORED_REP:-0}" in
   0|1) ;;
@@ -211,6 +219,25 @@ python3 "$run_dir/source/tools/cpc_presto_cubic_audit.py" \
   --root "$run_dir/measurements" --output "$run_dir/audit" \
   --source-archive "$stage/ed2-source.tar.gz" --exe "$exe" \
   > "$run_dir/audit-console.log" 2>&1
+# Optional same-binary/same-PBS-allocation CPU/thread scaling control.
+# First run uses native automatic capacity (input MNTE=-1). The paired
+# control uses explicit MNTE=64; Python verifies physical inputs differ
+# ONLY in the MNTE token and checks exact Ritz energy/direct residuals.
+# Run records and audits are kept in DIFFERENT immutable job subdirs.
+if [[ ${ED2_CPC_PAIRED_MNTE:-0} == 1 ]]; then
+  python3 "$run_dir/source/tools/cpc_presto_cubic_benchmark.py" \
+    "${args[@]}" --mnte 64 --output "$run_dir/measurements-explicit64" \
+    > "$run_dir/benchmark-explicit64-console.log" 2>&1
+  python3 "$run_dir/source/tools/cpc_presto_cubic_audit.py" \
+    --root "$run_dir/measurements-explicit64" --output "$run_dir/audit-explicit64" \
+    --source-archive "$stage/ed2-source.tar.gz" --exe "$exe" \
+    > "$run_dir/audit-explicit64-console.log" 2>&1
+  python3 "$run_dir/source/tools/cpc_presto_compare_mnte.py" \
+    --auto "$run_dir/measurements" \
+    --explicit64 "$run_dir/measurements-explicit64" \
+    --output "$run_dir/paired-comparison.json" \
+    > "$run_dir/paired-comparison-console.log" 2>&1
+fi
 {
   date -Is
   qstat -f "$PBS_JOBID" || true
