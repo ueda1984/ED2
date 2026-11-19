@@ -23,7 +23,7 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install independent oracle dependency
-        run: python -m pip install "numpy>=1.26,<3"
+        run: python -m pip install "numpy>=1.26,<3" "scipy>=1.11,<2"
       - name: Syntax and independent physical proofs
         env:
           OPENBLAS_NUM_THREADS: "1"
@@ -77,6 +77,16 @@ jobs:
           assert json.loads((out/'ed2_quspin_guard.json').read_text())['status']=='SKIPPED_RESOURCE_CAP'
           print('PASS: N1000/1024 model hashes, sector counts, bond export, and non-allocating cap')
           PY
+      - name: Independent N1000 cubic A1g source compile, physics and residual
+        env:
+          OPENBLAS_NUM_THREADS: "1"
+          OMP_NUM_THREADS: "1"
+        run: |
+          g++ -std=c++17 -O2 -Wall -Wextra benchmarks/cross_library/independent_cubic_a1g.cpp -o /tmp/ed2_independent_cubic
+          /tmp/ed2_independent_cubic 4 /tmp/ed2_cubic_a1g_N64.mtx
+          python benchmarks/cross_library/independent_cubic_solver.py --side 4 --matrix /tmp/ed2_cubic_a1g_N64.mtx
+          /tmp/ed2_independent_cubic 10 /tmp/ed2_cubic_a1g_N1000.mtx
+          python benchmarks/cross_library/independent_cubic_solver.py --side 10 --matrix /tmp/ed2_cubic_a1g_N1000.mtx
       - name: Clarify what this CI did NOT run
         run: |
           echo "No QuSpin or XDiag runtime has been installed or executed."
