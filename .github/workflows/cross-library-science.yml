@@ -1,0 +1,62 @@
+name: Cross-library benchmark science preflight
+
+on:
+  push:
+    branches:
+      - codex/ed2-cross-library-benchmark-protocol-20261119
+    paths:
+      - "benchmarks/cross_library/**"
+      - ".github/workflows/cross-library-science.yml"
+  pull_request:
+    paths:
+      - "benchmarks/cross_library/**"
+      - ".github/workflows/cross-library-science.yml"
+  workflow_dispatch:
+
+jobs:
+  independent-science:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install independent oracle dependency
+        run: python -m pip install "numpy>=1.26,<3"
+      - name: Syntax and independent physical proofs
+        env:
+          OPENBLAS_NUM_THREADS: "1"
+          OMP_NUM_THREADS: "1"
+        run: |
+          python -m py_compile benchmarks/cross_library/*.py
+          python benchmarks/cross_library/reference.py --self-test
+          python benchmarks/cross_library/symmetry_dimensions.py --self-test
+          python benchmarks/cross_library/verify_orbits.py --self-test
+      - name: Verify N1000/1024 primary feasibility metadata and input export
+        env:
+          OPENBLAS_NUM_THREADS: "1"
+          OMP_NUM_THREADS: "1"
+        run: |
+          python benchmarks/cross_library/symmetry_dimensions.py --all-primary > /tmp/ed2_oracle.jsonl
+          python benchmarks/cross_library/export_case.py --shape 10,10,10 --ndown 3 --output-prefix /tmp/ed2_primary > /tmp/ed2_export_stdout.json
+          python benchmarks/cross_library/run_quspin.py --shape 10,10,10 --ndown 3 --sector gamma --mode dimensions > /tmp/ed2_quspin_dimensions.json
+          python benchmarks/cross_library/run_quspin.py --shape 10,10,10 --ndown 3 --sector gamma --mode basis --max-raw-dim 1000000 > /tmp/ed2_quspin_guard.json
+          python - <<'PY'
+          import hashlib,json,pathlib
+          out=pathlib.Path('/tmp')
+          shapes=[json.loads(x) for x in (out/'ed2_oracle.jsonl').read_text().splitlines()]
+          assert [x['sites'] for x in shapes]==[1000,1024,1000]
+          assert [x['m3']['gamma_point_A1'] for x in shapes]==[83333,22291,4299]
+          manifest=json.loads((out/'ed2_primary.json').read_text())
+          bonds=(out/'ed2_primary.bonds').read_bytes()
+          assert hashlib.sha256(bonds).hexdigest()==manifest['bond_sha256']
+          assert len(bonds.splitlines())==3000
+          assert json.loads((out/'ed2_quspin_dimensions.json').read_text())['expected_dimension']==166167
+          assert json.loads((out/'ed2_quspin_guard.json').read_text())['status']=='SKIPPED_RESOURCE_CAP'
+          print('PASS: N1000/1024 model hashes, sector counts, bond export, and non-allocating cap')
+          PY
+      - name: Clarify what this CI did NOT run
+        run: |
+          echo "No QuSpin or XDiag runtime has been installed or executed."
+          echo "No HPC benchmark, no timing comparison and no CPC-ready performance claim."
