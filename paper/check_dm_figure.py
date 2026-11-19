@@ -124,7 +124,7 @@ def negative_tests(text, src):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--csv", type=Path, default=Path("docs/development/cpc-stationary-dm-reference.csv"))
+    parser.add_argument("--csv", type=Path, default=Path("paper/data/cpc-stationary-dm-reference.csv"))
     parser.add_argument("--tex", type=Path, default=Path("paper/cpc_ed2_main.tex"))
     parser.add_argument("--self-test", action="store_true")
     args = parser.parse_args()
