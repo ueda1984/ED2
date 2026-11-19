@@ -99,6 +99,49 @@ GNU13/14 GitHub science CI must independently pass
 against the exact PR head before any default or
 merge decision.
 
+## Compiler floating-point optimization policy
+
+ED2's historical default GNU compiler flags include `-Ofast`,
+which permits floating-point reassociation/complex arithmetic
+transforms. **Do not interpret raw IEEE bit equality between
+the original padded multiplication loop and the separately
+compiled CSR loop as unconditional under `-Ofast`.**
+
+An independent local GNU14.2 experiment compared N4/N6/N8/N10,
+both actual DM=0 and complex DM=0.12, T1/T4,
+and two distinct nonreal complex vectors per condition:
+
+- With `-O2 -fopenmp`: original, CSR retained, and CSR
+  released were **16/16 identical full output bitstreams**.
+- With `-Ofast -fopenmp`: CSR retained versus CSR released
+  were **16/16 identical full output bitstreams**.
+  Original padded versus CSR stayed bit-identical for
+  DM=0 models. For the nonzero complex DM models,
+  different compiler reassociation gave tiny per-element
+  last-bit differences: maximum absolute difference
+  `8.882e-16`, scaled by maximum output amplitude
+  `2.816e-16` or less across the tested systems.
+- Both compiled modes passed the independent direct
+  dense-Hamiltonian reference at N4/N6.
+
+The portable `tests/cpc_csr_release_regression.py`
+therefore uses **two explicit policies**:
+
+- Default strict `-O2` testing: *all three* H*x output
+  bitstreams must be identical.
+- `--allow-fp-reassociation` for `-Ofast` testing:
+  **CSR retained versus CSR released must still match
+  every IEEE bit**, while original versus CSR must match
+  to `1e-12*max(1, max(|H*x|))` or better. The runner
+  records both maximum numerical difference and whether
+  the original-to-CSR pair was bit-identical.
+
+The dual-compiler CI explicitly runs both optimization
+policies on the exact source branch. This tolerance
+does NOT justify approximate model/solver changes,
+and no stronger reproducibility assertion is made
+for all architectures or mathematical inputs.
+
 ## Compatibility and adoption limits
 
 **Users with code that reads the public module variables
