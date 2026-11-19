@@ -1,4 +1,7 @@
 module eigen_solver
+  use blas_lapack_interfaces, only: zheevr, dstevx, dlamch, dznrm2, zdotc, &
+    zgemm, zcopy, zaxpy, zscal, zdscal, check_lapack_info, &
+    zheevr_workspace_lengths
   use ham2vec
   implicit none
   integer :: NOE,NOK, NOM, maxitr, ite_lancz, i_vec_min, i_vec_max
@@ -79,9 +82,8 @@ contains
     real(8),allocatable::rwork_lanc(:)
     integer :: count_ne, info, lwork, lrwork,liwork, tritr, flag
     integer :: i, j, ell
-    real(8) :: eps, dlamch, dznrm2, abstol, max_conv,tmp(2)
+    real(8) :: eps, abstol, max_conv,tmp(2)
     integer t1,t2,t3,t4,t_rate,t_max
-    complex(8) :: zdotc
     complex(8) :: prdct 
     flag = 0
     allocate(conv(NOK), alpha(NOM), beta(0:NOM), coef(NOM,NOM), isuppz(2*NOM), &
@@ -249,9 +251,8 @@ contains
         write(*,*) "error in dxyevr in eigen_solver.f90. info =", info
         stop 3
       end if
-      lwork = nint(dble(work_lanc(1)))
-      lrwork = nint(rwork_lanc(1))
-      liwork= iwork_lanc(1)
+      call zheevr_workspace_lengths(NOM,work_lanc(1),rwork_lanc(1),iwork_lanc(1), &
+        lwork,lrwork,liwork)
       deallocate(iwork_lanc, work_lanc, rwork_lanc)
       allocate(work_lanc(lwork), iwork_lanc(liwork), rwork_lanc(lrwork))
     end subroutine get_work_mem_for_zheevr
@@ -267,9 +268,10 @@ contains
     character(1), intent(in) :: jobz
     complex(8), allocatable :: z(:,:)
     !
-    integer :: m, lda, vl, vu, il, iu, ldz, info
+    integer :: m, lda, il, iu, ldz, info
+    real(8) :: vl, vu
     integer, allocatable :: isuppz(:)
-    real(8) :: dlamch, abstol
+    real(8) :: abstol
     complex(8), allocatable :: work(:)
     integer :: lwork
     real(8), allocatable :: rwork(:)
@@ -277,9 +279,9 @@ contains
     integer, allocatable :: iwork(:)
     integer :: liwork
     !
-    complex(8) :: ztmp
-    real(8) :: dtmp
-    integer :: itmp
+    complex(8) :: ztmp(1)
+    real(8) :: dtmp(1)
+    integer :: itmp(1)
     !
     if(jobz=='N')then
       allocate(z(1,1))
@@ -305,9 +307,8 @@ contains
       m, w, z, ldz, isuppz, ztmp, lwork, dtmp, lrwork, itmp, liwork, info)
 
     !     Make sure that there is enough workspace for block size nb.
-    lwork = nint(dble(ztmp))
-    lrwork = nint(dtmp)
-    liwork = itmp
+    call zheevr_workspace_lengths(n,ztmp(1),dtmp(1),itmp(1), &
+      lwork,lrwork,liwork)
     allocate (work(lwork))
     allocate (rwork(lrwork))
     allocate (iwork(liwork))
