@@ -992,7 +992,7 @@ autoreconf -vfi
 ./configure FC=gfortran FCFLAGS="-O2 -fopenmp"
 make -j2
 export OPENBLAS_NUM_THREADS=1
-python3 -S tests/cpc_portable_dm_quickstart.py \
+python3 -S paper/tools/cpc_portable_dm_quickstart.py \
   --exe "$(pwd)/source/QS3ED2" \
   --size 4 --omp 1 \
   --output "$(pwd)/ed2-reproduction-l4"
@@ -1005,8 +1005,15 @@ It uses only the Python standard library \emph{after}
 building the Fortran executable. The full independent
 physics tests instead require NumPy/SciPy to construct
 separate dense/sparse spin Hamiltonians.
-The source archive and development repository retain
-the input recipes, reference CSV and workflow definitions.
+The paper bundle retains the self-contained input generator
+\texttt{paper/tools/cpc\_portable\_dm\_quickstart.py}, the
+independent reference data in
+\texttt{paper/data/cpc\_stationary\_dm\_reference.csv}, and
+the exact source revision. The separate generic ED2 mainline
+also contains full complex $H|\psi\rangle$ regression tests
+against real and nonreal DM Hamiltonians; those verify
+operator equivalence, not the complete physical-response
+curve on every later program revision.
 
 The final CPC program package must replace the moving
 branch with a full immutable source SHA or release tag,
@@ -1016,10 +1023,16 @@ input/output files. The software DOI and Program Library
 accession are not assigned in this draft.
 
 \section{Availability and limitations}
-The public source lineage is
-\url{https://github.com/QS-Cube/ED2};
-development verification is archived under
-\url{https://github.com/ueda1984/ED2}.
+The intended official software repository is
+\url{https://github.com/QS-Cube/ED2}; the independently
+validated development mainline and present manuscript source
+are in \url{https://github.com/ueda1984/ED2}.
+The public \url{https://ed2.readthedocs.io/en/latest/}
+website is built from the official repository and may lag
+features present only in the development fork.
+Upstream maintainer integration, a reviewed release snapshot
+and documentation rebuild remain necessary before an
+official version is claimed.
 Build and test scripts reproduce the original
 source-pinned QS$^3$ overlap, stationary mixed-spin
 DM response, independent low-energy references
