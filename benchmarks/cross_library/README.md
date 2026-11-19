@@ -160,6 +160,43 @@ Sources:
 - https://github.com/awietek/xdiag/blob/27065537a743c642c35efa0e1b5ae4f326fd984c/xdiag/blocks/spinhalf.cpp
 - https://github.com/awietek/xdiag/blob/27065537a743c642c35efa0e1b5ae4f326fd984c/xdiag/blocks/distributed/spinhalf_distributed.cpp
 
+### XDiag full cubic space-group API: a specific source-level memory bottleneck
+
+The pinned XDiag 0.6.0 `PermutationGroup` implementation explicitly stores
+an `arma::Mat<int64_t>` of **all group multiplication products**
+(`G x G`) and another `nsites x G` int64 matrix of site permutations.
+For a cubic (L^3=N=1000) site system, Gamma/Oh A1g requires a
+space group of (G=1000\times48=48000) elements, giving at least:
+
+- Multiplication table: **18,432,000,000 bytes (17.17 GiB)**.
+- Site-permutation matrix: **384,000,000 bytes (366.2 MiB)**.
+- Inverse indices: 384,000 bytes.
+- Sum of these **allocated payload arrays alone**:
+  **18,816,384,000 bytes (17.52 GiB)**, excluding temporary allocations,
+  Hilbert-space basis, Lanczos and runtime overhead.
+
+Moreover, the current `compute_multiply` implementation loops over
+every ordered pair of group elements and searches for the product in the
+permutation list, so the construction cost is a substantial additional
+scaling concern. `RepresentationSet` accepts only one SitePermutation
+group type; putting translations and Oh into two independent groups is
+not a supported substitute in this native API.
+
+This is a **structural bound for the present full-group API** from
+verified source, **not measured XDiag RSS or a proof that all potential
+XDiag extensions/algorithms are intrinsically unsuitable**. In
+particular, QuSpin's generator factorization stores small generators
+rather than this multiplication table. The comparison therefore
+highlights a valid research question: whether a library exploits the
+semidirect product / few-magnon structure or materializes the group.
+
+The independent `group_memory_floor.py --self-test` automates the
+accounting without constructing any group or calling XDiag.
+
+Source:
+- https://github.com/awietek/xdiag/blob/27065537a743c642c35efa0e1b5ae4f326fd984c/xdiag/symmetries/permutation_group.cpp
+- https://github.com/awietek/xdiag/blob/27065537a743c642c35efa0e1b5ae4f326fd984c/xdiag/symmetries/representation_set.cpp
+
 ## Specialized cubic lane (S) is a distinct physical workload
 
 Existing ED2 draft PRs #13--#21 contain exact but highly scoped cubic
