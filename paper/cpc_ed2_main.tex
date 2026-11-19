@@ -960,6 +960,58 @@ It uses only the Python standard library \emph{after}
 building the Fortran executable. The full independent
 physics tests instead require NumPy/SciPy to construct
 separate dense/sparse spin Hamiltonians.
+
+As a further source-anchored check of the current
+\emph{generic} development mainline, we executed both the
+four- and six-site alternating spin-$1/2$/spin-$1$
+model with the full occupation range at
+$D=-2\times10^{-4},0,+2\times10^{-4}$,
+holding the native Hamiltonian and observable definitions
+fixed. Table~\ref{tab:mainline-current-native-dm}
+shows $E_0$ and the staggered bond chirality
+$K=\sum_j(-1)^j\langle S_j^xS_{j+1}^y-
+S_j^yS_{j+1}^x\rangle$ at $D=0$, the central
+Hellmann--Feynman consistency error, and the finite-size
+susceptibility per bond. The runs use GNU Fortran 14,
+\texttt{-O2 -fopenmp} and one OpenMP/BLAS thread;
+the raw source, binary checksum, inputs, and report files
+are preserved with
+\href{https://github.com/ueda1984/ED2/actions/runs/44445263717}{CI run 44445263717}.
+These are finite-size physical reproducibility checks,
+not timing benchmarks or a thermodynamic extrapolation.
+
+\begin{table}[t]
+\centering
+\caption{Native current-main alternating mixed-spin XYZ/$\Gamma$/DM
+response at $D=0$; the derivative uses the symmetric
+$2\times10^{-4}$ DM step. Energy and chirality
+are expressed in the input coupling units. The final
+column is the finite-size staggered DM susceptibility per bond.}
+\label{tab:mainline-current-native-dm}
+\small
+% MAINLINE_CURRENT_NATIVE_DM_TABLE_BEGIN: audited against source JSON.
+\begin{tabular}{rrrrr}
+\toprule
+$L$ & $E_0$ & $K$ & $|\partial_D E_0-K|$ & $\chi_K/(L-1)$ \\
+\midrule
+4 & -2.230937250602 & 0.001150247666 & 5.31e-11 & 0.634311181 \\
+6 & -3.583863495866 & 0.001090053482 & 1.38e-10 & 0.568732921 \\
+\bottomrule
+\end{tabular}
+% MAINLINE_CURRENT_NATIVE_DM_TABLE_END
+\end{table}
+
+The current generic mainline does not emit the optional
+direct-eigenpair-residual sidecar found on some experimental
+branches. The native evidence here instead requires
+successful thick-restart convergence reporting,
+agreement of native Ritz values with their
+$\langle\psi|H|\psi\rangle$ expectations, and
+agreement with independently calculated physical reference
+energies, correlations and energy derivatives. These
+comparisons are \emph{not} equivalent to an independently
+evaluated norm $\|H\psi-E\psi\|_2$ for the reported Ritz pairs.
+
 The paper bundle retains the self-contained input generator
 \texttt{paper/tools/cpc\_portable\_dm\_quickstart.py}, the
 independent reference data in
