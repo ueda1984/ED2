@@ -35,10 +35,10 @@ direct residual certification.
 | Physical quantity | Four sites | Six sites |
 |---|---:|---:|
 | D=0 E0 | -2.230937250601721 | -3.583863495866078 |
-| D=0 staggered chirality (K) | +0.0011502476661632913 | +0.0010900534820340556 |
-| Central finite-difference (partial_D E_0) | +0.001150247719294839 | +0.001090053619590137 |
-| (|partial_D E_0-K|) | 5.3132e-11 | 1.3756e-10 |
-| Susceptibility (chi_K/(L-1)) | 0.6343111813578161 | 0.5687329207582081 |
+| D=0 staggered chirality $K$ | +0.0011502476661632913 | +0.0010900534820340556 |
+| Central finite-difference $\partial_D E_0$ | +0.001150247719294839 | +0.001090053619590137 |
+| $|\partial_D E_0-K|$ | 5.3132e-11 | 1.3756e-10 |
+| Susceptibility $\chi_K/(L-1)$ | 0.6343111813578161 | 0.5687329207582081 |
 | Independent source reference susceptibility | 0.6343112017685585 | 0.5687329253277751 |
 | Complete native runs | 3/3 PASS | 3/3 PASS |
 
@@ -58,10 +58,10 @@ thick-restart convergence flags, the final reported
 restart indicator, the two native `<Phi|H|Phi>` energy
 expectations, and their consistency with the two
 eigenvalues. The largest discrepancy among the native
-expectation checks was below (1.4\times10^{-14}).
+expectation checks was below $1.4\times10^{-14}$.
 
 Those indicators **do not mathematically equal** the direct
-residual norm (|Hpsi-Epsi|_2).
+residual norm $\|H\psi-E\psi\|_2$.
 The exact-source program cannot claim an independent
 direct-residual certificate on the basis of this check.
 Each structured `report.json` records
