@@ -36,6 +36,10 @@ jobs:
           git clone --filter=blob:none https://github.com/awietek/xdiag.git /tmp/ed2_xdiag_external
           git -C /tmp/ed2_xdiag_external checkout --detach "$XDIAG_PINNED_SHA"
           test "$(git -C /tmp/ed2_xdiag_external rev-parse HEAD)" = "$XDIAG_PINNED_SHA"
+      - name: Install system BLAS and LAPACK development libraries
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends libblas-dev liblapack-dev
       - name: Build XDiag library using CMake C++17 OpenMP (no MPI)
         timeout-minutes: 24
         run: |
