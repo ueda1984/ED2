@@ -3,7 +3,9 @@ name: ED2 original-main complex CSR and typed BLAS/LAPACK proof
 on:
   push:
     branches: [main]
+    tags: ["v*"]
     paths:
+      - "CITATION.cff"
       - "source/**"
       - "tests/**"
       - "script_*/**"
@@ -13,6 +15,7 @@ on:
       - "docs/development/generic-complex-csr-main.md"
   pull_request:
     paths:
+      - "CITATION.cff"
       - "source/**"
       - "tests/**"
       - "script_*/**"
@@ -49,9 +52,14 @@ jobs:
             FCFLAGS="-O2 -fopenmp"
           make -j2
           make check
-      - name: Verify unreleased citation metadata and archived ex9 output integrity
+      - name: Verify development or versioned citation metadata and archived ex9 integrity
         run: |
-          python3 -B tests/check_release_metadata.py
+          metadata_args=()
+          if [ "$GITHUB_REF_TYPE" = tag ]; then
+            metadata_args=(--release-tag "$GITHUB_REF_NAME")
+          fi
+          python3 -B tests/check_release_metadata.py "${metadata_args[@]}"
+          python3 -B tests/test_release_guards.py
           python3 -B tests/verify_ex9.py
       - name: Independent spin-matrix physics and guarded solver cases
         run: |
@@ -66,6 +74,14 @@ jobs:
           python3 -B tests/audit_runtime_regression.py \
             --fc gfortran-${{ matrix.gnu }} \
             --output "$RUNNER_TEMP/audit-runtime"
+      - name: Reject nonfinite scientific inputs and corrupt restarts
+        run: |
+          python3 -B tests/audit_input_validation.py \
+            --exe "$PWD/source/QS3ED2" \
+            --output "$RUNNER_TEMP/audit-input-validation"
+          python3 -B tests/audit_lanczos_shift_regression.py \
+            --exe "$PWD/source/QS3ED2" \
+            --output "$RUNNER_TEMP/audit-lanczos-shift"
       - name: Native LP64 BLAS complex ABI and full ZHEEVR eigensolver proof
         run: |
           gfortran-${{ matrix.gnu }} -O2 -fopenmp -I source \
@@ -123,6 +139,8 @@ jobs:
             ${{ runner.temp }}/csr-main-proof/*/csr_matvec_bits.txt
             ${{ runner.temp }}/audit-physics-t*/**
             ${{ runner.temp }}/audit-runtime/**
+            ${{ runner.temp }}/audit-input-validation/**
+            ${{ runner.temp }}/audit-lanczos-shift/**
             tests/*.long.log
             tests/test-suite.log
           retention-days: 30

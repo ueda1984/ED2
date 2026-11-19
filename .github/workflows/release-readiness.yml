@@ -10,8 +10,20 @@ on:
     paths:
       - "CITATION.cff"
       - "configure.ac"
-      - "examples/ref_data/cubic_sp_HB/**"
+      - "source/**"
+      - "tests/**"
+      - "script_*/**"
+      - "docs/**"
+      - "input/**"
+      - "README.md"
+      - "LICENSE"
+      - "mkdocs.yml"
+      - ".readthedocs.yaml"
+      - "examples/ref_data/**"
       - "tests/check_release_metadata.py"
+      - "tests/test_release_guards.py"
+      - "tests/release_archive_preflight.py"
+      - "Makefile.am"
       - "tests/verify_ex9.py"
       - "tests/run_ex9_reproducibility.sh"
       - ".github/workflows/release-readiness.yml"
@@ -19,8 +31,20 @@ on:
     paths:
       - "CITATION.cff"
       - "configure.ac"
-      - "examples/ref_data/cubic_sp_HB/**"
+      - "source/**"
+      - "tests/**"
+      - "script_*/**"
+      - "docs/**"
+      - "input/**"
+      - "README.md"
+      - "LICENSE"
+      - "mkdocs.yml"
+      - ".readthedocs.yaml"
+      - "examples/ref_data/**"
       - "tests/check_release_metadata.py"
+      - "tests/test_release_guards.py"
+      - "tests/release_archive_preflight.py"
+      - "Makefile.am"
       - "tests/verify_ex9.py"
       - "tests/run_ex9_reproducibility.sh"
       - ".github/workflows/release-readiness.yml"
@@ -48,6 +72,7 @@ jobs:
           fi
       - name: Validate archived ex9 energies, full observable files, and spin sum rule
         run: |
+          python3 -B tests/test_release_guards.py
           python3 -B tests/verify_ex9.py \
             --json-out "${{ runner.temp }}/ex9-archive-check.json"
           python3 -B tests/test_ex9_legacy_projection.py
@@ -77,3 +102,25 @@ jobs:
           ./configure FC=gfortran FCFLAGS="-O2 -fopenmp"
           make -j2
           make distcheck
+          make dist
+          metadata_args=()
+          if [ "$GITHUB_REF_TYPE" = tag ]; then
+            metadata_args=(--release-tag "$GITHUB_REF_NAME")
+          fi
+          shopt -s nullglob
+          archives=(./*.tar.gz)
+          test "${#archives[@]}" -eq 1
+          python3 -B tests/release_archive_preflight.py \
+            --archive "${archives[0]}" \
+            --expected-commit "$(git rev-parse HEAD)" \
+            "${metadata_args[@]}" \
+            --json-out "$RUNNER_TEMP/gnu-release-source-manifest.json"
+      - name: Preserve the exact checked GNU source archive and manifest
+        uses: actions/upload-artifact@v4
+        with:
+          name: ed2-checked-gnu-source-distribution
+          path: |
+            ./*.tar.gz
+            ${{ runner.temp }}/gnu-release-source-manifest.json
+          if-no-files-found: error
+          retention-days: 30

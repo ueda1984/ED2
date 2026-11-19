@@ -5,6 +5,7 @@ This checker does not run ex9. An archive-only pass is NOT a fresh reproduction.
 Uses Python's standard library; fails on partial/appended/NaN/Inf output.
 """
 import argparse
+import hashlib
 import json
 import math
 from pathlib import Path
@@ -15,6 +16,27 @@ TABLES = {
     "xyz": ("two_body_cf_xyz.dat", 9, 11),
     "zpm": ("two_body_cf_z+-.dat", 9, 20),
 }
+
+# This correction is justified for one known archive, not for arbitrary
+# correlation data. Pair IDs alone cannot establish the lattice geometry or
+# the symmetry sector. Keep byte-exact copies of all four original tables;
+# changing even whitespace deliberately requires a new provenance review.
+LEGACY_EX9_REFERENCE_SHA256 = {
+    "eigenvalues.dat": "0f3824d777fd4e21336d6a48bb3a3c84c0be8a4afdc05f72710f6741da17c6bf",
+    "local_mag.dat": "14f6aa1bded41068080bb42b3683d27989a580fadc563455bc61df530ddf61f3",
+    "two_body_cf_xyz.dat": "a0ae1b668bace46ea22ee292c50ce20a6dfc14c0dfac8f1058cc1b27814f6a92",
+    "two_body_cf_z+-.dat": "d764764d76b21944bd6ddd3632e3fc94ec3d5f2032ca8eb295afe213b219e03b",
+}
+
+
+def check_legacy_reference_identity(folder):
+    for name, expected in LEGACY_EX9_REFERENCE_SHA256.items():
+        observed = hashlib.sha256((folder / name).read_bytes()).hexdigest()
+        if observed != expected:
+            raise ValueError(
+                f"{name}: not the pinned historical ex9 reference; "
+                "symmetry projection requires byte-exact original tables")
+    return "SHA256 matches all four original historical ex9 tables"
 
 
 def read_table(folder, file_name, count, width):
@@ -66,9 +88,11 @@ def zpm_hermiticity_gap(rows):
 
 
 def symmetrize_historical_zpm(row):
-    # EX9 ONLY: the real k=0, even-reflection state has equal real
-    # +- and -+ channels. The old archive included translations but
-    # omitted reflection generators in the correlation average.
+    # EX9 ONLY: site-exchange symmetry and operator adjoints force equal real
+    # +- and -+ channels in this k=0, even-reflection sector. The old archive
+    # included translations but omitted reflections in the correlation average.
+    # For its nine collinear pairs, full reflection averaging exchanges these
+    # two oriented channels. This mean is not valid for general off-axis pairs.
     # Preserve the unmodified archive and project only these channels.
     result = list(row)
     symmetric = 0.5 * (row[12] + row[16])
@@ -147,7 +171,8 @@ def main():
     parser.add_argument("--observable-atol", type=float, default=1e-8)
     parser.add_argument("--legacy-ex9-symmetry-projection", action="store_true",
                         help="Compare to the historical ladder archive after the "
-                             "exact real even-reflection projection; report raw differences")
+                             "exact real even-reflection projection; requires byte-exact "
+                             "original reference tables and reports raw differences")
     parser.add_argument("--json-out", type=Path)
     args = parser.parse_args()
     report = {"mode": "archive_only", "reference": str(args.reference.resolve())}
@@ -155,6 +180,8 @@ def main():
         if not (math.isfinite(args.energy_atol) and args.energy_atol > 0
                 and math.isfinite(args.observable_atol) and args.observable_atol > 0):
             raise ValueError("Positive, finite tolerances required")
+        if args.legacy_ex9_symmetry_projection:
+            report["legacy_reference_identity"] = check_legacy_reference_identity(args.reference)
         ref = read_results(args.reference)
         report["reference_checks"] = check_physics(ref)
         if report["reference_checks"]["max_ladder_hermiticity_gap"] > 1e-8:

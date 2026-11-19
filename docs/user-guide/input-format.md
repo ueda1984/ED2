@@ -41,8 +41,11 @@ Except for `L1..L6=1`, `M1..M6=0`, and empty `FILE_S1..FILE_S6`, the
 NAMELIST variables have **no explicitly initialized application defaults**.
 Set every value used by your chosen calculation. A value observed after
 omitting a key is not a documented default. Input validation is incomplete:
-valid Fortran syntax does not prove that the model, ranges, or symmetries are
-physically consistent.
+valid Fortran syntax does not prove that the model or symmetries are
+physically consistent. Basic solver/count/site/spin/cap ranges are checked,
+and NaN/Inf values in couplings, fields, spins, solver tolerances and saved
+eigenpairs are rejected. These guards do not establish symmetry validity,
+checkpoint compatibility/normalization, or numerical convergence.
 
 All `FILE_*` and `OUTDIR` input strings are limited to 100 characters in the
 current implementation. Output directories must already exist. Include a
@@ -61,7 +64,9 @@ directly to these strings.
 | `FILE_NODmax` | CHARACTER(100) | Required | `NOS` records, each containing the local occupation cap. |
 
 The occupation at site `i` is `n_i = S_i - m_i`, with integer
-`0 <= n_i <= min(local_NODmax(i), 2*S_i)`. The retained product states obey
+`0 <= n_i <= local_NODmax(i)` and the required input constraint
+`0 <= local_NODmax(i) <= 2*S_i`. A cap above the physical spin range is
+rejected rather than silently clamped. The retained product states obey
 
 $$
 \mathrm{NODmin} \le \sum_i n_i \le \mathrm{NODmax}.
@@ -86,7 +91,7 @@ support from the wording of a runtime message.
 
 | Key | Type | Default | Meaning |
 | --- | --- | --- | --- |
-| `L1..L6` | INTEGER | `1` | Orders of up to six commuting site-permutation operations; each order must be positive. |
+| `L1..L6` | INTEGER | `1` | Orders of up to six site-permutation operations with compatible scalar characters; each order must be positive. |
 | `M1..M6` | INTEGER | `0` | Sector labels, conventionally `0 <= M_m < L_m`. |
 | `FILE_S1..FILE_S6` | CHARACTER(100) | Empty | `NOS` records giving each site's image under the corresponding permutation. Only read when `L_m != 1`. |
 
@@ -94,11 +99,17 @@ A translation by one site is the list `2,3,...,NOS,1`, written one integer
 per record. Each nontrivial list must be a permutation of `1..NOS` with the
 stated order. Its action must preserve the local spins, occupation caps, and
 **the entire Hamiltonian**, including oriented DM interactions and fields.
-The chosen operations must commute so that the requested scalar characters
-can be imposed simultaneously. The phase convention is
+ED2's ordered products must enumerate the generated finite group uniformly,
+and the requested scalar phases must obey the group's relations. Commuting
+operations with compatible labels are a sufficient case. Translation and
+reflection can also be combined in compatible zero/pi momentum sectors,
+including ex9; arbitrary noncommuting generators and multidimensional
+representations are not supported. See [Theory and algorithms](../theory/algorithms.md#spatial-symmetry-projection).
+Defining `T_m` as the **active** action that moves each site's spin occupation
+to the site in its image list, the phase convention is
 
 $$
-T_m |\Psi\rangle = e^{-2\pi i M_m/L_m}|\Psi\rangle.
+T_m |\Psi\rangle = e^{+2\pi i M_m/L_m}|\Psi\rangle.
 $$
 
 ED2 does not automatically prove these conditions. A calculation can terminate

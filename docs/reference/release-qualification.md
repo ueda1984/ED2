@@ -7,7 +7,7 @@ full Git commit used for each calculation.
 
 ## Before assigning a release number
 
-1. Freeze a candidate commit and ensure the source tree is clean. Record its
+1. Review a candidate branch and ensure the source tree is clean. Record its
    SHA, compiler/flags, BLAS/LAPACK implementation, operating system, and
    `ED2_*` environment options.
 2. Check GNU Fortran 13 and 14 CI, independent small-system physics checks,
@@ -26,21 +26,38 @@ full Git commit used for each calculation.
    `configure.ac` and the `version` field of `CITATION.cff` to match, and enter
    the *actual* release date as `date-released` in `CITATION.cff`. The existing
    `AC_INIT` package number must not be taken as evidence of an issued release.
-6. Run `python3 tests/check_release_metadata.py --release-tag vX.Y.Z`, replacing
-   the example with the proposed tag, before tagging. Rebuild distribution
-   archives; check that `README.md`, `LICENSE`, `CITATION.cff`, examples, and
-   offline regression scripts are included.
+6. Commit the agreed metadata and freeze that **final candidate SHA**. Run
+   `python3 tests/check_release_metadata.py --release-tag vX.Y.Z`, replacing
+   the example with the proposed tag, before tagging. Require the GNU/Intel
+   physics jobs and source-distribution checks on this same candidate. Rebuild
+   the archive and run `tests/release_archive_preflight.py` with the actual
+   archive, `--expected-commit <full-candidate-SHA>`, and `--release-tag vX.Y.Z`.
+   Preserve the exact archive and generated SHA-256 manifest together.
 7. With the appropriate repository permissions, create and publish the
    reviewed tag/release. Confirm that the tag points to the tested commit.
    Build the versioned Read the Docs pages and archive the matching source and
    checksums. Add an actual archival DOI only after issuance; do not cite a
    placeholder Zenodo or journal DOI.
 
-The default `python3 tests/check_release_metadata.py` intentionally checks
-for the **unreleased-development** state and ensures that `CITATION.cff`
-does not claim an unissued version/date. After the first versioned release,
-adapt the mainline CI policy to permit actual published release metadata;
-do not keep a development-only guard without review.
+The default `python3 tests/check_release_metadata.py` accepts either an
+unreleased-development state (both CFF release fields absent), or consistent
+versioned metadata (both fields present, version matching `AC_INIT`, valid
+`YYYY-MM-DD` date). This permits the metadata PR to pass before a tag is
+created and permits subsequent builds of that versioned source. A tag build
+additionally requires the exact `vMAJOR.MINOR.PATCH` value. Missing one field,
+version mismatches and malformed dates fail. No mode creates a release or
+establishes that publication has occurred; maintainers approve the actual
+version and publication date separately.
+
+The archive preflight requires every tracked release input: numerical
+Fortran modules, test scripts/drivers, example generators and inputs,
+historical reference tables, documentation and build templates. It compares
+those bytes with the frozen Git commit. Regenerated Autotools files are
+listed and checked separately against the build tree, because they depend
+on the toolchain. Missing, changed or unclassified archive files fail. These
+checks complement a successful unpacked `make distcheck`; neither replaces
+scientific tests. Run `python3 -B tests/test_release_guards.py` for the negative
+cases covering omitted/tampered solver sources and metadata transitions.
 
 ## How to complete the 1000-site ex9 verification
 
@@ -76,7 +93,11 @@ python3 tests/verify_ex9.py \
 The compute is CPU/memory intensive. The wrapper does not submit a job or
 request scheduler resources. It refuses pre-existing outputs to prevent
 append contamination, then preserves complete inputs, output files, checksums,
-and a run log under a new `ex9-audit-*` directory. Select the node class,
+and a run log under a new `ex9-audit-*` directory. It records the configured
+compiler/flags/libraries from the generated Makefile, `config.log` when
+available, executable hashes and dynamic linkage. A different compiler on
+the shell's default PATH does not identify the compiler that built ED2.
+Select the node class,
 thread count, and job walltime under the local scheduler's policy; retain scheduler peak RSS,
 walltime, stdout/stderr, complete input files, and the resulting
 `eigenvalues.dat`, `local_mag.dat`, `two_body_cf_xyz.dat`, and
@@ -124,6 +145,13 @@ the supplied 1000-site/three-magnon input:
   9:45.04 wall-clock elapsed; independently rebuilt from the same archived
   source snapshot.
 
+The Ubuntu build job explicitly used `FC=gfortran-14` and linked
+`-llapack -lopenblas`. Its older `environment.txt` collector printed the
+default `gfortran` (13.3), which was not the selected build compiler. Use
+the actual compile/link log for that audit. Generated build files in the
+separately exported source snapshot are historical checkout files; the
+Debian reproduction regenerated and reconfigured them before building.
+
 The first run produced all four numerical output files but its historical
 **raw** ladder comparison failed. This is a genuine archived-fixture
 inconsistency, **not** an incomplete ex9 calculation. The previous
@@ -141,6 +169,17 @@ imaginary parts set to zero; all historical archive files remain untouched.
 The explicit CLI flag
 `--legacy-ex9-symmetry-projection` enables this *ex9-specific* projection,
 and always records the unsymmetrized raw discrepancy.
+
+This average is justified for the archived collinear pairs `(1,2)` through
+`(1,10)` of this particular isotropic, zero-field, zero-momentum,
+even-reflection ex9 input. Reflection along that line exchanges the two
+oriented ladder channels; the transverse reflections preserve the pair
+displacement. It is not a general correction for arbitrary real or
+reflection-symmetric models: independent small-cube checks exhibit
+off-axis pairs for which the two-channel mean is wrong. Projection mode
+therefore requires the exact four historical numerical reference tables
+by SHA-256; ordinary strict comparisons remain available for other data.
+The computed output is never symmetrized or modified by the verifier.
 
 | Full output comparison | Maximum absolute discrepancy |
 | --- | ---: |

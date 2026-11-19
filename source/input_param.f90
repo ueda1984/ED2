@@ -1,4 +1,5 @@
 module input_param
+  use iso_fortran_env, only: int64
   implicit none
   integer :: NOS       ! number of sites
   integer :: NODmax    ! Upper limit value for number of down spins
@@ -50,6 +51,15 @@ module input_param
   !
 contains
   !
+  elemental logical function real8_is_finite(value)
+    real(8), intent(in) :: value
+    ! Supported ED2 platforms use IEEE binary64 for real(8). Check its
+    ! exponent bits because -Ofast may assume floating-point inputs finite
+    ! and optimize away an IEEE_IS_FINITE test.
+    real8_is_finite = iand(transfer(value,0_int64),int(z'7ff0000000000000',int64)) /= &
+      int(z'7ff0000000000000',int64)
+  end function real8_is_finite
+  !
   subroutine read_ip 
     integer :: i,j,k,l,m,n
     integer :: tmp
@@ -57,6 +67,14 @@ contains
     write(*,'(" ### Read input_parameters. ")')
     read(*,input_parameters)
     write(*,input_parameters)
+    if(NOS<1)error stop 'NOS must be positive'
+    if(ALG<1.or.ALG>3)error stop 'ALG must be 1, 2, or 3'
+    if(NO_one<0.or.NO_two<0)error stop 'Interaction counts must be nonnegative'
+    if(NODmin<0.or.NODmax<NODmin)error stop 'Require 0 <= NODmin <= NODmax'
+    if(any([L1,L2,L3,L4,L5,L6]<1))error stop 'Symmetry periods must be positive'
+    if(cal_cf==1)then
+      if(NO_two_cf<0)error stop 'NO_two_cf must be nonnegative'
+    end if
     !
     write(*,'(" ### Set wavevectors. ")')
     PI = acos(-1.0d0)
@@ -83,6 +101,10 @@ contains
     open(10, file=trim(adjustl(FILE_xyz_dm_gamma)),status='old')
     do i = 1, NO_two
       read(10,*) p_two(1,i), p_two(2,i), Jint(1:9,i)
+      if(.not.all(real8_is_finite(Jint(:,i)))) &
+        error stop 'FILE_xyz_dm_gamma contains a nonfinite coupling'
+      if(any(p_two(:,i)<1).or.any(p_two(:,i)>NOS).or.p_two(1,i)==p_two(2,i)) &
+        error stop 'Bond indices must be distinct sites in 1..NOS'
       if( p_two(1,i) > p_two(2,i) )then
         Jint(4:6,i) = -1.0d0 * Jint(4:6,i)
         tmp = p_two(1,i)
@@ -96,6 +118,9 @@ contains
     open(10, file=trim(adjustl(FILE_hvec)),status='old')
     do i = 1, NO_one
       read(10,*) p_one(i), hvec(1:3,i)
+      if(.not.all(real8_is_finite(hvec(:,i)))) &
+        error stop 'FILE_hvec contains a nonfinite field'
+      if(p_one(i)<1.or.p_one(i)>NOS)error stop 'Field index must be a site in 1..NOS'
     end do
     close(10)
     !
@@ -177,6 +202,16 @@ contains
     open(10, file=trim(adjustl(FILE_spin)),status='old')
     do i = 1, NOS
       read(10,*) local_spin(i)
+      if(.not.real8_is_finite(local_spin(i))) &
+        error stop 'FILE_spin contains a nonfinite spin'
+      ! Bound the value before doubling or converting it to default INTEGER.
+      if(local_spin(i)<0.0d0.or.local_spin(i)>dble(huge(0))/2.0d0) &
+        error stop 'Spin must be nonnegative with 2*S within the default INTEGER range'
+      tmp = int(2.0d0*local_spin(i))
+      if(dble(tmp)/=2.0d0*local_spin(i)) &
+        error stop 'Spin must be an integer or half-integer'
+      if(local_NODmax(i)<0.or.local_NODmax(i)>tmp) &
+        error stop 'Local occupation cap must satisfy 0 <= cap <= 2*S'
     end do
     close(10)
     !
@@ -186,6 +221,8 @@ contains
       open(10, file=trim(adjustl(FILE_two_cf)),status='old')
       do i = 1, NO_two_cf
         read(10,*) p_two_cf(1,i), p_two_cf(2,i)
+        if(any(p_two_cf(:,i)<1).or.any(p_two_cf(:,i)>NOS).or.p_two_cf(1,i)==p_two_cf(2,i)) &
+          error stop 'Correlation indices must be distinct sites in 1..NOS'
         if( p_two_cf(1,i) > p_two_cf(2,i) )then
           tmp = p_two_cf(1,i)
           p_two_cf(1,i) = p_two_cf(2,i)
@@ -259,6 +296,9 @@ contains
       open(10, file=trim(adjustl(file_name)), status='old', action='read', form='unformatted')
       read(10) psi(1:dim,i_vec)
       close(10)
+      if(.not.all(real8_is_finite(real(psi(:,i_vec),8))).or. &
+        .not.all(real8_is_finite(aimag(psi(:,i_vec))))) &
+        error stop 'Saved wavefunction contains a nonfinite coefficient'
       write(*,*) "first wavefunction coefficients"
       write(*,*) psi(1:min(10,dim),i_vec)
       write(*,*) " finish reading wave function!"
@@ -270,6 +310,8 @@ contains
     open(10, file=trim(adjustl(file_name1)),status='old')
     do i=1, NOE
       read(10,*) dummy, ene(i) 
+      if(.not.real8_is_finite(ene(i))) &
+        error stop 'Saved energy.dat contains a nonfinite energy'
       write(*,*) dummy, ene(i), "reading!"
     end do
     close(10)

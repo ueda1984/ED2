@@ -29,9 +29,12 @@ Fortran 14.2 and the system LP64 BLAS/LAPACK libraries. The existing CI also
 exercises GNU Fortran 13 and 14 on Ubuntu 24.04. This does not establish that
 every compiler, operating system, or BLAS variant is supported.
 
-The configure script retains the classic `ifort` path and includes an
-**opt-in** `ifx` path for Intel oneAPI and LP64 oneMKL. Runtime/compiler
-verification is tracked separately from the established GNU 13/14 baseline.
+The configure script supports GNU `gfortran`, classic Intel `ifort`, and
+Intel oneAPI `ifx`. Select `FC=gfortran` for the GNU recipe below or `FC=ifx`
+for the Intel recipe. If `FC` is not set, automatic compiler discovery tries
+`ifx`, then `ifort`, then `gfortran`; an available Intel compiler can therefore
+be selected automatically. Intel runtime/compiler verification is tracked
+separately from the GNU 13/14 baseline.
 The explicit Fortran interfaces require **LP64** integer arguments;
 ILP64 BLAS/LAPACK is not supported by these interfaces.
 
@@ -61,8 +64,11 @@ cache layouts is not guaranteed. See [Performance and memory](../user-guide/perf
 
 For the default `--with-lapack=lapack` configuration, `configure` searches for
 BLAS in this order: `-lopenblas`, `-lblas`, then `-lf77blas`. It separately
-checks `-llapack`. Only when an `ifort` compiler is selected and those BLAS
-checks fail does it attempt the MKL fallback `-qmkl=parallel`.
+checks `-llapack`. If the BLAS checks fail with an Intel compiler, it attempts
+the MKL fallback `-qmkl=parallel` for `ifort` or `-qmkl=sequential` for `ifx`.
+If the separate LAPACK check fails while either MKL option is active, the
+configuration assumes MKL supplies LAPACK; the subsequent link and runtime
+checks must still succeed.
 
 The explicit `--with-lapack=mkl` path accepts `FC=ifort` (historical
 parallel MKL) or `FC=ifx` (sequential LP64 MKL).
@@ -76,30 +82,38 @@ appropriate `LDFLAGS` and module environment and retain the resulting log.
 
 Install the oneAPI Fortran compiler and oneMKL development package from
 Intel's authenticated APT repository, or load matching oneAPI modules on
-your cluster. In a shell where the compiler and MKL environment are active:
+your cluster. Use a separate fresh checkout for this build, at its repository
+root. If reusing an existing build tree, run `make distclean` before changing
+compilers. The following Bash commands use Intel's standard installation
+location; with cluster modules, load the matching environment instead of
+the `source` command:
 
-\`\`\`bash
+```bash
 source /opt/intel/oneapi/setvars.sh
 ifx --version
 echo "$MKLROOT"
 autoreconf -vfi
 ./configure FC=ifx FCFLAGS="-O2 -qopenmp -fp-model precise" --with-lapack=mkl
 make -j2
+export OMP_NUM_THREADS=1
+export OPENBLAS_NUM_THREADS=1
+export MKL_NUM_THREADS=1
 make check
-\`\`\`
+```
 
-The explicit \`--with-lapack=mkl\` route selects Intel \`-qmkl=sequential\`
-for \`ifx\`, which uses the **LP64** interface. Set
-\`OMP_NUM_THREADS=1\` and \`MKL_NUM_THREADS=1\` for baseline correctness
-checks; later exercise 4 OpenMP threads independently. Review the final
-link command and \`ldd source/QS3ED2\` to confirm actual oneMKL linkage.
+The explicit `--with-lapack=mkl` route selects Intel `-qmkl=sequential`
+for `ifx`, which uses the **LP64** interface. Start correctness checks with
+the single-thread settings above; later exercise 4 OpenMP threads independently.
+Review the final link command and `ldd source/QS3ED2` to confirm actual oneMKL linkage.
 Do not infer that a successful build alone proves physical correctness.
 
-The repository's opt-in
+The repository's
 [oneAPI CI workflow](https://github.com/QS-Cube/ED2/actions/workflows/intel-oneapi-ifx-mkl.yml)
-tests the Intel backend with independent spin-matrix cases, typed complex
-BLAS/LAPACK and cache matrix-action regressions. It does not replace the
-full 1000-site ex9 benchmark or imply ILP64 support.
+runs automatically for its configured source/test/build-path changes on pushes
+and pull requests, and also supports manual dispatch. It tests the Intel
+backend with independent spin-matrix cases, typed complex BLAS/LAPACK and cache
+matrix-action regressions. It does not replace the full 1000-site ex9 benchmark
+or imply ILP64 support.
 
 
 ## 3. Set threads before running tests

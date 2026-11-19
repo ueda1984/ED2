@@ -1,4 +1,5 @@
 module eigen_solver
+  use input_param, only: real8_is_finite
   use blas_lapack_interfaces, only: zheevr, dstevx, dlamch, dznrm2, zdotc, &
     zgemm, zcopy, zaxpy, zscal, zdscal, check_lapack_info, &
     zheevr_workspace_lengths
@@ -44,6 +45,8 @@ contains
 
   subroutine read_input_TRLan 
     read(*,input_TRLan)
+    if(.not.real8_is_finite(lnc_ene_conv)) &
+      error stop 'TRLan tolerance lnc_ene_conv must be finite'
     write(*,input_TRLan)
     if(NOE<1.or.NOK<NOE.or.maxitr<1.or.lnc_ene_conv<=0.0d0) &
       error stop 'Invalid TRLan eigenvalue count, retained count, iterations, or tolerance'

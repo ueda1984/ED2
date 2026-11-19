@@ -102,15 +102,25 @@ contains
     complex(real64), intent(in) :: work_query
     real(real64), intent(in) :: rwork_query
     integer(int32), intent(out) :: lwork, lrwork, liwork
-    ! ZHEEVR requires max(1,2*N), max(1,24*N), max(1,10*N).
+    integer(int32) :: lwmin, lrwmin, liwmin
+    ! Netlib ZHEEVR uses one element in each workspace for N <= 1,
+    ! and requires 2*N, 24*N, 10*N respectively for N > 1.
     ! Check before integer multiplication/conversion, including LP64 overflow.
     if (n < 0 .or. n > huge(n)/24) then
       write(error_unit,'(a)') 'ZHEEVR: dimension exceeds LP64 workspace limits'
       error stop 1
     end if
-    lwork = checked_length(real(work_query,real64), max(1,2*n))
-    lrwork = checked_length(rwork_query, max(1,24*n))
-    if (iwork_query < max(1,10*n)) then
+    lwmin = 1
+    lrwmin = 1
+    liwmin = 1
+    if (n > 1) then
+      lwmin = 2*n
+      lrwmin = 24*n
+      liwmin = 10*n
+    end if
+    lwork = checked_length(real(work_query,real64), lwmin)
+    lrwork = checked_length(rwork_query, lrwmin)
+    if (iwork_query < liwmin) then
       write(error_unit,'(a)') 'ZHEEVR: invalid integer workspace query'
       error stop 1
     end if

@@ -16,6 +16,16 @@ Start with the [installation guide](docs/getting-started/installation.md) and
 [input](docs/user-guide/input-format.md) and [output](docs/user-guide/outputs.md)
 references.
 
+### Historical manual and retired setup script
+
+The [2023 Japanese manual](https://github.com/QS-Cube/ED2/blob/main/user_manual_jpn.pdf)
+is historical material. Its
+field-sign convention and build instructions differ from the current code;
+use the current [Read the Docs installation guide](https://ed2.readthedocs.io/en/latest/getting-started/installation/)
+and input reference above for current behavior. The legacy `setup.sh` entry
+point is retired: it exits with an error and prints the current build commands.
+The archived PDF is preserved unchanged.
+
 The general complex-CSR cache, coefficient-certified capacity, padded-cache
 release, and two-pass construction were merged into official `main` in
 [PR #1](https://github.com/QS-Cube/ED2/pull/1) on 19 November 2026. All four
@@ -165,8 +175,10 @@ and reference-check results. Consult
 [release qualification](docs/reference/release-qualification.md), and
 [CITATION.cff](CITATION.cff). Until a versioned archival DOI is available, cite
 the repository with the full commit hash used for the calculation. No GitHub
-release is implied by the historical `AC_INIT` package number; the CFF file
-intentionally omits release-specific version/date metadata until tagging.
+release is implied by the historical `AC_INIT` package number. Add the CFF
+version and actual planned release date only in a reviewed release candidate,
+before validating that candidate and creating its tag. A passing metadata
+check does not publish a tag, release, or DOI.
 
 ## License and maintainers
 

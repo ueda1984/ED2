@@ -9,7 +9,8 @@ EXTRA_DIST = test_ex1.sh test_common.sh \
              audit_wavefunction_io.f90 audit_basis_driver.f90 \
              audit_multivector_local_mag.f90 \
              verify_ex9.py check_release_metadata.py \
-             release_archive_preflight.py \
+             release_archive_preflight.py test_release_guards.py \
+             audit_input_validation.py audit_lanczos_shift_regression.py \
              run_ex9_reproducibility.sh test_ex9_legacy_projection.py \
              test_ex2.sh test_ex3.sh test_ex4.sh test_ex5.sh \
              test_ex6.sh test_ex7.sh test_ex8.sh test_ex9.sh \

@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
-"""Pre-release citation/version guard. Does not create a release or tag.
+"""Validate development, candidate, or tagged metadata without publishing.
 
-Development mode requires no release-specific version/date in CITATION.cff.
---release-tag vX.Y.Z checks metadata consistency for a prospective release.
+With no tag, either both CFF release fields are absent or both are consistent
+with AC_INIT. This permits a release-candidate PR and subsequent main builds.
+--release-tag additionally requires an exact vMAJOR.MINOR.PATCH match. A pass
+validates metadata only; it does not establish that a release was published.
 """
 import argparse
 from datetime import date
@@ -12,10 +14,25 @@ import re
 
 
 def field(text, name):
-    values = re.findall("^" + re.escape(name) + r":\s*(.*?)\s*$", text, re.M)
+    values = re.findall("^" + re.escape(name) + r":[ \t]*(.*?)[ \t]*$", text, re.M)
     if len(values) > 1:
         raise ValueError(f"Duplicate {name}")
-    return values[0].strip("\"'") if values else None
+    if not values:
+        return None
+    value = values[0]
+    # Only simple scalar fields are supported here, not a full CFF/YAML
+    # schema validator. Never turn an unmatched quote into valid metadata.
+    if value.startswith(('"', "'")):
+        quote = value[0]
+        match = re.fullmatch(re.escape(quote) + "([^" + quote + r"\n]*)" +
+                             re.escape(quote) + r"(?:[ \t]+#.*)?", value)
+        if not match:
+            raise ValueError(f"Invalid quoted scalar for {name}")
+        return match.group(1)
+    value = re.split(r"[ \t]+#", value, maxsplit=1)[0].strip()
+    if not value or '"' in value or "'" in value:
+        raise ValueError(f"Invalid scalar for {name}")
+    return value
 
 
 def validate(root, tag):
@@ -28,23 +45,27 @@ def validate(root, tag):
     if field(citation, "cff-version") != "1.2.0":
         raise ValueError("Expected CFF format 1.2.0")
     version, released = field(citation, "version"), field(citation, "date-released")
-    if not tag:
-        if version is not None or released is not None:
-            raise ValueError("Unreleased development: remove unissued CFF version/date")
+    if not tag and version is None and released is None:
         return {"mode": "unreleased_development",
                 "autotools_package_version": package_version,
                 "citation": "Use the full Git commit, not this package number"}
-    if not re.fullmatch(r"v[0-9]+\.[0-9]+\.[0-9]+", tag):
+    if version is None or released is None:
+        raise ValueError("CFF version and date-released must be supplied together")
+    if not re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", version):
+        raise ValueError("CFF version must be MAJOR.MINOR.PATCH")
+    if tag and not re.fullmatch(r"v[0-9]+\.[0-9]+\.[0-9]+", tag):
         raise ValueError("Release tag must be vMAJOR.MINOR.PATCH")
-    if version != tag[1:] or package_version != version:
+    if package_version != version or (tag and version != tag[1:]):
         raise ValueError(f"Version mismatch: tag={tag}, AC_INIT={package_version}, CFF={version}")
-    if not released:
-        raise ValueError("Tagged release requires CFF date-released")
+    if not re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", released):
+        raise ValueError("CFF date-released must use YYYY-MM-DD")
     try:
         date.fromisoformat(released)
     except ValueError as error:
         raise ValueError(f"Invalid CFF release date: {released}") from error
-    return {"mode": "release_metadata", "version": version, "date_released": released}
+    return {"mode": "tag_metadata" if tag else "versioned_metadata",
+            "version": version, "date_released": released,
+            "publication": "Not verified by this metadata check"}
 
 
 def main():

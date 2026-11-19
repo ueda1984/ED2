@@ -73,9 +73,12 @@ does not complete that process.
 
 For the full release gate, including the expensive cubic benchmark, see
 [Release qualification and ex9 validation](release-qualification.md).
-Check development metadata using `python3 tests/check_release_metadata.py`;
-a future release must explicitly set the agreed package and citation version
-and the real release date before tagging.
+Check metadata using `python3 tests/check_release_metadata.py`. Both release
+fields may be absent for development, or present and consistent in a reviewed
+release candidate and versioned source. A future release must explicitly set
+the agreed package and citation version and the real release date before
+tagging; `--release-tag vX.Y.Z` also verifies the intended tag value. Passing
+these checks does not establish that publication has occurred.
 
 ## Archival software DOI and article citation
 

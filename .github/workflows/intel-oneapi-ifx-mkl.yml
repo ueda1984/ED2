@@ -5,7 +5,10 @@ on:
     branches:
       - audit/ifx-mkl-release-20261119
       - main
+    tags: ["v*"]
     paths:
+      - CITATION.cff
+      - Makefile.am
       - configure.ac
       - source/**
       - tests/**
@@ -13,9 +16,12 @@ on:
       - .github/workflows/intel-oneapi-ifx-mkl.yml
   pull_request:
     paths:
+      - CITATION.cff
+      - Makefile.am
       - configure.ac
       - source/**
       - tests/**
+      - script_*/**
       - .github/workflows/intel-oneapi-ifx-mkl.yml
   workflow_dispatch:
 
@@ -90,7 +96,12 @@ jobs:
             echo "Unexpected OpenBLAS linkage in MKL-only test" >&2
             exit 1
           fi
-          python3 -B tests/check_release_metadata.py
+          metadata_args=()
+          if [ "$GITHUB_REF_TYPE" = tag ]; then
+            metadata_args=(--release-tag "$GITHUB_REF_NAME")
+          fi
+          python3 -B tests/check_release_metadata.py "${metadata_args[@]}"
+          python3 -B tests/test_release_guards.py
           python3 -B tests/verify_ex9.py
           python3 -B tests/test_ex9_legacy_projection.py
 
@@ -131,6 +142,18 @@ jobs:
           grep -q BLAS_LAPACK_TYPED_INTERFACE_REGRESSION_PASS \
             "$RUNNER_TEMP/ifx-blas-output/output.log"
 
+      - name: Reject nonfinite scientific inputs and corrupt restarts
+        shell: bash
+        run: |
+          set -eo pipefail
+          source /opt/intel/oneapi/setvars.sh > /dev/null 2>&1
+          python3 -B tests/audit_input_validation.py \
+            --exe "$PWD/source/QS3ED2" \
+            --output "$RUNNER_TEMP/ifx-input-validation"
+          python3 -B tests/audit_lanczos_shift_regression.py \
+            --exe "$PWD/source/QS3ED2" \
+            --output "$RUNNER_TEMP/ifx-lanczos-shift"
+
       - name: Native dense-H and complex CSR proofs
         shell: bash
         run: |
@@ -159,9 +182,14 @@ jobs:
           shopt -s nullglob
           archives=(./*.tar.gz)
           test "${#archives[@]}" -eq 1
+          metadata_args=()
+          if [ "$GITHUB_REF_TYPE" = tag ]; then
+            metadata_args=(--release-tag "$GITHUB_REF_NAME")
+          fi
           python3 -B tests/release_archive_preflight.py \
             --archive "${archives[0]}" \
             --expected-commit "$(git rev-parse HEAD)" \
+            "${metadata_args[@]}" \
             --json-out "$RUNNER_TEMP/release-source-manifest.json"
           test -s "$RUNNER_TEMP/release-source-manifest.json"
 
@@ -178,6 +206,8 @@ jobs:
             ${{ runner.temp }}/ifx-physics-t*/**
             ${{ runner.temp }}/ifx-runtime/**
             ${{ runner.temp }}/ifx-blas-output/**
+            ${{ runner.temp }}/ifx-input-validation/**
+            ${{ runner.temp }}/ifx-lanczos-shift/**
             ${{ runner.temp }}/ifx-csr-proof/**
             ${{ runner.temp }}/ifx-partial-cache-proof/**
             config.log

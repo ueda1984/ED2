@@ -34,10 +34,21 @@ mkdir -p "$audit"
   date -u
   git -C "$root" rev-parse HEAD 2>/dev/null || true
   git -C "$root" status --short 2>/dev/null || true
-  (command -v gfortran && gfortran --version | head -1) || true
+  if [ -f "$root/Makefile" ]; then
+    echo 'Configured build variables (not the default compiler on PATH):'
+    sed -n '/^FC = /p; /^FCFLAGS = /p; /^LDFLAGS = /p; /^LIBS = /p' "$root/Makefile"
+  fi
   printf 'OMP_NUM_THREADS=%s\nOPENBLAS_NUM_THREADS=%s\nMKL_NUM_THREADS=%s\n' \
     "$OMP_NUM_THREADS" "$OPENBLAS_NUM_THREADS" "$MKL_NUM_THREADS"
 } > "$audit/environment.txt"
+if [ -f "$root/config.log" ]; then
+  cp "$root/config.log" "$audit/build-config.log"
+fi
+sha256sum "$root/source/QS3ED2" "$root/script_cubic_sp_HB/mk_input" \
+  > "$audit/executables.sha256"
+if command -v ldd >/dev/null 2>&1; then
+  ldd "$root/source/QS3ED2" > "$audit/linkage.txt" 2>&1 || true
+fi
 
 echo "Running full ex9; log: $audit/run.log"
 if ! (cd "$root/script_cubic_sp_HB" && TOPDIR="$root" \
@@ -61,5 +72,5 @@ for file in input.dat input_param.dat list_xyz_dm_gamma.dat list_hvec.dat \
     cp "$out/$file" "$audit/$file"
   fi
 done
-( cd "$audit" && sha256sum ./*.dat ./*.json > SHA256SUMS )
+( cd "$audit" && sha256sum ./*.dat ./*.json ./*.txt ./*.log ./*.sha256 > SHA256SUMS )
 echo "PASS: full ex9 completed and verified. Results: $audit"

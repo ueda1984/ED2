@@ -1,4 +1,5 @@
 module lanczos
+  use input_param, only: real8_is_finite
   use blas_lapack_interfaces, only: dlamch, dznrm2, zdotc, dstevx, &
     zdscal, zcopy, zaxpy
   use ham2vec
@@ -9,6 +10,8 @@ module lanczos
 contains
   subroutine read_lanczos_para 
     read(*,input_lancz)
+    if(.not.real8_is_finite(lnc_ene_conv)) &
+      error stop 'Lanczos tolerance lnc_ene_conv must be finite'
     write(*,input_lancz)
   end subroutine read_lanczos_para
   !
@@ -23,6 +26,8 @@ contains
     allocate(ene(2))
     ene = 99.0d0
     read(*,input_lancz)
+    if(.not.real8_is_finite(lnc_ene_conv)) &
+      error stop 'Lanczos tolerance lnc_ene_conv must be finite'
     write(*,input_lancz)
     write(*,'("************************************************************************************")')
     write(*,*) "Eigen solver: Lanczos"
@@ -61,8 +66,8 @@ contains
     complex(8), allocatable :: psi(:,:)
     real(8), allocatable :: alpha(:), beta(:), z(:,:)
     integer :: i, m, info, ell, il = 1, iu = 1, mitr
-    real(8) :: tmp(2), abstol, conv, hnorm, vl = 0.0d0, vu = 0.0d0
-    logical :: breakdown, have_previous_ritz
+    real(8) :: tmp(2), abstol, conv, hnorm, observed_scale, vl = 0.0d0, vu = 0.0d0
+    logical :: breakdown, have_previous_ritz, small_centered_residual
     integer, allocatable :: iwork(:), ifail(:)
     real(8), allocatable :: work(:), w(:), d(:), e(:)
     abstol = 2.0d0*dlamch('S')
@@ -97,9 +102,27 @@ contains
         call zaxpy( dim, (-1.0d0,0.0d0)*alpha(i), psi(1,1), 1, psi(1,2), 1 )
       end if
       beta(i) = dznrm2( dim, psi(1,2), 1 )
-      ! A closed Krylov subspace is a successful termination, not a reason
-      ! to normalize a zero residual. Keep the final projected problem.
+      ! Do not normalize a zero or numerically unresolved residual. A small
+      ! value relative to ||H q|| alone cannot certify an invariant subspace:
+      ! a large scalar energy offset can conceal resolved spectral structure.
       breakdown = beta(i) <= 32.0d0*epsilon(1.0d0)*max(hnorm,tiny(1.0d0))
+      if(breakdown.and.i<dim.and.beta(i)>0.0d0)then
+        small_centered_residual = .false.
+        if(i>1)then
+          ! After observing more than one direction, retain ordinary finite
+          ! spectral closure only if the residual is small on a scale that
+          ! does not grow under H -> H + C I. This is a local closure check,
+          ! not a general accuracy certificate for the final eigenvector.
+          observed_scale = max(maxval(abs(alpha(1:i)-alpha(1))),maxval(beta(1:i-1)))
+          small_centered_residual = beta(i) <= &
+            32.0d0*epsilon(1.0d0)*max(observed_scale,tiny(1.0d0))
+        end if
+        if(.not.small_centered_residual)then
+          write(*,*) 'Remove an avoidable constant energy offset or use an independent solver.'
+          write(*,*) 'ALG=3 is an option only when the dense matrix fits in memory.'
+          error stop 'Lanczos numerical near-breakdown cannot certify an invariant subspace'
+        end if
+      end if
       call zcopy(dim,psi(1,1),1,psi(1,3),1)
       if(.not.breakdown.and.i<mitr)then
         !$omp parallel do
