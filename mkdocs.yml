@@ -37,6 +37,7 @@ nav:
   - User Guide:
       - Input format: user-guide/input-format.md
       - Outputs: user-guide/outputs.md
+      - Performance and memory: user-guide/performance-and-memory.md
   - Examples:
       - Chain: examples/chain.md
       - J1–J2 chain: examples/j1j2_chain.md
@@ -46,7 +47,8 @@ nav:
       - Honeycomb lattice: examples/honeycomb.md
       - Kagome lattice: examples/kagome.md
       - Cubic lattice: examples/cubic.md
-      - Cubic (sp_HB): examples/cubic_sp_HB.md      
+      - Cubic (sp_HB): examples/cubic_sp_HB.md
+      - Lattice and model optimization tips: examples/optimization-tips.md      
   - Performance:
       - wk_dim scaling: vp/wk_dim_scaling.md
       - mixed_spin_plateau: vp/mixed_spin_plateau.md
