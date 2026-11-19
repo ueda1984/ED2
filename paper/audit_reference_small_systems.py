@@ -179,7 +179,7 @@ def run(csv_path):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--csv", type=Path,
-                        default=Path("docs/development/cpc-stationary-dm-reference.csv"))
+                        default=Path("paper/data/cpc-stationary-dm-reference.csv"))
     parser.add_argument("--report", type=Path, default=None)
     args = parser.parse_args()
     report = run(args.csv)
