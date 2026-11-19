@@ -1,0 +1,44 @@
+{
+  "schema": 1,
+  "status": "review_only_native_reproduction_not_release",
+  "source_commit": "c40c904cd79c5e348d85ef876076d4cda58dea67",
+  "ham2vec_blob_sha": "721e6ee5dffc0d999aaefa6d11eae5fc4038da3e",
+  "binary_sha256": "4d772caa1e37b59f731587a2d818850812060a96e7e4e717d1d49e49ab5e3cd9",
+  "workflow_run_id": 44445263717,
+  "native_artifact_id": 14492907330,
+  "provenance": "https://github.com/ueda1984/ED2/actions/runs/44445263717",
+  "compiler": "GNU Fortran 14 -O2 -fopenmp, OpenBLAS threads=1, OpenMP threads=1",
+  "model": "alternating spin-1/2,spin-1 XYZ+Gamma+oriented staggered DM; full Hilbert space, OBC",
+  "dm_grid": [
+    -0.0002,
+    0,
+    0.0002
+  ],
+  "no_direct_residual_sidecar": true,
+  "sizes": [
+    {
+      "sites": 4,
+      "dimension": 36,
+      "energy_e0_dm0": -2.230937250601721,
+      "chirality_k_dm0": 0.0011502476661632913,
+      "energy_central_derivative": 0.001150247719294839,
+      "hf_abs_error": 5.3131547772533594e-11,
+      "chi_per_bond": 0.6343111813578161,
+      "independent_reference_chi_per_bond": 0.6343112017685585,
+      "run_count": 3,
+      "direct_residual_certified": false
+    },
+    {
+      "sites": 6,
+      "dimension": 216,
+      "energy_e0_dm0": -3.583863495866078,
+      "chirality_k_dm0": 0.0010900534820340556,
+      "energy_central_derivative": 0.0010900536195901367,
+      "hf_abs_error": 1.3755608110899153e-10,
+      "chi_per_bond": 0.5687329207582081,
+      "independent_reference_chi_per_bond": 0.5687329253277751,
+      "run_count": 3,
+      "direct_residual_certified": false
+    }
+  ]
+}
