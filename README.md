@@ -174,11 +174,12 @@ and reference-check results. Consult
 [citation and versioning](docs/reference/citation-versioning.md),
 [release qualification](docs/reference/release-qualification.md), and
 [CITATION.cff](CITATION.cff). Until a versioned archival DOI is available, cite
-the repository with the full commit hash used for the calculation. No GitHub
-release is implied by the historical `AC_INIT` package number. Add the CFF
-version and actual planned release date only in a reviewed release candidate,
-before validating that candidate and creating its tag. A passing metadata
-check does not publish a tag, release, or DOI.
+the repository with the full commit hash used for the calculation. The approved first release **candidate** is `1.0.0`, but this does not
+mean a `v1.0.0` tag or GitHub Release has been published. The candidate
+`CITATION.cff` has `version: 1.0.0` but deliberately omits
+`date-released` until the actual publication date is approved. The tag
+gate requires both values. Passing a metadata check does not publish a
+tag, release, or DOI.
 
 ## License and maintainers
 

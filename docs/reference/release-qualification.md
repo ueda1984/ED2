@@ -2,10 +2,11 @@
 
 ED2 development `main` and Read the Docs `latest` are moving targets. A
 successful merge or documentation build does **not** constitute a tagged
-software release. Until the maintainers select a release version, cite the
-full Git commit used for each calculation.
+software release. `v1.0.0` is the approved first release **candidate**, not
+an issued release. Until the tag/Release are published, cite the full Git
+commit used for each calculation.
 
-## Before assigning a release number
+## Before publishing the approved `v1.0.0` candidate
 
 1. Review a candidate branch and ensure the source tree is clean. Record its
    SHA, compiler/flags, BLAS/LAPACK implementation, operating system, and
@@ -22,32 +23,33 @@ full Git commit used for each calculation.
    artifacts. An Intel compiler build alone is not a validation of all
    scientific input families; a 1000-site ifx ex9 run is an independent
    optional benchmark.
-5. Decide the public `vMAJOR.MINOR.PATCH` identifier; update `AC_INIT` in
-   `configure.ac` and the `version` field of `CITATION.cff` to match, and enter
-   the *actual* release date as `date-released` in `CITATION.cff`. The existing
-   `AC_INIT` package number must not be taken as evidence of an issued release.
-6. Commit the agreed metadata and freeze that **final candidate SHA**. Run
-   `python3 tests/check_release_metadata.py --release-tag vX.Y.Z`, replacing
-   the example with the proposed tag, before tagging. Require the GNU/Intel
-   physics jobs and source-distribution checks on this same candidate. Rebuild
-   the archive and run `tests/release_archive_preflight.py` with the actual
-   archive, `--expected-commit <full-candidate-SHA>`, and `--release-tag vX.Y.Z`.
-   Preserve the exact archive and generated SHA-256 manifest together.
+5. The initial candidate version is approved as **`v1.0.0`**; `AC_INIT` already
+   says `1.0.0`. Set `version: 1.0.0` in `CITATION.cff` for candidate CI,
+   but **do not assert a date of publication before publication is scheduled**.
+   In this state omit `date-released`. Review release notes and all limitations.
+6. First verify the candidate with `python3 tests/check_release_metadata.py`
+   (mode `release_candidate`), GNU/Intel physics, source-distribution and
+   archived ex9 checks. Only after approving the *actual* publication date,
+   add `date-released: YYYY-MM-DD` to `CITATION.cff`, commit that change, and
+   freeze the **new final SHA**. Run
+   `python3 tests/check_release_metadata.py --release-tag v1.0.0` and
+   `tests/release_archive_preflight.py --archive <tar.gz>
+   --expected-commit <full-final-SHA> --release-tag v1.0.0`. Rerun all
+   GNU/Intel physics and source-distribution checks on the exact **final**
+   commit, retain the archive and SHA-256 manifest, then create the tag.
 7. With the appropriate repository permissions, create and publish the
    reviewed tag/release. Confirm that the tag points to the tested commit.
    Build the versioned Read the Docs pages and archive the matching source and
    checksums. Add an actual archival DOI only after issuance; do not cite a
    placeholder Zenodo or journal DOI.
 
-The default `python3 tests/check_release_metadata.py` accepts either an
-unreleased-development state (both CFF release fields absent), or consistent
-versioned metadata (both fields present, version matching `AC_INIT`, valid
-`YYYY-MM-DD` date). This permits the metadata PR to pass before a tag is
-created and permits subsequent builds of that versioned source. A tag build
-additionally requires the exact `vMAJOR.MINOR.PATCH` value. Missing one field,
-version mismatches and malformed dates fail. No mode creates a release or
-establishes that publication has occurred; maintainers approve the actual
-version and publication date separately.
+The default `python3 tests/check_release_metadata.py` accepts (1) development
+with both CFF fields absent, (2) `release_candidate` with `version` present
+and `date-released` absent, and (3) complete versioned metadata with both
+fields present and consistent with `AC_INIT`. The `--release-tag` mode
+additionally requires a valid actual release date and exact tag version.
+A date without a version, version mismatches, malformed dates and missing
+date on tag builds all fail. Passing a check never creates a release or DOI.
 
 The archive preflight requires every tracked release input: numerical
 Fortran modules, test scripts/drivers, example generators and inputs,

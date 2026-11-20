@@ -37,17 +37,29 @@ class ReleaseMetadataTests(unittest.TestCase):
     def test_unreleased_development(self):
         self.assertEqual(metadata.validate(self.root, None)["mode"], "unreleased_development")
 
+    def test_approved_candidate_without_pretend_publication_date(self):
+        self.citation("version: 1.0.0\n")
+        candidate = metadata.validate(self.root, None)
+        self.assertEqual(candidate["mode"], "release_candidate")
+        self.assertEqual(candidate["version"], "1.0.0")
+        self.assertIsNone(candidate["date_released"])
+        with self.assertRaisesRegex(ValueError, "requires an actual CFF date-released"):
+            metadata.validate(self.root, "v1.0.0")
+
+    def test_candidate_version_must_equal_package_version(self):
+        self.citation("version: 1.0.1\n")
+        with self.assertRaisesRegex(ValueError, "mismatch"):
+            metadata.validate(self.root, None)
+
     def test_candidate_then_tag_same_metadata(self):
         self.citation("version: 1.0.0\ndate-released: 2026-11-20\n")
         self.assertEqual(metadata.validate(self.root, None)["mode"], "versioned_metadata")
         self.assertEqual(metadata.validate(self.root, "v1.0.0")["mode"], "tag_metadata")
 
-    def test_missing_one_field(self):
-        for field in ("version: 1.0.0\n", "date-released: 2026-11-20\n"):
-            with self.subTest(field=field):
-                self.citation(field)
-                with self.assertRaisesRegex(ValueError, "together"):
-                    metadata.validate(self.root, None)
+    def test_date_without_version_is_rejected(self):
+        self.citation("date-released: 2026-11-20\n")
+        with self.assertRaisesRegex(ValueError, "requires version"):
+            metadata.validate(self.root, None)
 
     def test_tag_requires_metadata(self):
         with self.assertRaises(ValueError):

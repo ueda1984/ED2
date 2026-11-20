@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """Validate development, candidate, or tagged metadata without publishing.
 
-With no tag, either both CFF release fields are absent or both are consistent
-with AC_INIT. This permits a release-candidate PR and subsequent main builds.
---release-tag additionally requires an exact vMAJOR.MINOR.PATCH match. A pass
-validates metadata only; it does not establish that a release was published.
+Without a tag: absent CFF fields mean development; a version without an
+actual release date means an approved, UNPUBLISHED candidate; version+date
+is valid complete metadata after scheduling/final approval.
+--release-tag requires both fields and an exact vMAJOR.MINOR.PATCH match.
+No check creates or proves publication of a tag, Release, or DOI.
 """
 import argparse
 from datetime import date
@@ -45,18 +46,26 @@ def validate(root, tag):
     if field(citation, "cff-version") != "1.2.0":
         raise ValueError("Expected CFF format 1.2.0")
     version, released = field(citation, "version"), field(citation, "date-released")
-    if not tag and version is None and released is None:
+    if tag and not re.fullmatch(r"v[0-9]+\.[0-9]+\.[0-9]+", tag):
+        raise ValueError("Release tag must be vMAJOR.MINOR.PATCH")
+    if version is None and released is None:
+        if tag:
+            raise ValueError("Tagged release requires CFF version and date-released")
         return {"mode": "unreleased_development",
                 "autotools_package_version": package_version,
                 "citation": "Use the full Git commit, not this package number"}
-    if version is None or released is None:
-        raise ValueError("CFF version and date-released must be supplied together")
+    if version is None:
+        raise ValueError("CFF date-released requires version")
     if not re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", version):
         raise ValueError("CFF version must be MAJOR.MINOR.PATCH")
-    if tag and not re.fullmatch(r"v[0-9]+\.[0-9]+\.[0-9]+", tag):
-        raise ValueError("Release tag must be vMAJOR.MINOR.PATCH")
     if package_version != version or (tag and version != tag[1:]):
         raise ValueError(f"Version mismatch: tag={tag}, AC_INIT={package_version}, CFF={version}")
+    if released is None:
+        if tag:
+            raise ValueError("Tagged release requires an actual CFF date-released")
+        return {"mode": "release_candidate", "version": version,
+                "date_released": None,
+                "publication": "Not published; cite the full Git commit"}
     if not re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", released):
         raise ValueError("CFF date-released must use YYYY-MM-DD")
     try:
