@@ -10,6 +10,7 @@ import tarfile
 
 ROOT_SOURCES = (
     "README.md", "LICENSE", "CITATION.cff", "configure.ac",
+    "RELEASE_NOTES_v1.0.0.md",
     "Makefile.am", "mkdocs.yml", ".readthedocs.yaml",
 )
 GENERATED_DIST = (

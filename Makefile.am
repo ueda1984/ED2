@@ -18,6 +18,7 @@ check-long:
 # Ship complete reproducible input/examples and documentation with make dist.
 EXTRA_DIST = \
   README.md \
+  RELEASE_NOTES_v1.0.0.md \
   LICENSE \
   CITATION.cff \
   mkdocs.yml \

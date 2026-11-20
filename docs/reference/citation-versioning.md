@@ -26,17 +26,19 @@ the build log and compiler flags with the calculation results.
 
 The repository's [CITATION.cff](https://github.com/QS-Cube/ED2/blob/main/CITATION.cff)
 contains the software title and contributor metadata for citation tools.
-The maintainers have approved **`v1.0.0` as the initial release candidate**,
-but approval alone does not create a Git tag, GitHub Release, archive DOI, or
-immutable documentation version. The candidate `CITATION.cff` contains
-`version: 1.0.0` and deliberately omits `date-released` until the actual
-publication date is determined. Until the release is issued, cite the exact
-source commit, **not** a software release that does not yet exist.
+The approved first software version is **`v1.0.0`**. The release-source
+`CITATION.cff` records `version: 1.0.0` and
+`date-released: 2026-11-20`, matching the planned initial publication
+date. If publication is rescheduled, update that date and rerun the complete
+release checks **before** tagging. These metadata fields alone do not
+establish the existence of a release: first verify that an actual
+`v1.0.0` tag and GitHub Release exist and point to the qualified source.
+Until then, cite the full Git commit rather than a release not yet issued.
 
-For provenance, the CFF previously contained a historical `0.1.0`
-version and an unverified `2026-01-01` date, neither identifying a real tag.
-The historical Autotools `AC_INIT` package identifier already reads `1.0.0`
-and now matches the approved candidate; it still does not prove issuance.
+The older CFF historically contained an unissued `0.1.0` version and an
+unverified `2026-01-01` release date. The Autotools `AC_INIT` package
+identifier already reads `1.0.0` and now matches the approved software
+version; it is not by itself proof of publication.
 
 ## Tags, releases, and documentation versions
 
@@ -70,21 +72,21 @@ The intended naming convention for future releases is
 | MINOR | New features compatible with the previous public interface |
 | PATCH | Compatible bug fixes, performance changes, or documentation fixes |
 
-The approved `v1.0.0` candidate follows this scheme; it is not yet an
-issued release. The final tag must identify a frozen, tested source commit,
-matching documentation, test evidence, and archive. A merge to `main`
+The first software version `v1.0.0` follows this scheme. Its tag, when
+published, must identify the frozen, tested source commit with corresponding
+documentation, verification evidence, and archive. A merge to `main`
 alone does not complete that process.
 
 For the full release gate, including the expensive cubic benchmark, see
 [Release qualification and ex9 validation](release-qualification.md).
 Check metadata using `python3 tests/check_release_metadata.py`. Development
-may omit both fields. A reviewed, **unpublished** release candidate may contain
-the approved `version` without `date-released`; the validator returns
-`release_candidate`. Final publication requires the **actual** release date.
-Then run `python3 tests/check_release_metadata.py --release-tag v1.0.0`
-against the frozen final commit and rerun all GNU/Intel/archive tests on
-that commit. The tag-specific check rejects any missing release date.
-Passing these checks does not establish that publication occurred.
+may omit both fields; a version-only candidate returns `release_candidate`.
+The final versioned source includes both `version` and the actual
+`date-released`. Run `python3 tests/check_release_metadata.py --release-tag
+v1.0.0` against the frozen final commit, and rerun all GNU/Intel/archive
+checks on that *same* source tree. The tag-specific check rejects missing
+release dates or mismatched versions. A passing check proves metadata
+consistency, not that publication has actually occurred.
 
 ## Archival software DOI and article citation
 

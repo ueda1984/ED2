@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 title: "ED2 (QS³-ED2): Exact Diagonalization for Quantum Spin Systems"
-message: "Version 1.0.0 is a release candidate until the v1.0.0 tag and GitHub Release are published; cite the full Git commit in the meantime."
+message: "Please cite ED2 (QS³-ED2) version 1.0.0 after its release is published; cite the full Git commit for unreleased work and retain the exact source revision."
 type: software
 
 authors:
@@ -14,8 +14,9 @@ authors:
 repository-code: "https://github.com/QS-Cube/ED2"
 url: "https://ed2.readthedocs.io"
 
-# Approved initial version candidate; date-released is added only on publication.
+# First versioned software release: verify that v1.0.0 was actually published.
 version: 1.0.0
+date-released: 2026-11-20
 
 license: MIT
 

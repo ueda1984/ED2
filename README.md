@@ -174,12 +174,14 @@ and reference-check results. Consult
 [citation and versioning](docs/reference/citation-versioning.md),
 [release qualification](docs/reference/release-qualification.md), and
 [CITATION.cff](CITATION.cff). Until a versioned archival DOI is available, cite
-the repository with the full commit hash used for the calculation. The approved first release **candidate** is `1.0.0`, but this does not
-mean a `v1.0.0` tag or GitHub Release has been published. The candidate
-`CITATION.cff` has `version: 1.0.0` but deliberately omits
-`date-released` until the actual publication date is approved. The tag
-gate requires both values. Passing a metadata check does not publish a
-tag, release, or DOI.
+the repository with the full commit hash used for the calculation. The first approved software version is `v1.0.0`; `CITATION.cff` records
+the version and the agreed publication date. These fields alone do **not**
+prove that a Git tag or GitHub Release has actually been issued. Check the
+[tags](https://github.com/QS-Cube/ED2/tags) and
+[releases](https://github.com/QS-Cube/ED2/releases), and confirm the tag's
+source commit before citing it. If the release is not yet published, cite
+the full Git commit used instead. See the
+[v1.0.0 release notes](RELEASE_NOTES_v1.0.0.md) and reproducibility guide.
 
 ## License and maintainers
 
