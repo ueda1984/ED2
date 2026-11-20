@@ -5,8 +5,10 @@ module state_lists
 contains
 
   subroutine get_cum_ltd_rep_combination(NOS,NODmax,NODmin,m) 
+    use iso_fortran_env, only: int64
     integer, intent(in) :: NOS, NODmax, NODmin, m(NOS)
     integer :: i, j, dN
+    integer(int64) :: wide
     dN = NODmax-NODmin
     call get_ltd_rep_combination(NOS,NODmax,m)
     allocate(cum_ltd_rep_combination(0:NOS+1,0:NODmax+1))
@@ -14,23 +16,29 @@ contains
     if(NODmin == 0)then
       j = 0
       cum_ltd_rep_combination(:,j) = 1
-      do j = 1, NODmax+1
+      do j = 1, NODmax
         do i = 0, NOS+1
-          cum_ltd_rep_combination(i,j) = cum_ltd_rep_combination(i,j-1) + ltd_rep_combination(i,j)
+          wide=int(cum_ltd_rep_combination(i,j-1),int64)+int(ltd_rep_combination(i,j),int64)
+          if(wide>huge(1).or.wide<0)error stop "Hilbert count exceeds supported integer range"
+          cum_ltd_rep_combination(i,j)=int(wide)
         end do
       end do
     else
       j = 0
       cum_ltd_rep_combination(:,j) = 1
-      do j = 1, NODmax+1
+      do j = 1, NODmax
         if(j <= dN)then
           do i = 0, NOS+1
-            cum_ltd_rep_combination(i,j) = cum_ltd_rep_combination(i,j-1) + ltd_rep_combination(i,j)
+            wide=int(cum_ltd_rep_combination(i,j-1),int64)+int(ltd_rep_combination(i,j),int64)
+            if(wide>huge(1).or.wide<0)error stop "Hilbert count exceeds supported integer range"
+            cum_ltd_rep_combination(i,j)=int(wide)
           end do
         else
           do i = 0, NOS+1
-            cum_ltd_rep_combination(i,j) = cum_ltd_rep_combination(i,j-1) + ltd_rep_combination(i,j) - &
-              ltd_rep_combination(i,j-dN-1)
+            wide=int(cum_ltd_rep_combination(i,j-1),int64)+int(ltd_rep_combination(i,j),int64) - &
+              int(ltd_rep_combination(i,j-dN-1),int64)
+            if(wide>huge(1).or.wide<0)error stop "Hilbert count exceeds supported integer range"
+            cum_ltd_rep_combination(i,j)=int(wide)
           end do
         end if
       end do      
@@ -39,20 +47,24 @@ contains
   end subroutine get_cum_ltd_rep_combination
 
   subroutine get_ltd_rep_combination(NOS,NODmax,m) 
+    use iso_fortran_env, only: int64
     integer, intent(in) :: NOS, NODmax, m(NOS)
     integer :: i, j
+    integer(int64) :: wide
     integer, allocatable :: dp(:,:)
     allocate(ltd_rep_combination(0:NOS+1,0:NODmax+1))
     allocate(dp(0:NODmax+1,0:NOS+1))
     dp(:,:) = 0
     dp(0,:) = 1
     do i = 1, NOS
-      do j = 1, NODmax+1
+      do j = 1, NODmax
         if(j-1-m(i) >= 0)then
-          dp(j,i) = dp(j-1,i) + dp(j,i-1) - dp(j-1-m(i),i-1)
+          wide=int(dp(j-1,i),int64)+int(dp(j,i-1),int64)-int(dp(j-1-m(i),i-1),int64)
         else
-          dp(j,i) = dp(j-1,i) + dp(j,i-1)
+          wide=int(dp(j-1,i),int64)+int(dp(j,i-1),int64)
         end if
+        if(wide>huge(1).or.wide<0)error stop "Hilbert count exceeds supported integer range"
+        dp(j,i)=int(wide)
       end do
     end do
     ltd_rep_combination = transpose(dp)
