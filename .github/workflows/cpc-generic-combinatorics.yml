@@ -1,0 +1,13 @@
+name: Generic combinatorics overflow guard
+on:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install GNU Fortran
+        run: sudo apt-get update && sudo apt-get install -y gfortran
+      - name: Verify counted dimensions and overflow rejection
+        run: python3 tests/cpc_generic_combination_guard.py --source .
